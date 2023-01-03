@@ -1,39 +1,39 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# hashlib
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+[![plugin version](https://img.shields.io/pub/v/hashlib?label=pub)](https://pub.dev/packages/hashlib)
+[![dependencies](https://img.shields.io/librariesio/release/pub/hashlib?label=dependencies)](https://github.com/dipu-bd/hashlib/-/blob/master/pubspec.yaml)
+[![Dart](https://github.com/dipu-bd/hashlib/actions/workflows/dart.yml/badge.svg)](https://github.com/dipu-bd/hashlib/actions/workflows/dart.yml)
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+This library contains some implementation of popular hashing algorithms in pure Dart inspired by Python's [hashlib](https://docs.python.org/3/library/hashlib.html) interface.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+| Algorithms    | Supported | Since |
+| ------------- | --------- | ----- |
+| `md5`         |           |       |
+| `sha1`        |           |       |
+| `sha224`      |           |       |
+| `sha256`      |           |       |
+| `sha384`      |           |       |
+| `sha512`      |           |       |
+| `blake2b`     |           |       |
+| `blake2s`     |           |       |
+| `sha3_224`    |           |       |
+| `sha3_256`    |           |       |
+| `sha3_384`    |           |       |
+| `sha3_512`    |           |       |
+| `shake_128`   |           |       |
+| `shake_256`   |           |       |
+| `pbkdf2_hmac` |           |       |
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+The following import will give you access to all of the algorithms in this package.
+
+```dart
+import 'package:hashlib/hashlib.dart';
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+TBD
