@@ -20,7 +20,7 @@ int _toHexCodeUnit(int digit, [bool uppercase = false]) =>
 Uint8List toHex(List<int> buffer, [bool uppercase = false]) {
   final hex = Uint8List(buffer.length * 2);
   for (int i = 0; i < buffer.length; ++i) {
-    hex[i << 1] = _toHexCodeUnit((buffer[i] >> 4) & 0xF);
+    hex[i << 1] = _toHexCodeUnit((buffer[i] >>> 4) & 0xF);
     hex[(i << 1) + 1] = _toHexCodeUnit(buffer[i] & 0xF);
   }
   return hex;

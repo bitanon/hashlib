@@ -83,7 +83,7 @@ class SHA1 extends HashAlgo {
 
     // Update number of bits
     int m = _countLow + (n << 3);
-    _countHigh = (_countHigh + (m >> 32) + (n >> 29)) & _mask32;
+    _countHigh = (_countHigh + (m >>> 32) + (n >>> 29)) & _mask32;
     _countLow = m & _mask32;
   }
 
@@ -114,25 +114,25 @@ class SHA1 extends HashAlgo {
 
     // Append original message length in bits to message
     for (int source in [_countHigh, _countLow]) {
-      _buffer[_pos++] = (source >> 24) & 0xff;
-      _buffer[_pos++] = (source >> 16) & 0xff;
-      _buffer[_pos++] = (source >> 8) & 0xff;
+      _buffer[_pos++] = (source >>> 24) & 0xff;
+      _buffer[_pos++] = (source >>> 16) & 0xff;
+      _buffer[_pos++] = (source >>> 8) & 0xff;
       _buffer[_pos++] = (source & 0xff);
     }
     _update();
     _pos = 0;
 
     for (int i = 0, j = 0; j < 20; i++, j += 4) {
-      _digest[j] = (_state[i] >> 24) & 0xff;
-      _digest[j + 1] = (_state[i] >> 16) & 0xff;
-      _digest[j + 2] = (_state[i] >> 8) & 0xff;
+      _digest[j] = (_state[i] >>> 24) & 0xff;
+      _digest[j + 1] = (_state[i] >>> 16) & 0xff;
+      _digest[j + 2] = (_state[i] >>> 8) & 0xff;
       _digest[j + 3] = (_state[i] & 0xff);
     }
     return _digest;
   }
 
   /// Rotates x left by n bits.
-  int _rotl(int x, int n) => ((x << n) & _mask32) | ((x & _mask32) >> (32 - n));
+  int _rotl(int x, int n) => ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   /// MD5 block update operation. Continues an MD5 message-digest operation,
   /// processing another message block, and updating the context.

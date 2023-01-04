@@ -28,7 +28,7 @@ String md5sum(final Iterable<int> input) {
 }
 
 /// Generates a 128-bit MD5 hash as hexadecimal digest from string
-String md5(final String input, [Encoding encoding = utf8]) {
+String md5(final String input, [Encoding? encoding]) {
   return md5sum(toBytes(input, encoding));
 }
 
@@ -80,7 +80,7 @@ class MD5 extends HashAlgo {
 
     // Update number of bits
     int m = _countLow + (n << 3);
-    _countHigh = (_countHigh + (m >> 32) + (n >> 29)) & _mask32;
+    _countHigh = (_countHigh + (m >>> 32) + (n >>> 29)) & _mask32;
     _countLow = m & _mask32;
   }
 
@@ -112,9 +112,9 @@ class MD5 extends HashAlgo {
     // Append original message length in bits to message
     for (int source in [_countLow, _countHigh]) {
       _buffer[_pos] = (source & 0xff);
-      _buffer[_pos + 1] = (source >> 8) & 0xff;
-      _buffer[_pos + 2] = (source >> 16) & 0xff;
-      _buffer[_pos + 3] = (source >> 24) & 0xff;
+      _buffer[_pos + 1] = (source >>> 8) & 0xff;
+      _buffer[_pos + 2] = (source >>> 16) & 0xff;
+      _buffer[_pos + 3] = (source >>> 24) & 0xff;
       _pos += 4;
     }
     _update();
@@ -122,15 +122,16 @@ class MD5 extends HashAlgo {
 
     for (int i = 0, j = 0; j < 16; i++, j += 4) {
       _digest[j] = (_state[i] & 0xff);
-      _digest[j + 1] = (_state[i] >> 8) & 0xff;
-      _digest[j + 2] = (_state[i] >> 16) & 0xff;
-      _digest[j + 3] = (_state[i] >> 24) & 0xff;
+      _digest[j + 1] = (_state[i] >>> 8) & 0xff;
+      _digest[j + 2] = (_state[i] >>> 16) & 0xff;
+      _digest[j + 3] = (_state[i] >>> 24) & 0xff;
     }
     return _digest;
   }
 
   /// Rotates x left by n bits.
-  int _rotl(int x, int n) => ((x << n) & _mask32) | ((x & _mask32) >> (32 - n));
+  int _rotl(int x, int n) =>
+      ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   /// Basic MD5 function for round 1.
   int _tF(int x, int y, int z) => (x & y) | (~x & z);

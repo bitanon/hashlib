@@ -1,3 +1,8 @@
+## 1.0.0-dev.6
+
+- Requires 2.14.0
+- Using `>>>` operator for right shift
+
 ## 1.0.0-dev.5
 
 - Adds SHA256 and SHA224 following [rfc6234](https://datatracker.ietf.org/doc/html/rfc6234)

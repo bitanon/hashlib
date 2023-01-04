@@ -50,7 +50,7 @@ abstract class SHA2of32bit extends HashAlgo {
 
     // Update number of bits
     int m = _countLow + (n << 3);
-    _countHigh = (_countHigh + (m >> 32) + (n >> 29)) & _mask32;
+    _countHigh = (_countHigh + (m >>> 32) + (n >>> 29)) & _mask32;
     _countLow = m & _mask32;
   }
 
@@ -81,9 +81,9 @@ abstract class SHA2of32bit extends HashAlgo {
 
     // Append original message length in bits to message
     for (int source in [_countHigh, _countLow]) {
-      _buffer[_pos++] = (source >> 24) & 0xff;
-      _buffer[_pos++] = (source >> 16) & 0xff;
-      _buffer[_pos++] = (source >> 8) & 0xff;
+      _buffer[_pos++] = (source >>> 24) & 0xff;
+      _buffer[_pos++] = (source >>> 16) & 0xff;
+      _buffer[_pos++] = (source >>> 8) & 0xff;
       _buffer[_pos++] = (source & 0xff);
     }
     _update();
@@ -91,24 +91,24 @@ abstract class SHA2of32bit extends HashAlgo {
 
     _digest = Uint8List(hashLength);
     for (int i = 0, j = 0; j < hashLength; i++, j += 4) {
-      _digest[j] = (_state[i] >> 24) & 0xff;
-      _digest[j + 1] = (_state[i] >> 16) & 0xff;
-      _digest[j + 2] = (_state[i] >> 8) & 0xff;
+      _digest[j] = (_state[i] >>> 24) & 0xff;
+      _digest[j + 1] = (_state[i] >>> 16) & 0xff;
+      _digest[j + 2] = (_state[i] >>> 8) & 0xff;
       _digest[j + 3] = (_state[i] & 0xff);
     }
     return _digest;
   }
 
   /// Rotates x right by n bits.
-  int _rotr(int x, int n) => ((x & _mask32) >> n) | ((x << (32 - n)) & _mask32);
+  int _rotr(int x, int n) => ((x & _mask32) >>> n) | ((x << (32 - n)) & _mask32);
 
   int _bsig0(int x) => (_rotr(x, 2) ^ _rotr(x, 13) ^ _rotr(x, 22));
 
   int _bsig1(int x) => (_rotr(x, 6) ^ _rotr(x, 11) ^ _rotr(x, 25));
 
-  int _ssig0(int x) => (_rotr(x, 7) ^ _rotr(x, 18) ^ (x >> 3));
+  int _ssig0(int x) => (_rotr(x, 7) ^ _rotr(x, 18) ^ (x >>> 3));
 
-  int _ssig1(int x) => (_rotr(x, 17) ^ _rotr(x, 19) ^ (x >> 10));
+  int _ssig1(int x) => (_rotr(x, 17) ^ _rotr(x, 19) ^ (x >>> 10));
 
   /// MD5 block update operation. Continues an MD5 message-digest operation,
   /// processing another message block, and updating the context.
