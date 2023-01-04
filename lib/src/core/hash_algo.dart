@@ -4,7 +4,8 @@
 import 'package:hashlib/src/core/hash_digest.dart';
 
 abstract class HashAlgo extends HashDigest {
-  abstract final int hashSize;
+  /// The length of generated hash in bits
+  abstract final int hashLengthInBits;
 
   /// Clears all contexts and resets the instance for re-use.
   void clear();
@@ -15,4 +16,7 @@ abstract class HashAlgo extends HashDigest {
   ///
   /// Throws an [StateError] if the message-digest is already closed.
   void update(final Iterable<int> input);
+
+  /// The length of generated hash in bytes
+  int get hashLength => hashLengthInBits >> 3;
 }

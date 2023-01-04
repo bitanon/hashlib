@@ -4,16 +4,16 @@
 [![dependencies](https://img.shields.io/librariesio/release/pub/hashlib?label=dependencies)](https://github.com/dipu-bd/hashlib/-/blob/master/pubspec.yaml)
 [![Dart](https://github.com/dipu-bd/hashlib/actions/workflows/dart.yml/badge.svg)](https://github.com/dipu-bd/hashlib/actions/workflows/dart.yml)
 
-This library contains implementation of some popular hash functions in pure Dart inspired by Python's [hashlib](https://docs.python.org/3/library/hashlib.html) interface.
+This library contains RFC-compliant implementations of secure hash functions in pure Dart with zero-dependencies.
 
 ## Features
 
 | Algorithms    | Supported | Since |
 | ------------- | :-------: | :---: |
 | `md5`         |    ✔️     | 1.0.0 |
-| `sha1`        |    ⌛     |       |
-| `sha224`      |    ⌛     |       |
-| `sha256`      |    ⌛     |       |
+| `sha1`        |    ✔️     | 1.0.0 |
+| `sha224`      |    ✔️     | 1.0.0 |
+| `sha256`      |    ✔️     | 1.0.0 |
 | `sha384`      |    ⌛     |       |
 | `sha512`      |    ⌛     |       |
 | `blake2b`     |    ⌛     |       |

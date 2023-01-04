@@ -1,7 +1,7 @@
 name: hashlib
 description: RFC-compliant implementations of secure hash functions in pure Dart with zero-dependencies.
-version: 1.0.0-dev.4
 homepage: https://github.com/dipu-bd/hashlib
+version: 1.0.0-dev.5
 
 environment:
   sdk: '>=2.12.0 <3.0.0'

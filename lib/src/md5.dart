@@ -43,12 +43,12 @@ const int _mask32 = 0xFFFFFFFF;
 /// for checksum, but do not use it for cryptographic purposes.
 class MD5 extends HashAlgo {
   @override
-  final int hashSize = 128;
+  final int hashLengthInBits = 128;
 
-  final _state = Uint32List(4); /* state (ABCD) */
+  final _state = Uint32List(4); /* the hash state */
   final _digest = Uint8List(16); /* the final digest */
   final _buffer = Uint8List(64); /* 512-bit byte buffer */
-  final _chunk = Uint32List(16); /* 512-bit word chunk */
+  final _chunk = Uint32List(16); /* 512-bit message block */
   int _countLow = 0, _countHigh = 0; /* number of bits mod 2^64 */
   bool _closed = false; /* whether the digest is ready */
   int _pos = 0; /* latest buffer position */
@@ -142,6 +142,9 @@ class MD5 extends HashAlgo {
     return _digest;
   }
 
+  /// Rotates x left by n bits.
+  int _rotl(int x, int n) => ((x << n) & _mask32) | ((x & _mask32) >> (32 - n));
+
   /// Basic MD5 function for round 1.
   int _tF(int x, int y, int z) => (x & y) | (~x & z);
 
@@ -153,9 +156,6 @@ class MD5 extends HashAlgo {
 
   /// Basic MD5 function for round 4.
   int _tI(int x, int y, int z) => y ^ (x | (~z & _mask32));
-
-  /// Rotates x left n bits.
-  int _rotl(int x, int n) => ((x << n) & _mask32) | ((x & _mask32) >> (32 - n));
 
   /// MD5 Transformation for round 1.
   int _tFF(int a, int b, int c, int d, int x, int s, int ac) =>
@@ -178,7 +178,7 @@ class MD5 extends HashAlgo {
   ///
   /// It uses the [_chunk] as the message block.
   void _update() {
-    // convert 8-bit _buffer to 16-bit _chunk
+    // convert 8-bit byte buffer to 16-bit word block
     final x = _chunk;
     for (int i = 0, j = 0; j < 64; i++, j += 4) {
       _chunk[i] = (_buffer[j]) |

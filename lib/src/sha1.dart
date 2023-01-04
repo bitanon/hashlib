@@ -45,12 +45,12 @@ const int _mask32 = 0xFFFFFFFF;
 /// for checksum, but do not use it for cryptographic purposes.
 class SHA1 extends HashAlgo {
   @override
-  final int hashSize = 160;
+  final int hashLengthInBits = 160;
 
-  final _state = Uint32List(5); /* state (ABCD) */
+  final _state = Uint32List(5); /* the hash state */
   final _digest = Uint8List(20); /* the final digest */
   final _buffer = Uint8List(64); /* 512-bit chunk in bytes */
-  final _chunk = Uint32List(80); /* Extended words */
+  final _chunk = Uint32List(80); /* Extended word block */
   int _countLow = 0, _countHigh = 0; /* number of bits mod 2^64 */
   bool _closed = false; /* whether the digest is ready */
   int _pos = 0; /* latest buffer position */
@@ -144,9 +144,8 @@ class SHA1 extends HashAlgo {
     return _digest;
   }
 
-  /// Rotates x left n bits.
-  int _shift(int n, int x) =>
-      ((x << n) & _mask32) | ((x & _mask32) >> (32 - n));
+  /// Rotates x left by n bits.
+  int _rotl(int x, int n) => ((x << n) & _mask32) | ((x & _mask32) >> (32 - n));
 
   /// MD5 block update operation. Continues an MD5 message-digest operation,
   /// processing another message block, and updating the context.
@@ -161,6 +160,12 @@ class SHA1 extends HashAlgo {
           (_buffer[j + 2] << 8) |
           (_buffer[j + 3]);
     }
+
+    // Extend the first 16 words into the remaining 64 words
+    for (int t = 16; t < 80; t++) {
+      w[t] = _rotl(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+    }
+
     const int k0 = 0x5A827999;
     const int k1 = 0x6ED9EBA1;
     const int k2 = 0x8F1BBCDC;
@@ -172,43 +177,43 @@ class SHA1 extends HashAlgo {
     int d = _state[3];
     int e = _state[4];
 
-    int x, t = 0;
-    for (t = 16; t < 80; t++) {
-      w[t] = _shift(1, w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16]);
-    }
-
+    int t, x, ch;
     for (t = 0; t < 20; t++) {
-      x = _shift(5, a) + ((b & c) | ((~b) & d)) + e + w[t] + k0;
+      ch = ((b & c) | ((~b) & d));
+      x = _rotl(a, 5) + ch + e + w[t] + k0;
       e = d;
       d = c;
-      c = _shift(30, b);
+      c = _rotl(b, 30);
       b = a;
       a = x & _mask32;
     }
 
     for (; t < 40; t++) {
-      x = _shift(5, a) + (b ^ c ^ d) + e + w[t] + k1;
+      ch = (b ^ c ^ d);
+      x = _rotl(a, 5) + ch + e + w[t] + k1;
       e = d;
       d = c;
-      c = _shift(30, b);
+      c = _rotl(b, 30);
       b = a;
       a = x & _mask32;
     }
 
     for (; t < 60; t++) {
-      x = _shift(5, a) + ((b & c) | (b & d) | (c & d)) + e + w[t] + k2;
+      ch = ((b & c) | (b & d) | (c & d));
+      x = _rotl(a, 5) + ch + e + w[t] + k2;
       e = d;
       d = c;
-      c = _shift(30, b);
+      c = _rotl(b, 30);
       b = a;
       a = x & _mask32;
     }
 
     for (; t < 80; t++) {
-      x = _shift(5, a) + (b ^ c ^ d) + e + w[t] + k3;
+      ch = (b ^ c ^ d);
+      x = _rotl(a, 5) + ch + e + w[t] + k3;
       e = d;
       d = c;
-      c = _shift(30, b);
+      c = _rotl(b, 30);
       b = a;
       a = x & _mask32;
     }
