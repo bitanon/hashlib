@@ -4,7 +4,7 @@
 [![dependencies](https://img.shields.io/librariesio/release/pub/hashlib?label=dependencies)](https://github.com/dipu-bd/hashlib/-/blob/master/pubspec.yaml)
 [![Dart](https://github.com/dipu-bd/hashlib/actions/workflows/dart.yml/badge.svg)](https://github.com/dipu-bd/hashlib/actions/workflows/dart.yml)
 
-This library contains some implementation of popular hashing algorithms in pure Dart inspired by Python's [hashlib](https://docs.python.org/3/library/hashlib.html) interface.
+This library contains implementation of some popular hash functions in pure Dart inspired by Python's [hashlib](https://docs.python.org/3/library/hashlib.html) interface.
 
 ## Features
 
@@ -25,6 +25,7 @@ This library contains some implementation of popular hashing algorithms in pure 
 | `shake_128`   |    ⌛     |       |
 | `shake_256`   |    ⌛     |       |
 | `pbkdf2_hmac` |    ⌛     |       |
+| `scrypt`      |    ⌛     |       |
 
 ## Getting started
 

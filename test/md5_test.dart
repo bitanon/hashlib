@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
@@ -37,12 +39,37 @@ void main() {
       final data = {
         "123": "202cb962ac59075b964b07152d234b70",
         "test": "098f6bcd4621d373cade4e832627b4f6",
+        'message': "78e731027d8fd50ed642340b7c9a63b3",
         "Hello World": "b10a8db164e0754105b7a99be72e3fe5",
+        "fcnbqnfziebjnvbvqwwzzpdfafnvpyhkeemxxyijwuhkqyogkhdzovbvbbfguudzalavojxashfhzxrfmcjikzas":
+            "6859ce201fd3ec059370d9eba4e86307",
+        "fcnbqnfziebjnvbvqwwzzpdfafnvpyhkeemxxyijwuhkqyogkhdzovbvbbfguudzalavojxashfhzxrfmcjikz":
+            "0e530931b1bb74c3df3a40a6854b6bf1",
+        "fcnbqnfziebjnvbvqwwzzpdfafnvpyhkeemxxyijwuhkqyogkhdzovbvbbfguudzalavojxashfhzxrfmcjikzc":
+            "e9227380933753a03dad1cb5d7be39bb",
+        "simewkidgzgesatfyviqesladjafoclbwppqplhcwfqsbfnijiqsydxzpckbqxumulitsxzrpqhmdqhobhnhyoboijhcnulmxrhystmijucbnnnstecepnsynugxnqiqnssfbakzavpqxiyjkqjdcgvcrotocqsrlejuauleazpwnohknnuheooopltmjuqjcudewmtboqhlvgpawztiglmvxmolgzihczqcxfzebudlapnyeufbgijckqi":
+            "9703e12025a2119b23a2b2da791ea44a",
       };
       for (final entry in data.entries) {
-        final stream = Stream.fromIterable(entry.key.codeUnits);
+        final stream = Stream.fromIterable(
+                List.generate(1 + (entry.key.length >> 3), (i) => i << 3))
+            .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
+            .map(toBytes);
         final result = await hashlib.md5stream(stream);
         expect(toHexString(result), entry.value);
+      }
+    });
+
+    test('with 2 random numbers', () {
+      final random = Random.secure();
+      for (int i = 0; i < 1000; ++i) {
+        final a = random.nextInt(1000000).toString();
+        final b = random.nextInt(1000000).toString();
+        if (a == b) {
+          expect(hashlib.md5(a), hashlib.md5(b));
+        } else {
+          assert(hashlib.md5(a) != hashlib.md5(b));
+        }
       }
     });
   });
