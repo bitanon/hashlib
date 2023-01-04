@@ -56,7 +56,6 @@ class SHA1 extends HashAlgo {
   int _pos = 0; /* latest buffer position */
 
   /// Initializes a new instance of SHA1 message-digest.
-  /// An instance can be re-used after calling the [clear] function.
   SHA1() {
     _state[0] = 0x67452301; // a
     _state[1] = 0xEFCDAB89; // b

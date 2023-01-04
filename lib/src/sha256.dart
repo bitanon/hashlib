@@ -44,7 +44,6 @@ class SHA256 extends SHA2of32bit {
   final int hashLengthInBits = 256;
 
   /// Initializes a new instance of SHA256 message-digest.
-  /// An instance can be re-used after calling the [clear] function.
   SHA256()
       : super([
           0x6a09e667, // a

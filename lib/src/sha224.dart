@@ -44,7 +44,6 @@ class SHA224 extends SHA2of32bit {
   final int hashLengthInBits = 224;
 
   /// Initializes a new instance of SHA224 message-digest.
-  /// An instance can be re-used after calling the [clear] function.
   SHA224()
       : super([
           0xc1059ed8, // a

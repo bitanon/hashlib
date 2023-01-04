@@ -23,8 +23,7 @@ abstract class SHA2of32bit extends HashAlgo {
   bool _closed = false; /* whether the digest is ready */
   Uint8List _digest; /* the final digest */
 
-  /// Initializes a new instance of SHA2 message-digest.
-  /// An instance can be re-used after calling the [clear] function.
+  /// For internal use only.
   SHA2of32bit(Iterable<int> state) : _digest = Uint8List(32) {
     int i = 0;
     for (int x in state) {

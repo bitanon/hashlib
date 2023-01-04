@@ -54,7 +54,6 @@ class MD5 extends HashAlgo {
   int _pos = 0; /* latest buffer position */
 
   /// Initializes a new instance of MD5 message-digest.
-  /// An instance can be re-used after calling the [clear] function.
   MD5() {
     _state[0] = 0x67452301; // a
     _state[1] = 0xefcdab89; // b
