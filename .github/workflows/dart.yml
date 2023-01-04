@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest] # macos-latest, windows-latest
-        sdk: ['2.12.0', 'stable', 'beta', 'dev']
+        sdk: ["2.14.0", "stable", "beta", "dev"]
 
     steps:
       - uses: actions/checkout@v3
@@ -34,10 +34,8 @@ jobs:
       - name: Analyze project source
         run: dart analyze
 
-      - if: matrix.sdk != '2.12.0'
-        name: Generate documentation
+      - name: Generate documentation
         run: dart doc .
 
       - name: Run tests
         run: dart test
- 

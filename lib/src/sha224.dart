@@ -3,35 +3,28 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:hashlib/src/sha2_32.dart';
 
 /// Generates a 224-bit SHA224 hash digest from the input.
-Uint8List sha224buffer(final Iterable<int> input) {
+HashDigest sha224buffer(final Iterable<int> input) {
   final sha224 = SHA224();
   sha224.update(input);
   return sha224.digest();
 }
 
-/// Generates a 224-bit SHA224 hash digest from stream
-Future<Uint8List> sha224stream(final Stream<List<int>> inputStream) async {
-  final sha224 = SHA224();
-  await inputStream.forEach((x) {
-    sha224.update(x);
-  });
-  return sha224.digest();
-}
-
-/// Generates a 224-bit SHA224 hash as hexadecimal digest from bytes
-String sha224sum(final Iterable<int> input) {
-  return toHexString(sha224buffer(input));
-}
-
 /// Generates a 224-bit SHA224 hash as hexadecimal digest from string
-String sha224(final String input, [Encoding encoding = utf8]) {
-  return sha224sum(toBytes(input, encoding));
+HashDigest sha224(final String input, [Encoding? encoding]) {
+  return sha224buffer(toBytes(input, encoding));
+}
+
+/// Generates a 224-bit SHA224 hash digest from stream
+Future<HashDigest> sha224stream(final Stream<List<int>> inputStream) async {
+  final sha224 = SHA224();
+  await inputStream.forEach(sha224.update);
+  return sha224.digest();
 }
 
 /// A generator to produce 224-bit hash value using SHA224 algorithm.
@@ -40,12 +33,9 @@ String sha224(final String input, [Encoding encoding = utf8]) {
 ///
 /// [rfc6234]: https://datatracker.ietf.org/doc/html/rfc6234
 class SHA224 extends SHA2of32bit {
-  @override
-  final int hashLengthInBits = 224;
-
   /// Initializes a new instance of SHA224 message-digest.
   SHA224()
-      : super([
+      : super(hashSize: 224, seed: [
           0xc1059ed8, // a
           0x367cd507, // b
           0x3070dd17, // c

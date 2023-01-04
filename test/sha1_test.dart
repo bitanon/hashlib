@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
@@ -13,7 +14,7 @@ void main() {
         "abc": "a9993e364706816aba3e25717850c26c9cd0d89d",
       };
       data.forEach((key, value) {
-        expect(hashlib.sha1(key), value);
+        expect(hashlib.sha1(key).hex(), value);
       });
     });
 
@@ -29,7 +30,7 @@ void main() {
             .join(): "dea356a2cddd90c7a7ecedc5ebb563934f460452",
       };
       data.forEach((key, value) {
-        expect(hashlib.sha1(key), value);
+        expect(hashlib.sha1(key).hex(), value);
       });
     });
 
@@ -41,7 +42,7 @@ void main() {
             "de9f2c7fd25e1b3afad3e85a0bd17d9b100db4b3",
       };
       data.forEach((key, value) {
-        expect(hashlib.sha1(key), value);
+        expect(hashlib.sha1(key).hex(), value);
       });
     });
 
@@ -62,20 +63,22 @@ void main() {
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
         final result = await hashlib.sha1stream(stream);
-        expect(toHexString(result), entry.value);
+        expect(result.hex(), entry.value);
       }
     });
 
-    test('with 2 random numbers', () {
+    test('with many random numbers', () {
       final random = Random.secure();
-      for (int i = 0; i < 1000; ++i) {
-        final a = random.nextInt(1000000).toString();
-        final b = random.nextInt(1000000).toString();
-        if (a == b) {
-          expect(hashlib.sha1(a), hashlib.sha1(b));
-        } else {
-          assert(hashlib.sha1(a) != hashlib.sha1(b));
-        }
+      for (int i = 0; i < 100; ++i) {
+        final data = List.generate(
+          random.nextInt(1000),
+          (i) => random.nextInt(24) + 97,
+        );
+        expect(
+          hashlib.sha1buffer(data).hex(),
+          toHex(crypto.sha1.convert(data).bytes),
+          reason: String.fromCharCodes(data),
+        );
       }
     });
   });

@@ -1,11 +1,20 @@
 import 'dart:math';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('MD5 tests', () {
+    test('with empty string', () {
+      expect(hashlib.md5("").hex(), "d41d8cd98f00b204e9800998ecf8427e");
+    });
+
+    test('with single letter', () {
+      expect(hashlib.md5("a").hex(), "0cc175b9c0f1b6a831c399e269772661");
+    });
+
     test('from RFC1321', () {
       final data = {
         "": "d41d8cd98f00b204e9800998ecf8427e",
@@ -19,7 +28,7 @@ void main() {
             "57edf4a22be3c955ac49da2e2107b67a",
       };
       data.forEach((key, value) {
-        expect(hashlib.md5(key), value);
+        expect(hashlib.md5(key).hex(), value);
       });
     });
 
@@ -31,7 +40,7 @@ void main() {
             "e4d909c290d0fb1ca068ffaddf22cbd0",
       };
       data.forEach((key, value) {
-        expect(hashlib.md5(key), value);
+        expect(hashlib.md5(key).hex(), value);
       });
     });
 
@@ -52,24 +61,26 @@ void main() {
       };
       for (final entry in data.entries) {
         final stream = Stream.fromIterable(
-                List.generate(1 + (entry.key.length >> 3), (i) => i << 3))
+                List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
         final result = await hashlib.md5stream(stream);
-        expect(toHexString(result), entry.value);
+        expect(result.hex(), entry.value);
       }
     });
 
-    test('with 2 random numbers', () {
+    test('with many random numbers', () {
       final random = Random.secure();
-      for (int i = 0; i < 1000; ++i) {
-        final a = random.nextInt(1000000).toString();
-        final b = random.nextInt(1000000).toString();
-        if (a == b) {
-          expect(hashlib.md5(a), hashlib.md5(b));
-        } else {
-          assert(hashlib.md5(a) != hashlib.md5(b));
-        }
+      for (int i = 0; i < 100; ++i) {
+        final data = List.generate(
+          random.nextInt(1000),
+          (i) => random.nextInt(24) + 97,
+        );
+        expect(
+          hashlib.md5buffer(data).hex(),
+          toHex(crypto.md5.convert(data).bytes),
+          reason: "[${data.length}] ${String.fromCharCodes(data)}",
+        );
       }
     });
   });

@@ -1,18 +1,38 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
+import 'package:hashlib/src/core/hash_algo.dart';
 import 'package:hashlib/src/core/utils.dart';
 
-abstract class HashDigest {
-  /// Finalizes the MD5 message-digest operation,
-  /// and returns the 128-bit long hash.
-  Uint8List digest();
+class HashDigest<T extends HashAlgo> {
+  final T algorithm;
+  final Uint8List bytes;
 
-  /// Finalizes the MD5 message-digest operation,
-  /// and returns a hexadecimal string.
-  String hexdigest([bool uppercase = false]) {
-    return toHexString(digest(), uppercase);
+  HashDigest({
+    required this.algorithm,
+    required Iterable<int> bytes,
+  }) : bytes = Uint8List.fromList(bytes.toList());
+
+  String hex([bool uppercase = false]) {
+    return toHex(bytes, uppercase);
+  }
+
+  String base64() {
+    return cvt.base64.encode(bytes);
+  }
+
+  String base64Url() {
+    return cvt.base64Url.encode(bytes);
+  }
+
+  String latin1({bool? allowInvalid}) {
+    return cvt.latin1.decode(bytes, allowInvalid: allowInvalid);
+  }
+
+  String ascii({bool? allowInvalid}) {
+    return toAscii(bytes, allowInvalid: allowInvalid);
   }
 }

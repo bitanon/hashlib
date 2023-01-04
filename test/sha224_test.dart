@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -12,7 +14,7 @@ void main() {
         "abc": "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
       };
       data.forEach((key, value) {
-        expect(hashlib.sha224(key), value);
+        expect(hashlib.sha224(key).hex(), value);
       });
     });
 
@@ -28,7 +30,7 @@ void main() {
             .join(): "567f69f168cd7844e65259ce658fe7aadfa25216e68eca0eb7ab8262",
       };
       data.forEach((key, value) {
-        expect(hashlib.sha224(key), value);
+        expect(hashlib.sha224(key).hex(), value);
       });
     });
 
@@ -40,20 +42,22 @@ void main() {
             "fee755f44a55f20fb3362cdc3c493615b3cb574ed95ce610ee5b1e9b",
       };
       data.forEach((key, value) {
-        expect(hashlib.sha224(key), value);
+        expect(hashlib.sha224(key).hex(), value);
       });
     });
 
-    test('with 2 random numbers', () {
+    test('with many random numbers', () {
       final random = Random.secure();
-      for (int i = 0; i < 1000; ++i) {
-        final a = random.nextInt(1000000).toString();
-        final b = random.nextInt(1000000).toString();
-        if (a == b) {
-          expect(hashlib.sha224(a), hashlib.sha224(b));
-        } else {
-          assert(hashlib.sha224(a) != hashlib.sha224(b));
-        }
+      for (int i = 0; i < 100; ++i) {
+        final data = List.generate(
+          random.nextInt(1000),
+          (i) => random.nextInt(24) + 97,
+        );
+        expect(
+          hashlib.sha224buffer(data).hex(),
+          toHex(crypto.sha224.convert(data).bytes),
+          reason: "[${data.length}] ${String.fromCharCodes(data)}",
+        );
       }
     });
   });
