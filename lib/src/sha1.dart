@@ -58,23 +58,11 @@ class SHA1 extends HashAlgo {
   /// Initializes a new instance of SHA1 message-digest.
   /// An instance can be re-used after calling the [clear] function.
   SHA1() {
-    clear();
-  }
-
-  @override
-  void clear() {
-    // Reset count
-    _countLow = 0;
-    _countHigh = 0;
-    // Initialize variables
     _state[0] = 0x67452301; // a
     _state[1] = 0xEFCDAB89; // b
     _state[2] = 0x98BADCFE; // c
     _state[3] = 0x10325476; // d
     _state[4] = 0xC3D2E1F0; // e
-    // Reset state
-    _pos = 0;
-    _closed = false;
   }
 
   @override

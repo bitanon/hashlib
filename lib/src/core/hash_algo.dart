@@ -7,9 +7,6 @@ abstract class HashAlgo extends HashDigest {
   /// The length of generated hash in bits
   abstract final int hashLengthInBits;
 
-  /// Clears all contexts and resets the instance for re-use.
-  void clear();
-
   /// Updates the MD5 message-digest.
   ///
   /// _This method only supports 8-bit big-endian input array._

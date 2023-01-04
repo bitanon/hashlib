@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:test/test.dart';
 
@@ -43,6 +45,19 @@ void main() {
       data.forEach((key, value) {
         expect(hashlib.sha256(key), value);
       });
+    });
+
+    test('with 2 random numbers', () {
+      final random = Random.secure();
+      for (int i = 0; i < 1000; ++i) {
+        final a = random.nextInt(1000000).toString();
+        final b = random.nextInt(1000000).toString();
+        if (a == b) {
+          expect(hashlib.sha256(a), hashlib.sha256(b));
+        } else {
+          assert(hashlib.sha256(a) != hashlib.sha256(b));
+        }
+      }
     });
   });
 }

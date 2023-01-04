@@ -1,8 +1,8 @@
 ## 1.0.0-dev.5
 
-- Adds `sha256` following [rfc6234](https://datatracker.ietf.org/doc/html/rfc6234)
-- New functions available: `sha256`, `sha256sum`, `sha256stream`, `sha256buffer`
-- New class available: `SHA256`
+- Adds SHA256 and SHA224 following [rfc6234](https://datatracker.ietf.org/doc/html/rfc6234)
+- For SHA256: `sha256`, `sha256sum`, `sha256stream`, `sha256buffer`, `SHA256`
+- For SHA224: `sha224`, `sha224sum`, `sha224stream`, `sha224buffer`, `SHA224`
 
 ## 1.0.0-dev.4
 
