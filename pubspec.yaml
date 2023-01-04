@@ -1,6 +1,6 @@
 name: hashlib
-description: Python's hashlib in pure Dart
-version: 1.0.0-dev.1
+description: Secure hash algorithms in pure dart
+version: 1.0.0-dev.2
 homepage: https://github.com/dipu-bd/hashlib
 
 environment:

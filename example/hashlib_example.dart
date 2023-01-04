@@ -1,6 +1,6 @@
-import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/hashlib.dart' as hashlib;
 
 void main() {
-  var awesome = Awesome();
-  print('awesome: ${awesome.isAwesome}');
+  final md5 = hashlib.md5("Hello World");
+  print('MD5[Hello World] => $md5');
 }
