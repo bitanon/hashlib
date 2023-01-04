@@ -1,23 +1,18 @@
-import 'dart:typed_data';
+// Copyright (c) 2023, Sudipto Chandra
+// All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/src/core/utils.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
-abstract class HashAlgo {
+abstract class HashAlgo extends HashDigest {
+  abstract final int hashSize;
+
   /// Clears all contexts and resets the instance for re-use.
   void clear();
 
-  /// Finalizes the MD5 message-digest operation,
-  /// and returns the 128-bit long hash.
-  Uint8List digest();
-
   /// Updates the MD5 message-digest.
+  ///
+  /// _This method only supports 8-bit big-endian input array._
   ///
   /// Throws an [StateError] if the message-digest is already closed.
   void update(final Iterable<int> input);
-
-  /// Finalizes the MD5 message-digest operation,
-  /// and returns a hexadecimal string.
-  String hexdigest() {
-    return toHexString(digest());
-  }
 }

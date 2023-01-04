@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('MD5 tests', () {
-    test('from RFC doc', () {
+    test('from RFC1321', () {
       final data = {
         "": "d41d8cd98f00b204e9800998ecf8427e",
         "a": "0cc175b9c0f1b6a831c399e269772661",
