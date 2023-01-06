@@ -4,35 +4,39 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/utils.dart';
 
-class HashDigest<T extends HashBase> {
-  final T algorithm;
+class HashDigest {
   final Uint8List bytes;
 
-  HashDigest({
-    required this.bytes,
-    required this.algorithm,
-  });
+  HashDigest(this.bytes);
 
-  String hex([bool uppercase = false]) {
-    return toHex(bytes, uppercase);
-  }
-
+  /// The message digest as a string of base64.
   String base64() {
-    return cvt.base64.encode(bytes);
+    return cvt.base64.encoder.convert(bytes);
   }
 
+  /// The message digest as a string of URL-safe base64.
   String base64Url() {
     return cvt.base64Url.encode(bytes);
   }
 
+  /// The message digest as a string of extended Latin alphabets.
   String latin1({bool? allowInvalid}) {
     return cvt.latin1.decode(bytes, allowInvalid: allowInvalid);
   }
 
-  String ascii({bool? allowInvalid}) {
-    return toAscii(bytes, allowInvalid: allowInvalid);
+  /// The message digest as a string of hexadecimal digits.
+  String hex([bool uppercase = false]) {
+    return toHex(bytes, uppercase);
   }
+
+  /// The message digest as a string of ASCII alphabets.
+  String ascii() {
+    return toAscii(bytes);
+  }
+
+  /// The message digest as a string of hexadecimal digits.
+  @override
+  String toString() => toHex(bytes);
 }

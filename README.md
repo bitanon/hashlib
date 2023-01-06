@@ -13,7 +13,6 @@ This library contains RFC-compliant implementations of secure hash functions in 
 | Algorithms               | Supported | Since |
 | ------------------------ | :-------: | :---: |
 | `md5`                    |    ✔️     | 1.0.0 |
-| `sha0`                   |    ⌛     |       |
 | `sha1`                   |    ✔️     | 1.0.0 |
 | `sha224`                 |    ✔️     | 1.0.0 |
 | `sha256`                 |    ✔️     | 1.0.0 |
@@ -31,6 +30,7 @@ This library contains RFC-compliant implementations of secure hash functions in 
 | `shake128` / `keccak256` |    ⌛     |       |
 | `shake256` / `keccak512` |    ⌛     |       |
 
+<!--
 ### Password hashing / Key derivation functions:
 
 | Algorithms    | Supported | Since |
@@ -43,7 +43,6 @@ This library contains RFC-compliant implementations of secure hash functions in 
 | `scrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
 
-<!--
 ### Cyclic redundancy checks:
 
 | Algorithms | Supported | Since |
@@ -87,11 +86,50 @@ Check the API Documentation for usage instruction. Examples can be found inside 
 import 'package:hashlib/hashlib.dart' as hashlib;
 
 void main() {
-  final md5 = hashlib.md5("Hello World");
-  print('MD5[Hello World] => $md5');
+  final text = "Happy Hashing!";
+  print('[MD5] $text => ${hashlib.md5sum(text)}');
+  print('[SHA-1] $text => ${hashlib.sha1sum(text)}');
+  print('[SHA-224] $text => ${hashlib.sha224sum(text)}');
+  print('[SHA-256] $text => ${hashlib.sha256sum(text)}');
 }
 ```
 
-<!-- ## Benchmarks
+## Benchmarks
 
-TBD -->
+To obtain the following benchmarks, run this command:
+
+```
+dart run ./benchmark/benchmark.dart`
+```
+
+Libraries:
+
+- **Hashlib** : https://pub.dev/packages/hashlib
+- **Crypto** : https://pub.dev/packages/crypto
+
+With string of length 17 (1000 times):
+
+| Algorithm |    Hashlib |  Crypto |
+| --------- | ---------: | ------: |
+| MD5       | **359 us** |  768 us |
+| SHA-1     | **549 us** |  892 us |
+| SHA-224   | **809 us** | 1167 us |
+| SHA-256   | **787 us** | 1160 us |
+
+With string of length 1777 (50 times):
+
+| Algorithm |    Hashlib |     Crypto |
+| --------- | ---------: | ---------: |
+| MD5       | **408 us** |     518 us |
+| SHA-1     | **599 us** |     658 us |
+| SHA-224   |     934 us | **905 us** |
+| SHA-256   |     942 us | **916 us** |
+
+With string of length 77000 (2 times):
+
+| Algorithm |     Hashlib |      Crypto |
+| --------- | ----------: | ----------: |
+| MD5       |  **675 us** |      847 us |
+| SHA-1     | **1027 us** |     1081 us |
+| SHA-224   |     1592 us | **1502 us** |
+| SHA-256   |     1588 us | **1501 us** |
