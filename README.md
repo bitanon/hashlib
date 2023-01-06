@@ -8,24 +8,68 @@ This library contains RFC-compliant implementations of secure hash functions in 
 
 ## Features
 
+### Secure hash functions:
+
+| Algorithms               | Supported | Since |
+| ------------------------ | :-------: | :---: |
+| `md5`                    |    ✔️     | 1.0.0 |
+| `sha0`                   |    ⌛     |       |
+| `sha1`                   |    ✔️     | 1.0.0 |
+| `sha224`                 |    ✔️     | 1.0.0 |
+| `sha256`                 |    ✔️     | 1.0.0 |
+| `sha384`                 |    ⌛     |       |
+| `sha512`                 |    ⌛     |       |
+| `sha512_224`             |    ⌛     |       |
+| `sha512_256`             |    ⌛     |       |
+| `blake2b`                |    ⌛     |       |
+| `blake2s`                |    ⌛     |       |
+| `blake3`                 |    ⌛     |       |
+| `sha3_224` / `keccak224` |    ⌛     |       |
+| `sha3_256` / `keccak256` |    ⌛     |       |
+| `sha3_384` / `keccak384` |    ⌛     |       |
+| `sha3_512` / `keccak512` |    ⌛     |       |
+| `shake128` / `keccak256` |    ⌛     |       |
+| `shake256` / `keccak512` |    ⌛     |       |
+
+### Password hashing / Key derivation functions:
+
 | Algorithms    | Supported | Since |
 | ------------- | :-------: | :---: |
-| `md5`         |    ✔️     | 1.0.0 |
-| `sha1`        |    ✔️     | 1.0.0 |
-| `sha224`      |    ✔️     | 1.0.0 |
-| `sha256`      |    ✔️     | 1.0.0 |
-| `sha384`      |    ⌛     |       |
-| `sha512`      |    ⌛     |       |
-| `blake2b`     |    ⌛     |       |
-| `blake2s`     |    ⌛     |       |
-| `sha3_224`    |    ⌛     |       |
-| `sha3_256`    |    ⌛     |       |
-| `sha3_384`    |    ⌛     |       |
-| `sha3_512`    |    ⌛     |       |
-| `shake_128`   |    ⌛     |       |
-| `shake_256`   |    ⌛     |       |
 | `pbkdf2_hmac` |    ⌛     |       |
+| `argon2i`     |    ⌛     |       |
+| `argon2d`     |    ⌛     |       |
+| `argon2id`    |    ⌛     |       |
+| `bcrypt`      |    ⌛     |       |
 | `scrypt`      |    ⌛     |       |
+| `balloon`     |    ⌛     |       |
+
+<!--
+### Cyclic redundancy checks:
+
+| Algorithms | Supported | Since |
+| ---------- | :-------: | :---: |
+| `cksum`    |    ⌛     |       |
+| `crc16`    |    ⌛     |       |
+| `crc32`    |    ⌛     |       |
+| `crc64`    |    ⌛     |       |
+
+### Checksums:
+
+| Algorithms | Supported | Since |
+| ---------- | :-------: | :---: |
+| `bsd`      |    ⌛     |       |
+| `sysv`     |    ⌛     |       |
+| `alder32`  |    ⌛     |       |
+
+### Other Cryptographic hash functions:
+
+| Algorithms  | Supported | Since |
+| ----------- | :-------: | :---: |
+| `ripemd128` |    ⌛     |       |
+| `ripemd160` |    ⌛     |       |
+| `ripemd320` |    ⌛     |       |
+| `whirlpool` |    ⌛     |       |
+-->
 
 ## Getting started
 

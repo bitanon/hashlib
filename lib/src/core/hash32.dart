@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 const int maxAllowedMessageLength = (1 << 50);
 
@@ -16,6 +17,7 @@ abstract class Hash32bit extends HashBase {
 
   int _pos = 0;
   int _messageLength = 0;
+  HashDigest? _digest;
 
   Hash32bit({
     required this.seed,
@@ -30,13 +32,8 @@ abstract class Hash32bit extends HashBase {
           blockLengthInBits: blockLengthInBits,
         );
 
-  @override
-  void $reset() {
-    super.$reset();
-    _pos = 0;
-    _messageLength = 0;
-    _state.setAll(0, seed);
-  }
+  /// Whether the generator is closed
+  bool get closed => _digest != null;
 
   /// The original message length in bytes
   int get messageLength => _messageLength;
@@ -51,8 +48,16 @@ abstract class Hash32bit extends HashBase {
   void $finalize(final Uint32List state, ByteData buffer, int pos);
 
   @override
+  void $reset() {
+    _pos = 0;
+    _messageLength = 0;
+    _state.setAll(0, seed);
+    _digest = null;
+  }
+
+  @override
   void update(final Iterable<int> input) {
-    if (closed) {
+    if (_digest != null) {
       throw StateError('The message-digest is already closed');
     }
 
@@ -70,8 +75,7 @@ abstract class Hash32bit extends HashBase {
     }
   }
 
-  @override
-  Uint8List $close() {
+  Uint8List _close() {
     $finalize(_state, _buffer, _pos);
 
     if (endian == Endian.host) {
@@ -83,5 +87,17 @@ abstract class Hash32bit extends HashBase {
       data.setUint32(j, _state[i], endian);
     }
     return data.buffer.asUint8List();
+  }
+
+  @override
+  HashDigest digest() {
+    if (_digest != null) {
+      return _digest!;
+    }
+    _digest = HashDigest(
+      algorithm: this,
+      bytes: _close(),
+    );
+    return _digest!;
   }
 }
