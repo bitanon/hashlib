@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_algo.dart';
+import 'package:hashlib/src/core/hash32.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
@@ -14,18 +14,18 @@ const int _mask32 = 0xFFFFFFFF;
 ///
 /// [rfc6234]: https://datatracker.ietf.org/doc/html/rfc6234
 /// For an instance, use [SHA224] or [SHA256].
-abstract class SHA2of32bit extends HashAlgo {
+abstract class SHA2of32bit extends Hash32bit {
   final _chunk = Uint32List(64); /* Extended message block */
 
   /// For internal use only.
   SHA2of32bit({
     required List<int> seed,
-    required int hashSize,
+    required int hashLengthInBits,
   }) : super(
           seed: seed,
-          hashSize: hashSize,
           endian: Endian.big,
-          blockSize: 512,
+          blockLengthInBits: 512,
+          hashLengthInBits: hashLengthInBits,
         );
 
   /// Rotates x right by n bits.
@@ -41,9 +41,11 @@ abstract class SHA2of32bit extends HashAlgo {
   int _ssig1(int x) => (_rotr(x, 17) ^ _rotr(x, 19) ^ (x >>> 10));
 
   @override
-  void $process(Uint32List state, Uint8List buffer) {
-    $decode(buffer, _chunk);
+  void $process(final Uint32List state, final ByteData buffer) {
     final w = _chunk;
+    for (int i = 0, j = 0; j < blockLength; i++, j += 4) {
+      _chunk[i] = buffer.getUint32(j, endian);
+    }
 
     // Extend the first 16 words into the remaining 48 words
     for (int t = 16; t < 64; t++) {
@@ -107,14 +109,14 @@ abstract class SHA2of32bit extends HashAlgo {
   }
 
   @override
-  void $finalize(Uint32List state, Uint8List buffer, int pos) {
+  void $finalize(final Uint32List state, final ByteData buffer, int pos) {
     // Adding a single 1 bit padding
-    buffer[pos++] = 0x80;
+    buffer.setUint8(pos++, 0x80);
 
     // If buffer length > 56 bytes, skip this block
     if (pos > 56) {
       while (pos < 64) {
-        buffer[pos++] = 0;
+        buffer.setUint8(pos++, 0);
       }
       $process(state, buffer);
       pos = 0;
@@ -122,11 +124,11 @@ abstract class SHA2of32bit extends HashAlgo {
 
     // Padding with 0s until buffer length is 56 bytes
     while (pos < 56) {
-      buffer[pos++] = 0;
+      buffer.setUint8(pos++, 0);
     }
 
     // Append original message length in bits to message
-    $encode64(Uint64List.fromList([messageLengthInBits]), buffer, pos);
+    buffer.setUint64(pos, messageLengthInBits, endian);
     $process(state, buffer);
   }
 }

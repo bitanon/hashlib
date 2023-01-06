@@ -4,17 +4,17 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_algo.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/utils.dart';
 
-class HashDigest<T extends HashAlgo> {
+class HashDigest<T extends HashBase> {
   final T algorithm;
   final Uint8List bytes;
 
   HashDigest({
+    required this.bytes,
     required this.algorithm,
-    required Iterable<int> bytes,
-  }) : bytes = Uint8List.fromList(bytes.toList());
+  });
 
   String hex([bool uppercase = false]) {
     return toHex(bytes, uppercase);

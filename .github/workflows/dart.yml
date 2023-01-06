@@ -34,7 +34,8 @@ jobs:
       - name: Analyze project source
         run: dart analyze
 
-      - name: Generate documentation
+      - if: matrix.sdk != '2.14.0'
+        name: Generate documentation
         run: dart doc .
 
       - name: Run tests

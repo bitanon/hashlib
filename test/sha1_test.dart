@@ -59,7 +59,7 @@ void main() {
       };
       for (final entry in data.entries) {
         final stream = Stream.fromIterable(
-                List.generate(1 + (entry.key.length >> 3), (i) => i << 3))
+                List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
         final result = await hashlib.sha1stream(stream);

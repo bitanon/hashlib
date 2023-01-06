@@ -28,7 +28,7 @@ String toHex(List<int> buffer, [bool uppercase = false]) {
 
 /// Converts a byte buffer to a hexadecimal buffer
 String toAscii(List<int> buffer, {bool? allowInvalid}) {
-  int n = buffer.length + (buffer.length >> 3);
+  int n = buffer.length + (buffer.length >>> 3);
   if (n & 7 != 0) n++;
   final ascii = List<int>.filled(n, 0);
   for (int i = 0, p = 0; i < buffer.length; ++i) {

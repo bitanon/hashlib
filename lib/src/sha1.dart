@@ -5,15 +5,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_algo.dart';
+import 'package:hashlib/src/core/hash32.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/utils.dart';
 
+final SHA1 _sha1 = SHA1();
+
 /// Generates a 160-bit SHA1 hash digest from the input.
 HashDigest sha1buffer(final Iterable<int> input) {
-  final sha1 = SHA1();
-  sha1.update(input);
-  return sha1.digest();
+  _sha1.$reset();
+  _sha1.update(input);
+  return _sha1.digest();
 }
 
 /// Generates a 160-bit SHA1 hash as hexadecimal digest from string
@@ -23,9 +25,9 @@ HashDigest sha1(final String input, [Encoding? encoding]) {
 
 /// Generates a 160-bit SHA1 hash digest from stream
 Future<HashDigest> sha1stream(final Stream<List<int>> inputStream) async {
-  final sha1 = SHA1();
-  await inputStream.forEach(sha1.update);
-  return sha1.digest();
+  _sha1.$reset();
+  await inputStream.forEach(_sha1.update);
+  return _sha1.digest();
 }
 
 const int _mask32 = 0xFFFFFFFF;
@@ -37,15 +39,15 @@ const int _mask32 = 0xFFFFFFFF;
 ///
 /// **Warning**: SHA1 has extensive vulnerabilities. It can be safely used
 /// for checksum, but do not use it for cryptographic purposes.
-class SHA1 extends HashAlgo {
+class SHA1 extends Hash32bit {
   final _chunk = Uint32List(80); /* Extended message block */
 
   /// Initializes a new instance of SHA1 message-digest.
   SHA1()
       : super(
-          hashSize: 160,
-          blockSize: 512,
           endian: Endian.big,
+          hashLengthInBits: 160,
+          blockLengthInBits: 512,
           seed: [
             0x67452301, // a
             0xEFCDAB89, // b
@@ -60,9 +62,11 @@ class SHA1 extends HashAlgo {
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   @override
-  void $process(final Uint32List state, Uint8List buffer) {
-    $decode(buffer, _chunk);
+  void $process(final Uint32List state, final ByteData buffer) {
     final w = _chunk;
+    for (int i = 0, j = 0; j < blockLength; i++, j += 4) {
+      _chunk[i] = buffer.getUint32(j, endian);
+    }
 
     // Extend the first 16 words into the remaining 64 words
     for (int t = 16; t < 80; t++) {
@@ -124,14 +128,14 @@ class SHA1 extends HashAlgo {
   }
 
   @override
-  void $finalize(Uint32List state, Uint8List buffer, int pos) {
+  void $finalize(final Uint32List state, final ByteData buffer, int pos) {
     // Adding a single 1 bit padding
-    buffer[pos++] = 0x80;
+    buffer.setUint8(pos++, 0x80);
 
     // If buffer length > 56 bytes, skip this block
     if (pos > 56) {
       while (pos < 64) {
-        buffer[pos++] = 0;
+        buffer.setUint8(pos++, 0);
       }
       $process(state, buffer);
       pos = 0;
@@ -139,11 +143,11 @@ class SHA1 extends HashAlgo {
 
     // Padding with 0s until buffer length is 56 bytes
     while (pos < 56) {
-      buffer[pos++] = 0;
+      buffer.setUint8(pos++, 0);
     }
 
     // Append original message length in bits to message
-    $encode64(Uint64List.fromList([messageLengthInBits]), buffer, pos);
+    buffer.setUint64(pos, messageLengthInBits, endian);
     $process(state, buffer);
   }
 }

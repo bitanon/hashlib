@@ -5,15 +5,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_algo.dart';
+import 'package:hashlib/src/core/hash32.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/utils.dart';
 
+final MD5 _md5 = MD5();
+
 /// Generates a 128-bit MD5 hash digest from the input.
 HashDigest md5buffer(final Iterable<int> input) {
-  final md5 = MD5();
-  md5.update(input);
-  return md5.digest();
+  MD5 _md5 = MD5();
+  _md5.$reset();
+  _md5.update(input);
+  return _md5.digest();
 }
 
 /// Generates a 128-bit MD5 hash as hexadecimal digest from string
@@ -23,9 +26,9 @@ HashDigest md5(final String input, [Encoding? encoding]) {
 
 /// Generates a 128-bit MD5 hash digest from stream
 Future<HashDigest> md5stream(final Stream<List<int>> inputStream) async {
-  final md5 = MD5();
-  await inputStream.forEach(md5.update);
-  return md5.digest();
+  _md5.$reset();
+  await inputStream.forEach(_md5.update);
+  return _md5.digest();
 }
 
 const int _mask32 = 0xFFFFFFFF;
@@ -37,15 +40,15 @@ const int _mask32 = 0xFFFFFFFF;
 ///
 /// **Warning**: MD5 has extensive vulnerabilities. It can be safely used
 /// for checksum, but do not use it for cryptographic purposes.
-class MD5 extends HashAlgo {
+class MD5 extends Hash32bit {
   final _chunk = Uint32List(16); /* 512-bit message block */
 
   /// Initializes a new instance of MD5 message-digest.
   MD5()
       : super(
-          hashSize: 128,
-          blockSize: 512,
           endian: Endian.little,
+          hashLengthInBits: 128,
+          blockLengthInBits: 512,
           seed: [
             0x67452301, // a
             0xefcdab89, // b
@@ -87,9 +90,11 @@ class MD5 extends HashAlgo {
       (b + _rotl(a + _tI(b, c, d) + x + ac, s)) & _mask32;
 
   @override
-  void $process(final Uint32List state, final Uint8List buffer) {
-    $decode(buffer, _chunk);
+  void $process(final Uint32List state, final ByteData buffer) {
     final x = _chunk;
+    for (int i = 0, j = 0; j < blockLength; i++, j += 4) {
+      _chunk[i] = buffer.getUint32(j, endian);
+    }
 
     // Shift amounts for round 1.
     const int s11 = 07;
@@ -200,14 +205,14 @@ class MD5 extends HashAlgo {
   }
 
   @override
-  void $finalize(final Uint32List state, final Uint8List buffer, int pos) {
+  void $finalize(final Uint32List state, final ByteData buffer, int pos) {
     // Adding a single 1 bit padding
-    buffer[pos++] = 0x80;
+    buffer.setUint8(pos++, 0x80);
 
     // If buffer length > 56 bytes, skip this block
     if (pos > 56) {
       while (pos < 64) {
-        buffer[pos++] = 0;
+        buffer.setUint8(pos++, 0);
       }
       $process(state, buffer);
       pos = 0;
@@ -215,11 +220,11 @@ class MD5 extends HashAlgo {
 
     // Padding with 0s until buffer length is 56 bytes
     while (pos < 56) {
-      buffer[pos++] = 0;
+      buffer.setUint8(pos++, 0);
     }
 
     // Append original message length in bits to message
-    $encode64(Uint64List.fromList([messageLengthInBits]), buffer, pos);
+    buffer.setUint64(pos, messageLengthInBits, endian);
     $process(state, buffer);
   }
 }
