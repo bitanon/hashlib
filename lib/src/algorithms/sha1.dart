@@ -16,7 +16,6 @@ class SHA1Sink extends HashSink {
   SHA1Sink([Sink<HashDigest>? sink])
       : super(
           sink: sink,
-          endian: Endian.big,
           hashLengthInBits: 160,
           blockLengthInBits: 512,
           extendedChunkLength: 80,

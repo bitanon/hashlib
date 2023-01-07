@@ -36,11 +36,10 @@ const int _s44 = 21;
 /// [MD5 Message-Digest Algorithm][rfc1321].
 ///
 /// [rfc1321]: https://datatracker.ietf.org/doc/html/rfc1321
-class MD5Sink extends HashSink {
+class MD5Sink extends HashSinkLittle {
   MD5Sink([Sink<HashDigest>? sink])
       : super(
           sink: sink,
-          endian: Endian.little,
           hashLengthInBits: 128,
           blockLengthInBits: 512,
           seed: [

@@ -3,6 +3,7 @@
 
 import 'dart:math';
 
+import 'package:hash/hash.dart' as hash;
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
 
@@ -28,18 +29,30 @@ class CryptoBenchmark extends Benchmark {
   }
 }
 
+class HashBenchmark extends Benchmark {
+  HashBenchmark(int size, int iter) : super('hash', size, iter);
+
+  @override
+  void run() {
+    hash.SHA224().update(input).digest();
+  }
+}
+
 void main() {
   print('--------- SHA-224 ----------');
   HashlibBenchmark(17, 1000).showDiff([
     CryptoBenchmark(17, 1000),
+    HashBenchmark(17, 1000),
   ]);
   print('');
   HashlibBenchmark(1777, 50).showDiff([
     CryptoBenchmark(1777, 50),
+    HashBenchmark(1777, 50),
   ]);
   print('');
   HashlibBenchmark(111000, 1).showDiff([
     CryptoBenchmark(111000, 1),
+    HashBenchmark(111000, 1),
   ]);
   print('');
 }

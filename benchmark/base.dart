@@ -23,16 +23,8 @@ abstract class Benchmark extends BenchmarkBase {
     }
   }
 
-  Map<String, int> measureDiff(List<BenchmarkBase> others) {
-    Map<String, int> data = {};
-    for (BenchmarkBase benchmark in {...others, this}) {
-      data[benchmark.name] = benchmark.measure().round();
-    }
-    return data;
-  }
-
   void showDiff(List<BenchmarkBase> others) {
-    var data = measureDiff(others);
+    var data = measureDiff({...others, this});
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
     for (var entry in data.entries) {
@@ -46,4 +38,12 @@ abstract class Benchmark extends BenchmarkBase {
       print(message);
     }
   }
+}
+
+Map<String, int> measureDiff(Iterable<BenchmarkBase> benchmarks) {
+  Map<String, int> data = {};
+  for (BenchmarkBase benchmark in benchmarks) {
+    data[benchmark.name] = benchmark.measure().round();
+  }
+  return data;
 }

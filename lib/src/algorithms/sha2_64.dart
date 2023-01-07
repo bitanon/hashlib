@@ -124,7 +124,6 @@ abstract class _SHA2of64bit extends HashSink {
   }) : super(
           sink: sink,
           seed: seed,
-          endian: Endian.big,
           signatureLength: 16,
           blockLengthInBits: 1024,
           hashLengthInBits: hashLengthInBits,

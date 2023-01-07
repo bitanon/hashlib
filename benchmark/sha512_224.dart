@@ -29,7 +29,7 @@ class CryptoBenchmark extends Benchmark {
 }
 
 void main() {
-  print('--------- SHA-512 ----------');
+  print('--------- SHA-512/224 ----------');
   HashlibBenchmark(17, 1000).showDiff([
     CryptoBenchmark(17, 1000),
   ]);

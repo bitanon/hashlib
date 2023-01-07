@@ -4,42 +4,43 @@ Libraries:
 
 - **Hashlib** : https://pub.dev/packages/hashlib
 - **Crypto** : https://pub.dev/packages/crypto
+- **Hash** : https://pub.dev/packages/hash
 
-With string of length 17 (1000 times):
+With string of length 17 (1000 iterations):
 
-| Algorithms  |  `hashlib` | `crypto` |  Comment   |
-| ----------- | ---------: | -------: | :--------: |
-| MD5         | **369 us** |   764 us | 52% faster |
-| SHA-1       | **489 us** |   915 us | 47% faster |
-| SHA-224     | **764 us** |  1167 us | 35% faster |
-| SHA-256     | **786 us** |  1155 us | 32% faster |
-| SHA-384     | **758 us** |  1719 us | 56% faster |
-| SHA-512     | **765 us** |  1710 us | 55% faster |
-| SHA-512/224 | **741 us** |  1685 us | 56% faster |
-| SHA-512/256 | **756 us** |  1690 us | 55% faster |
+| Algorithms  | `hashlib`  | `crypto`              | `hash`                |
+| ----------- | ---------- | --------------------- | --------------------- |
+| MD5         | **346 us** | 758 us (119% slower)  | 902 us (161% slower)  |
+| SHA-1       | **497 us** | 912 us (84% slower)   | 1443 us (190% slower) |
+| SHA-224     | **756 us** | 1178 us (56% slower)  | 1345 us (78% slower)  |
+| SHA-256     | **757 us** | 1158 us (53% slower)  | 1370 us (81% slower)  |
+| SHA-384     | **739 us** | 1701 us (130% slower) | 3613 us (389% slower) |
+| SHA-512     | **749 us** | 1715 us (129% slower) | 3668 us (390% slower) |
+| SHA-512/224 | **755 us** | 1681 us (123% slower) | ➖                    |
+| SHA-512/256 | **782 us** | 1710 us (119% slower) | ➖                    |
 
-With string of length 1777 (50 times):
+With string of length 1777 (50 iterations):
 
-| Algorithms  |  `hashlib` |   `crypto` |  Comment   |
-| ----------- | ---------: | ---------: | :--------: |
-| MD5         | **428 us** |     541 us | 21% faster |
-| SHA-1       | **594 us** |     686 us | 13% faster |
-| SHA-224     |     965 us | **923 us** | 5% slower  |
-| SHA-256     |     965 us | **922 us** | 5% slower  |
-| SHA-384     | **505 us** |     727 us | 31% faster |
-| SHA-512     | **505 us** |     732 us | 31% faster |
-| SHA-512/224 | **516 us** |     737 us | 30% faster |
-| SHA-512/256 | **516 us** |     741 us | 30% faster |
+| Algorithms  | `hashlib`  | `crypto`            | `hash`                |
+| ----------- | ---------- | ------------------- | --------------------- |
+| MD5         | **284 us** | 534 us (88% slower) | 752 us (165% slower)  |
+| SHA-1       | **465 us** | 684 us (47% slower) | 1402 us (202% slower) |
+| SHA-224     | **816 us** | 923 us (13% slower) | 1257 us (54% slower)  |
+| SHA-256     | **816 us** | 923 us (13% slower) | 1254 us (54% slower)  |
+| SHA-384     | **376 us** | 722 us (92% slower) | 2115 us (463% slower) |
+| SHA-512     | **378 us** | 735 us (94% slower) | 2141 us (466% slower) |
+| SHA-512/224 | **381 us** | 735 us (93% slower) | ➖                    |
+| SHA-512/256 | **377 us** | 725 us (92% slower) | ➖                    |
 
-With string of length 177000 (1 times):
+With string of length 177000 (2 iterations):
 
-| Algorithms  |   `hashlib` |    `crypto` |  Comment   |
-| ----------- | ----------: | ----------: | :--------: |
-| MD5         |  **840 us** |     1010 us | 17% faster |
-| SHA-1       | **1177 us** |     1320 us | 11% faster |
-| SHA-224     |     1914 us | **1826 us** | 5% slower  |
-| SHA-256     |     1909 us | **1773 us** | 8% slower  |
-| SHA-384     |  **929 us** |     1278 us | 27% faster |
-| SHA-512     |  **942 us** |     1234 us | 24% faster |
-| SHA-512/224 |  **933 us** |     1237 us | 25% faster |
-| SHA-512/256 |  **947 us** |     1236 us | 23% faster |
+| Algorithms  | `hashlib`   | `crypto`             | `hash`                |
+| ----------- | ----------- | -------------------- | --------------------- |
+| MD5         | **1104 us** | 2016 us (83% slower) | 4529 us (310% slower) |
+| SHA-1       | **1830 us** | 2585 us (41% slower) | 6913 us (278% slower) |
+| SHA-224     | **3206 us** | 3523 us (10% slower) | 6306 us (97% slower)  |
+| SHA-256     | **3199 us** | 3524 us (10% slower) | 6324 us (98% slower)  |
+| SHA-384     | **1290 us** | 2446 us (90% slower) | 9042 us (601% slower) |
+| SHA-512     | **1289 us** | 2458 us (91% slower) | 9038 us (601% slower) |
+| SHA-512/224 | **1288 us** | 2463 us (91% slower) | ➖                    |
+| SHA-512/256 | **1289 us** | 2447 us (90% slower) | ➖                    |
