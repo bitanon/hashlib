@@ -38,6 +38,6 @@ class _MD5 extends HashBase {
   const _MD5();
 
   @override
-  ByteConversionSink startChunkedConversion(Sink<HashDigest> sink) =>
-      ByteConversionSink.from(MD5Sink(sink));
+  Sink<List<int>> startChunkedConversion(Sink<HashDigest> sink) =>
+      MD5Sink(sink);
 }

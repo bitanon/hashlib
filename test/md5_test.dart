@@ -19,14 +19,11 @@ final tests = {
   "test": "098f6bcd4621d373cade4e832627b4f6",
   'message': "78e731027d8fd50ed642340b7c9a63b3",
   "Hello World": "b10a8db164e0754105b7a99be72e3fe5",
-  "fcnbqnfziebjnvbvqwwzzpdfafnvpyhkeemxxyijwuhkqyogkhdzovbvbbfguudzalavojxashfhzxrfmcjikzas":
-      "6859ce201fd3ec059370d9eba4e86307",
-  "fcnbqnfziebjnvbvqwwzzpdfafnvpyhkeemxxyijwuhkqyogkhdzovbvbbfguudzalavojxashfhzxrfmcjikz":
-      "0e530931b1bb74c3df3a40a6854b6bf1",
-  "fcnbqnfziebjnvbvqwwzzpdfafnvpyhkeemxxyijwuhkqyogkhdzovbvbbfguudzalavojxashfhzxrfmcjikzc":
-      "e9227380933753a03dad1cb5d7be39bb",
-  "simewkidgzgesatfyviqesladjafoclbwppqplhcwfqsbfnijiqsydxzpckbqxumulitsxzrpqhmdqhobhnhyoboijhcnulmxrhystmijucbnnnstecepnsynugxnqiqnssfbakzavpqxiyjkqjdcgvcrotocqsrlejuauleazpwnohknnuheooopltmjuqjcudewmtboqhlvgpawztiglmvxmolgzihczqcxfzebudlapnyeufbgijckqi":
-      "9703e12025a2119b23a2b2da791ea44a",
+  List.filled(512, "a").join(): "56907396339ca2b099bd12245f936ddc",
+  List.filled(128, "a").join(): "e510683b3f5ffe4093d021808bc6ff70",
+  List.filled(513, "a").join(): "6649c3e827e44f7bf539768bddf76435",
+  List.filled(511, "a").join(): "3ba3485f242a5859f4417ccf004cd74c",
+  List.filled(1000000, "a").join(): "7707d6ae4e027c70eea2a935c2296f21",
 };
 
 void main() {
@@ -41,6 +38,23 @@ void main() {
 
     test('with few letters', () {
       expect(hashlib.md5sum("abc").hex(), tests["abc"]);
+    });
+
+    test('with longest string', () {
+      var last = tests.entries.last;
+      expect(hashlib.md5sum(last.key).hex(), last.value);
+    });
+
+    test('with special case', () {
+      var key =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      expect(hashlib.md5sum(key).hex(), tests[key]);
+    });
+
+    test('with block size', () {
+      var key = tests.keys.firstWhere((x) => x.length == 512);
+      var value = tests[key]!;
+      expect(hashlib.md5sum(key).hex(), value);
     });
 
     test('with known cases', () {

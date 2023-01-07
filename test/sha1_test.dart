@@ -19,10 +19,11 @@ final tests = {
       "de9f2c7fd25e1b3afad3e85a0bd17d9b100db4b3",
   "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq":
       "84983e441c3bd26ebaae4aa1f95129e5e54670f1",
+  List.filled(512, "a").join(): "164557facb73929875168c1e92caf09bb6064564",
+  List.filled(128, "a").join(): "ad5b3fdbcb526778c2839d2f151ea753995e26a0",
+  List.filled(513, "a").join(): "87ecd7233dbe9d7543a9a199fc671a90e469873d",
+  List.filled(511, "a").join(): "b9370eafb7ac772c6c1dc6b88ac9ad466b880ea1",
   List.filled(1000000, "a").join(): "34aa973cd4c4daa4f61eeb2bdbad27316534016f",
-  List.filled(10,
-          "0123456701234567012345670123456701234567012345670123456701234567")
-      .join(): "dea356a2cddd90c7a7ecedc5ebb563934f460452",
 };
 
 void main() {
@@ -37,6 +38,17 @@ void main() {
 
     test('with few letters', () {
       expect(hashlib.sha1sum("abc").hex(), tests["abc"]);
+    });
+
+    test('with longest string', () {
+      var last = tests.entries.last;
+      expect(hashlib.sha1sum(last.key).hex(), last.value);
+    });
+
+    test('with block size', () {
+      var key = tests.keys.firstWhere((x) => x.length == 512);
+      var value = tests[key]!;
+      expect(hashlib.sha1sum(key).hex(), value);
     });
 
     test('with known cases', () {

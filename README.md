@@ -109,27 +109,27 @@ Libraries:
 
 With string of length 17 (1000 times):
 
-| Algorithm |    Hashlib |  Crypto |
-| --------- | ---------: | ------: |
-| MD5       | **359 us** |  768 us |
-| SHA-1     | **549 us** |  892 us |
-| SHA-224   | **809 us** | 1167 us |
-| SHA-256   | **787 us** | 1160 us |
+| Algorithms |    Hashlib |  Crypto | Difference |
+| ---------- | ---------: | ------: | :--------: |
+| MD5        | **355 us** |  726 us |     ➖     |
+| SHA-1      | **469 us** |  874 us |     ➖     |
+| SHA-224    | **726 us** | 1131 us |     ➖     |
+| SHA-256    | **729 us** | 1126 us |     ➖     |
 
 With string of length 1777 (50 times):
 
-| Algorithm |    Hashlib |     Crypto |
-| --------- | ---------: | ---------: |
-| MD5       | **408 us** |     518 us |
-| SHA-1     | **599 us** |     658 us |
-| SHA-224   |     934 us | **905 us** |
-| SHA-256   |     942 us | **916 us** |
+| Algorithms |    Hashlib |     Crypto | Difference |
+| ---------- | ---------: | ---------: | :--------: |
+| MD5        | **413 us** |     524 us |     ➖     |
+| SHA-1      | **575 us** |     674 us |     ➖     |
+| SHA-224    |     931 us | **920 us** |   -11 us   |
+| SHA-256    |     930 us | **922 us** |   -8 us    |
 
 With string of length 77000 (2 times):
 
-| Algorithm |     Hashlib |      Crypto |
-| --------- | ----------: | ----------: |
-| MD5       |  **675 us** |      847 us |
-| SHA-1     | **1027 us** |     1081 us |
-| SHA-224   |     1592 us | **1502 us** |
-| SHA-256   |     1588 us | **1501 us** |
+| Algorithms |    Hashlib |      Crypto | Difference |
+| ---------- | ---------: | ----------: | :--------: |
+| MD5        | **709 us** |      863 us |     ➖     |
+| SHA-1      | **996 us** |     1109 us |     ➖     |
+| SHA-224    |    1595 us | **1533 us** |   -62 us   |
+| SHA-256    |    1585 us | **1531 us** |   -54 us   |

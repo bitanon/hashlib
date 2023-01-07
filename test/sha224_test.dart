@@ -11,15 +11,20 @@ final tests = {
   "abc": "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
   "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq":
       "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525",
-  List.filled(1000000, "a").join():
-      "20794655980c91d8bbb4c1ea97618a4bf03f42581948b2ee4ee7ad67",
-  List.filled(10,
-          "0123456701234567012345670123456701234567012345670123456701234567")
-      .join(): "567f69f168cd7844e65259ce658fe7aadfa25216e68eca0eb7ab8262",
   "The quick brown fox jumps over the lazy dog":
       "730e109bd7a8a32b1cb9d9a09aa2325d2430587ddbc0c38bad911525",
   "The quick brown fox jumps over the lazy cog":
       "fee755f44a55f20fb3362cdc3c493615b3cb574ed95ce610ee5b1e9b",
+  List.filled(512, "a").join():
+      "e926c6b764d4b216c99067c92f838ca1c5793c13c782d9ef7b668d71",
+  List.filled(128, "a").join():
+      "39873a2441c56608137850f4c54dde157710b9a2b83c8bdc756dd643",
+  List.filled(513, "a").join():
+      "e0afca6342847c80827fdc511f0004e53239d3c2f82f67ddd8185bef",
+  List.filled(511, "a").join():
+      "6eb1c24577241c0871ec3ab020786f59cecb2edb6acef2d483051d6a",
+  List.filled(1000000, "a").join():
+      "20794655980c91d8bbb4c1ea97618a4bf03f42581948b2ee4ee7ad67",
 };
 
 void main() {
@@ -34,6 +39,18 @@ void main() {
 
     test('with few letters', () {
       expect(hashlib.sha224sum("abc").hex(), tests["abc"]);
+    });
+
+    test('with block size', () {
+      var key = tests.keys.firstWhere((x) => x.length == 512);
+      var value = tests[key]!;
+      expect(hashlib.sha224sum(key).hex(), value);
+    });
+
+    test('with known cases', () {
+      tests.forEach((key, value) {
+        expect(hashlib.sha224sum(key).hex(), value);
+      });
     });
 
     test('with known cases', () {

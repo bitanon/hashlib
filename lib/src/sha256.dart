@@ -36,6 +36,6 @@ class _SHA256 extends HashBase {
   const _SHA256();
 
   @override
-  ByteConversionSink startChunkedConversion(Sink<HashDigest> sink) =>
-      ByteConversionSink.from(SHA256Sink(sink));
+  Sink<List<int>> startChunkedConversion(Sink<HashDigest> sink) =>
+      SHA256Sink(sink);
 }

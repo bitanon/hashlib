@@ -43,17 +43,17 @@ void main(List<String> args) {
       ],
     };
 
-    var names = algorithms['MD5']!.map((e) => e.name);
-    var joiner = names.map((e) => ('-' * (e.length + 1)) + ':');
+    var names = algorithms[algorithms.keys.first]!.map((e) => e.name);
+    var separator = names.map((e) => ('-' * (e.length + 1)) + ':');
 
     print("With string of length $size ($iter times):");
     print('');
-    print('| Algorithm | ${names.join(' | ')} |');
-    print('|-----------|${joiner.join('|')}|');
+    print('| Algorithms | ${names.join(' | ')} | Difference |');
+    print('|------------|${separator.join('|')}|:----------:|');
 
     for (var entry in algorithms.entries) {
       var me = entry.value.first;
-      var diff = me.measureDiff(entry.value.sublist(1));
+      var diff = me.measureDiff(entry.value);
       var mine = diff[me.name]!;
       var best = diff.values.fold(mine, min);
       var message = '| ${entry.key}';
@@ -63,8 +63,14 @@ void main(List<String> args) {
         if (value == best) {
           message += '**$value us**';
         } else {
-          message += "$value  us";
+          message += "$value us";
         }
+      }
+      message += " | ";
+      if (mine == best) {
+        message += '     \u2796     ';
+      } else {
+        message += '${best - mine} us';
       }
       message += " |";
       print(message);

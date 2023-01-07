@@ -25,7 +25,7 @@ abstract class Benchmark extends BenchmarkBase {
 
   Map<String, int> measureDiff(List<BenchmarkBase> others) {
     Map<String, int> data = {};
-    for (BenchmarkBase benchmark in [this, ...others]) {
+    for (BenchmarkBase benchmark in {...others, this}) {
       benchmark.warmup();
       data[benchmark.name] = benchmark.measure().round();
     }

@@ -39,6 +39,6 @@ class _SHA1 extends HashBase {
   const _SHA1();
 
   @override
-  ByteConversionSink startChunkedConversion(Sink<HashDigest> sink) =>
-      ByteConversionSink.from(SHA1Sink(sink));
+  Sink<List<int>> startChunkedConversion(Sink<HashDigest> sink) =>
+      SHA1Sink(sink);
 }

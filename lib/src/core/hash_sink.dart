@@ -14,7 +14,6 @@ abstract class HashSink extends Sink<List<int>> {
   final Uint32List state;
   final Uint32List chunk;
   final Uint8List _buffer;
-  late final ByteData buffer;
 
   int _pos = 0;
   bool _closed = false;
@@ -24,7 +23,7 @@ abstract class HashSink extends Sink<List<int>> {
   HashSink({
     this.sink,
     required this.seed,
-    required this.hashLengthInBits,
+    required int hashLengthInBits,
     this.blockLengthInBits = 512,
     this.endian = Endian.big,
     this.signatureByte = 0x80,
@@ -32,16 +31,12 @@ abstract class HashSink extends Sink<List<int>> {
   })  : state = Uint32List.fromList(seed),
         hashLength = hashLengthInBits >>> 3,
         blockLength = blockLengthInBits >>> 3,
+        blockLengthInWords = blockLengthInBits >>> 5,
         _buffer = Uint8List(blockLengthInBits >>> 3),
-        chunk = Uint32List(extendedChunkLength ?? (blockLengthInBits >>> 5)) {
-    buffer = _buffer.buffer.asByteData();
-  }
+        chunk = Uint32List(extendedChunkLength ?? blockLengthInBits >>> 5);
 
   /// The endianness of the buffers
   final Endian endian;
-
-  /// The length of generated hash in bits
-  final int hashLengthInBits;
 
   /// The length of generated hash in bytes
   final int hashLength;
@@ -51,6 +46,9 @@ abstract class HashSink extends Sink<List<int>> {
 
   /// The internal block length of the algorithm in bytes
   final int blockLength;
+
+  /// The internal block length of the algorithm in words
+  final int blockLengthInWords;
 
   /// The original message length in bytes
   int get messageLength => _messageLength;
@@ -110,36 +108,55 @@ abstract class HashSink extends Sink<List<int>> {
     // Adding the signature byte
     _buffer[_pos++] = signatureByte;
 
-    // If buffer length > 56 bytes, skip this block
-    if (_pos > 56) {
-      while (_pos < 64) {
+    // If no more space left in buffer for the message length
+    if (_pos > blockLength - 8) {
+      while (_pos < blockLength) {
         _buffer[_pos++] = 0;
       }
       _process();
     }
 
-    // Padding with 0s until buffer length is 56 bytes
-    while (_pos < 56) {
+    // Fill remaining buffer to put the message length at the end
+    while (_pos < blockLength - 8) {
       _buffer[_pos++] = 0;
     }
 
     // Append original message length in bits to message
-    buffer.setUint64(_pos, messageLengthInBits, endian);
+    var count = messageLengthInBits;
+    if (endian == Endian.big) {
+      for (int i = blockLength - 1; i >= _pos; --i) {
+        _buffer[i] = count;
+        count >>= 8;
+      }
+      _pos = blockLength;
+    } else {
+      while (_pos < blockLength) {
+        _buffer[_pos++] = count;
+        count >>= 8;
+      }
+    }
     _process();
 
     // Encode the hash state to 8-bit byte array
     Uint8List bytes;
     if (endian == Endian.host) {
       bytes = state.buffer.asUint8List(0, hashLength);
-    } else {
-      var data = Uint8List(hashLength);
+    } else if (endian == Endian.big) {
+      bytes = Uint8List(hashLength);
       for (int j = 0, i = 0; j < hashLength; i++) {
-        data[j++] = state[i] >> 24;
-        data[j++] = state[i] >> 16;
-        data[j++] = state[i] >> 8;
-        data[j++] = state[i];
+        bytes[j++] = state[i] >> 24;
+        bytes[j++] = state[i] >> 16;
+        bytes[j++] = state[i] >> 8;
+        bytes[j++] = state[i];
       }
-      bytes = data.buffer.asUint8List();
+    } else {
+      bytes = Uint8List(hashLength);
+      for (int j = 0, i = 0; j < hashLength; i++) {
+        bytes[j++] = state[i];
+        bytes[j++] = state[i] >> 8;
+        bytes[j++] = state[i] >> 16;
+        bytes[j++] = state[i] >> 24;
+      }
     }
 
     _digest = HashDigest(bytes);
@@ -150,10 +167,23 @@ abstract class HashSink extends Sink<List<int>> {
   }
 
   void _process() {
-    _pos = 0;
-    for (int i = 0, j = 0; j < blockLength; i++, j += 4) {
-      chunk[i] = buffer.getUint32(j, endian);
+    int j = 0;
+    if (endian == Endian.big) {
+      for (int i = 0; i < blockLengthInWords; i++, j += 4) {
+        chunk[i] = (_buffer[j] << 24) |
+            (_buffer[j + 1] << 16) |
+            (_buffer[j + 2] << 8) |
+            (_buffer[j + 3]);
+      }
+    } else {
+      for (int i = 0; i < blockLengthInWords; i++, j += 4) {
+        chunk[i] = (_buffer[j + 3] << 24) |
+            (_buffer[j + 2] << 16) |
+            (_buffer[j + 1] << 8) |
+            (_buffer[j]);
+      }
     }
     update(chunk);
+    _pos = 0;
   }
 }

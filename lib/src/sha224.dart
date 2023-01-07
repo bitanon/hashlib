@@ -36,6 +36,6 @@ class _SHA224 extends HashBase {
   const _SHA224();
 
   @override
-  ByteConversionSink startChunkedConversion(Sink<HashDigest> sink) =>
-      ByteConversionSink.from(SHA224Sink(sink));
+  Sink<List<int>> startChunkedConversion(Sink<HashDigest> sink) =>
+      SHA224Sink(sink);
 }
