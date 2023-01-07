@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'base.dart';
 import 'md5.dart' as md5;
+import 'md5_hmac.dart' as md5_hmac;
 import 'sha1.dart' as sha1;
 import 'sha224.dart' as sha224;
 import 'sha256.dart' as sha256;
+import 'sha256_hmac.dart' as sha256_hmac;
 import 'sha384.dart' as sha384;
 import 'sha512.dart' as sha512;
 import 'sha512_224.dart' as sha512224;
@@ -12,9 +14,9 @@ import 'sha512_256.dart' as sha512256;
 
 void main(List<String> args) {
   final conditions = [
-    [17, 1000],
-    [1777, 50],
-    [177000, 2],
+    [10, 100000],
+    [1000, 5000],
+    [500000, 10],
   ];
 
   print('## Benchmarks');
@@ -69,6 +71,15 @@ void main(List<String> args) {
         sha512256.HashlibBenchmark(size, iter),
         sha512256.CryptoBenchmark(size, iter),
       ],
+      "HMAC(MD5)": [
+        md5_hmac.HashlibBenchmark(size, iter),
+        md5_hmac.CryptoBenchmark(size, iter),
+        md5_hmac.HashBenchmark(size, iter),
+      ],
+      "HMAC(SHA-256)": [
+        sha256_hmac.HashlibBenchmark(size, iter),
+        sha256_hmac.CryptoBenchmark(size, iter),
+      ],
     };
 
     var names = algorithms[algorithms.keys.first]!.map((e) => e.name);
@@ -81,7 +92,7 @@ void main(List<String> args) {
 
     for (var entry in algorithms.entries) {
       var me = entry.value.first;
-      var diff = measureDiff(entry.value);
+      var diff = measureDiff(entry.value.reversed);
       var mine = diff[me.name]!;
       var best = diff.values.fold(mine, min);
       var message = '| ${entry.key}     ';
@@ -93,9 +104,9 @@ void main(List<String> args) {
         }
         var value = diff[name]!;
         if (value == best) {
-          message += '**$value us**';
+          message += '**${value / 1000} ms**';
         } else {
-          message += '$value us';
+          message += '${value / 1000} ms';
         }
         if (value > mine) {
           var p = (100 * (value - mine) / mine).round();

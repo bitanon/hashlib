@@ -3,15 +3,13 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/hash_sink.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
 class SHA224Sink extends _SHA2of32bit {
-  SHA224Sink([Sink<HashDigest>? sink])
+  SHA224Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 224,
           seed: [
             0xC1059ED8, // a
@@ -27,9 +25,8 @@ class SHA224Sink extends _SHA2of32bit {
 }
 
 class SHA256Sink extends _SHA2of32bit {
-  SHA256Sink([Sink<HashDigest>? sink])
+  SHA256Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 256,
           seed: [
             0x6A09E667, // a
@@ -67,15 +64,13 @@ const List<int> _k = [
 /// The implementation is derived from the US Secure Hash Algorithms document
 /// of [SHA and SHA-based HMAC and HKDF][rfc6234].
 ///
-/// [rfc6234]: https://datatracker.ietf.org/doc/html/rfc6234
+/// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
 abstract class _SHA2of32bit extends HashSink {
   /// For internal use only.
   _SHA2of32bit({
-    Sink<HashDigest>? sink,
     required List<int> seed,
     required int hashLengthInBits,
   }) : super(
-          sink: sink,
           seed: seed,
           blockLengthInBits: 512,
           extendedChunkLength: 64,

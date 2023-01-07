@@ -3,7 +3,6 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/hash_sink.dart';
 
 const int _mask32 = 0xFFFFFFFF;
@@ -11,11 +10,10 @@ const int _mask32 = 0xFFFFFFFF;
 /// This implementation is derived from The Internet Society
 /// [US Secure Hash Algorithm 1 (SHA1)][rfc3174].
 ///
-/// [rfc3174]: https://datatracker.ietf.org/doc/html/rfc3174
+/// [rfc3174]: https://www.rfc-editor.org/rfc/rfc3174
 class SHA1Sink extends HashSink {
-  SHA1Sink([Sink<HashDigest>? sink])
+  SHA1Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 160,
           blockLengthInBits: 512,
           extendedChunkLength: 80,

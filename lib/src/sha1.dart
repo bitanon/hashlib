@@ -5,8 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha1.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
-import 'package:hashlib/src/core/utils.dart';
 
 /// SHA-1 produces a message digest based on principle similar to MD5, except
 /// it can generate a 160-bit hash. Since 2005, SHA-1 has not been considered
@@ -17,28 +15,18 @@ import 'package:hashlib/src/core/utils.dart';
 /// **WARNING**: Do not use it for cryptographic purposes.
 const HashBase sha1 = _SHA1();
 
-/// Generates a 160-bit SHA-1 hash digest from a byte array
-HashDigest sha1buffer(final List<int> input) {
-  return sha1.convert(input);
-}
-
-/// Generates a 160-bit SHA-1 hash from string
-HashDigest sha1sum(final String input, [Encoding? encoding]) {
-  return sha1buffer(toBytes(input, encoding));
-}
-
-/// Generates a 160-bit SHA-1 hash from stream
-Future<HashDigest> sha1stream(final Stream<List<int>> stream) async {
-  var sha1 = SHA1Sink();
-  await stream.forEach(sha1.add);
-  sha1.close();
-  return sha1.digest;
-}
-
 class _SHA1 extends HashBase {
   const _SHA1();
 
   @override
-  Sink<List<int>> startChunkedConversion(Sink<HashDigest> sink) =>
-      SHA1Sink(sink);
+  SHA1Sink create() => SHA1Sink();
+}
+
+/// Generates a SHA-1 checksum
+String sha1sum(
+  final String input, [
+  Encoding? encoding,
+  bool uppercase = false,
+]) {
+  return sha1.string(input, encoding).hex(uppercase);
 }

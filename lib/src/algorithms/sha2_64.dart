@@ -3,13 +3,11 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/hash_sink.dart';
 
 class SHA384Sink extends _SHA2of64bit {
-  SHA384Sink([Sink<HashDigest>? sink])
+  SHA384Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 384,
           seed: [
             0xCBBB9D5D, 0xC1059ED8, // a
@@ -25,9 +23,8 @@ class SHA384Sink extends _SHA2of64bit {
 }
 
 class SHA512Sink extends _SHA2of64bit {
-  SHA512Sink([Sink<HashDigest>? sink])
+  SHA512Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 512,
           seed: [
             0x6A09E667, 0xF3BCC908, // a
@@ -42,10 +39,9 @@ class SHA512Sink extends _SHA2of64bit {
         );
 }
 
-class SHA512224Sink extends _SHA2of64bit {
-  SHA512224Sink([Sink<HashDigest>? sink])
+class SHA512t224Sink extends _SHA2of64bit {
+  SHA512t224Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 224,
           seed: [
             0x8C3D37C8, 0x19544DA2, // a
@@ -60,10 +56,9 @@ class SHA512224Sink extends _SHA2of64bit {
         );
 }
 
-class SHA512256Sink extends _SHA2of64bit {
-  SHA512256Sink([Sink<HashDigest>? sink])
+class SHA512t256Sink extends _SHA2of64bit {
+  SHA512t256Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 256,
           seed: [
             0x22312194, 0xFC2BF72C, // a
@@ -112,17 +107,15 @@ const List<int> _k = [
 /// The implementation is derived from the US Secure Hash Algorithms document
 /// of [SHA and SHA-based HMAC and HKDF][rfc6234].
 ///
-/// [rfc6234]: https://datatracker.ietf.org/doc/html/rfc6234
+/// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
 abstract class _SHA2of64bit extends HashSink {
   final Uint64List _extended = Uint64List(80);
 
   /// For internal use only.
   _SHA2of64bit({
-    Sink<HashDigest>? sink,
     required List<int> seed,
     required int hashLengthInBits,
   }) : super(
-          sink: sink,
           seed: seed,
           signatureLength: 16,
           blockLengthInBits: 1024,

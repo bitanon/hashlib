@@ -3,7 +3,6 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/hash_sink.dart';
 
 const _mask32 = 0xFFFFFFFF;
@@ -35,11 +34,10 @@ const int _s44 = 21;
 /// This implementation is derived from the RSA Data Security, Inc.
 /// [MD5 Message-Digest Algorithm][rfc1321].
 ///
-/// [rfc1321]: https://datatracker.ietf.org/doc/html/rfc1321
+/// [rfc1321]: https://www.rfc-editor.org/rfc/rfc1321
 class MD5Sink extends HashSinkLittle {
-  MD5Sink([Sink<HashDigest>? sink])
+  MD5Sink()
       : super(
-          sink: sink,
           hashLengthInBits: 128,
           blockLengthInBits: 512,
           seed: [

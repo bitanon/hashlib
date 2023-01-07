@@ -4,7 +4,7 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/utils.dart';
+import 'package:hashlib/src/core/utils.dart' as utils;
 
 class HashDigest {
   final Uint8List bytes;
@@ -28,15 +28,15 @@ class HashDigest {
 
   /// The message digest as a string of hexadecimal digits.
   String hex([bool uppercase = false]) {
-    return toHex(bytes, uppercase);
+    return utils.toHex(bytes, uppercase);
   }
 
   /// The message digest as a string of ASCII alphabets.
-  String ascii() {
-    return toAscii(bytes);
+  String toAscii() {
+    return utils.toAscii(bytes);
   }
 
   /// The message digest as a string of hexadecimal digits.
   @override
-  String toString() => toHex(bytes);
+  String toString() => utils.toHex(bytes);
 }

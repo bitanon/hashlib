@@ -2,40 +2,32 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:typed_data';
+
 import 'package:hashlib/src/core/hash_digest.dart';
 
 // Maximum length of message allowed (considering both the JS and the Dart VM)
 const int _maxMessageLength = (1 << 50) - 1;
 
-/// Parent class for hash algorithms with big endian numbers.
-///
-/// This class only supports big endian numbers. Use [HashSinkLittle] to use
-/// little endian numbers.
-abstract class HashSink extends Sink<List<int>> {
-  Sink<HashDigest>? sink;
+abstract class HashDigestSink {
+  const HashDigestSink();
+
+  /// Resets the internal state to make it ready for re-use
+  void reset();
+
+  /// Adds [data] to the message-digest.
+  ///
+  /// Throws [StateError] if called after closing the digest.
+  void add(List<int> data);
+
+  /// Finalizes the message-digest and returns a [HashDigest]
+  HashDigest digest();
+}
+
+abstract class _HashSinkBase implements HashDigestSink {
   final List<int> seed;
-  final Uint32List state;
-  final Uint32List chunk;
-  final Uint8List _buffer;
 
-  int _pos = 0;
-  HashDigest? _digest;
-  bool _closed = false;
-  int _messageLength = 0;
-
-  HashSink({
-    this.sink,
-    required this.seed,
-    required int hashLengthInBits,
-    this.blockLengthInBits = 512,
-    this.signatureLength = 8,
-    int? extendedChunkLength,
-  })  : state = Uint32List.fromList(seed),
-        hashLength = hashLengthInBits >>> 3,
-        blockLength = blockLengthInBits >>> 3,
-        blockLengthInWords = blockLengthInBits >>> 5,
-        _buffer = Uint8List(blockLengthInBits >>> 3),
-        chunk = Uint32List(extendedChunkLength ?? blockLengthInBits >>> 5);
+  /// The length of generated hash in bits
+  final int hashLengthInBits;
 
   /// The length of generated hash in bytes
   final int hashLength;
@@ -49,38 +41,66 @@ abstract class HashSink extends Sink<List<int>> {
   /// The internal block length of the algorithm in words
   final int blockLengthInWords;
 
+  /// The byte to append at the end of the digest when closing
+  final int signatureLength;
+
+  const _HashSinkBase({
+    required this.seed,
+    required this.hashLengthInBits,
+    this.blockLengthInBits = 512,
+    this.signatureLength = 8,
+  })  : hashLength = hashLengthInBits >>> 3,
+        blockLength = blockLengthInBits >>> 3,
+        blockLengthInWords = blockLengthInBits >>> 5;
+}
+
+/// Parent class for hash algorithms with big endian numbers.
+///
+/// This class only supports big endian numbers. Use [HashSinkLittle] to use
+/// little endian numbers.
+abstract class HashSink extends _HashSinkBase {
+  late final Uint32List state;
+  late final Uint32List chunk;
+  late final Uint8List _buffer;
+
+  int _pos = 0;
+  HashDigest? _digest;
+  int _messageLength = 0;
+
+  HashSink({
+    required List<int> seed,
+    required int hashLengthInBits,
+    int blockLengthInBits = 512,
+    int signatureLength = 8,
+    int? extendedChunkLength,
+  }) : super(
+          seed: seed,
+          signatureLength: signatureLength,
+          hashLengthInBits: hashLengthInBits,
+          blockLengthInBits: blockLengthInBits,
+        ) {
+    state = Uint32List.fromList(seed);
+    _buffer = Uint8List(blockLength);
+    chunk = Uint32List(extendedChunkLength ?? blockLength);
+  }
+
   /// The original message length in bytes
   int get messageLength => _messageLength;
 
   /// The original message length in bits
   int get messageLengthInBits => _messageLength << 3;
 
-  /// The byte to append at the end of the digest when closing
-  final int signatureLength;
-
-  /// The final message-digest.
-  ///
-  /// Throws [StateError] if called before closing the digest.
-  HashDigest get digest {
-    if (_digest == null) {
-      throw StateError('The message-digest is not yet closed.');
-    }
-    return _digest!;
-  }
-
-  /// Resets all state to make it ready for re-use
-  void reset([Sink<HashDigest>? sink]) {
-    this.sink = sink;
+  @override
+  void reset() {
     _pos = 0;
     _digest = null;
-    _closed = false;
     _messageLength = 0;
     state.setAll(0, seed);
   }
 
   @override
   void add(List<int> data) {
-    if (_closed) {
+    if (_digest != null) {
       throw StateError('The message-digest is already closed');
     }
 
@@ -108,9 +128,10 @@ abstract class HashSink extends Sink<List<int>> {
   }
 
   @override
-  void close() {
-    if (_closed) return;
-    _closed = true;
+  HashDigest digest() {
+    if (_digest != null) {
+      return _digest!;
+    }
 
     // Adding the signature byte
     _buffer[_pos++] = 0x80;
@@ -134,8 +155,24 @@ abstract class HashSink extends Sink<List<int>> {
     processData(_buffer, blockLength);
     _pos = 0;
 
-    _digest = HashDigest(buildDigest());
-    sink?.add(_digest!);
+    var result = HashDigest(buildDigest());
+    _digest = result;
+
+    return result;
+  }
+
+  /// Split data into chunks and update the message digest
+  int processData(List<int> data, int n, [int t = 0]) {
+    while ((n - t) >= blockLength) {
+      for (int i = 0; i < blockLengthInWords; i++, t += 4) {
+        chunk[i] = ((data[t] & 0xFF) << 24) |
+            ((data[t + 1] & 0xFF) << 16) |
+            ((data[t + 2] & 0xFF) << 8) |
+            ((data[t + 3] & 0xFF));
+      }
+      update(chunk);
+    }
+    return t;
   }
 
   /// Append 64-bit integer at the end of the buffer
@@ -158,21 +195,7 @@ abstract class HashSink extends Sink<List<int>> {
     return bytes;
   }
 
-  /// Split data into chunks and update the message digest
-  int processData(List<int> data, int n, [int t = 0]) {
-    while ((n - t) >= blockLength) {
-      for (int i = 0; i < blockLengthInWords; i++, t += 4) {
-        chunk[i] = ((data[t] & 0xFF) << 24) |
-            ((data[t + 1] & 0xFF) << 16) |
-            ((data[t + 2] & 0xFF) << 8) |
-            ((data[t + 3] & 0xFF));
-      }
-      update(chunk);
-    }
-    return t;
-  }
-
-  /// Internal method to update the message-digest with new block
+  /// Update the message-digest with new 32-bit block
   void update(Uint32List block);
 }
 
@@ -181,14 +204,12 @@ abstract class HashSink extends Sink<List<int>> {
 /// Supports only little endian numbers. Use [HashSink] for big endian numbers.
 abstract class HashSinkLittle extends HashSink {
   HashSinkLittle({
-    Sink<HashDigest>? sink,
     required List<int> seed,
     required int hashLengthInBits,
     int blockLengthInBits = 512,
     int signatureLength = 8,
     int? extendedChunkLength,
   }) : super(
-          sink: sink,
           seed: seed,
           hashLengthInBits: hashLengthInBits,
           blockLengthInBits: blockLengthInBits,
@@ -220,6 +241,13 @@ abstract class HashSinkLittle extends HashSink {
 
   @override
   Uint8List buildDigest() {
-    return state.buffer.asUint8List(0, hashLength);
+    var bytes = Uint8List(hashLength);
+    for (int j = 0, i = 0; j < hashLength; i++, j += 4) {
+      bytes[j] = state[i];
+      bytes[j + 1] = state[i] >> 8;
+      bytes[j + 2] = state[i] >> 16;
+      bytes[j + 3] = state[i] >> 24;
+    }
+    return bytes;
   }
 }

@@ -33,31 +33,31 @@ final tests = {
 void main() {
   group('SHA1 test', () {
     test('with empty string', () {
-      expect(hashlib.sha1sum("").hex(), tests[""]);
+      expect(hashlib.sha1sum(""), tests[""]);
     });
 
     test('with single letter', () {
-      expect(hashlib.sha1sum("a").hex(), tests["a"]);
+      expect(hashlib.sha1sum("a"), tests["a"]);
     });
 
     test('with few letters', () {
-      expect(hashlib.sha1sum("abc").hex(), tests["abc"]);
+      expect(hashlib.sha1sum("abc"), tests["abc"]);
     });
 
     test('with longest string', () {
       var last = tests.entries.last;
-      expect(hashlib.sha1sum(last.key).hex(), last.value);
+      expect(hashlib.sha1sum(last.key), last.value);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.sha1sum(key).hex(), value);
+      expect(hashlib.sha1sum(key), value);
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha1sum(key).hex(), value);
+        expect(hashlib.sha1sum(key), value);
       });
     });
 
@@ -67,7 +67,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha1stream(stream);
+        final result = await hashlib.sha1.stream(stream);
         expect(result.hex(), entry.value);
       }
     });
@@ -81,6 +81,17 @@ void main() {
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }
+    });
+
+    test('run in parallel', () async {
+      await Future.wait(List.generate(10, (i) => i).map((i) async {
+        final data = List<int>.filled(i, 97);
+        expect(
+          toHex(hashlib.sha1.convert(data).bytes),
+          toHex(crypto.sha1.convert(data).bytes),
+          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
+        );
+      }));
     });
   });
 }

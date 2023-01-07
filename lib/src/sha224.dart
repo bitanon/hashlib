@@ -5,8 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2_32.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
-import 'package:hashlib/src/core/utils.dart';
 
 /// SHA-224 is a part of SHA-2 algorithm family designed by the United States
 /// National Security Agency (NSA) and first published in 2001.
@@ -15,28 +13,18 @@ import 'package:hashlib/src/core/utils.dart';
 /// omits the last 32-bits of SHA-256 to generate a 224-bit long hash digest.
 const HashBase sha224 = _SHA224();
 
-/// Generates a 224-bit SHA-224 hash digest from a byte array
-HashDigest sha224buffer(final List<int> input) {
-  return sha224.convert(input);
-}
-
-/// Generates a 224-bit SHA-224 hash from string
-HashDigest sha224sum(final String input, [Encoding? encoding]) {
-  return sha224buffer(toBytes(input, encoding));
-}
-
-/// Generates a 224-bit SHA-224 hash from stream
-Future<HashDigest> sha224stream(final Stream<List<int>> stream) async {
-  var sha224 = SHA224Sink();
-  await stream.forEach(sha224.add);
-  sha224.close();
-  return sha224.digest;
-}
-
 class _SHA224 extends HashBase {
   const _SHA224();
 
   @override
-  Sink<List<int>> startChunkedConversion(Sink<HashDigest> sink) =>
-      SHA224Sink(sink);
+  SHA224Sink create() => SHA224Sink();
+}
+
+/// Generates a SHA-224 checksum
+String sha224sum(
+  final String input, [
+  Encoding? encoding,
+  bool uppercase = false,
+]) {
+  return sha224.string(input, encoding).hex(uppercase);
 }
