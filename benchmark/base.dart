@@ -26,7 +26,6 @@ abstract class Benchmark extends BenchmarkBase {
   Map<String, int> measureDiff(List<BenchmarkBase> others) {
     Map<String, int> data = {};
     for (BenchmarkBase benchmark in {...others, this}) {
-      benchmark.warmup();
       data[benchmark.name] = benchmark.measure().round();
     }
     return data;
@@ -37,12 +36,12 @@ abstract class Benchmark extends BenchmarkBase {
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
     for (var entry in data.entries) {
-      var message = "${entry.key} Runtime: ${entry.value} us";
+      var message = "${entry.key} Runtime: ${entry.value} ms";
       if (entry.value == best) {
         message += " [best]";
       }
       if (entry.key != name) {
-        message += " ~ ${(entry.value - mine)} us";
+        message += " ~ ${(entry.value - mine)} ms";
       }
       print(message);
     }

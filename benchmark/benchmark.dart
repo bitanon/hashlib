@@ -13,7 +13,7 @@ void main(List<String> args) {
   final conditions = [
     [17, 1000],
     [1777, 50],
-    [77000, 2],
+    [177000, 1],
   ];
 
   print('## Benchmarks');
@@ -64,18 +64,19 @@ void main(List<String> args) {
     };
 
     var names = algorithms[algorithms.keys.first]!.map((e) => e.name);
-    var separator = names.map((e) => ('-' * (e.length + 1)) + ':');
+    var separator = names.map((e) => ('-' * (e.length + 3)) + ':');
 
     print("With string of length $size ($iter times):");
     print('');
-    print('| Algorithms | ${names.join(' | ')} | Difference |');
-    print('|------------|${separator.join('|')}|:----------:|');
+    print('| Algorithms | `${names.join('` | `')}` |  Comment  |');
+    print('|------------|${separator.join('|')}|:---------:|');
 
     for (var entry in algorithms.entries) {
       var me = entry.value.first;
       var diff = me.measureDiff(entry.value);
       var mine = diff[me.name]!;
       var best = diff.values.fold(mine, min);
+      var worst = diff.values.fold(mine, max);
       var message = '| ${entry.key}     ';
       for (var name in names) {
         message += " | ";
@@ -91,10 +92,14 @@ void main(List<String> args) {
         }
       }
       message += " | ";
-      if (mine == best) {
-        message += '     \u2796     ';
+      if (mine > best) {
+        var p = (100 * (mine - best) / best).round();
+        message += ' $p% slower ';
+      } else if (mine < worst) {
+        var p = (100 * (worst - mine) / worst).round();
+        message += ' $p% faster ';
       } else {
-        message += '${mine - best} us';
+        message += "    \u2796    ";
       }
       message += " |";
       print(message);

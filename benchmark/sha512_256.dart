@@ -11,7 +11,7 @@ import 'base.dart';
 Random random = Random();
 
 class HashlibBenchmark extends Benchmark {
-  HashlibBenchmark(int size, int iter) : super('Hashlib', size, iter);
+  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
 
   @override
   void run() {
@@ -20,7 +20,7 @@ class HashlibBenchmark extends Benchmark {
 }
 
 class CryptoBenchmark extends Benchmark {
-  CryptoBenchmark(int size, int iter) : super('Crypto', size, iter);
+  CryptoBenchmark(int size, int iter) : super('crypto', size, iter);
 
   @override
   void run() {
