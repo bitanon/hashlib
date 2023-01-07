@@ -8,15 +8,14 @@ import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/utils.dart';
 
-/// MD5 can be used as a checksum to verify data integrity against
-/// unintentional corruption. Although it was widely used as a cryptographic
-/// has function once, it has been found to suffer from extensive
-/// vulnerabilities.
+/// MD5 can be used as a checksum to verify data integrity against unintentional
+/// corruption. Although it was widely used as a cryptographic has function
+/// once, it has been found to suffer from extensive vulnerabilities.
 ///
-/// **Warning**: Do not use it for cryptographic purposes.
+/// **WARNING**: Do not use it for cryptographic purposes.
 const HashBase md5 = _MD5();
 
-/// Generates a 128-bit MD5 hash digest from the input.
+/// Generates a 128-bit MD5 hash digest from a byte array
 HashDigest md5buffer(final List<int> input) {
   return md5.convert(input);
 }

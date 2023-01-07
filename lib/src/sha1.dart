@@ -14,10 +14,10 @@ import 'package:hashlib/src/core/utils.dart';
 /// in digital signatures, however it is safe to use it as a checksum to verify
 /// data integrity.
 ///
-/// **Warning**: Do not use it for cryptographic purposes.
+/// **WARNING**: Do not use it for cryptographic purposes.
 const HashBase sha1 = _SHA1();
 
-/// Generates a 160-bit SHA-1 hash digest from the input.
+/// Generates a 160-bit SHA-1 hash digest from a byte array
 HashDigest sha1buffer(final List<int> input) {
   return sha1.convert(input);
 }

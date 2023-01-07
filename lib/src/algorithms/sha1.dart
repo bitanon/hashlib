@@ -34,7 +34,7 @@ class SHA1Sink extends HashSink {
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   @override
-  void update(final Uint32List block) {
+  void update(Uint32List block) {
     var w = block;
     var a = state[0];
     var b = state[1];

@@ -9,7 +9,7 @@ import 'package:hashlib/src/core/hash_digest.dart';
 const int _maxMessageLength = (1 << 50) - 1;
 
 abstract class HashSink extends Sink<List<int>> {
-  final Sink<HashDigest>? sink;
+  Sink<HashDigest>? sink;
   final List<int> seed;
   final Uint32List state;
   final Uint32List chunk;
@@ -26,7 +26,7 @@ abstract class HashSink extends Sink<List<int>> {
     required int hashLengthInBits,
     this.blockLengthInBits = 512,
     this.endian = Endian.big,
-    this.signatureByte = 0x80,
+    this.signatureLength = 8,
     int? extendedChunkLength,
   })  : state = Uint32List.fromList(seed),
         hashLength = hashLengthInBits >>> 3,
@@ -57,7 +57,7 @@ abstract class HashSink extends Sink<List<int>> {
   int get messageLengthInBits => _messageLength << 3;
 
   /// The byte to append at the end of the digest when closing
-  final int signatureByte;
+  final int signatureLength;
 
   /// The final message-digest.
   ///
@@ -73,7 +73,8 @@ abstract class HashSink extends Sink<List<int>> {
   void update(Uint32List block);
 
   /// Resets all state to make it ready for re-use
-  void reset() {
+  void reset([Sink<HashDigest>? sink]) {
+    this.sink = sink;
     _pos = 0;
     _digest = null;
     _closed = false;
@@ -106,10 +107,10 @@ abstract class HashSink extends Sink<List<int>> {
     _closed = true;
 
     // Adding the signature byte
-    _buffer[_pos++] = signatureByte;
+    _buffer[_pos++] = 0x80;
 
     // If no more space left in buffer for the message length
-    if (_pos > blockLength - 8) {
+    if (_pos > blockLength - signatureLength) {
       while (_pos < blockLength) {
         _buffer[_pos++] = 0;
       }
@@ -160,10 +161,7 @@ abstract class HashSink extends Sink<List<int>> {
     }
 
     _digest = HashDigest(bytes);
-    if (sink != null) {
-      sink!.add(_digest!);
-      sink!.close();
-    }
+    sink?.add(_digest!);
   }
 
   void _process() {

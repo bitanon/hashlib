@@ -11,6 +11,10 @@ final tests = {
   "abc": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
   "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq":
       "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789":
+      "db4bfcbd4da0cd85a60c3c37d3fbd8805c77f15fc6b1fdfe614ee0a7c8fdb4c0",
+  "12345678901234567890123456789012345678901234567890123456789012345678901234567890":
+      "f371bc4a311f2b009eef952dd83ca80e2b60026c8e935592d0f9c308453c813e",
   "The quick brown fox jumps over the lazy dog":
       "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592",
   "The quick brown fox jumps over the lazy cog":
@@ -28,7 +32,7 @@ final tests = {
 };
 
 void main() {
-  group('SHA-256 tests', () {
+  group('SHA256 test', () {
     test('with empty string', () {
       expect(hashlib.sha256sum("").hex(), tests[""]);
     });
@@ -41,8 +45,8 @@ void main() {
       expect(hashlib.sha256sum("abc").hex(), tests["abc"]);
     });
 
-    test('with block size', () {
-      var key = tests.keys.firstWhere((x) => x.length == 512);
+    test('with string of length 511', () {
+      var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
       expect(hashlib.sha256sum(key).hex(), value);
     });
@@ -71,16 +75,12 @@ void main() {
     });
 
     test('to compare against known implementations', () {
-      final random = Random.secure();
-      for (int i = 0; i < 100; ++i) {
-        final data = List.generate(
-          random.nextInt(1000) + 10,
-          (i) => random.nextInt(24) + 97,
-        );
+      for (int i = 0; i < 1000; ++i) {
+        final data = List<int>.filled(i, 97);
         expect(
           toHex(hashlib.sha256.convert(data).bytes),
           toHex(crypto.sha256.convert(data).bytes),
-          reason: String.fromCharCodes(data),
+          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }
     });

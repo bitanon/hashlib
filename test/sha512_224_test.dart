@@ -6,60 +6,59 @@ import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
 final tests = {
-  "": "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f",
-  "a": "abd37534c7d9a2efb9465de931cd7055ffdb8879563ae98078d6d6d5",
-  "abc": "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
+  "": "6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4",
+  "a": "d5cdb9ccc769a5121d4175f2bfdd13d6310e0d3d361ea75d82108327",
+  "abc": "4634270f707b6a54daae7530460842e20e37ed265ceee9a43e8924aa",
   "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq":
-      "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525",
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789":
-      "bff72b4fcb7d75e5632900ac5f90d219e05e97a7bde72e740db393d9",
-  "12345678901234567890123456789012345678901234567890123456789012345678901234567890":
-      "b50aecbe4e9bb0b57bc5f3ae760a8e01db24f203fb3cdcd13148046e",
+      "e5302d6d54bb242275d1e7622d68df6eb02dedd13f564c13dbda2174",
   "The quick brown fox jumps over the lazy dog":
-      "730e109bd7a8a32b1cb9d9a09aa2325d2430587ddbc0c38bad911525",
+      "944cd2847fb54558d4775db0485a50003111c8e5daa63fe722c6aa37",
   "The quick brown fox jumps over the lazy cog":
-      "fee755f44a55f20fb3362cdc3c493615b3cb574ed95ce610ee5b1e9b",
+      "2b9d6565a7e40f780ba8ab7c8dcf41e3ed3b77997f4c55aa987eede5",
   List.filled(512, "a").join():
-      "e926c6b764d4b216c99067c92f838ca1c5793c13c782d9ef7b668d71",
+      "057bab73fa47ac3e597a34d02c1e285e2d5d8a2e90c9079f549b4af6",
   List.filled(128, "a").join():
-      "39873a2441c56608137850f4c54dde157710b9a2b83c8bdc756dd643",
+      "261b94bcba554264b3b738e9e09e7dc68ac8e0b4c8517fe9bb7c3617",
   List.filled(513, "a").join():
-      "e0afca6342847c80827fdc511f0004e53239d3c2f82f67ddd8185bef",
+      "502ec9656e1e0b96f9a2699c04cec265edc690b729c45037c6b37a00",
   List.filled(511, "a").join():
-      "6eb1c24577241c0871ec3ab020786f59cecb2edb6acef2d483051d6a",
+      "bd0452a57045c857de05b1c1d94fb49624b00ceaf0ec4c0d4d656a89",
   List.filled(1000000, "a").join():
-      "20794655980c91d8bbb4c1ea97618a4bf03f42581948b2ee4ee7ad67",
+      "37ab331d76f0d36de422bd0edeb22a28accd487b7a8453ae965dd287",
+  List.filled(112, "a").join():
+      "79b41fef2a0439d2705724a67615f7bcbcd2bf5664a7774b80818eb6",
 };
 
 void main() {
-  group('SHA224 test', () {
+  group('SHA512224 test', () {
     test('with empty string', () {
-      expect(hashlib.sha224sum("").hex(), tests[""]);
+      expect(hashlib.sha512224sum("").hex(), tests[""]);
     });
 
     test('with single letter', () {
-      expect(hashlib.sha224sum("a").hex(), tests["a"]);
+      expect(hashlib.sha512224sum("a").hex(), tests["a"]);
     });
 
     test('with few letters', () {
-      expect(hashlib.sha224sum("abc").hex(), tests["abc"]);
+      expect(hashlib.sha512224sum("abc").hex(), tests["abc"]);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.sha224sum(key).hex(), value);
+      expect(hashlib.sha512224sum(key).hex(), value);
     });
 
-    test('with known cases', () {
+    test('known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha224sum(key).hex(), value);
+        // print(toHex(crypto.sha512224.convert(toBytes(key)).bytes));
+        expect(hashlib.sha512224sum(key).hex(), value);
       });
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha224sum(key).hex(), value);
+        expect(hashlib.sha512224sum(key).hex(), value);
       });
     });
 
@@ -69,7 +68,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha224stream(stream);
+        final result = await hashlib.sha512224stream(stream);
         expect(result.hex(), entry.value);
       }
     });
@@ -78,8 +77,8 @@ void main() {
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
         expect(
-          toHex(hashlib.sha224.convert(data).bytes),
-          toHex(crypto.sha224.convert(data).bytes),
+          toHex(hashlib.sha512224.convert(data).bytes),
+          toHex(crypto.sha512224.convert(data).bytes),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }

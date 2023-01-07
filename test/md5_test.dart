@@ -27,7 +27,7 @@ final tests = {
 };
 
 void main() {
-  group('MD5 tests', () {
+  group('MD5 test', () {
     test('with empty string', () {
       expect(hashlib.md5sum("").hex(), tests[""]);
     });
@@ -51,8 +51,8 @@ void main() {
       expect(hashlib.md5sum(key).hex(), tests[key]);
     });
 
-    test('with block size', () {
-      var key = tests.keys.firstWhere((x) => x.length == 512);
+    test('with string of length 511', () {
+      var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
       expect(hashlib.md5sum(key).hex(), value);
     });
@@ -75,16 +75,12 @@ void main() {
     });
 
     test('to compare against known implementations', () {
-      final random = Random.secure();
-      for (int i = 0; i < 100; ++i) {
-        final data = List.generate(
-          random.nextInt(1000) + 10,
-          (i) => random.nextInt(24) + 97,
-        );
+      for (int i = 0; i < 1000; ++i) {
+        final data = List<int>.filled(i, 97);
         expect(
           toHex(hashlib.md5.convert(data).bytes),
           toHex(crypto.md5.convert(data).bytes),
-          reason: String.fromCharCodes(data),
+          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }
     });

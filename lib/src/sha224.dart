@@ -9,12 +9,13 @@ import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/utils.dart';
 
 /// SHA-224 is a part of SHA-2 algorithm family designed by the United States
-/// National Security Agency (NSA) and first published in 2001. SHA-224 and
-/// SHA-256 essentially does the same calculations, except this one omits the
-/// last 32-bits of SHA-256 to generate a 224-bit long hash digest.
+/// National Security Agency (NSA) and first published in 2001.
+///
+/// SHA-224 and SHA-256 essentially does the same calculations, except this one
+/// omits the last 32-bits of SHA-256 to generate a 224-bit long hash digest.
 const HashBase sha224 = _SHA224();
 
-/// Generates a 224-bit SHA-224 hash digest from the input.
+/// Generates a 224-bit SHA-224 hash digest from a byte array
 HashDigest sha224buffer(final List<int> input) {
   return sha224.convert(input);
 }
