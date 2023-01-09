@@ -26,12 +26,12 @@ This library contains implementations of secure hash functions, checksum generat
 | `sha3_512`   |   ✔️    | 1.0.0  |  ⌛  |        |
 | `shake128`   |   ✔️    | 1.0.0  |  ⌛  |        |
 | `shake256`   |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak_224` |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak_256` |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak_384` |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak_512` |   ✔️    | 1.0.0  |  ⌛  |        |
 
 <!--
-| `keccak_224` |   ⌛    |        |  ⌛  |        |
-| `keccak_256` |   ⌛    |        |  ⌛  |        |
-| `keccak_384` |   ⌛    |        |  ⌛  |        |
-| `keccak_512` |   ⌛    |        |  ⌛  |        |
 | `blake2b`    |   ⌛    |        |  ⌛  |        |
 | `blake2s`    |   ⌛    |        |  ⌛  |        |
 | `blake3`     |   ⌛    |        |  ⌛  |        |
@@ -93,9 +93,11 @@ The following import will give you access to all of the algorithms in this packa
 import 'package:hashlib/hashlib.dart' as hashlib;
 ```
 
+Check the [API Reference](https://pub.dev/documentation/hashlib/latest/) for details.
+
 ## Usage
 
-Check the API Documentation for usage instruction. Examples can be found inside the `example` folder.
+Examples can be found inside the `example` folder.
 
 ```dart
 import 'package:hashlib/hashlib.dart';
@@ -148,9 +150,11 @@ To obtain the following benchmarks, run this command:
 dart run ./benchmark/benchmark.dart`
 ```
 
+> These benchmarks were done in _AMD Ryzen 7 5800X_ with _32GB_ RAM using compiled _exe_ on Windows 10
+
 Libraries:
 
-- **Hashlib** : https://pub.dev/packages/hashlib
+- **Hashlib** : https://pub.dev/packages/hashlib 🔥
 - **Crypto** : https://pub.dev/packages/crypto
 - **Hash** : https://pub.dev/packages/hash
 
