@@ -69,7 +69,7 @@ const _rc = <int>[
 /// [keccak]: https://github.com/Legrandin/pycryptodome/blob/master/src/keccak.c
 /// [tiny_sha3]: https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
 abstract class KeccakHash extends BlockHashBase {
-  final int rounds;
+  // final int rounds;
   final int stateSize;
   final int paddingByte;
   final Uint32List state;
@@ -77,7 +77,7 @@ abstract class KeccakHash extends BlockHashBase {
   late final Uint64List qstate;
 
   KeccakHash({
-    this.rounds = 24,
+    // this.rounds = 24,
     required this.stateSize,
     this.paddingByte = 0x06,
     int? outputSize, // equals to state size if not provided
@@ -85,10 +85,10 @@ abstract class KeccakHash extends BlockHashBase {
           stateSize >= 0 && stateSize <= 100,
           'The state size is not valid',
         ),
-        assert(
-          rounds == 24 || rounds == 12,
-          'Only 12 or 24 rounds are supported',
-        ),
+        // assert(
+        //   rounds == 24 || rounds == 12,
+        //   'Only 12 or 24 rounds are supported',
+        // ),
         state = Uint32List(50), // 1600-bit state
         super(
           blockLength: 200 - (stateSize << 1), // rate
@@ -149,7 +149,8 @@ abstract class KeccakHash extends BlockHashBase {
     a23 = st[23];
     a24 = st[24];
 
-    for (int r in _rc.skip(24 - rounds)) {
+    // for (int r in _rc.skip(24 - rounds)) {
+    for (int r in _rc) {
       // Theta parity
       c0 = a0 ^ a5 ^ a10 ^ a15 ^ a20;
       c1 = a1 ^ a6 ^ a11 ^ a16 ^ a21;
@@ -279,5 +280,31 @@ abstract class KeccakHash extends BlockHashBase {
       bytes[i] = bstate[j];
     }
     return bytes;
+  }
+
+  /// Returns a iterable of bytes generated from the Keccak sponge.
+  ///
+  /// It will produce exactly [outputSize] bytes before closing the stream.
+  ///
+  /// If [outputSize] is 0, it will generate an infinite sequence of
+  /// bytes.
+  ///
+  /// **WARNING: Do not go down the rabbit hole of infinite looping!**
+  Iterable<int> generate() sync* {
+    // make sure that the digest is closed
+    var b = digest().bytes;
+    if (b.isNotEmpty) {
+      yield* b;
+      return;
+    }
+
+    // infinite sponge construction
+    for (int j = 0;; j++) {
+      if (j == blockLength) {
+        $update([]);
+        j = 0;
+      }
+      yield bstate[j];
+    }
   }
 }

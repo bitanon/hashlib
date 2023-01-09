@@ -10,9 +10,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// Keccak-256 is a member of Keccak family hash functions that generates
 /// a 256-bit hash.
 ///
-/// _Note that the only difference between Keccak-256 and standard SHA3-256
-/// is the choice of padding, everything else are the same._
-///
 /// Keccak is a secure and versatile hash function family that uses a simple
 /// [sponge construction][sponge] and Keccak-f cryptographic permutation.
 /// After its selection as the winner of the SHA-3 competition, Keccak has
@@ -36,7 +33,7 @@ class _Keccak256 extends HashBase {
       Keccak256Hash();
 }
 
-/// Generates a SHA3-256 checksum
+/// Generates a Keccak-256 checksum
 String keccak256sum(
   String input, [
   Encoding? encoding,

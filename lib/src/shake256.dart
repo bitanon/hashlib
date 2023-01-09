@@ -39,3 +39,15 @@ String shake256sum(
 ]) {
   return Shake256(outputSizeInBytes).string(input, encoding).hex(uppercase);
 }
+
+/// Creates a SHAKE-256 based **infinite** hash generator.
+///
+/// If [seed] is provided it will be used as an input to the algorithm.
+/// With a proper seed, this can work as a random number generator.
+///
+/// **WARNING: Do not go down the rabbit hole of infinite looping!**
+Iterable<int> shake256generator([List<int>? seed]) {
+  final hash = Shake256Hash(0);
+  hash.add(seed ?? []);
+  return hash.generate();
+}

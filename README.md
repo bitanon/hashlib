@@ -26,10 +26,10 @@ This library contains implementations of secure hash functions, checksum generat
 | `sha3_512`   |   ✔️    | 1.0.0  |  ⌛  |        |
 | `shake128`   |   ✔️    | 1.0.0  |  ⌛  |        |
 | `shake256`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak_224` |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak_256` |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak_384` |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak_512` |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak224`  |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak256`  |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak384`  |   ✔️    | 1.0.0  |  ⌛  |        |
+| `keccak512`  |   ✔️    | 1.0.0  |  ⌛  |        |
 
 <!--
 | `blake2b`    |   ⌛    |        |  ⌛  |        |
@@ -37,7 +37,7 @@ This library contains implementations of secure hash functions, checksum generat
 | `blake3`     |   ⌛    |        |  ⌛  |        |
 -->
 
-### MAC generation
+### Message Authentication Code generators
 
 | Algorithms | (Native | Since) | (Web | Since) |
 | ---------- | :-----: | :----: | :--: | :----: |

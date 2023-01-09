@@ -10,9 +10,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// Keccak-224 is a member of Keccak family hash functions that generates
 /// a 224-bit hash.
 ///
-/// _Note that the only difference between Keccak-224 and standard SHA3-224
-/// is the choice of padding, everything else are the same._
-///
 /// Keccak is a secure and versatile hash function family that uses a simple
 /// [sponge construction][sponge] and Keccak-f cryptographic permutation.
 /// After its selection as the winner of the SHA-3 competition, Keccak has
@@ -36,7 +33,7 @@ class _Keccak224 extends HashBase {
       Keccak224Hash();
 }
 
-/// Generates a SHA3-224 checksum
+/// Generates a Keccak-224 checksum
 String keccak224sum(
   String input, [
   Encoding? encoding,

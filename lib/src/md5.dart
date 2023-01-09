@@ -21,7 +21,7 @@ class _MD5 extends HashBase {
   MD5Hash startChunkedConversion([Sink<HashDigest>? sink]) => MD5Hash();
 }
 
-/// Generates a MD-5 checksum
+/// Generates a MD5 checksum
 String md5sum(
   String input, [
   Encoding? encoding,

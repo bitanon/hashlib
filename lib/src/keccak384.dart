@@ -10,9 +10,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// Keccak-384 is a member of Keccak family hash functions that generates
 /// a 384-bit hash.
 ///
-/// _Note that the only difference between Keccak-384 and standard SHA3-384
-/// is the choice of padding, everything else are the same._
-///
 /// Keccak is a secure and versatile hash function family that uses a simple
 /// [sponge construction][sponge] and Keccak-f cryptographic permutation.
 /// After its selection as the winner of the SHA-3 competition, Keccak has
@@ -36,7 +33,7 @@ class _Keccak384 extends HashBase {
       Keccak384Hash();
 }
 
-/// Generates a SHA3-384 checksum
+/// Generates a Keccak-384 checksum
 String keccak384sum(
   String input, [
   Encoding? encoding,
