@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/md5.dart';
 import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 /// MD5 can be used as a checksum to verify data integrity against unintentional
 /// corruption. Although it was widely used as a cryptographic has function
@@ -17,7 +18,7 @@ class _MD5 extends HashBase {
   const _MD5();
 
   @override
-  MD5Sink create() => MD5Sink();
+  MD5Hash startChunkedConversion([Sink<HashDigest>? sink]) => MD5Hash();
 }
 
 /// Generates a MD-5 checksum

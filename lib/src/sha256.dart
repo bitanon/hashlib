@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2_32.dart';
 import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-256 is a part of SHA-2 algorithm family designed by the United States
 /// National Security Agency (NSA) and first published in 2001.
@@ -16,7 +17,7 @@ class _SHA256 extends HashBase {
   const _SHA256();
 
   @override
-  SHA256Sink create() => SHA256Sink();
+  SHA256Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA256Hash();
 }
 
 /// Generates a SHA-256 checksum

@@ -1,5 +1,5 @@
 name: hashlib
-description: RFC-compliant implementations of secure hash functions in pure Dart with zero-dependencies.
+description: Secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 homepage: https://github.com/dipu-bd/hashlib
 version: 1.0.0
 

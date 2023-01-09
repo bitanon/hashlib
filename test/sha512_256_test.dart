@@ -68,7 +68,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha512256.stream(stream);
+        final result = await hashlib.sha512t256.stream(stream);
         expect(result.hex(), entry.value);
       }
     });
@@ -77,7 +77,7 @@ void main() {
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
         expect(
-          toHex(hashlib.sha512256.convert(data).bytes),
+          toHex(hashlib.sha512t256.convert(data).bytes),
           toHex(crypto.sha512256.convert(data).bytes),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
@@ -88,7 +88,7 @@ void main() {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
         final data = List<int>.filled(i, 97);
         expect(
-          toHex(hashlib.sha512256.convert(data).bytes),
+          toHex(hashlib.sha512t256.convert(data).bytes),
           toHex(crypto.sha512256.convert(data).bytes),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );

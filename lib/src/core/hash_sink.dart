@@ -23,7 +23,7 @@ abstract class HashDigestSink {
   HashDigest digest();
 }
 
-abstract class _HashSinkBase implements HashDigestSink {
+abstract class HashSinkBase implements HashDigestSink {
   final List<int> seed;
 
   /// The length of generated hash in bits
@@ -42,13 +42,13 @@ abstract class _HashSinkBase implements HashDigestSink {
   final int blockLengthInWords;
 
   /// The byte to append at the end of the digest when closing
-  final int signatureLength;
+  final int messageLengthBytes;
 
-  const _HashSinkBase({
+  const HashSinkBase({
     required this.seed,
     required this.hashLengthInBits,
     this.blockLengthInBits = 512,
-    this.signatureLength = 8,
+    this.messageLengthBytes = 8,
   })  : hashLength = hashLengthInBits >>> 3,
         blockLength = blockLengthInBits >>> 3,
         blockLengthInWords = blockLengthInBits >>> 5;
@@ -58,7 +58,7 @@ abstract class _HashSinkBase implements HashDigestSink {
 ///
 /// This class only supports big endian numbers. Use [HashSinkLittle] to use
 /// little endian numbers.
-abstract class HashSink extends _HashSinkBase {
+abstract class HashSink extends HashSinkBase {
   late final Uint32List state;
   late final Uint32List chunk;
   late final Uint8List _buffer;
@@ -71,11 +71,11 @@ abstract class HashSink extends _HashSinkBase {
     required List<int> seed,
     required int hashLengthInBits,
     int blockLengthInBits = 512,
-    int signatureLength = 8,
+    int messageLengthBytes = 8,
     int? extendedChunkLength,
   }) : super(
           seed: seed,
-          signatureLength: signatureLength,
+          messageLengthBytes: messageLengthBytes,
           hashLengthInBits: hashLengthInBits,
           blockLengthInBits: blockLengthInBits,
         ) {
@@ -137,7 +137,7 @@ abstract class HashSink extends _HashSinkBase {
     _buffer[_pos++] = 0x80;
 
     // If no more space left in buffer for the message length
-    if (_pos > blockLength - signatureLength) {
+    if (_pos > blockLength - messageLengthBytes) {
       while (_pos < blockLength) {
         _buffer[_pos++] = 0;
       }
@@ -187,9 +187,9 @@ abstract class HashSink extends _HashSinkBase {
   Uint8List buildDigest() {
     var bytes = Uint8List(hashLength);
     for (int j = 0, i = 0; j < hashLength; i++, j += 4) {
-      bytes[j] = state[i] >> 24;
-      bytes[j + 1] = state[i] >> 16;
-      bytes[j + 2] = state[i] >> 8;
+      bytes[j] = state[i] >>> 24;
+      bytes[j + 1] = state[i] >>> 16;
+      bytes[j + 2] = state[i] >>> 8;
       bytes[j + 3] = state[i];
     }
     return bytes;
@@ -213,7 +213,7 @@ abstract class HashSinkLittle extends HashSink {
           seed: seed,
           hashLengthInBits: hashLengthInBits,
           blockLengthInBits: blockLengthInBits,
-          signatureLength: signatureLength,
+          messageLengthBytes: signatureLength,
           extendedChunkLength: extendedChunkLength,
         );
 
@@ -244,9 +244,9 @@ abstract class HashSinkLittle extends HashSink {
     var bytes = Uint8List(hashLength);
     for (int j = 0, i = 0; j < hashLength; i++, j += 4) {
       bytes[j] = state[i];
-      bytes[j + 1] = state[i] >> 8;
-      bytes[j + 2] = state[i] >> 16;
-      bytes[j + 3] = state[i] >> 24;
+      bytes[j + 1] = state[i] >>> 8;
+      bytes[j + 2] = state[i] >>> 16;
+      bytes[j + 3] = state[i] >>> 24;
     }
     return bytes;
   }

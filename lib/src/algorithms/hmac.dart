@@ -1,65 +1,80 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
+import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
-import 'package:hashlib/src/core/hash_sink.dart';
 
 /// This implementation is derived from the RFC document
 /// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
 ///
 /// [rfc2104]: https://www.rfc-editor.org/rfc/rfc2104
-class HMACSink implements HashDigestSink {
-  final HashSink algo;
-  final List<int> outerKey;
-  final List<int> innerKey;
-  HashDigest? _digest;
+class HMACSink extends HashDigestSink {
+  final HashDigestSink outerSink;
+  final HashDigestSink innerSink;
 
-  HMACSink(this.algo, List<int> key)
-      : outerKey = List.filled(algo.blockLength, 0x5c),
-        innerKey = List.filled(algo.blockLength, 0x36) {
+  factory HMACSink(HashBase algo, List<int> key) {
+    var outerSink = algo.startChunkedConversion();
+    var innerSink = algo.startChunkedConversion();
+    var paddedKey = Uint8List(outerSink.blockLength);
+
     // Keys longer than blockLength are shortened by hashing them
-    if (key.length > algo.blockLength) {
-      algo.reset();
-      algo.add(key);
-      key = algo.digest().bytes;
+    if (key.length > outerSink.blockLength) {
+      key = algo.convert(key).bytes;
     }
 
-    // Calculated padded keys
+    // Calculated padded key for outer sink
     for (var i = 0; i < key.length; i++) {
-      outerKey[i] ^= key[i];
-      innerKey[i] ^= key[i];
+      paddedKey[i] = key[i] ^ 0x5c;
     }
+    for (var i = key.length; i < paddedKey.length; i++) {
+      paddedKey[i] = 0x5c;
+    }
+    outerSink.add(paddedKey);
 
-    // Append inner padding before original message
-    algo.reset();
-    algo.add(innerKey);
+    // Calculated padded key for inner sink
+    for (var i = 0; i < key.length; i++) {
+      paddedKey[i] = key[i] ^ 0x36;
+    }
+    for (var i = key.length; i < paddedKey.length; i++) {
+      paddedKey[i] = 0x36;
+    }
+    innerSink.add(paddedKey);
+
+    return HMACSink._(
+      outerSink: outerSink,
+      innerSink: innerSink,
+      hashLength: outerSink.hashLength,
+      blockLength: outerSink.blockLength,
+    );
   }
+
+  HMACSink._({
+    required this.outerSink,
+    required this.innerSink,
+    required int blockLength,
+    required int hashLength,
+  }) : super(
+          blockLength: blockLength,
+          hashLength: hashLength,
+        );
 
   @override
-  void reset() {
-    _digest = null;
-    algo.reset();
-    algo.add(innerKey);
-  }
+  bool get closed => outerSink.closed;
 
   @override
   void add(List<int> data) {
-    algo.add(data);
+    innerSink.add(data);
   }
 
   @override
   HashDigest digest() {
-    if (_digest != null) {
-      return _digest!;
+    if (outerSink.closed) {
+      return outerSink.digest();
     }
-
-    var innerHash = algo.digest().bytes;
-
-    algo.reset();
-    algo.add(outerKey);
-    algo.add(innerHash);
-
-    _digest = algo.digest();
-    return _digest!;
+    outerSink.add(innerSink.digest().bytes);
+    return outerSink.digest();
   }
 }

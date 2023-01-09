@@ -15,7 +15,7 @@ class HashlibBenchmark extends Benchmark {
 
   @override
   void run() {
-    hashlib.sha512224.convert(input).bytes;
+    hashlib.sha512t224.convert(input).bytes;
   }
 }
 
@@ -34,12 +34,12 @@ void main() {
     CryptoBenchmark(17, 1000),
   ]);
   print('');
-  HashlibBenchmark(1777, 50).showDiff([
-    CryptoBenchmark(1777, 50),
+  HashlibBenchmark(7000, 100).showDiff([
+    CryptoBenchmark(7000, 100),
   ]);
   print('');
-  HashlibBenchmark(111000, 1).showDiff([
-    CryptoBenchmark(111000, 1),
+  HashlibBenchmark(777000, 1).showDiff([
+    CryptoBenchmark(777000, 1),
   ]);
   print('');
 }

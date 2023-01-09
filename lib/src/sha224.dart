@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2_32.dart';
 import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-224 is a part of SHA-2 algorithm family designed by the United States
 /// National Security Agency (NSA) and first published in 2001.
@@ -17,7 +18,7 @@ class _SHA224 extends HashBase {
   const _SHA224();
 
   @override
-  SHA224Sink create() => SHA224Sink();
+  SHA224Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA224Hash();
 }
 
 /// Generates a SHA-224 checksum

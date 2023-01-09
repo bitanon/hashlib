@@ -3,14 +3,15 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_sink.dart';
+import 'package:hashlib/src/core/block_hash.dart'
+    if (dart.library.js) 'package:hashlib/src/core/block_hash.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
-class SHA224Sink extends _SHA2of32bit {
-  SHA224Sink()
+class SHA224Hash extends _SHA2of32bit {
+  SHA224Hash()
       : super(
-          hashLengthInBits: 224,
+          hashLength: 224 >> 3,
           seed: [
             0xC1059ED8, // a
             0x367CD507, // b
@@ -24,10 +25,10 @@ class SHA224Sink extends _SHA2of32bit {
         );
 }
 
-class SHA256Sink extends _SHA2of32bit {
-  SHA256Sink()
+class SHA256Hash extends _SHA2of32bit {
+  SHA256Hash()
       : super(
-          hashLengthInBits: 256,
+          hashLength: 256 >> 3,
           seed: [
             0x6A09E667, // a
             0xBB67AE85, // b
@@ -65,21 +66,28 @@ const List<int> _k = [
 /// of [SHA and SHA-based HMAC and HKDF][rfc6234].
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
-abstract class _SHA2of32bit extends HashSink {
+abstract class _SHA2of32bit extends BlockHashBase {
+  final Uint32List state;
+  final Uint32List chunk;
+
   /// For internal use only.
   _SHA2of32bit({
     required List<int> seed,
-    required int hashLengthInBits,
-  }) : super(
-          seed: seed,
-          blockLengthInBits: 512,
-          extendedChunkLength: 64,
-          hashLengthInBits: hashLengthInBits,
+    required int hashLength,
+  })  : chunk = Uint32List(64),
+        state = Uint32List.fromList(seed),
+        super(
+          blockLength: 64,
+          hashLength: hashLength,
         );
 
   /// Rotates x right by n bits.
   int _rotr(int x, int n) =>
       ((x & _mask32) >>> n) | ((x << (32 - n)) & _mask32);
+
+  int _ch(int x, int y, int z) => (x & y) ^ ((~x & _mask32) & z);
+
+  int _maj(int x, int y, int z) => (x & y) ^ (x & z) ^ (y & z);
 
   int _bsig0(int x) => (_rotr(x, 2) ^ _rotr(x, 13) ^ _rotr(x, 22));
 
@@ -90,8 +98,8 @@ abstract class _SHA2of32bit extends HashSink {
   int _ssig1(int x) => (_rotr(x, 17) ^ _rotr(x, 19) ^ (x >>> 10));
 
   @override
-  void update(Uint32List block) {
-    var w = block;
+  void update(List<int> block, [int offset = 0]) {
+    var w = chunk;
     var a = state[0];
     var b = state[1];
     var c = state[2];
@@ -101,15 +109,22 @@ abstract class _SHA2of32bit extends HashSink {
     var g = state[6];
     var h = state[7];
 
+    // Convert the block to chunk
+    for (int i = 0, j = offset; i < 16; i++, j += 4) {
+      w[i] = ((block[j] & 0xFF) << 24) |
+          ((block[j + 1] & 0xFF) << 16) |
+          ((block[j + 2] & 0xFF) << 8) |
+          (block[j + 3] & 0xFF);
+    }
+
     // Extend the first 16 words into the remaining 48 words
     for (int i = 16; i < 64; i++) {
       w[i] = _ssig1(w[i - 2]) + w[i - 7] + _ssig0(w[i - 15]) + w[i - 16];
     }
 
     for (int i = 0; i < 64; ++i) {
-      var ch = (e & f) ^ ((~e) & g);
-      var t1 = h + _bsig1(e) + ch + _k[i] + w[i];
-      var t2 = _bsig0(a) + ((a & b) ^ (a & c) ^ (b & c));
+      var t1 = h + _bsig1(e) + _ch(e, f, g) + _k[i] + w[i];
+      var t2 = _bsig0(a) + _maj(a, b, c);
 
       h = g;
       g = f;
@@ -129,5 +144,49 @@ abstract class _SHA2of32bit extends HashSink {
     state[5] += f;
     state[6] += g;
     state[7] += h;
+  }
+
+  @override
+  Uint8List finalize(Uint8List block, int length) {
+    // Adding the signature byte
+    block[length++] = 0x80;
+
+    // If no more space left in buffer for the message length
+    if (length > 56) {
+      for (; length < 64; length++) {
+        block[length] = 0;
+      }
+      update(block);
+      length = 0;
+    }
+
+    // Fill remaining buffer to put the message length at the end
+    for (; length < 56; length++) {
+      block[length] = 0;
+    }
+
+    // Append original message length in bits to message
+    int n = messageLengthInBits;
+    block[56] = n >>> 56;
+    block[57] = n >>> 48;
+    block[58] = n >>> 40;
+    block[59] = n >>> 32;
+    block[60] = n >>> 24;
+    block[61] = n >>> 16;
+    block[62] = n >>> 8;
+    block[63] = n;
+
+    // Update with the final block
+    update(block);
+
+    // Convert the state to 8-bit byte array
+    var bytes = Uint8List(hashLength);
+    for (int j = 0, i = 0; j < hashLength; i++, j += 4) {
+      bytes[j] = state[i] >>> 24;
+      bytes[j + 1] = state[i] >>> 16;
+      bytes[j + 2] = state[i] >>> 8;
+      bytes[j + 3] = state[i];
+    }
+    return bytes;
   }
 }

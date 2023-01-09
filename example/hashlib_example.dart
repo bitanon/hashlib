@@ -21,8 +21,8 @@ void main() {
   print('HMAC[SHA-256] $text => ${sha256.hmacBy(key).string(text)}');
   print('HMAC[SHA-384] $text => ${sha384.hmacBy(key).string(text)}');
   print('HMAC[SHA-512] $text => ${sha512.hmacBy(key).string(text)}');
-  print('HMAC[SHA-512/224] $text => ${sha512224.hmacBy(key).string(text)}');
-  print('HMAC[SHA-512/256] $text => ${sha512256.hmacBy(key).string(text)}');
+  print('HMAC[SHA-512/224] $text => ${sha512t224.hmacBy(key).string(text)}');
+  print('HMAC[SHA-512/256] $text => ${sha512t256.hmacBy(key).string(text)}');
   print('');
 }
 

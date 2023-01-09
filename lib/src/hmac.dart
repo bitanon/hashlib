@@ -5,17 +5,19 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 /// HMAC is a hash-based message authentication code that can be used to
 /// simultaneously verify both the data integrity and authenticity of a message.
-class HMAC extends HashConverterBase {
+class HMAC extends HashBase {
   final HashBase algo;
   final List<int> key;
 
   const HMAC(this.algo, this.key);
 
   @override
-  HMACSink create() => HMACSink(algo.create(), key);
+  HMACSink startChunkedConversion([Sink<HashDigest>? sink]) =>
+      HMACSink(algo, key);
 }
 
 /// Extension to the HashBase to get an [HMAC] instance

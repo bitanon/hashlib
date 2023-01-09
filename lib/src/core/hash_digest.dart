@@ -9,7 +9,7 @@ import 'package:hashlib/src/core/utils.dart' as utils;
 class HashDigest {
   final Uint8List bytes;
 
-  HashDigest(this.bytes);
+  const HashDigest(this.bytes);
 
   /// The message digest as a string of base64.
   String base64() {

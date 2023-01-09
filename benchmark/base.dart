@@ -10,11 +10,14 @@ Random random = Random();
 abstract class Benchmark extends BenchmarkBase {
   final int size;
   final int iter;
-  final List<int> input;
+  List<int> input = [];
 
-  Benchmark(String name, this.size, this.iter)
-      : input = List<int>.generate(size, (i) => random.nextInt(256)),
-        super(name);
+  Benchmark(String name, this.size, this.iter) : super(name);
+
+  @override
+  void setup() {
+    input = List<int>.generate(size, (i) => random.nextInt(256));
+  }
 
   @override
   void exercise() {
@@ -28,12 +31,12 @@ abstract class Benchmark extends BenchmarkBase {
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
     for (var entry in data.entries) {
-      var message = "${entry.key} Runtime: ${entry.value} ms";
+      var message = "${entry.key} Runtime: ${entry.value} µs";
       if (entry.value == best) {
         message += " [best]";
       }
       if (entry.key != name) {
-        message += " ~ ${(entry.value - mine)} ms";
+        message += " ~ ${(entry.value - mine)} µs";
       }
       print(message);
     }
