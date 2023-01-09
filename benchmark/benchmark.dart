@@ -8,9 +8,11 @@ import 'sha224.dart' as sha224;
 import 'sha256.dart' as sha256;
 import 'sha256_hmac.dart' as sha256_hmac;
 import 'sha384.dart' as sha384;
+import 'sha3_256.dart' as sha3_256;
+import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
-import 'sha512_224.dart' as sha512224;
-import 'sha512_256.dart' as sha512256;
+import 'sha512_224.dart' as sha512t224;
+import 'sha512_256.dart' as sha512t256;
 
 void main(List<String> args) {
   final conditions = [
@@ -64,12 +66,18 @@ void main(List<String> args) {
         sha512.HashBenchmark(size, iter),
       ],
       "SHA-512/224": [
-        sha512224.HashlibBenchmark(size, iter),
-        sha512224.CryptoBenchmark(size, iter),
+        sha512t224.HashlibBenchmark(size, iter),
+        sha512t224.CryptoBenchmark(size, iter),
       ],
       "SHA-512/256": [
-        sha512256.HashlibBenchmark(size, iter),
-        sha512256.CryptoBenchmark(size, iter),
+        sha512t256.HashlibBenchmark(size, iter),
+        sha512t256.CryptoBenchmark(size, iter),
+      ],
+      "SHA3-256": [
+        sha3_256.HashlibBenchmark(size, iter),
+      ],
+      "SHA3-512": [
+        sha3_512.HashlibBenchmark(size, iter),
       ],
       "HMAC(MD5)": [
         md5_hmac.HashlibBenchmark(size, iter),

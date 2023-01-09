@@ -23,7 +23,7 @@ class _MD5 extends HashBase {
 
 /// Generates a MD-5 checksum
 String md5sum(
-  final String input, [
+  String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {

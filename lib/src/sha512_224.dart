@@ -3,12 +3,12 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha512.dart';
+import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-/// SHA-512/224 is the truncated version of SHA-512. This algorithm generates
-/// a 224-bit hash omitting the last 288-bit from 512-bit SHA-512 function.
+/// SHA-512/224 is a variation of SHA-512 which uses 512-bit internal state to
+/// generate a message digest of 224-bit long truncating the last bits.
 const HashBase sha512t224 = _SHA512t224();
 
 class _SHA512t224 extends HashBase {

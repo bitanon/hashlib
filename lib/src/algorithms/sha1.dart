@@ -29,21 +29,22 @@ class SHA1Hash extends BlockHashBase {
           blockLength: 512 >> 3,
         );
 
-  /// Rotates x left by n bits.
-  int _rotl(int x, int n) =>
-      ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
-
   @override
-  void update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0]) {
     var w = chunk;
-    var a = state[0];
-    var b = state[1];
-    var c = state[2];
-    var d = state[3];
-    var e = state[4];
+
+    int a, b, c, d, e;
+    int t, x, ch, i, j;
+    a = state[0];
+    b = state[1];
+    c = state[2];
+    d = state[3];
+    e = state[4];
 
     // Convert the block to chunk
-    for (int i = 0, j = offset; i < 16; i++, j += 4) {
+    i = 0;
+    j = offset;
+    for (; i < 16; i++, j += 4) {
       w[i] = ((block[j] & 0xFF) << 24) |
           ((block[j + 1] & 0xFF) << 16) |
           ((block[j + 2] & 0xFF) << 8) |
@@ -51,47 +52,51 @@ class SHA1Hash extends BlockHashBase {
     }
 
     // Extend the first 16 words into the remaining 64 words
-    for (int t = 16; t < 80; t++) {
-      w[t] = _rotl(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+    for (i = 16; i < 80; i++) {
+      x = w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16];
+      w[i] = (x << 1) | ((x & _mask32) >>> 31);
     }
 
-    int t, x, ch;
-    for (t = 0; t < 20; t++) {
-      ch = ((b & c) | ((~b) & d));
-      x = _rotl(a, 5) + ch + e + w[t] + 0x5A827999;
+    for (i = 0; i < 20; i++) {
+      ch = (b & c) | ((~b) & d);
+      t = ((a << 5) & _mask32) | (a >>> 27);
+      x = t + ch + e + w[i] + 0x5A827999;
       e = d;
       d = c;
-      c = _rotl(b, 30);
+      c = ((b << 30) & _mask32) | (b >>> 2);
       b = a;
       a = x & _mask32;
     }
 
-    for (; t < 40; t++) {
+    for (; i < 40; i++) {
       ch = (b ^ c ^ d);
-      x = _rotl(a, 5) + ch + e + w[t] + 0x6ED9EBA1;
+      t = ((a << 5) & _mask32) | (a >>> 27);
+      x = t + ch + e + w[i] + 0x6ED9EBA1;
       e = d;
       d = c;
-      c = _rotl(b, 30);
+      c = ((b << 30) & _mask32) | (b >>> 2);
       b = a;
       a = x & _mask32;
     }
 
-    for (; t < 60; t++) {
+    for (; i < 60; i++) {
       ch = ((b & c) | (b & d) | (c & d));
-      x = _rotl(a, 5) + ch + e + w[t] + 0x8F1BBCDC;
+      t = ((a << 5) & _mask32) | (a >>> 27);
+      x = t + ch + e + w[i] + 0x8F1BBCDC;
       e = d;
       d = c;
-      c = _rotl(b, 30);
+      c = ((b << 30) & _mask32) | (b >>> 2);
       b = a;
       a = x & _mask32;
     }
 
-    for (; t < 80; t++) {
+    for (; i < 80; i++) {
       ch = (b ^ c ^ d);
-      x = _rotl(a, 5) + ch + e + w[t] + 0xCA62C1D6;
+      t = ((a << 5) & _mask32) | (a >>> 27);
+      x = t + ch + e + w[i] + 0xCA62C1D6;
       e = d;
       d = c;
-      c = _rotl(b, 30);
+      c = ((b << 30) & _mask32) | (b >>> 2);
       b = a;
       a = x & _mask32;
     }
@@ -104,7 +109,7 @@ class SHA1Hash extends BlockHashBase {
   }
 
   @override
-  Uint8List finalize(Uint8List block, int length) {
+  Uint8List $finalize(Uint8List block, int length) {
     // Adding the signature byte
     block[length++] = 0x80;
 
@@ -113,7 +118,7 @@ class SHA1Hash extends BlockHashBase {
       for (; length < 64; length++) {
         block[length] = 0;
       }
-      update(block);
+      $update(block);
       length = 0;
     }
 
@@ -134,7 +139,7 @@ class SHA1Hash extends BlockHashBase {
     block[63] = n;
 
     // Update with the final block
-    update(block);
+    $update(block);
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);

@@ -3,44 +3,9 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/block_hash.dart'
-    if (dart.library.js) 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 
 const int _mask32 = 0xFFFFFFFF;
-
-class SHA224Hash extends _SHA2of32bit {
-  SHA224Hash()
-      : super(
-          hashLength: 224 >> 3,
-          seed: [
-            0xC1059ED8, // a
-            0x367CD507, // b
-            0x3070DD17, // c
-            0xF70E5939, // d
-            0xFFC00B31, // e
-            0x68581511, // f
-            0x64F98FA7, // g
-            0xBEFA4FA4, // h
-          ],
-        );
-}
-
-class SHA256Hash extends _SHA2of32bit {
-  SHA256Hash()
-      : super(
-          hashLength: 256 >> 3,
-          seed: [
-            0x6A09E667, // a
-            0xBB67AE85, // b
-            0x3C6EF372, // c
-            0xA54FF53A, // d
-            0x510E527F, // e
-            0x9B05688C, // f
-            0x1F83D9AB, // g
-            0x5BE0CD19, // h
-          ],
-        );
-}
 
 // Initialize array of round constants
 const List<int> _k = [
@@ -62,16 +27,17 @@ const List<int> _k = [
   0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2,
 ];
 
-/// The implementation is derived from the US Secure Hash Algorithms document
-/// of [SHA and SHA-based HMAC and HKDF][rfc6234].
+/// The implementation is derived from [RFC6234][rfc6234] which follows the
+/// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
-abstract class _SHA2of32bit extends BlockHashBase {
+/// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
+abstract class SHA2of32bit extends BlockHashBase {
   final Uint32List state;
   final Uint32List chunk;
 
   /// For internal use only.
-  _SHA2of32bit({
+  SHA2of32bit({
     required List<int> seed,
     required int hashLength,
   })  : chunk = Uint32List(64),
@@ -82,32 +48,41 @@ abstract class _SHA2of32bit extends BlockHashBase {
         );
 
   /// Rotates x right by n bits.
-  int _rotr(int x, int n) =>
-      ((x & _mask32) >>> n) | ((x << (32 - n)) & _mask32);
+  static int _bsig0(int x) =>
+      (((x & _mask32) >>> 2) | ((x << 30) & _mask32)) ^
+      (((x & _mask32) >>> 13) | ((x << 19) & _mask32)) ^
+      (((x & _mask32) >>> 22) | ((x << 10) & _mask32));
 
-  int _ch(int x, int y, int z) => (x & y) ^ ((~x & _mask32) & z);
+  static int _bsig1(int x) =>
+      (((x & _mask32) >>> 6) | ((x << 26) & _mask32)) ^
+      (((x & _mask32) >>> 11) | ((x << 21) & _mask32)) ^
+      (((x & _mask32) >>> 25) | ((x << 7) & _mask32));
 
-  int _maj(int x, int y, int z) => (x & y) ^ (x & z) ^ (y & z);
+  static int _ssig0(int x) =>
+      (((x & _mask32) >>> 7) | ((x << 25) & _mask32)) ^
+      (((x & _mask32) >>> 18) | ((x << 14) & _mask32)) ^
+      (x >>> 3);
 
-  int _bsig0(int x) => (_rotr(x, 2) ^ _rotr(x, 13) ^ _rotr(x, 22));
-
-  int _bsig1(int x) => (_rotr(x, 6) ^ _rotr(x, 11) ^ _rotr(x, 25));
-
-  int _ssig0(int x) => (_rotr(x, 7) ^ _rotr(x, 18) ^ (x >>> 3));
-
-  int _ssig1(int x) => (_rotr(x, 17) ^ _rotr(x, 19) ^ (x >>> 10));
+  static int _ssig1(int x) =>
+      (((x & _mask32) >>> 17) | ((x << 15) & _mask32)) ^
+      (((x & _mask32) >>> 19) | ((x << 13) & _mask32)) ^
+      (x >>> 10);
 
   @override
-  void update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0]) {
     var w = chunk;
-    var a = state[0];
-    var b = state[1];
-    var c = state[2];
-    var d = state[3];
-    var e = state[4];
-    var f = state[5];
-    var g = state[6];
-    var h = state[7];
+
+    int t1, t2, ch, maj;
+    int a, b, c, d, e, f, g, h;
+
+    a = state[0];
+    b = state[1];
+    c = state[2];
+    d = state[3];
+    e = state[4];
+    f = state[5];
+    g = state[6];
+    h = state[7];
 
     // Convert the block to chunk
     for (int i = 0, j = offset; i < 16; i++, j += 4) {
@@ -123,8 +98,10 @@ abstract class _SHA2of32bit extends BlockHashBase {
     }
 
     for (int i = 0; i < 64; ++i) {
-      var t1 = h + _bsig1(e) + _ch(e, f, g) + _k[i] + w[i];
-      var t2 = _bsig0(a) + _maj(a, b, c);
+      ch = (e & f) ^ ((~e & _mask32) & g);
+      maj = (a & b) ^ (a & c) ^ (b & c);
+      t1 = h + _bsig1(e) + ch + _k[i] + w[i];
+      t2 = _bsig0(a) + maj;
 
       h = g;
       g = f;
@@ -147,7 +124,7 @@ abstract class _SHA2of32bit extends BlockHashBase {
   }
 
   @override
-  Uint8List finalize(Uint8List block, int length) {
+  Uint8List $finalize(Uint8List block, int length) {
     // Adding the signature byte
     block[length++] = 0x80;
 
@@ -156,7 +133,7 @@ abstract class _SHA2of32bit extends BlockHashBase {
       for (; length < 64; length++) {
         block[length] = 0;
       }
-      update(block);
+      $update(block);
       length = 0;
     }
 
@@ -177,7 +154,7 @@ abstract class _SHA2of32bit extends BlockHashBase {
     block[63] = n;
 
     // Update with the final block
-    update(block);
+    $update(block);
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);

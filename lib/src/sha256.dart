@@ -3,14 +3,18 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha2_32.dart';
+import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-/// SHA-256 is a part of SHA-2 algorithm family designed by the United States
-/// National Security Agency (NSA) and first published in 2001.
+/// SHA-256 is a member of SHA-2 family which uses 256-bit internal state to
+/// generate a message digest of 256-bit long.
 ///
-/// SHA-256 uses 32-bit operations to generate a 256-bit long hash digest.
+/// SHA-2 is a family of algorithms designed by the United States National
+/// Security Agency (NSA), first published in 2001 and later standardized in
+/// [FIPS 180-4][fips180].
+///
+/// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
 const HashBase sha256 = _SHA256();
 
 class _SHA256 extends HashBase {
@@ -22,7 +26,7 @@ class _SHA256 extends HashBase {
 
 /// Generates a SHA-256 checksum
 String sha256sum(
-  final String input, [
+  String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {

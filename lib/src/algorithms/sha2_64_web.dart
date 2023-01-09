@@ -5,8 +5,6 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 
-const int _mask32 = 0xFFFFFFFF;
-
 // Initialize array of round 64-bit constants
 const List<int> _k = [
   0x428A2F98, 0xD728AE22, 0x71374491, 0x23EF65CD, 0xB5C0FBCF, 0xEC4D3B2F, //
@@ -38,8 +36,6 @@ const List<int> _k = [
   0x5FCB6FAB, 0x3AD6FAEC, 0x6C44198C, 0x4A475817,
 ];
 
-const _r1 = 0;
-const _r2 = 2;
 const _sig1 = 4;
 const _sig2 = 6;
 const _sig3 = 8;
@@ -58,10 +54,15 @@ const _t3 = 32;
 const _t4 = 34;
 const _t5 = 36;
 
-/// The implementation is derived from the US Secure Hash Algorithms document
-/// of [SHA and SHA-based HMAC and HKDF][rfc6234].
+/// The implementation is derived from [RFC6234][rfc6234] which follows the
+/// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
+///
+/// It uses 32-bit integers to accommodate 64-bit integer operations, designed
+/// specially to be supported by Web VM. It is albeit slower than the native
+/// implementation.
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
+/// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
 abstract class SHA2of64bit extends BlockHashBase {
   final List<int> seed;
   final Uint32List state;
@@ -175,7 +176,7 @@ abstract class SHA2of64bit extends BlockHashBase {
   }
 
   @override
-  void update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0]) {
     var w = chunk;
 
     _var.setAll(_a, state);
@@ -239,7 +240,7 @@ abstract class SHA2of64bit extends BlockHashBase {
   }
 
   @override
-  Uint8List finalize(Uint8List block, int length) {
+  Uint8List $finalize(Uint8List block, int length) {
     // Adding the signature byte
     block[length++] = 0x80;
 
@@ -248,7 +249,7 @@ abstract class SHA2of64bit extends BlockHashBase {
       for (; length < 128; length++) {
         block[length] = 0;
       }
-      update(block);
+      $update(block);
       length = 0;
     }
 
@@ -269,7 +270,7 @@ abstract class SHA2of64bit extends BlockHashBase {
     block[127] = n;
 
     // Update with the final block
-    update(block);
+    $update(block);
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);

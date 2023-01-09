@@ -1,7 +1,42 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'sha2_32.dart';
 import 'sha2_64_native.dart' if (dart.library.js) 'sha2_64_web.dart';
+
+class SHA224Hash extends SHA2of32bit {
+  SHA224Hash()
+      : super(
+          hashLength: 224 >> 3,
+          seed: [
+            0xC1059ED8, // a
+            0x367CD507, // b
+            0x3070DD17, // c
+            0xF70E5939, // d
+            0xFFC00B31, // e
+            0x68581511, // f
+            0x64F98FA7, // g
+            0xBEFA4FA4, // h
+          ],
+        );
+}
+
+class SHA256Hash extends SHA2of32bit {
+  SHA256Hash()
+      : super(
+          hashLength: 256 >> 3,
+          seed: [
+            0x6A09E667, // a
+            0xBB67AE85, // b
+            0x3C6EF372, // c
+            0xA54FF53A, // d
+            0x510E527F, // e
+            0x9B05688C, // f
+            0x1F83D9AB, // g
+            0x5BE0CD19, // h
+          ],
+        );
+}
 
 class SHA384Hash extends SHA2of64bit {
   SHA384Hash()

@@ -36,10 +36,14 @@ const List<int> _k = [
   0x5FCB6FAB3AD6FAEC, 0x6C44198C4A475817,
 ];
 
-/// The implementation is derived from the US Secure Hash Algorithms document
-/// of [SHA and SHA-based HMAC and HKDF][rfc6234].
+/// The implementation is derived from [RFC6234][rfc6234] which follows the
+/// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
+///
+/// It uses 64-bit integer operations internally which is not supported by
+/// Web VM, but faster.
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
+/// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
 abstract class SHA2of64bit extends BlockHashBase {
   final List<int> seed;
   final Uint32List state;
@@ -57,24 +61,27 @@ abstract class SHA2of64bit extends BlockHashBase {
         );
 
   /// Rotates 64-bit number x by n bits
-  int _rotr(int x, int n) => (x >>> n) | (x << (64 - n));
+  static int _bsig0(int x) =>
+      ((x >>> 28) | (x << 36)) ^
+      ((x >>> 34) | (x << 30)) ^
+      ((x >>> 39) | (x << 25));
 
-  int _ch(int x, int y, int z) => (x & y) ^ ((~x) & z);
+  static int _bsig1(int x) =>
+      ((x >>> 14) | (x << 50)) ^
+      ((x >>> 18) | (x << 46)) ^
+      ((x >>> 41) | (x << 23));
 
-  int _maj(int x, int y, int z) => (x & y) ^ (x & z) ^ (y & z);
+  static int _ssig0(int x) =>
+      ((x >>> 1) | (x << 63)) ^ ((x >>> 8) | (x << 56)) ^ (x >>> 7);
 
-  int _bsig0(int x) => (_rotr(x, 28) ^ _rotr(x, 34) ^ _rotr(x, 39));
-
-  int _bsig1(int x) => (_rotr(x, 14) ^ _rotr(x, 18) ^ _rotr(x, 41));
-
-  int _ssig0(int x) => (_rotr(x, 1) ^ _rotr(x, 8) ^ (x >>> 7));
-
-  int _ssig1(int x) => (_rotr(x, 19) ^ _rotr(x, 61) ^ (x >>> 6));
+  static int _ssig1(int x) =>
+      ((x >>> 19) | (x << 45)) ^ ((x >>> 61) | (x << 3)) ^ (x >>> 6);
 
   @override
-  void update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0]) {
     var w = chunk;
 
+    int t1, t2, ch, maj;
     int a, b, c, d, e, f, g, h;
     int ta, tb, tc, td, te, tf, tg, th;
     ta = a = (state[0] << 32) | state[1];
@@ -104,8 +111,10 @@ abstract class SHA2of64bit extends BlockHashBase {
     }
 
     for (int i = 0; i < 80; ++i) {
-      var t1 = h + _bsig1(e) + _ch(e, f, g) + _k[i] + w[i];
-      var t2 = _bsig0(a) + _maj(a, b, c);
+      ch = (e & f) ^ ((~e) & g);
+      maj = (a & b) ^ (a & c) ^ (b & c);
+      t1 = h + _bsig1(e) + ch + _k[i] + w[i];
+      t2 = _bsig0(a) + maj;
 
       h = g;
       g = f;
@@ -145,7 +154,7 @@ abstract class SHA2of64bit extends BlockHashBase {
   }
 
   @override
-  Uint8List finalize(Uint8List block, int length) {
+  Uint8List $finalize(Uint8List block, int length) {
     // Adding the signature byte
     block[length++] = 0x80;
 
@@ -154,7 +163,7 @@ abstract class SHA2of64bit extends BlockHashBase {
       for (; length < 128; length++) {
         block[length] = 0;
       }
-      update(block);
+      $update(block);
       length = 0;
     }
 
@@ -175,7 +184,7 @@ abstract class SHA2of64bit extends BlockHashBase {
     block[127] = n;
 
     // Update with the final block
-    update(block);
+    $update(block);
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);

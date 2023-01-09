@@ -3,15 +3,18 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha512.dart';
+import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-/// SHA-384 is a part of SHA-2 algorithm family designed by the United States
-/// National Security Agency (NSA) and first published in 2001.
+/// SHA-384 is a member of SHA-2 family which uses 512-bit internal state to
+/// generate a message digest of 384-bit long.
 ///
-/// SHA-384 and SHA-512 internally does the same calculations, except this one
-/// omits the last 128-bits of SHA-512 to generate a 384-bit long hash digest.
+/// SHA-2 is a family of algorithms designed by the United States National
+/// Security Agency (NSA), first published in 2001 and later standardized in
+/// [FIPS 180-4][fips180].
+///
+/// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
 const HashBase sha384 = _SHA384();
 
 class _SHA384 extends HashBase {
@@ -23,7 +26,7 @@ class _SHA384 extends HashBase {
 
 /// Generates a SHA-384 checksum
 String sha384sum(
-  final String input, [
+  String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {

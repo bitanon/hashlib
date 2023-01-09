@@ -1,9 +1,12 @@
+// Copyright (c) 2023, Sudipto Chandra
+// All rights reserved. Check LICENSE file for details.
+
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_digest.dart';
 
 // Maximum length of message allowed (considering both the JS and the Dart VM)
-const int _maxMessageLength = (1 << 50) - 1;
+const int _maxMessageLength = 0x3FFFFFFFFFFFF; // (1 << 50) - 1
 
 abstract class HashDigestSink extends Sink<List<int>> {
   /// The length of generated hash in bytes
@@ -62,15 +65,13 @@ abstract class BlockHashBase extends HashDigestSink {
   /// Internal method to update the message-digest with a single [block].
   ///
   /// The method starts reading the block from [offset] index
-  ///
-  /// Throws [StateError] if block size is not supported.
-  void update(List<int> block, [int offset = 0]);
+  void $update(List<int> block, [int offset = 0]);
 
   /// Finalizes the message digest with the remaining message block,
   /// and returns the output as byte array.
   ///
   /// The [length] must be less than the [blockLength]
-  Uint8List finalize(Uint8List block, int length);
+  Uint8List $finalize(Uint8List block, int length);
 
   @override
   bool get closed => _closed;
@@ -94,12 +95,12 @@ abstract class BlockHashBase extends HashDigestSink {
       }
       if (_pos < blockLength) return;
 
-      update(_buffer);
+      $update(_buffer);
       _pos = 0;
     }
 
     while ((n - t) >= blockLength) {
-      update(data, t);
+      $update(data, t);
       t += blockLength;
     }
     for (; t < n; _pos++, t++) {
@@ -111,7 +112,7 @@ abstract class BlockHashBase extends HashDigestSink {
   HashDigest digest() {
     if (_closed) return _digest!;
     _closed = true;
-    _digest = HashDigest(finalize(_buffer, _pos));
+    _digest = HashDigest($finalize(_buffer, _pos));
     return _digest!;
   }
 }

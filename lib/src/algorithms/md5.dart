@@ -57,8 +57,7 @@ class MD5Hash extends BlockHashBase {
         );
 
   @override
-  void update(List<int> block, [int offset = 0]) {
-    var x = chunk;
+  void $update(List<int> block, [int offset = 0]) {
     int a, b, c, d, e, f, g, h, t;
 
     a = state[0];
@@ -128,7 +127,7 @@ class MD5Hash extends BlockHashBase {
   }
 
   @override
-  Uint8List finalize(Uint8List block, int length) {
+  Uint8List $finalize(Uint8List block, int length) {
     // Adding the signature byte
     block[length++] = 0x80;
 
@@ -137,7 +136,7 @@ class MD5Hash extends BlockHashBase {
       for (; length < 64; length++) {
         block[length] = 0;
       }
-      update(block);
+      $update(block);
       length = 0;
     }
 
@@ -158,26 +157,9 @@ class MD5Hash extends BlockHashBase {
     block[63] = n >>> 56;
 
     // Update with the final block
-    update(block);
+    $update(block);
 
     // Convert the state to 8-bit byte array
-    return Uint8List.fromList([
-      state[0],
-      state[0] >>> 8,
-      state[0] >>> 16,
-      state[0] >>> 24,
-      state[1],
-      state[1] >>> 8,
-      state[1] >>> 16,
-      state[1] >>> 24,
-      state[2],
-      state[2] >>> 8,
-      state[2] >>> 16,
-      state[2] >>> 24,
-      state[3],
-      state[3] >>> 8,
-      state[3] >>> 16,
-      state[3] >>> 24,
-    ]);
+    return Uint8List.fromList(state.buffer.asUint8List());
   }
 }

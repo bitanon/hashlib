@@ -3,15 +3,18 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha2_32.dart';
+import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-/// SHA-224 is a part of SHA-2 algorithm family designed by the United States
-/// National Security Agency (NSA) and first published in 2001.
+/// SHA-224 is a member of SHA-2 family which uses 256-bit internal state to
+/// generate a message digest of 224-bit long.
 ///
-/// SHA-224 and SHA-256 essentially does the same calculations, except this one
-/// omits the last 32-bits of SHA-256 to generate a 224-bit long hash digest.
+/// SHA-2 is a family of algorithms designed by the United States National
+/// Security Agency (NSA), first published in 2001 and later standardized in
+/// [FIPS 180-4][fips180].
+///
+/// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
 const HashBase sha224 = _SHA224();
 
 class _SHA224 extends HashBase {
@@ -23,7 +26,7 @@ class _SHA224 extends HashBase {
 
 /// Generates a SHA-224 checksum
 String sha224sum(
-  final String input, [
+  String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {

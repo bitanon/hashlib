@@ -25,7 +25,7 @@ class _SHA1 extends HashBase {
 
 /// Generates a SHA-1 checksum
 String sha1sum(
-  final String input, [
+  String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
