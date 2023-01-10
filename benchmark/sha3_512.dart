@@ -4,6 +4,7 @@
 import 'dart:math';
 
 import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:sha3/sha3.dart' as sha3;
 
 import 'base.dart';
 
@@ -18,12 +19,29 @@ class HashlibBenchmark extends Benchmark {
   }
 }
 
+class Sha3Benchmark extends Benchmark {
+  Sha3Benchmark(int size, int iter) : super('sha3', size, iter);
+
+  @override
+  void run() {
+    sha3.SHA3(512, sha3.SHA3_PADDING, 512)
+      ..update(input)
+      ..digest();
+  }
+}
+
 void main() {
   print('--------- SHA3-512 ----------');
-  HashlibBenchmark(17, 1000).showDiff([]);
+  HashlibBenchmark(17, 1000).showDiff([
+    Sha3Benchmark(17, 1000),
+  ]);
   print('');
-  HashlibBenchmark(1777, 50).showDiff([]);
+  HashlibBenchmark(1777, 50).showDiff([
+    Sha3Benchmark(1777, 50),
+  ]);
   print('');
-  HashlibBenchmark(111000, 1).showDiff([]);
+  HashlibBenchmark(111000, 1).showDiff([
+    Sha3Benchmark(111000, 1),
+  ]);
   print('');
 }

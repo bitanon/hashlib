@@ -2,6 +2,7 @@ import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/algorithms/sha3.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
+import 'package:sha3/sha3.dart' as sha3;
 
 void main() {
   group('SHA3 test', () {
@@ -97,6 +98,28 @@ void main() {
       final output =
           "2baa15b5a204f74ae708d588793657a70cda2288a06e7e12c918cc3aedc5cd8d";
       expect(sha3_256sum(input), output);
+    });
+
+    test('SHA3-256 with existing library', () {
+      final input = "A quick brown fox jumps over the lazy dog";
+      final output =
+          "2baa15b5a204f74ae708d588793657a70cda2288a06e7e12c918cc3aedc5cd8d";
+      var lib = sha3.SHA3(256, sha3.SHA3_PADDING, 256);
+      lib.update(toBytes(input));
+      expect(toHex(lib.digest()), output);
+    });
+
+    test('to compare against known implementations', () {
+      for (int i = 0; i < 1000; ++i) {
+        final data = List<int>.filled(i, 97);
+        var other = sha3.SHA3(256, sha3.SHA3_PADDING, 256);
+        other.update(data);
+        expect(
+          sha3_256.convert(data).hex(),
+          toHex(other.digest()),
+          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
+        );
+      }
     });
   });
 }

@@ -28,6 +28,7 @@ void main(List<String> args) {
   print("- **Hashlib** : https://pub.dev/packages/hashlib");
   print("- **Crypto** : https://pub.dev/packages/crypto");
   print("- **Hash** : https://pub.dev/packages/hash");
+  print("- **Sha3** : https://pub.dev/packages/sha3");
   print('');
 
   for (var condition in conditions) {
@@ -75,9 +76,11 @@ void main(List<String> args) {
       ],
       "SHA3-256": [
         sha3_256.HashlibBenchmark(size, iter),
+        sha3_256.Sha3Benchmark(size, iter),
       ],
       "SHA3-512": [
         sha3_512.HashlibBenchmark(size, iter),
+        sha3_512.Sha3Benchmark(size, iter),
       ],
       "HMAC(MD5)": [
         md5_hmac.HashlibBenchmark(size, iter),
@@ -90,7 +93,10 @@ void main(List<String> args) {
       ],
     };
 
-    var names = algorithms[algorithms.keys.first]!.map((e) => e.name);
+    var names = algorithms.entries.fold<Set<String>>(
+      Set<String>.identity(),
+      (p, v) => p..addAll(v.value.map((b) => b.name)),
+    );
     var separator = names.map((e) => ('-' * (e.length + 4)));
 
     print("With string of length $size ($iter iterations):");
