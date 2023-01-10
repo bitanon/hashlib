@@ -20,16 +20,16 @@ This library contains implementations of secure hash functions, checksum generat
 | `sha512`     |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
 | `sha512_224` |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
 | `sha512_256` |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `sha3_224`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `sha3_256`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `sha3_384`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `sha3_512`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `shake128`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `shake256`   |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak224`  |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak256`  |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak384`  |   ✔️    | 1.0.0  |  ⌛  |        |
-| `keccak512`  |   ✔️    | 1.0.0  |  ⌛  |        |
+| `sha3_224`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `sha3_256`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `sha3_384`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `sha3_512`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `shake128`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `shake256`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `keccak224`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `keccak256`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `keccak384`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `keccak512`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
 
 <!--
 | `blake2b`    |   ⌛    |        |  ⌛  |        |
@@ -111,12 +111,16 @@ void main() {
   print('[SHA-256] $text => ${sha256sum(text)}');
   print('[SHA-384] $text => ${sha384sum(text)}');
   print('[SHA-512] $text => ${sha512sum(text)}');
-  print('[SHA-512/224] $text => ${sha512sum224(text)}');
-  print('[SHA-512/256] $text => ${sha512sum256(text)}');
+  print('[SHA-512/224] $text => ${sha512t224sum(text)}');
+  print('[SHA-512/256] $text => ${sha512t256sum(text)}');
   print('[SHA3-224] $text => ${sha3_224sum(text)}');
   print('[SHA3-256] $text => ${sha3_256sum(text)}');
   print('[SHA3-384] $text => ${sha3_384sum(text)}');
   print('[SHA3-512] $text => ${sha3_512sum(text)}');
+  print('[Keccak-224] $text => ${keccak224sum(text)}');
+  print('[Keccak-256] $text => ${keccak256sum(text)}');
+  print('[Keccak-384] $text => ${keccak384sum(text)}');
+  print('[Keccak-512] $text => ${keccak512sum(text)}');
   print('[SHAKE-128] $text => ${shake128sum(text, 20)}');
   print('[SHAKE-256] $text => ${shake256sum(text, 20)}');
   print('');
@@ -135,8 +139,12 @@ void main() {
   print('HMAC[SHA3-256] $text => ${sha3_256.hmacBy(key).string(text)}');
   print('HMAC[SHA3-384] $text => ${sha3_384.hmacBy(key).string(text)}');
   print('HMAC[SHA3-512] $text => ${sha3_512.hmacBy(key).string(text)}');
-  print('HMAC[SHAKE-128] $text => ${Shake128(20).hmacBy(key).string(text)}');
-  print('HMAC[SHAKE-256] $text => ${Shake256(20).hmacBy(key).string(text)}');
+  print('HMAC[Keccak-224] $text => ${keccak224.hmacBy(key).string(text)}');
+  print('HMAC[Keccak-256] $text => ${keccak256.hmacBy(key).string(text)}');
+  print('HMAC[Keccak-384] $text => ${keccak384.hmacBy(key).string(text)}');
+  print('HMAC[Keccak-512] $text => ${keccak512.hmacBy(key).string(text)}');
+  print('HMAC[SHAKE-128] $text => ${shake128.of(20).hmacBy(key).string(text)}');
+  print('HMAC[SHAKE-256] $text => ${shake256.of(20).hmacBy(key).string(text)}');
   print('');
 }
 

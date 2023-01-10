@@ -70,8 +70,15 @@ abstract class SHA2of32bit extends BlockHashBase {
 
   @override
   void $update(List<int> block, [int offset = 0]) {
-    var w = chunk;
+    // Convert the block to chunk
+    for (int i = 0, j = offset; i < 16; i++, j += 4) {
+      chunk[i] = ((block[j] & 0xFF) << 24) |
+          ((block[j + 1] & 0xFF) << 16) |
+          ((block[j + 2] & 0xFF) << 8) |
+          (block[j + 3] & 0xFF);
+    }
 
+    var w = chunk;
     int t1, t2, ch, maj;
     int a, b, c, d, e, f, g, h;
 
@@ -84,21 +91,13 @@ abstract class SHA2of32bit extends BlockHashBase {
     g = state[6];
     h = state[7];
 
-    // Convert the block to chunk
-    for (int i = 0, j = offset; i < 16; i++, j += 4) {
-      w[i] = ((block[j] & 0xFF) << 24) |
-          ((block[j + 1] & 0xFF) << 16) |
-          ((block[j + 2] & 0xFF) << 8) |
-          (block[j + 3] & 0xFF);
-    }
-
-    // Extend the first 16 words into the remaining 48 words
+    // Extend the first 16 words into the 64 words
     for (int i = 16; i < 64; i++) {
       w[i] = _ssig1(w[i - 2]) + w[i - 7] + _ssig0(w[i - 15]) + w[i - 16];
     }
 
     for (int i = 0; i < 64; ++i) {
-      ch = (e & f) ^ ((~e & _mask32) & g);
+      ch = (e & f) ^ ((~e) & g);
       maj = (a & b) ^ (a & c) ^ (b & c);
       t1 = h + _bsig1(e) + ch + _k[i] + w[i];
       t2 = _bsig0(a) + maj;

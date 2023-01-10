@@ -52,8 +52,8 @@ class MD5Hash extends BlockHashBase {
           0x10325476, // d
         ]),
         super(
-          hashLength: 128 >> 3,
-          blockLength: 512 >> 3,
+          hashLength: 128 >>> 3,
+          blockLength: 512 >>> 3,
         );
 
   @override

@@ -10,6 +10,7 @@
 - Modifies the internal `HashDigestSink`:
   - Implements `ByteConversionSink` instead of extending `Sink<List<int>>`
   - Use `addSlice` instead of `add`
+- Improves performance of some algorithms
 
 ## 1.0.0
 

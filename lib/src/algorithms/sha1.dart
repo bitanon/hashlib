@@ -25,8 +25,8 @@ class SHA1Hash extends BlockHashBase {
           0xC3D2E1F0, // e
         ]),
         super(
-          hashLength: 160 >> 3,
-          blockLength: 512 >> 3,
+          hashLength: 160 >>> 3,
+          blockLength: 512 >>> 3,
         );
 
   @override

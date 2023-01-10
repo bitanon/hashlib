@@ -18,8 +18,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-///
-/// **WARNING**: Not supported in Web
 const HashBase sha3_256 = _SHA3d256();
 
 class _SHA3d256 extends HashBase {

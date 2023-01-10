@@ -11,7 +11,7 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// corruption. Although it was widely used as a cryptographic has function
 /// once, it has been found to suffer from extensive vulnerabilities.
 ///
-/// **WARNING**: Do not use it for cryptographic purposes.
+/// **WARNING**: It should not be used for cryptographic purposes.
 const HashBase md5 = _MD5();
 
 class _MD5 extends HashBase {

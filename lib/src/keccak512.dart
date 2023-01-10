@@ -21,8 +21,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-///
-/// **WARNING**: Not supported in Web
 const HashBase keccak512 = _Keccak512();
 
 class _Keccak512 extends HashBase {

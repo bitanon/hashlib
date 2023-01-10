@@ -36,23 +36,23 @@ const List<int> _k = [
   0x5FCB6FAB, 0x3AD6FAEC, 0x6C44198C, 0x4A475817,
 ];
 
-const _sig1 = 4;
-const _sig2 = 6;
-const _sig3 = 8;
-const _sig4 = 10;
-const _a = 12;
-const _b = 14;
-const _c = 16;
-const _d = 18;
-const _e = 20;
-const _f = 22;
-const _g = 24;
-const _h = 26;
-const _t1 = 28;
-const _t2 = 30;
-const _t3 = 32;
-const _t4 = 34;
-const _t5 = 36;
+const int _sig1 = 0;
+const int _sig2 = _sig1 + 2;
+const int _sig3 = _sig2 + 2;
+const int _sig4 = _sig3 + 2;
+const int _a = _sig4 + 2;
+const int _b = _a + 2;
+const int _c = _b + 2;
+const int _d = _c + 2;
+const int _e = _d + 2;
+const int _f = _e + 2;
+const int _g = _f + 2;
+const int _h = _g + 2;
+const int _t1 = _h + 2;
+const int _t2 = _t1 + 2;
+const int _t3 = _t2 + 2;
+const int _t4 = _t3 + 2;
+const int _t5 = _t4 + 2;
 
 /// The implementation is derived from [RFC6234][rfc6234] which follows the
 /// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
@@ -67,7 +67,7 @@ abstract class SHA2of64bit extends BlockHashBase {
   final List<int> seed;
   final Uint32List state;
   final Uint32List chunk;
-  final _var = Uint32List(38);
+  final _var = Uint32List(_t5 + 2);
 
   /// For internal use only.
   SHA2of64bit({
@@ -76,61 +76,62 @@ abstract class SHA2of64bit extends BlockHashBase {
   })  : chunk = Uint32List(160),
         state = Uint32List.fromList(seed),
         super(
-          blockLength: 1024 >> 3,
+          blockLength: 1024 >>> 3,
           hashLength: hashLength,
         );
 
   /// z = x ^ y
-  void _xor(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
+  static void _xor(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
     z[k] = x[i] ^ y[j];
     z[k + 1] = x[i + 1] ^ y[j + 1];
   }
 
   /// z = x + y
-  void _plus(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
+  static void _add(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
     z[k + 1] = x[i + 1] + y[j + 1];
     z[k] = x[i] + y[j] + (z[k + 1] < x[i + 1] ? 1 : 0);
   }
 
   /// x += z
-  void _plusEqual(List<int> x, int i, List<int> z, int j) {
+  static void _addAndSet(List<int> x, int i, List<int> z, int j) {
     var t = x[i + 1];
     x[i + 1] += z[j + 1];
     x[i] += z[j] + (x[i + 1] < t ? 1 : 0);
   }
 
   // x >>> n
-  void _shr(int n, List<int> x, int i, List<int> z, int k) {
+  static void _shr(int n, List<int> x, int i, List<int> z, int k) {
     var a = x[i];
     var b = x[i + 1];
     if (n == 32) {
       z[k] = 0;
       z[k + 1] = a;
-    } else if (n > 32) {
-      z[k] = 0;
-      z[k + 1] = a >>> (n - 32);
-    } else {
+    } else if (n < 32) {
       z[k] = a >>> n;
       z[k + 1] = (a << (32 - n)) | (b >>> n);
+    } else {
+      z[k] = 0;
+      z[k + 1] = a >>> (n - 32);
     }
   }
 
   // (x << (64 - n)) | (x >>> n)
-  void _rotr(int n, List<int> x, int i, List<int> z, int k) {
+  static void _rotr(int n, List<int> x, int i, List<int> z, int k) {
     var a = x[i];
     var b = x[i + 1];
     if (n == 32) {
       z[k] = b;
       z[k + 1] = a;
-    } else if (n > 32) {
-      z[k] = (a << (64 - n)) | (b >>> (n - 32));
-      z[k + 1] = (b << (64 - n)) | (a >>> (n - 32));
-    } else {
+    } else if (n < 32) {
       z[k] = (b << (32 - n)) | (a >>> n);
       z[k + 1] = (a << (32 - n)) | (b >>> n);
+    } else {
+      z[k] = (a << (64 - n)) | (b >>> (n - 32));
+      z[k + 1] = (b << (64 - n)) | (a >>> (n - 32));
     }
   }
 
+  // z = _rotr(x, 28) ^ _rotr(x, 34) ^ _rotr(x, 39)
   void _bsig0(List<int> x, int i, List<int> z, int j) {
     _rotr(28, x, i, _var, _sig1);
     _rotr(34, x, i, _var, _sig2);
@@ -139,6 +140,7 @@ abstract class SHA2of64bit extends BlockHashBase {
     _xor(_var, _sig1, _var, _sig4, z, j);
   }
 
+  // z = _rotr(x, 14) ^ _rotr(x, 18) ^ _rotr(x, 41)
   void _bsig1(List<int> x, int i, List<int> z, int j) {
     _rotr(14, x, i, _var, _sig1);
     _rotr(18, x, i, _var, _sig2);
@@ -147,6 +149,7 @@ abstract class SHA2of64bit extends BlockHashBase {
     _xor(_var, _sig1, _var, _sig4, z, j);
   }
 
+  // z = _rotr(x, 1) ^ _rotr(x, 8) ^ (x >>> 7)
   void _ssig0(List<int> x, int i, List<int> z, int j) {
     _rotr(1, x, i, _var, _sig1);
     _rotr(8, x, i, _var, _sig2);
@@ -155,6 +158,7 @@ abstract class SHA2of64bit extends BlockHashBase {
     _xor(_var, _sig1, _var, _sig4, z, j);
   }
 
+  // z = _rotr(x, 19) ^ _rotr(x, 61) ^ (x >>> 6)
   void _ssig1(List<int> x, int i, List<int> z, int j) {
     _rotr(19, x, i, _var, _sig1);
     _rotr(61, x, i, _var, _sig2);
@@ -163,16 +167,18 @@ abstract class SHA2of64bit extends BlockHashBase {
     _xor(_var, _sig1, _var, _sig4, z, j);
   }
 
-  void _ch(List<int> x, int i, List<int> y, int j, List<int> z, int k,
-      List<int> t, int l) {
-    t[l] = ((x[i] & (y[j] ^ z[k])) ^ z[k]);
-    t[l + 1] = ((x[i + 1] & (y[j + 1] ^ z[k + 1])) ^ z[k + 1]);
+  // z = (e & f) ^ ((~e) & g)
+  static void _ch(List<int> e, int i, List<int> f, int j, List<int> g, int k,
+      List<int> z, int l) {
+    z[l] = (e[i] & (f[j] ^ g[k])) ^ g[k];
+    z[l + 1] = (e[i + 1] & (f[j + 1] ^ g[k + 1])) ^ g[k + 1];
   }
 
-  void _maj(List<int> x, int i, List<int> y, int j, List<int> z, int k,
-      List<int> t, int l) {
-    t[l] = ((x[i] & (y[j] | z[k])) | (y[j] & z[k]));
-    t[l + 1] = ((x[i + 1] & (y[j + 1] | z[k + 1])) | (y[j + 1] & z[k + 1]));
+  // z = (a & b) ^ (a & c) ^ (b & c)
+  static void _maj(List<int> a, int i, List<int> b, int j, List<int> c, int k,
+      List<int> z, int l) {
+    z[l] = (a[i] & (b[j] | c[k])) | (b[j] & c[k]);
+    z[l + 1] = (a[i + 1] & (b[j + 1] | c[k + 1])) | (b[j + 1] & c[k + 1]);
   }
 
   @override
@@ -191,52 +197,60 @@ abstract class SHA2of64bit extends BlockHashBase {
 
     // Extend the first 32 words into nest 160 words
     for (var i = 32; i < 160; i += 2) {
+      // w[i] = _ssig1(w[i - 2]) + w[i - 7] + _ssig0(w[i - 15]) + w[i - 16];
       _ssig1(w, i - 4, _var, _t1);
-      _plus(_var, _t1, w, i - 14, _var, _t2);
+      _add(_var, _t1, w, i - 14, _var, _t2);
       _ssig0(w, i - 30, _var, _t1);
-      _plus(_var, _t1, w, i - 32, _var, _t3);
-      _plus(_var, _t2, _var, _t3, w, i);
+      _add(_var, _t1, w, i - 32, _var, _t3);
+      _add(_var, _t2, _var, _t3, w, i);
     }
 
     for (int i = 0; i < 160; i += 2) {
-      // temp1 = H + SHA512_SIGMA1(E) + SHA_Ch(E,F,G) + K[t] + W[t];
+      // t1 = h + _bsig1(e) + _ch(e, f, g) + k[i] + w[i];
       _bsig1(_var, _e, _var, _t1);
-      _plus(_var, _h, _var, _t1, _var, _t2);
+      _add(_var, _h, _var, _t1, _var, _t2);
       _ch(_var, _e, _var, _f, _var, _g, _var, _t3);
-      _plus(_var, _t2, _var, _t3, _var, _t4);
-      _plus(_k, i, w, i, _var, _t5);
-      _plus(_var, _t4, _var, _t5, _var, _t1);
+      _add(_var, _t2, _var, _t3, _var, _t4);
+      _add(_k, i, w, i, _var, _t5);
+      _add(_var, _t4, _var, _t5, _var, _t1);
 
-      // temp2 = SHA512_SIGMA0(A) + SHA_Maj(A,B,C);
+      // t2 = _bsig0(A) + _maj(a, b, c);
       _bsig0(_var, _a, _var, _t3);
       _maj(_var, _a, _var, _b, _var, _c, _var, _t4);
-      _plus(_var, _t3, _var, _t4, _var, _t2);
+      _add(_var, _t3, _var, _t4, _var, _t2);
 
+      // h = g;
       _var[_h] = _var[_g];
       _var[_h + 1] = _var[_g + 1];
+      // g = f;
       _var[_g] = _var[_f];
       _var[_g + 1] = _var[_f + 1];
+      // f = e;
       _var[_f] = _var[_e];
       _var[_f + 1] = _var[_e + 1];
-      _plus(_var, _d, _var, _t1, _var, _e);
+      // e = d + t1;
+      _add(_var, _d, _var, _t1, _var, _e);
+      // d = c;
       _var[_d] = _var[_c];
       _var[_d + 1] = _var[_c + 1];
+      // c = b;
       _var[_c] = _var[_b];
       _var[_c + 1] = _var[_b + 1];
+      // b = a;
       _var[_b] = _var[_a];
       _var[_b + 1] = _var[_a + 1];
-
-      _plus(_var, _t1, _var, _t2, _var, _a);
+      // a = t1 + t2;
+      _add(_var, _t1, _var, _t2, _var, _a);
     }
 
-    _plusEqual(state, 0, _var, _a);
-    _plusEqual(state, 2, _var, _b);
-    _plusEqual(state, 4, _var, _c);
-    _plusEqual(state, 6, _var, _d);
-    _plusEqual(state, 8, _var, _e);
-    _plusEqual(state, 10, _var, _f);
-    _plusEqual(state, 12, _var, _g);
-    _plusEqual(state, 14, _var, _h);
+    _addAndSet(state, 0, _var, _a);
+    _addAndSet(state, 2, _var, _b);
+    _addAndSet(state, 4, _var, _c);
+    _addAndSet(state, 6, _var, _d);
+    _addAndSet(state, 8, _var, _e);
+    _addAndSet(state, 10, _var, _f);
+    _addAndSet(state, 12, _var, _g);
+    _addAndSet(state, 14, _var, _h);
   }
 
   @override

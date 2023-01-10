@@ -69,15 +69,12 @@ const _rc = <int>[
 /// [keccak]: https://github.com/Legrandin/pycryptodome/blob/master/src/keccak.c
 /// [tiny_sha3]: https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
 abstract class KeccakHash extends BlockHashBase {
-  // final int rounds;
   final int stateSize;
   final int paddingByte;
-  final Uint32List state;
+  final Uint64List qstate;
   late final Uint8List bstate;
-  late final Uint64List qstate;
 
   KeccakHash({
-    // this.rounds = 24,
     required this.stateSize,
     this.paddingByte = 0x06,
     int? outputSize, // equals to state size if not provided
@@ -85,17 +82,12 @@ abstract class KeccakHash extends BlockHashBase {
           stateSize >= 0 && stateSize <= 100,
           'The state size is not valid',
         ),
-        // assert(
-        //   rounds == 24 || rounds == 12,
-        //   'Only 12 or 24 rounds are supported',
-        // ),
-        state = Uint32List(50), // 1600-bit state
+        qstate = Uint64List(25), // 1600-bit state
         super(
           blockLength: 200 - (stateSize << 1), // rate
           hashLength: outputSize ?? stateSize, // output length
         ) {
-    bstate = state.buffer.asUint8List();
-    qstate = state.buffer.asUint64List();
+    bstate = qstate.buffer.asUint8List();
   }
 
   /// Rotates 64-bit number x by n bits
@@ -149,16 +141,15 @@ abstract class KeccakHash extends BlockHashBase {
     a23 = st[23];
     a24 = st[24];
 
-    // for (int r in _rc.skip(24 - rounds)) {
     for (int r in _rc) {
-      // Theta parity
+      // ---- Theta parity ----
       c0 = a0 ^ a5 ^ a10 ^ a15 ^ a20;
       c1 = a1 ^ a6 ^ a11 ^ a16 ^ a21;
       c2 = a2 ^ a7 ^ a12 ^ a17 ^ a22;
       c3 = a3 ^ a8 ^ a13 ^ a18 ^ a23;
       c4 = a4 ^ a9 ^ a14 ^ a19 ^ a24;
 
-      // Theta + Rho + Pi
+      // ---- Theta + Rho + Pi ----
       d = c4 ^ _rotl(c1, 1);
       b0 = d ^ a0;
       b16 = _rotl(d ^ a5, _rot01);
@@ -194,7 +185,7 @@ abstract class KeccakHash extends BlockHashBase {
       b13 = _rotl(d ^ a19, _rot23);
       b4 = _rotl(d ^ a24, _rot24);
 
-      // Chi + Iota
+      // ---- Chi + Iota ----
       a0 = b0 ^ (~b1 & b2) ^ r;
       a1 = b1 ^ (~b2 & b3);
       a2 = b2 ^ (~b3 & b4);
@@ -289,7 +280,7 @@ abstract class KeccakHash extends BlockHashBase {
   /// If [outputSize] is 0, it will generate an infinite sequence of
   /// bytes.
   ///
-  /// **WARNING: Do not go down the rabbit hole of infinite looping!**
+  /// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
   Iterable<int> generate() sync* {
     // make sure that the digest is closed
     var b = digest().bytes;

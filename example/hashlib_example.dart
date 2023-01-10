@@ -41,8 +41,8 @@ void main() {
   print('HMAC[Keccak-256] $text => ${keccak256.hmacBy(key).string(text)}');
   print('HMAC[Keccak-384] $text => ${keccak384.hmacBy(key).string(text)}');
   print('HMAC[Keccak-512] $text => ${keccak512.hmacBy(key).string(text)}');
-  print('HMAC[SHAKE-128] $text => ${Shake128(20).hmacBy(key).string(text)}');
-  print('HMAC[SHAKE-256] $text => ${Shake256(20).hmacBy(key).string(text)}');
+  print('HMAC[SHAKE-128] $text => ${shake128.of(20).hmacBy(key).string(text)}');
+  print('HMAC[SHAKE-256] $text => ${shake256.of(20).hmacBy(key).string(text)}');
   print('');
 }
 

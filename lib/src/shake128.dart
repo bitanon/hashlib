@@ -18,8 +18,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-///
-/// **WARNING**: Not supported in Web
 const shake128 = _Shake128Builder();
 
 class _Shake128Builder {
@@ -43,8 +41,6 @@ class _Shake128Builder {
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-///
-/// **WARNING**: Not supported in Web
 class Shake128 extends HashBase {
   final int outputSizeInBytes;
 
@@ -93,7 +89,7 @@ extension Shake128StringExtension on String {
 /// If [seed] is provided it will be used as an input to the algorithm.
 /// With a proper seed, this can work as a random number generator.
 ///
-/// **WARNING: Do not go down the rabbit hole of infinite looping!**
+/// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
 @Deprecated("Experimental feature. Can be removed or changed in the future.")
 Iterable<int> shake128generator([List<int>? seed]) {
   final hash = Shake128Hash(0);
