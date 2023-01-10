@@ -2,9 +2,11 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:pointycastle/digests/sha512t.dart' as pc;
 
 import 'base.dart';
 
@@ -28,18 +30,38 @@ class CryptoBenchmark extends Benchmark {
   }
 }
 
+class PointyCastleBenchmark extends Benchmark {
+  Uint8List _input = Uint8List(0);
+  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
+
+  @override
+  void setup() {
+    super.setup();
+    _input = Uint8List.fromList(input);
+  }
+
+  @override
+  void run() {
+    final d = pc.SHA512tDigest(16);
+    d.process(_input);
+  }
+}
+
 void main() {
   print('--------- SHA-512/224 ----------');
   HashlibBenchmark(17, 1000).showDiff([
     CryptoBenchmark(17, 1000),
+    PointyCastleBenchmark(17, 1000),
   ]);
   print('');
   HashlibBenchmark(7000, 100).showDiff([
     CryptoBenchmark(7000, 100),
+    PointyCastleBenchmark(7000, 100),
   ]);
   print('');
   HashlibBenchmark(777000, 1).showDiff([
     CryptoBenchmark(777000, 1),
+    PointyCastleBenchmark(777000, 1),
   ]);
   print('');
 }

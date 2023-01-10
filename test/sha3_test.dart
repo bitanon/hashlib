@@ -57,7 +57,7 @@ void main() {
       final hash = Shake128Hash(512);
       final buf = List.filled(20, 0xA3);
       for (int i = 0; i < 200; i += 20) {
-        hash.add(buf);
+        hash.addSlice(buf, 0, buf.length);
       }
       expect(hash.digest().hex().substring((512 - 32) * 2),
           "44c9fb359fd56ac0a9a75a743cff6862f17d7259ab075216c0699511643b6439");
@@ -73,7 +73,7 @@ void main() {
       final hash = Shake256Hash(512);
       final buf = List.filled(20, 0xA3);
       for (int i = 0; i < 200; i += 20) {
-        hash.add(buf);
+        hash.addSlice(buf, 0, buf.length);
       }
       expect(hash.digest().hex().substring((512 - 32) * 2),
           "6a1a9d7846436e4dca5728b6f760eef0ca92bf0be5615e96959d767197a0beeb");

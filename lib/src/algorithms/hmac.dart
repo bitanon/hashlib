@@ -32,7 +32,7 @@ class HMACSink extends HashDigestSink {
     for (var i = key.length; i < paddedKey.length; i++) {
       paddedKey[i] = 0x5c;
     }
-    outerSink.add(paddedKey);
+    outerSink.addSlice(paddedKey, 0, outerSink.blockLength);
 
     // Calculated padded key for inner sink
     for (var i = 0; i < key.length; i++) {
@@ -41,7 +41,7 @@ class HMACSink extends HashDigestSink {
     for (var i = key.length; i < paddedKey.length; i++) {
       paddedKey[i] = 0x36;
     }
-    innerSink.add(paddedKey);
+    innerSink.addSlice(paddedKey, 0, outerSink.blockLength);
 
     return HMACSink._(
       outerSink: outerSink,
@@ -65,8 +65,8 @@ class HMACSink extends HashDigestSink {
   bool get closed => outerSink.closed;
 
   @override
-  void add(List<int> data) {
-    innerSink.add(data);
+  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
+    innerSink.addSlice(chunk, start, end, isLast);
   }
 
   @override
@@ -74,7 +74,12 @@ class HMACSink extends HashDigestSink {
     if (outerSink.closed) {
       return outerSink.digest();
     }
-    outerSink.add(innerSink.digest().bytes);
+    outerSink.addSlice(
+      innerSink.digest().bytes,
+      0,
+      innerSink.hashLength,
+      true,
+    );
     return outerSink.digest();
   }
 }

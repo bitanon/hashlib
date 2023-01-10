@@ -13,7 +13,6 @@ export 'sha3_256.dart';
 export 'sha3_384.dart';
 export 'sha3_512.dart';
 export 'sha512.dart';
-export 'sha512_224.dart';
-export 'sha512_256.dart';
+export 'sha512t.dart';
 export 'shake128.dart';
 export 'shake256.dart';

@@ -69,7 +69,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha256.stream(stream);
+        final result = await hashlib.sha256.consume(stream);
         expect(result.hex(), entry.value);
       }
     });

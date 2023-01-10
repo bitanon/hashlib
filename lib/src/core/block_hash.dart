@@ -1,41 +1,48 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_digest.dart';
 
-// Maximum length of message allowed (considering both the JS and the Dart VM)
+// Maximum length of message allowed (considering both the JS and Dart VM)
 const int _maxMessageLength = 0x3FFFFFFFFFFFF; // (1 << 50) - 1
 
-abstract class HashDigestSink extends Sink<List<int>> {
+abstract class HashDigestSink implements ByteConversionSink {
   /// The length of generated hash in bytes
   final int hashLength;
 
   /// The internal block length of the algorithm in bytes
   final int blockLength;
 
-  HashDigestSink({
+  const HashDigestSink({
     required this.hashLength,
     required this.blockLength,
   });
 
-  /// Whether the sink is closed or not
+  /// Returns true if the sink is closed, false otherwise
   bool get closed;
 
   /// Adds [data] to the message-digest.
   ///
-  /// Throws [StateError] if called after closing the digest.
+  /// The [addSlice] function is preferred over [add]
+  ///
+  /// Throws [StateError], if it is called after closing the digest.
   @override
-  void add(List<int> data);
+  void add(List<int> data) => addSlice(data, 0, data.length);
+
+  /// Adds [data] to the message-digest.
+  ///
+  /// Throws [StateError], if it is called after closing the digest.
+  @override
+  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]);
 
   /// Finalizes the message-digest and returns a [HashDigest]
   HashDigest digest();
 
   @override
-  void close() {
-    digest();
-  }
+  void close() => digest();
 }
 
 abstract class BlockHashBase extends HashDigestSink {
@@ -77,21 +84,20 @@ abstract class BlockHashBase extends HashDigestSink {
   bool get closed => _closed;
 
   @override
-  void add(List<int> data) {
+  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
 
-    int n = data.length;
-    if (_messageLength + n > _maxMessageLength) {
+    if (_messageLength - start > _maxMessageLength - end) {
       throw StateError('Exceeds the maximum message size limit');
     }
-    _messageLength += n;
+    _messageLength += end - start;
 
-    int t = 0;
+    int t = start;
     if (_pos > 0) {
-      for (; t < n && _pos < blockLength; _pos++, t++) {
-        _buffer[_pos] = data[t];
+      for (; t < end && _pos < blockLength; _pos++, t++) {
+        _buffer[_pos] = chunk[t];
       }
       if (_pos < blockLength) return;
 
@@ -99,13 +105,15 @@ abstract class BlockHashBase extends HashDigestSink {
       _pos = 0;
     }
 
-    while ((n - t) >= blockLength) {
-      $update(data, t);
+    while ((end - t) >= blockLength) {
+      $update(chunk, t);
       t += blockLength;
     }
-    for (; t < n; _pos++, t++) {
-      _buffer[_pos] = data[t];
+    for (; t < end; _pos++, t++) {
+      _buffer[_pos] = chunk[t];
     }
+
+    if (isLast) digest();
   }
 
   @override

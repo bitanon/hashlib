@@ -33,11 +33,27 @@ class _Keccak512 extends HashBase {
       Keccak512Hash();
 }
 
-/// Generates a Keccak-512 checksum
+/// Generates a Keccak-512 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String keccak512sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return keccak512.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [keccak512] hash
+extension Keccak512StringExtension on String {
+  /// Generates a Keccak-512 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest keccak512digest([Encoding? encoding]) {
+    return keccak512.string(this, encoding);
+  }
 }

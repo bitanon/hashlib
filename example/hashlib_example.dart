@@ -9,8 +9,8 @@ void main() {
   print('[SHA-256] $text => ${sha256sum(text)}');
   print('[SHA-384] $text => ${sha384sum(text)}');
   print('[SHA-512] $text => ${sha512sum(text)}');
-  print('[SHA-512/224] $text => ${sha512sum224(text)}');
-  print('[SHA-512/256] $text => ${sha512sum256(text)}');
+  print('[SHA-512/224] $text => ${sha512t224sum(text)}');
+  print('[SHA-512/256] $text => ${sha512t256sum(text)}');
   print('[SHA3-224] $text => ${sha3_224sum(text)}');
   print('[SHA3-256] $text => ${sha3_256sum(text)}');
   print('[SHA3-384] $text => ${sha3_384sum(text)}');

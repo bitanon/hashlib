@@ -33,11 +33,27 @@ class _Keccak384 extends HashBase {
       Keccak384Hash();
 }
 
-/// Generates a Keccak-384 checksum
+/// Generates a Keccak-384 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String keccak384sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return keccak384.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [keccak384] hash
+extension Keccak384StringExtension on String {
+  /// Generates a Keccak-384 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest keccak384digest([Encoding? encoding]) {
+    return keccak384.string(this, encoding);
+  }
 }

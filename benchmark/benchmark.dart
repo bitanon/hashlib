@@ -28,6 +28,7 @@ void main(List<String> args) {
   print("- **Hashlib** : https://pub.dev/packages/hashlib");
   print("- **Crypto** : https://pub.dev/packages/crypto");
   print("- **Hash** : https://pub.dev/packages/hash");
+  print("- **PointyCastle** : https://pub.dev/packages/pointycastle");
   print("- **Sha3** : https://pub.dev/packages/sha3");
   print('');
 
@@ -40,47 +41,57 @@ void main(List<String> args) {
         md5.HashlibBenchmark(size, iter),
         md5.CryptoBenchmark(size, iter),
         md5.HashBenchmark(size, iter),
+        md5.PointyCastleBenchmark(size, iter),
       ],
       "SHA-1": [
         sha1.HashlibBenchmark(size, iter),
         sha1.CryptoBenchmark(size, iter),
+        sha1.PointyCastleBenchmark(size, iter),
         sha1.HashBenchmark(size, iter),
       ],
       "SHA-224": [
         sha224.HashlibBenchmark(size, iter),
         sha224.CryptoBenchmark(size, iter),
         sha224.HashBenchmark(size, iter),
+        sha224.PointyCastleBenchmark(size, iter),
       ],
       "SHA-256": [
         sha256.HashlibBenchmark(size, iter),
         sha256.CryptoBenchmark(size, iter),
         sha256.HashBenchmark(size, iter),
+        sha256.PointyCastleBenchmark(size, iter),
       ],
       "SHA-384": [
         sha384.HashlibBenchmark(size, iter),
         sha384.CryptoBenchmark(size, iter),
         sha384.HashBenchmark(size, iter),
+        sha384.PointyCastleBenchmark(size, iter),
       ],
       "SHA-512": [
         sha512.HashlibBenchmark(size, iter),
         sha512.CryptoBenchmark(size, iter),
         sha512.HashBenchmark(size, iter),
+        sha512.PointyCastleBenchmark(size, iter),
       ],
       "SHA-512/224": [
         sha512t224.HashlibBenchmark(size, iter),
         sha512t224.CryptoBenchmark(size, iter),
+        sha512t224.PointyCastleBenchmark(size, iter),
       ],
       "SHA-512/256": [
         sha512t256.HashlibBenchmark(size, iter),
         sha512t256.CryptoBenchmark(size, iter),
+        sha512t256.PointyCastleBenchmark(size, iter),
       ],
       "SHA3-256": [
         sha3_256.HashlibBenchmark(size, iter),
         sha3_256.Sha3Benchmark(size, iter),
+        sha3_256.PointyCastleBenchmark(size, iter),
       ],
       "SHA3-512": [
         sha3_512.HashlibBenchmark(size, iter),
         sha3_512.Sha3Benchmark(size, iter),
+        sha3_512.PointyCastleBenchmark(size, iter),
       ],
       "HMAC(MD5)": [
         md5_hmac.HashlibBenchmark(size, iter),
@@ -124,10 +135,10 @@ void main(List<String> args) {
         }
         if (value > mine) {
           var p = (100 * (value - mine) / mine).round();
-          message += ' ($p% slower)';
+          message += ' <br> `$p% slower`';
         } else if (value < mine) {
           var p = (100 * (mine - value) / mine).round();
-          message += ' ($p% faster)';
+          message += ' <br> `$p% faster`';
         }
       }
       message += " |";

@@ -34,7 +34,7 @@ void main() {
     });
 
     test('with single letter', () {
-      expect(hashlib.md5sum("a"), tests["a"]);
+      expect("a".md5digest().hex(), tests["a"]);
     });
 
     test('with few letters', () {
@@ -70,7 +70,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.md5.stream(stream);
+        final result = await hashlib.md5.consume(stream);
         expect(result.hex(), entry.value);
       }
     });

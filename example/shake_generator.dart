@@ -4,6 +4,7 @@ import 'package:hashlib/src/core/utils.dart';
 void main() {
   final seed = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
   Stopwatch stopwatch = Stopwatch()..start();
+  // ignore: deprecated_member_use_from_same_package
   final it = shake256generator(seed.codeUnits).iterator;
   it.moveNext();
   int i = 0;

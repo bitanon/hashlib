@@ -33,11 +33,27 @@ class _Keccak256 extends HashBase {
       Keccak256Hash();
 }
 
-/// Generates a Keccak-256 checksum
+/// Generates a Keccak-256 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String keccak256sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return keccak256.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [keccak256] hash
+extension Keccak256StringExtension on String {
+  /// Generates a Keccak-256 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest keccak256digest([Encoding? encoding]) {
+    return keccak256.string(this, encoding);
+  }
 }

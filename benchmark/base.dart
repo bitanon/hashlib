@@ -10,14 +10,11 @@ Random random = Random();
 abstract class Benchmark extends BenchmarkBase {
   final int size;
   final int iter;
-  List<int> input = [];
+  final List<int> input;
 
-  Benchmark(String name, this.size, this.iter) : super(name);
-
-  @override
-  void setup() {
-    input = List<int>.generate(size, (i) => random.nextInt(256));
-  }
+  Benchmark(String name, this.size, this.iter)
+      : input = List.filled(size, 0x3f),
+        super(name);
 
   @override
   void exercise() {
@@ -27,7 +24,7 @@ abstract class Benchmark extends BenchmarkBase {
   }
 
   void showDiff(List<BenchmarkBase> others) {
-    var data = measureDiff({...others, this});
+    var data = measureDiff({this, ...others});
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
     for (var entry in data.entries) {

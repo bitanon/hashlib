@@ -23,11 +23,27 @@ class _SHA1 extends HashBase {
   SHA1Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA1Hash();
 }
 
-/// Generates a SHA-1 checksum
+/// Generates a SHA-1 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String sha1sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return sha1.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [sha1] hash
+extension Sha1StringExtension on String {
+  /// Generates a SHA-1 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest sha1digest([Encoding? encoding]) {
+    return sha1.string(this, encoding);
+  }
 }

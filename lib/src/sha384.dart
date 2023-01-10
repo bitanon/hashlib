@@ -24,11 +24,27 @@ class _SHA384 extends HashBase {
   SHA384Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA384Hash();
 }
 
-/// Generates a SHA-384 checksum
+/// Generates a SHA-384 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String sha384sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return sha384.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [sha384] hash
+extension Sha384StringExtension on String {
+  /// Generates a SHA-384 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest sha384digest([Encoding? encoding]) {
+    return sha384.string(this, encoding);
+  }
 }

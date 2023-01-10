@@ -19,7 +19,7 @@ abstract class HashBase extends Converter<List<int>, HashDigest> {
   @override
   HashDigest convert(List<int> input) {
     var sink = startChunkedConversion();
-    sink.add(input);
+    sink.addSlice(input, 0, input.length, true);
     return sink.digest();
   }
 
@@ -29,30 +29,34 @@ abstract class HashBase extends Converter<List<int>, HashDigest> {
   HashDigest string(String input, [Encoding? encoding]) {
     var sink = startChunkedConversion();
     if (encoding != null) {
-      sink.add(encoding.encode(input));
+      var data = encoding.encode(input);
+      sink.addSlice(data, 0, data.length, true);
     } else {
-      sink.add(input.codeUnits);
+      sink.addSlice(input.codeUnits, 0, input.length, true);
     }
     return sink.digest();
   }
 
   /// Consume the entire [stream] of byte array and generate a HashDigest.
-  Future<HashDigest> stream(Stream<List<int>> stream) async {
+  Future<HashDigest> consume(Stream<List<int>> stream) async {
     var sink = startChunkedConversion();
-    await stream.forEach(sink.add);
+    await stream.forEach((chunk) => sink.addSlice(chunk, 0, chunk.length));
     return sink.digest();
   }
 
   /// Consume the entire [stream] of string and generate a HashDigest.
   ///
   /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
-  Future<HashDigest> stringStream(Stream<String> stream,
+  Future<HashDigest> consumeAs(Stream<String> stream,
       [Encoding? encoding]) async {
     var sink = startChunkedConversion();
     if (encoding != null) {
-      await stream.transform(encoding.encoder).forEach(sink.add);
+      await stream
+          .transform(encoding.encoder)
+          .forEach((chunk) => sink.addSlice(chunk, 0, chunk.length));
     } else {
-      await stream.forEach((input) => sink.add(input.codeUnits));
+      await stream
+          .forEach((input) => sink.addSlice(input.codeUnits, 0, input.length));
     }
     return sink.digest();
   }

@@ -33,11 +33,27 @@ class _Keccak224 extends HashBase {
       Keccak224Hash();
 }
 
-/// Generates a Keccak-224 checksum
+/// Generates a Keccak-224 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String keccak224sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return keccak224.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [keccak224] hash
+extension Keccak224StringExtension on String {
+  /// Generates a Keccak-224 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest keccak224digest([Encoding? encoding]) {
+    return keccak224.string(this, encoding);
+  }
 }

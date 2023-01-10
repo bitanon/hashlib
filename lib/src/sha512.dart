@@ -24,11 +24,27 @@ class _SHA512 extends HashBase {
   SHA512Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA512Hash();
 }
 
-/// Generates a SHA-512 checksum
+/// Generates a SHA-512 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String sha512sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return sha512.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [sha512] hash
+extension Sha512StringExtension on String {
+  /// Generates a SHA-512 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest sha512digest([Encoding? encoding]) {
+    return sha512.string(this, encoding);
+  }
 }

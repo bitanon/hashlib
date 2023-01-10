@@ -24,11 +24,27 @@ class _SHA224 extends HashBase {
   SHA224Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA224Hash();
 }
 
-/// Generates a SHA-224 checksum
+/// Generates a SHA-224 checksum in hexadecimal
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [uppercase] defines if the hexadecimal output should be in uppercase
 String sha224sum(
   String input, [
   Encoding? encoding,
   bool uppercase = false,
 ]) {
   return sha224.string(input, encoding).hex(uppercase);
+}
+
+/// Extension to [String] to generate [sha224] hash
+extension Sha224StringExtension on String {
+  /// Generates a SHA-224 digest of this string
+  ///
+  /// Parameters:
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  HashDigest sha224digest([Encoding? encoding]) {
+    return sha224.string(this, encoding);
+  }
 }

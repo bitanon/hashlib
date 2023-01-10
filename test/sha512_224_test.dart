@@ -32,33 +32,33 @@ final tests = {
 void main() {
   group('SHA512224 test', () {
     test('with empty string', () {
-      expect(hashlib.sha512sum224(""), tests[""]);
+      expect(hashlib.sha512t224sum(""), tests[""]);
     });
 
     test('with single letter', () {
-      expect(hashlib.sha512sum224("a"), tests["a"]);
+      expect(hashlib.sha512t224sum("a"), tests["a"]);
     });
 
     test('with few letters', () {
-      expect(hashlib.sha512sum224("abc"), tests["abc"]);
+      expect(hashlib.sha512t224sum("abc"), tests["abc"]);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.sha512sum224(key), value);
+      expect(hashlib.sha512t224sum(key), value);
     });
 
     test('known cases', () {
       tests.forEach((key, value) {
         // print(toHex(crypto.sha512224.convert(toBytes(key)).bytes));
-        expect(hashlib.sha512sum224(key), value);
+        expect(hashlib.sha512t224sum(key), value);
       });
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha512sum224(key), value);
+        expect(hashlib.sha512t224sum(key), value);
       });
     });
 
@@ -68,7 +68,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha512t224.stream(stream);
+        final result = await hashlib.sha512t224.consume(stream);
         expect(result.hex(), entry.value);
       }
     });
