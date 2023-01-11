@@ -1,3 +1,7 @@
+export 'alder32.dart';
+export 'crc16.dart';
+export 'crc32.dart';
+export 'crc64.dart';
 export 'hmac.dart';
 export 'keccak224.dart';
 export 'keccak256.dart';

@@ -4,7 +4,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// The base class used by the hash algorithm implementations
@@ -60,4 +59,36 @@ abstract class HashBase extends Converter<List<int>, HashDigest> {
     }
     return sink.digest();
   }
+}
+
+abstract class HashDigestSink implements ByteConversionSink {
+  /// The length of generated hash in bytes
+  final int hashLength;
+
+  const HashDigestSink({
+    required this.hashLength,
+  });
+
+  /// Returns true if the sink is closed, false otherwise
+  bool get closed;
+
+  /// Adds [data] to the message-digest.
+  ///
+  /// The [addSlice] function is preferred over [add]
+  ///
+  /// Throws [StateError], if it is called after closing the digest.
+  @override
+  void add(List<int> data) => addSlice(data, 0, data.length);
+
+  /// Adds [data] to the message-digest.
+  ///
+  /// Throws [StateError], if it is called after closing the digest.
+  @override
+  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]);
+
+  /// Finalizes the message-digest and returns a [HashDigest]
+  HashDigest digest();
+
+  @override
+  void close() => digest();
 }

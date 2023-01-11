@@ -12,16 +12,20 @@ import 'package:hashlib/src/core/hash_digest.dart';
 ///
 /// [rfc2104]: https://www.rfc-editor.org/rfc/rfc2104
 class HMACSink extends HashDigestSink {
-  final HashDigestSink outerSink;
-  final HashDigestSink innerSink;
+  final BlockHashBase outerSink;
+  final BlockHashBase innerSink;
 
   factory HMACSink(HashBase algo, List<int> key) {
-    var outerSink = algo.startChunkedConversion();
-    var innerSink = algo.startChunkedConversion();
-    var paddedKey = Uint8List(outerSink.blockLength);
+    var outer = algo.startChunkedConversion();
+    var inner = algo.startChunkedConversion();
+    if (outer is! BlockHashBase || inner is! BlockHashBase) {
+      throw StateError('Only block hashes are supported for HMAC');
+    }
+
+    var paddedKey = Uint8List(outer.blockLength);
 
     // Keys longer than blockLength are shortened by hashing them
-    if (key.length > outerSink.blockLength) {
+    if (key.length > outer.blockLength) {
       key = algo.convert(key).bytes;
     }
 
@@ -32,7 +36,7 @@ class HMACSink extends HashDigestSink {
     for (var i = key.length; i < paddedKey.length; i++) {
       paddedKey[i] = 0x5c;
     }
-    outerSink.addSlice(paddedKey, 0, outerSink.blockLength);
+    outer.addSlice(paddedKey, 0, outer.blockLength);
 
     // Calculated padded key for inner sink
     for (var i = 0; i < key.length; i++) {
@@ -41,25 +45,18 @@ class HMACSink extends HashDigestSink {
     for (var i = key.length; i < paddedKey.length; i++) {
       paddedKey[i] = 0x36;
     }
-    innerSink.addSlice(paddedKey, 0, outerSink.blockLength);
+    inner.addSlice(paddedKey, 0, outer.blockLength);
 
     return HMACSink._(
-      outerSink: outerSink,
-      innerSink: innerSink,
-      hashLength: outerSink.hashLength,
-      blockLength: outerSink.blockLength,
+      outerSink: outer,
+      innerSink: inner,
     );
   }
 
   HMACSink._({
     required this.outerSink,
     required this.innerSink,
-    required int blockLength,
-    required int hashLength,
-  }) : super(
-          blockLength: blockLength,
-          hashLength: hashLength,
-        );
+  }) : super(hashLength: outerSink.hashLength);
 
   @override
   bool get closed => outerSink.closed;

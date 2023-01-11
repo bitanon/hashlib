@@ -1,3 +1,11 @@
+## 1.2.0
+
+- New features available:
+  - `crc16`
+  - `crc32`
+  - `crc64`
+  - `alder32`
+
 ## 1.1.0
 
 - Adds `String` extensions for convenient use all algorithms.

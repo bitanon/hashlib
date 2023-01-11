@@ -13,7 +13,7 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// in digital signatures, however it is safe to use it as a checksum to verify
 /// data integrity.
 ///
-/// **WARNING**: It should not be used for cryptographic purposes.
+/// **WARNING: It should not be used for cryptographic purposes.**
 const HashBase sha1 = _SHA1();
 
 class _SHA1 extends HashBase {

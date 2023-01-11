@@ -20,21 +20,25 @@ This library contains implementations of secure hash functions, checksum generat
 | `sha512`     |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
 | `sha512_224` |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
 | `sha512_256` |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `sha3_224`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `sha3_256`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `sha3_384`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `sha3_512`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `shake128`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `shake256`   |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `keccak224`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `keccak256`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `keccak384`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-| `keccak512`  |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
+| `sha3_224`   |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `sha3_256`   |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `sha3_384`   |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `sha3_512`   |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `shake128`   |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `shake256`   |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `keccak224`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `keccak256`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `keccak384`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `keccak512`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
 
 <!--
 | `blake2b`    |   ⌛    |        |  ⌛  |        |
 | `blake2s`    |   ⌛    |        |  ⌛  |        |
 | `blake3`     |   ⌛    |        |  ⌛  |        |
+| `ripemd128` |    ⌛     |       |
+| `ripemd160` |    ⌛     |       |
+| `ripemd320` |    ⌛     |       |
+| `whirlpool` |    ⌛     |       |
 -->
 
 ### Message Authentication Code generators
@@ -44,6 +48,20 @@ This library contains implementations of secure hash functions, checksum generat
 | `hmac`     |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
 
 <!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
+
+### Checksums algorithms
+
+| Algorithms | Supported | Since |
+| ---------- | :-------: | :---: |
+| `alder32`  |    ✔️     | 1.2.0 |
+| `crc16`    |    ✔️     | 1.2.0 |
+| `crc32`    |    ✔️     | 1.2.0 |
+| `crc64`    |    ✔️     | 1.2.0 |
+
+<!--
+| `bsd`      |    ⌛     |       |
+| `sysv`     |    ⌛     |       |
+-->
 
 <!--
 ### Password hashing / Key derivation
@@ -57,32 +75,6 @@ This library contains implementations of secure hash functions, checksum generat
 | `bcrypt`      |    ⌛     |       |
 | `scrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
-
-### Cyclic redundancy checks
-
-| Algorithms | Supported | Since |
-| ---------- | :-------: | :---: |
-| `cksum`    |    ⌛     |       |
-| `crc16`    |    ⌛     |       |
-| `crc32`    |    ⌛     |       |
-| `crc64`    |    ⌛     |       |
-
-### Checksums
-
-| Algorithms | Supported | Since |
-| ---------- | :-------: | :---: |
-| `bsd`      |    ⌛     |       |
-| `sysv`     |    ⌛     |       |
-| `alder32`  |    ⌛     |       |
-
-### Other Cryptographic hash functions
-
-| Algorithms  | Supported | Since |
-| ----------- | :-------: | :---: |
-| `ripemd128` |    ⌛     |       |
-| `ripemd160` |    ⌛     |       |
-| `ripemd320` |    ⌛     |       |
-| `whirlpool` |    ⌛     |       |
 -->
 
 ## Getting started

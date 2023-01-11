@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 
-const _mask32 = 0xFFFFFFFF;
+const int _mask32 = 0xFFFFFFFF;
 
 /// 64 constants [Formula: floor(2^32 * abs(sin(i + 1)))]
 const _k = <int>[
