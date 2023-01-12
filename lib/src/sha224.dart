@@ -43,7 +43,7 @@ extension Sha224StringExtension on String {
   /// Generates a SHA-224 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest sha224digest([Encoding? encoding]) {
     return sha224.string(this, encoding);
   }

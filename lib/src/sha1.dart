@@ -42,7 +42,7 @@ extension Sha1StringExtension on String {
   /// Generates a SHA-1 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest sha1digest([Encoding? encoding]) {
     return sha1.string(this, encoding);
   }

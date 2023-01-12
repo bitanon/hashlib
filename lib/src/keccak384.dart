@@ -44,14 +44,3 @@ String keccak384sum(
 ]) {
   return keccak384.string(input, encoding).hex(uppercase);
 }
-
-/// Extension to [String] to generate [keccak384] hash
-extension Keccak384StringExtension on String {
-  /// Generates a Keccak-384 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  HashDigest keccak384digest([Encoding? encoding]) {
-    return keccak384.string(this, encoding);
-  }
-}

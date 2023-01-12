@@ -30,14 +30,3 @@ class _CRC64 extends HashBase {
 int crc64code(String input, [Encoding? encoding]) {
   return crc64.string(input, encoding).remainder();
 }
-
-/// Extension to [String] to generate [crc64] code
-extension CRC64StringExtension on String {
-  /// Gets the CRC-64 remainder value of a String
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  int crc64code([Encoding? encoding]) {
-    return crc64.string(this, encoding).remainder();
-  }
-}

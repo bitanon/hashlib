@@ -40,7 +40,7 @@ extension Md5StringExtension on String {
   /// Generates a MD5 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest md5digest([Encoding? encoding]) {
     return md5.string(this, encoding);
   }

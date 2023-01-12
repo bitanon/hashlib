@@ -47,7 +47,7 @@ extension Sha3d384StringExtension on String {
   /// Generates a SHA3-384 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest sha3_384digest([Encoding? encoding]) {
     return sha3_384.string(this, encoding);
   }

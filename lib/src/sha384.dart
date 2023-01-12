@@ -37,14 +37,3 @@ String sha384sum(
 ]) {
   return sha384.string(input, encoding).hex(uppercase);
 }
-
-/// Extension to [String] to generate [sha384] hash
-extension Sha384StringExtension on String {
-  /// Generates a SHA-384 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  HashDigest sha384digest([Encoding? encoding]) {
-    return sha384.string(this, encoding);
-  }
-}

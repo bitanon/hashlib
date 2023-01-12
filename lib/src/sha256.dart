@@ -43,7 +43,7 @@ extension Sha256StringExtension on String {
   /// Generates a SHA-256 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest sha256digest([Encoding? encoding]) {
     return sha256.string(this, encoding);
   }

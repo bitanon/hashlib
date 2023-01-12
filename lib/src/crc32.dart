@@ -36,7 +36,7 @@ extension CRC32StringExtension on String {
   /// Gets the CRC-32 remainder value of a String
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int crc32code([Encoding? encoding]) {
     return crc32.string(this, encoding).remainder();
   }

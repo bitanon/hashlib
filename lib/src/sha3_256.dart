@@ -47,7 +47,7 @@ extension Sha3d256StringExtension on String {
   /// Generates a SHA3-256 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest sha3_256digest([Encoding? encoding]) {
     return sha3_256.string(this, encoding);
   }

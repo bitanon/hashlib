@@ -37,14 +37,3 @@ class _Alder32 extends HashBase {
 int alder32code(String input, [Encoding? encoding]) {
   return alder32.string(input, encoding).remainder();
 }
-
-/// Extension to [String] to generate [alder32] code
-extension Alder32StringExtension on String {
-  /// Gets the Alder-32 remainder value of a String
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  int alder32code([Encoding? encoding]) {
-    return alder32.string(this, encoding).remainder();
-  }
-}

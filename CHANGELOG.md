@@ -1,3 +1,17 @@
+## 1.4.0
+
+- Removes a lot of string extensions. Remaining ones are:
+  - `sha512digest`
+  - `sha256digest`
+  - `sha224digest`
+  - `sha3_512digest`
+  - `sha3_384digest`
+  - `sha3_256digest`
+  - `sha3_224digest`
+  - `sha1digest`
+  - `md5digest`
+  - `crc32code`
+
 ## 1.3.0
 
 - Reduces memory overhead by utilizing the buffer in all `BlockHash`

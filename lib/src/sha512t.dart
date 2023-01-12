@@ -58,22 +58,3 @@ String sha512t224sum(
 ]) {
   return sha512t224.string(input, encoding).hex(uppercase);
 }
-
-/// Extension to [String] to generate [sha512t224] and [sha512t256] hash
-extension Sha512tStringExtension on String {
-  /// Generates a SHA-512/224 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  HashDigest sha512t224digest([Encoding? encoding]) {
-    return sha512t224.string(this, encoding);
-  }
-
-  /// Generates a SHA-512/256 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  HashDigest sha512t256digest([Encoding? encoding]) {
-    return sha512t256.string(this, encoding);
-  }
-}

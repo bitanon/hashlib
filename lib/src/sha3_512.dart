@@ -47,7 +47,7 @@ extension Sha3d512StringExtension on String {
   /// Generates a SHA3-512 digest of this string
   ///
   /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   HashDigest sha3_512digest([Encoding? encoding]) {
     return sha3_512.string(this, encoding);
   }

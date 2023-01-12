@@ -44,14 +44,3 @@ String keccak512sum(
 ]) {
   return keccak512.string(input, encoding).hex(uppercase);
 }
-
-/// Extension to [String] to generate [keccak512] hash
-extension Keccak512StringExtension on String {
-  /// Generates a Keccak-512 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  HashDigest keccak512digest([Encoding? encoding]) {
-    return keccak512.string(this, encoding);
-  }
-}
