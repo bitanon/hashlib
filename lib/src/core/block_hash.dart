@@ -10,28 +10,47 @@ import 'package:hashlib/src/core/hash_digest.dart';
 const int _maxMessageLength = 0x3FFFFFFFFFFFF; // (1 << 50) - 1
 
 abstract class BlockHashBase extends HashDigestSink {
+  // The digest and closing flag
+  HashDigest? _digest;
+  bool _closed = false;
+
+  /// The current position of data in the [buffer]
+  int pos = 0;
+
+  /// The message length in bytes
+  int messageLength = 0;
+
   /// The internal block length of the algorithm in bytes
   final int blockLength;
 
-  int _pos = 0;
-  HashDigest? _digest;
-  bool _closed = false;
-  int _messageLength = 0;
+  /// The buffer as Uint8List
+  late final Uint8List buffer;
 
-  /// The internal buffer for processing
-  final Uint8List _buffer;
+  /// The buffer as ByteData
+  late final ByteData bdata;
+
+  /// The buffer as Uint32List
+  late final Uint32List sbuffer;
+
+  /// The buffer as Uint34List
+  late final Uint64List qbuffer;
 
   BlockHashBase({
     required this.blockLength,
     required int hashLength,
-  })  : _buffer = Uint8List(blockLength),
-        super(hashLength: hashLength);
+    int? bufferLengthInBytes,
+  }) : super(hashLength: hashLength) {
+    buffer = Uint8List(bufferLengthInBytes ?? blockLength);
+    bdata = buffer.buffer.asByteData();
+    sbuffer = buffer.buffer.asUint32List();
+    qbuffer = buffer.buffer.asUint64List();
+  }
 
-  /// Get the message length in bytes
-  int get messageLength => _messageLength;
+  @override
+  bool get closed => _closed;
 
   /// Get the message length in bits
-  int get messageLengthInBits => _messageLength << 3;
+  int get messageLengthInBits => messageLength << 3;
 
   /// Internal method to update the message-digest with a single [block].
   ///
@@ -45,46 +64,48 @@ abstract class BlockHashBase extends HashDigestSink {
   Uint8List $finalize(Uint8List block, int length);
 
   @override
-  bool get closed => _closed;
-
-  @override
   void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-
-    if (_messageLength - start > _maxMessageLength - end) {
+    if (messageLength - start > _maxMessageLength - end) {
       throw StateError('Exceeds the maximum message size limit');
     }
-    _messageLength += end - start;
 
+    $process(chunk, start, end);
+    if (isLast) digest();
+  }
+
+  /// Processes a chunk of input data
+  void $process(List<int> chunk, int start, int end) {
     int t = start;
-    if (_pos > 0) {
-      for (; t < end && _pos < blockLength; _pos++, t++) {
-        _buffer[_pos] = chunk[t];
+    if (pos > 0) {
+      for (; t < end && pos < blockLength; pos++, t++) {
+        buffer[pos] = chunk[t];
       }
-      if (_pos < blockLength) return;
+      messageLength += t - start;
+      if (pos < blockLength) return;
 
-      $update(_buffer);
-      _pos = 0;
+      $update(buffer);
+      pos = 0;
     }
 
     while ((end - t) >= blockLength) {
+      messageLength += blockLength;
       $update(chunk, t);
       t += blockLength;
     }
-    for (; t < end; _pos++, t++) {
-      _buffer[_pos] = chunk[t];
+    messageLength += end - t;
+    for (; t < end; pos++, t++) {
+      buffer[pos] = chunk[t];
     }
-
-    if (isLast) digest();
   }
 
   @override
   HashDigest digest() {
     if (_closed) return _digest!;
     _closed = true;
-    _digest = HashDigest($finalize(_buffer, _pos));
+    _digest = HashDigest($finalize(buffer, pos));
     return _digest!;
   }
 }

@@ -32,12 +32,12 @@ const List<int> _k = [
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-abstract class SHA2of32bit extends BlockHashBase {
+class SHA2of512 extends BlockHashBase {
   final Uint32List state;
   final Uint32List chunk;
 
   /// For internal use only.
-  SHA2of32bit({
+  SHA2of512({
     required List<int> seed,
     required int hashLength,
   })  : chunk = Uint32List(64),

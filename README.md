@@ -32,10 +32,10 @@ This library contains implementations of secure hash functions, checksum generat
 | `keccak256`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
 | `keccak384`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
 | `keccak512`  |   ✔️    | 1.0.0  |  ✔️  | 1.1.0  |
+| `blake2s`    |   ✔️    | 1.3.0  |  ✔️  | 1.3.0  |
+| `blake2b`    |   ✔️    | 1.3.0  |  ➖  |   ➖   |
 
 <!--
-| `blake2b`    |   ⌛    |        |  ⌛  |        |
-| `blake2s`    |   ⌛    |        |  ⌛  |        |
 | `blake3`     |   ⌛    |        |  ⌛  |        |
 | `ripemd128` |    ⌛     |       |
 | `ripemd160` |    ⌛     |       |
@@ -61,18 +61,13 @@ This library contains implementations of secure hash functions, checksum generat
 | `crc64`    |    ✔️     | 1.2.0 |
 
 <!--
-| `bsd`      |    ⌛     |       |
-| `sysv`     |    ⌛     |       |
--->
-
-<!--
 ### Password hashing / Key derivation
 
 | Algorithms    | Supported | Since |
 | ------------- | :-------: | :---: |
 | `pbkdf2_hmac` |    ⌛     |       |
-| `argon2i`     |    ⌛     |       |
 | `argon2d`     |    ⌛     |       |
+| `argon2i`     |    ⌛     |       |
 | `argon2id`    |    ⌛     |       |
 | `bcrypt`      |    ⌛     |       |
 | `scrypt`      |    ⌛     |       |
@@ -117,6 +112,8 @@ void main() {
   print('[Keccak-512] $text => ${keccak512sum(text)}');
   print('[SHAKE-128] $text => ${shake128sum(text, 20)}');
   print('[SHAKE-256] $text => ${shake256sum(text, 20)}');
+  print('[BLAKE-2s/256] $text => ${blake2s256.string(text)}');
+  print('[BLAKE-2b/256] $text => ${blake2b256.string(text)}');
   print('');
 
   // Example of HMAC generation
@@ -139,9 +136,10 @@ void main() {
   print('HMAC[Keccak-512] $text => ${keccak512.hmacBy(key).string(text)}');
   print('HMAC[SHAKE-128] $text => ${shake128.of(20).hmacBy(key).string(text)}');
   print('HMAC[SHAKE-256] $text => ${shake256.of(20).hmacBy(key).string(text)}');
+  print('[BLAKE-2s/256] $text => ${Blake2s(key.codeUnits, 256).string(text)}');
+  print('[BLAKE-2b/256] $text => ${Blake2b(key.codeUnits, 256).string(text)}');
   print('');
 }
-
 ```
 
 ## Benchmarks

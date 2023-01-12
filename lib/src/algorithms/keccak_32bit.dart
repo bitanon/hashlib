@@ -125,14 +125,17 @@ const int _d = _c4 + 2;
 /// Followed the optimizations in [PyCryptodome's implementation][keccak].
 /// Special thanks to [tiny_sha3] for readable code and test cases.
 ///
+/// It uses 32-bit integers to accommodate 64-bit integer operations, designed
+/// specially to be supported by Web VM. It is albeit slower than the native
+/// implementation.
+///
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
 /// [keccak]: https://github.com/Legrandin/pycryptodome/blob/master/src/keccak.c
 /// [tiny_sha3]: https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
-abstract class KeccakHash extends BlockHashBase {
+class KeccakHash extends BlockHashBase {
   final int stateSize;
   final int paddingByte;
-  final Uint32List state;
-  late final Uint8List bstate;
+  late final Uint32List state;
   final _var = Uint32List(_d + 2);
 
   KeccakHash({
@@ -143,12 +146,27 @@ abstract class KeccakHash extends BlockHashBase {
           stateSize >= 0 && stateSize <= 100,
           'The state size is not valid',
         ),
-        state = Uint32List(50), // 1600-bit state
         super(
+          bufferLengthInBytes: 200, // 1600-bit state
           blockLength: 200 - (stateSize << 1), // rate
           hashLength: outputSize ?? stateSize, // output length
         ) {
-    bstate = state.buffer.asUint8List();
+    state = buffer.buffer.asUint32List();
+  }
+
+  @override
+  void $process(List<int> chunk, int start, int end) {
+    for (; start < end; start++, pos++) {
+      if (pos == blockLength) {
+        $update();
+        pos = 0;
+      }
+      buffer[pos] ^= chunk[start];
+    }
+    if (pos == blockLength) {
+      $update(buffer);
+      pos = 0;
+    }
   }
 
   // static void _shr(int n, List<int> x, int i, List<int> z, int k) {
@@ -226,14 +244,7 @@ abstract class KeccakHash extends BlockHashBase {
   }
 
   @override
-  void $update(List<int> block, [int offset = 0]) {
-    if (offset + blockLength <= block.length) {
-      // Put the block in the state
-      for (int i = 0; i < blockLength; ++i, offset++) {
-        bstate[i] ^= block[offset];
-      }
-    }
-
+  void $update([List<int>? block, int offset = 0]) {
     for (int r = 0; r < _rc.length; r += 2) {
       // ---- Theta parity ----
       // c0 = a0 ^ a5 ^ a10 ^ a15 ^ a20;
@@ -402,29 +413,30 @@ abstract class KeccakHash extends BlockHashBase {
   }
 
   @override
-  Uint8List $finalize(Uint8List block, int length) {
-    // Update the state with the final block
-    for (int i = 0; i < length; ++i) {
-      bstate[i] ^= block[i];
+  Uint8List $finalize([Uint8List? block, int? length]) {
+    // Update the final block
+    if (pos == blockLength) {
+      $update();
+      pos = 0;
     }
 
     // Setting the signature bytes
-    bstate[length] ^= paddingByte;
-    bstate[blockLength - 1] ^= 0x80;
-    $update([]);
+    buffer[pos] ^= paddingByte;
+    buffer[blockLength - 1] ^= 0x80;
+    $update();
 
     if (hashLength <= stateSize) {
-      return bstate.sublist(0, hashLength);
+      return buffer.sublist(0, hashLength);
     }
 
     // sponge construction
     var bytes = Uint8List(hashLength);
     for (int i = 0, j = 0; i < hashLength; i++, j++) {
       if (j == blockLength) {
-        $update([]);
+        $update();
         j = 0;
       }
-      bytes[i] = bstate[j];
+      bytes[i] = buffer[j];
     }
     return bytes;
   }
@@ -448,10 +460,10 @@ abstract class KeccakHash extends BlockHashBase {
     // infinite sponge construction
     for (int j = 0;; j++) {
       if (j == blockLength) {
-        $update([]);
+        $update();
         j = 0;
       }
-      yield bstate[j];
+      yield buffer[j];
     }
   }
 }

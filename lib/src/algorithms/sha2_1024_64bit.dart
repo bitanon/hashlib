@@ -40,21 +40,21 @@ const List<int> _k = [
 /// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
 ///
 /// It uses 64-bit integer operations internally which is not supported by
-/// Web VM, but faster.
+/// Web VM, but a lot faster.
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-abstract class SHA2of64bit extends BlockHashBase {
+class SHA2of1024 extends BlockHashBase {
   final List<int> seed;
-  final Uint64List state;
+  final Uint32List state;
   final Uint64List chunk;
 
   /// For internal use only.
-  SHA2of64bit({
+  SHA2of1024({
     required this.seed,
     required int hashLength,
   })  : chunk = Uint64List(80),
-        state = Uint64List.fromList(seed),
+        state = Uint32List.fromList(seed),
         super(
           blockLength: 1024 >>> 3,
           hashLength: hashLength,
@@ -94,15 +94,16 @@ abstract class SHA2of64bit extends BlockHashBase {
     var w = chunk;
     int t1, t2, ch, maj;
     int a, b, c, d, e, f, g, h;
+    int ta, tb, tc, td, te, tf, tg, th;
 
-    a = state[0];
-    b = state[1];
-    c = state[2];
-    d = state[3];
-    e = state[4];
-    f = state[5];
-    g = state[6];
-    h = state[7];
+    ta = a = (state[0] << 32) | (state[1]);
+    tb = b = (state[2] << 32) | (state[3]);
+    tc = c = (state[4] << 32) | (state[5]);
+    td = d = (state[6] << 32) | (state[7]);
+    te = e = (state[8] << 32) | (state[9]);
+    tf = f = (state[10] << 32) | (state[11]);
+    tg = g = (state[12] << 32) | (state[13]);
+    th = h = (state[14] << 32) | (state[15]);
 
     // Extend the first 16 words into the 80 words (64-bit)
     for (int i = 16; i < 80; i++) {
@@ -125,14 +126,30 @@ abstract class SHA2of64bit extends BlockHashBase {
       a = t1 + t2;
     }
 
-    state[0] += a;
-    state[1] += b;
-    state[2] += c;
-    state[3] += d;
-    state[4] += e;
-    state[5] += f;
-    state[6] += g;
-    state[7] += h;
+    ta += a;
+    tb += b;
+    tc += c;
+    td += d;
+    te += e;
+    tf += f;
+    tg += g;
+    th += h;
+    state[0] = ta >> 32;
+    state[1] = ta;
+    state[2] = tb >> 32;
+    state[3] = tb;
+    state[4] = tc >> 32;
+    state[5] = tc;
+    state[6] = td >> 32;
+    state[7] = td;
+    state[8] = te >> 32;
+    state[9] = te;
+    state[10] = tf >> 32;
+    state[11] = tf;
+    state[12] = tg >> 32;
+    state[13] = tg;
+    state[14] = th >> 32;
+    state[15] = th;
   }
 
   @override
@@ -170,13 +187,7 @@ abstract class SHA2of64bit extends BlockHashBase {
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);
-    for (int j = 0, i = 0; j < hashLength; i++, j += 8) {
-      bytes[j] = state[i] >>> 56;
-      bytes[j + 1] = state[i] >>> 48;
-      bytes[j + 2] = state[i] >>> 40;
-      bytes[j + 3] = state[i] >> 32;
-    }
-    for (int j = 4, i = 0; j < hashLength; i++, j += 8) {
+    for (int j = 0, i = 0; j < hashLength; i++, j += 4) {
       bytes[j] = state[i] >>> 24;
       bytes[j + 1] = state[i] >>> 16;
       bytes[j + 2] = state[i] >>> 8;

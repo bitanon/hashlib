@@ -41,11 +41,9 @@ const _rc = <int>[
 /// [rfc1321]: https://www.rfc-editor.org/rfc/rfc1321
 class MD5Hash extends BlockHashBase {
   final Uint32List state;
-  final Uint32List chunk;
 
   MD5Hash()
-      : chunk = Uint32List(16),
-        state = Uint32List.fromList([
+      : state = Uint32List.fromList([
           0x67452301, // a
           0xEFCDAB89, // b
           0x98BADCFE, // c
@@ -57,28 +55,38 @@ class MD5Hash extends BlockHashBase {
         );
 
   @override
-  void $update(List<int> block, [int offset = 0]) {
+  void $process(List<int> chunk, int start, int end) {
+    messageLength += end - start;
+    for (; start < end; start++, pos++) {
+      if (pos == blockLength) {
+        $update();
+        pos = 0;
+      }
+      buffer[pos] = chunk[start];
+    }
+    if (pos == blockLength) {
+      $update(buffer);
+      pos = 0;
+    }
+  }
+
+  @override
+  void $update([List<int>? block, int offset = 0]) {
     int a, b, c, d, e, f, g, h, t;
+    var x = sbuffer;
 
     a = state[0];
     b = state[1];
     c = state[2];
     d = state[3];
 
-    // Convert the block to chunk
-    for (int i = 0, j = offset; i < 16; i++, j += 4) {
-      chunk[i] = ((block[j + 3] & 0xFF) << 24) |
-          ((block[j + 2] & 0xFF) << 16) |
-          ((block[j + 1] & 0xFF) << 8) |
-          (block[j] & 0xFF);
-    }
-
     for (int i = 0; i < 16; i++) {
       e = (b & c) | ((~b & _mask32) & d);
+      f = i;
       t = d;
       d = c;
       c = b;
-      g = (a + e + _k[i] + chunk[i]) & _mask32;
+      g = (a + e + _k[i] + x[f]) & _mask32;
       h = _rc[i];
       b += ((g << h) & _mask32) | (g >>> (32 - h));
       a = t;
@@ -90,7 +98,7 @@ class MD5Hash extends BlockHashBase {
       t = d;
       d = c;
       c = b;
-      g = (a + e + _k[i] + chunk[f]) & _mask32;
+      g = (a + e + _k[i] + x[f]) & _mask32;
       h = _rc[i];
       b += ((g << h) & _mask32) | (g >>> (32 - h));
       a = t;
@@ -102,7 +110,7 @@ class MD5Hash extends BlockHashBase {
       t = d;
       d = c;
       c = b;
-      g = (a + e + _k[i] + chunk[f]) & _mask32;
+      g = (a + e + _k[i] + x[f]) & _mask32;
       h = _rc[i];
       b += ((g << h) & _mask32) | (g >>> (32 - h));
       a = t;
@@ -114,7 +122,7 @@ class MD5Hash extends BlockHashBase {
       t = d;
       d = c;
       c = b;
-      g = (a + e + _k[i] + chunk[f]) & _mask32;
+      g = (a + e + _k[i] + x[f]) & _mask32;
       h = _rc[i];
       b += ((g << h) & _mask32) | (g >>> (32 - h));
       a = t;
@@ -127,39 +135,32 @@ class MD5Hash extends BlockHashBase {
   }
 
   @override
-  Uint8List $finalize(Uint8List block, int length) {
+  Uint8List $finalize([Uint8List? block, int? length]) {
     // Adding the signature byte
-    block[length++] = 0x80;
+    buffer[pos++] = 0x80;
 
     // If no more space left in buffer for the message length
-    if (length > 56) {
-      for (; length < 64; length++) {
-        block[length] = 0;
+    if (pos > 56) {
+      for (; pos < 64; pos++) {
+        buffer[pos] = 0;
       }
-      $update(block);
-      length = 0;
+      $update();
+      pos = 0;
     }
 
     // Fill remaining buffer to put the message length at the end
-    for (; length < 56; length++) {
-      block[length] = 0;
+    for (; pos < 56; pos++) {
+      buffer[pos] = 0;
     }
 
     // Append original message length in bits to message
-    int n = messageLengthInBits;
-    block[56] = n;
-    block[57] = n >>> 8;
-    block[58] = n >>> 16;
-    block[59] = n >>> 24;
-    block[60] = n >>> 32;
-    block[61] = n >>> 40;
-    block[62] = n >>> 48;
-    block[63] = n >>> 56;
+    bdata.setUint32(56, messageLengthInBits, Endian.little);
+    bdata.setUint32(60, messageLengthInBits >> 32, Endian.little);
 
     // Update with the final block
-    $update(block);
+    $update();
 
     // Convert the state to 8-bit byte array
-    return Uint8List.fromList(state.buffer.asUint8List());
+    return state.buffer.asUint8List();
   }
 }

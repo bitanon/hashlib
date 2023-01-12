@@ -1,3 +1,11 @@
+## 1.3.0
+
+- Reduces memory overhead by utilizing the buffer in all `BlockHash`
+- Fixes broken sha512 hash fo web VM
+- New features:
+  - `blake2s`
+  - `blake2b`
+
 ## 1.2.0
 
 - New features available:
