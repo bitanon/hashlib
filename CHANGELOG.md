@@ -1,5 +1,6 @@
 ## 1.4.0
 
+- Update the internal structure for better accessibility
 - Removes a lot of string extensions. Remaining ones are:
   - `sha512digest`
   - `sha256digest`
@@ -11,6 +12,7 @@
   - `sha1digest`
   - `md5digest`
   - `crc32code`
+- Accept file input in `HashBase`
 
 ## 1.3.0
 

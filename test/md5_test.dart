@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart' as crypto;
@@ -73,6 +74,11 @@ void main() {
         final result = await hashlib.md5.consume(stream);
         expect(result.hex(), entry.value);
       }
+    });
+
+    test('with a file', () {
+      var file = File('LICENSE');
+      expect(hashlib.md5.file(file).hex(), '488a54b1e0a45266e589c8148a9ff334');
     });
 
     test('to compare against known implementations', () {

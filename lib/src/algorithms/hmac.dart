@@ -12,13 +12,13 @@ import 'package:hashlib/src/core/hash_digest.dart';
 ///
 /// [rfc2104]: https://www.rfc-editor.org/rfc/rfc2104
 class HMACSink extends HashDigestSink {
-  final BlockHashBase outerSink;
-  final BlockHashBase innerSink;
+  final BlockHash outerSink;
+  final BlockHash innerSink;
 
   factory HMACSink(HashBase algo, List<int> key) {
     var outer = algo.startChunkedConversion();
     var inner = algo.startChunkedConversion();
-    if (outer is! BlockHashBase || inner is! BlockHashBase) {
+    if (outer is! BlockHash || inner is! BlockHash) {
       throw StateError('Only block hashes are supported for HMAC');
     }
 

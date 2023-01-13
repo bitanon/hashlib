@@ -60,7 +60,7 @@ const _sigma = [
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2bHash extends BlockHashBase {
+class Blake2bHash extends BlockHash {
   final Uint64List state;
 
   /// For internal use only.

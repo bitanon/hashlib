@@ -1,3 +1,4 @@
+#!/bin/sh
 set -ex
 dart test
 mkdir -p build

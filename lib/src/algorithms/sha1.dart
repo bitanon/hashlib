@@ -11,7 +11,7 @@ const int _mask32 = 0xFFFFFFFF;
 /// [US Secure Hash Algorithm 1 (SHA1)][rfc3174].
 ///
 /// [rfc3174]: https://www.rfc-editor.org/rfc/rfc3174
-class SHA1Hash extends BlockHashBase {
+class SHA1Hash extends BlockHash {
   final Uint32List state;
   final Uint32List chunk;
 

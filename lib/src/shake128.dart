@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha3.dart';
+import 'package:hashlib/src/algorithms/shake.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 

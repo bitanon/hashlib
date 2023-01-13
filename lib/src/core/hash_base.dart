@@ -3,6 +3,8 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_digest.dart';
 
@@ -22,7 +24,7 @@ abstract class HashBase extends Converter<List<int>, HashDigest> {
     return sink.digest();
   }
 
-  /// Converts [input] string and returns a [HashDigest].
+  /// Converts the [input] string and returns a [HashDigest].
   ///
   /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
   HashDigest string(String input, [Encoding? encoding]) {
@@ -56,6 +58,25 @@ abstract class HashBase extends Converter<List<int>, HashDigest> {
     } else {
       await stream
           .forEach((input) => sink.addSlice(input.codeUnits, 0, input.length));
+    }
+    return sink.digest();
+  }
+
+  /// Converts the [input] file and returns a [HashDigest].
+  ///
+  /// If [start] is present, the file will be read from byte-offset [start].
+  /// Otherwise from the beginning (index 0).
+  ///
+  /// If [end] is present, only bytes up to byte-index [end] will be read.
+  /// Otherwise, until end of file.
+  HashDigest file(File input, [int? start, int? end]) {
+    var sink = startChunkedConversion();
+    var raf = input.openSync();
+    var buffer = Uint8List(2048);
+    int length = raf.lengthSync();
+    for (int i = 0, l; i < length; i += l) {
+      l = raf.readIntoSync(buffer);
+      sink.addSlice(buffer, 0, l);
     }
     return sink.digest();
   }

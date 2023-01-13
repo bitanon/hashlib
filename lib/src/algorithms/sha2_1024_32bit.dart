@@ -63,7 +63,7 @@ const int _t5 = _t4 + 2;
 ///
 /// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-class SHA2of1024 extends BlockHashBase {
+class SHA2of1024 extends BlockHash {
   final List<int> seed;
   final Uint32List state;
   final Uint32List chunk;

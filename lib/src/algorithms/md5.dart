@@ -39,7 +39,7 @@ const _rc = <int>[
 /// [MD5 Message-Digest Algorithm][rfc1321].
 ///
 /// [rfc1321]: https://www.rfc-editor.org/rfc/rfc1321
-class MD5Hash extends BlockHashBase {
+class MD5Hash extends BlockHash {
   final Uint32List state;
 
   MD5Hash()

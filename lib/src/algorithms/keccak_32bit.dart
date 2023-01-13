@@ -132,7 +132,7 @@ const int _d = _c4 + 2;
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
 /// [keccak]: https://github.com/Legrandin/pycryptodome/blob/master/src/keccak.c
 /// [tiny_sha3]: https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
-class KeccakHash extends BlockHashBase {
+class KeccakHash extends BlockHash {
   final int stateSize;
   final int paddingByte;
   late final Uint32List state;

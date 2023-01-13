@@ -1,6 +1,7 @@
 import 'dart:math';
 
-import 'base.dart';
+import 'blake2b.dart' as blake2b;
+import 'blake2s.dart' as blake2s;
 import 'md5.dart' as md5;
 import 'md5_hmac.dart' as md5_hmac;
 import 'sha1.dart' as sha1;
@@ -21,14 +22,14 @@ void main(List<String> args) {
     [500000, 10],
   ];
 
-  print('## Benchmarks');
+  print("# Benchmarks");
   print('');
   print("Libraries:");
   print('');
   print("- **Hashlib** : https://pub.dev/packages/hashlib");
   print("- **Crypto** : https://pub.dev/packages/crypto");
-  print("- **Hash** : https://pub.dev/packages/hash");
   print("- **PointyCastle** : https://pub.dev/packages/pointycastle");
+  print("- **Hash** : https://pub.dev/packages/hash");
   print("- **Sha3** : https://pub.dev/packages/sha3");
   print('');
 
@@ -93,6 +94,13 @@ void main(List<String> args) {
         sha3_512.Sha3Benchmark(size, iter),
         sha3_512.PointyCastleBenchmark(size, iter),
       ],
+      "BLAKE-2s": [
+        blake2s.HashlibBenchmark(size, iter),
+      ],
+      "BLAKE-2b": [
+        blake2b.HashlibBenchmark(size, iter),
+        blake2b.PointyCastleBenchmark(size, iter),
+      ],
       "HMAC(MD5)": [
         md5_hmac.HashlibBenchmark(size, iter),
         md5_hmac.CryptoBenchmark(size, iter),
@@ -116,10 +124,14 @@ void main(List<String> args) {
     print('|------------|${separator.join('|')}|');
 
     for (var entry in algorithms.entries) {
+      var diff = <String, int>{};
+      for (var benchmark in entry.value.reversed) {
+        diff[benchmark.name] = benchmark.measure().round();
+      }
       var me = entry.value.first;
-      var diff = measureDiff(entry.value.reversed);
       var mine = diff[me.name]!;
       var best = diff.values.fold(mine, min);
+
       var message = '| ${entry.key}     ';
       for (var name in names) {
         message += " | ";

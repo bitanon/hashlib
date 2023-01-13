@@ -61,7 +61,7 @@ const _sigma = [
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2sHash extends BlockHashBase {
+class Blake2sHash extends BlockHash {
   final Uint32List state;
 
   /// For internal use only.
@@ -104,8 +104,7 @@ class Blake2sHash extends BlockHashBase {
   }
 
   /// Rotates x right by n bits.
-  static int _rotr(int x, int n) =>
-      ((x & _mask32) >>> n) | ((x << (32 - n)) & _mask32);
+  static int _rotr(int x, int n) => ((x & _mask32) >>> n) | ((x << (32 - n)));
 
   // static void _G(Uint32List v, int a, int b, int c, int d, int x, int y) {
   //   v[a] = (v[a] + v[b] + x);
@@ -140,7 +139,7 @@ class Blake2sHash extends BlockHashBase {
     w10 = _seed[2];
     w11 = _seed[3];
     w12 = _seed[4] ^ (messageLength & _mask32);
-    w13 = _seed[5] ^ (messageLength >> 32);
+    w13 = _seed[5] ^ (messageLength >>> 32);
     w14 = _seed[6];
     w15 = _seed[7];
 

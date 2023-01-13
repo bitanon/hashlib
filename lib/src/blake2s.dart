@@ -5,25 +5,25 @@ import 'package:hashlib/src/algorithms/blake2s.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-/// For generating un-keyed message digest with BLAKE2s-256.
+/// For generating un-keyed message digest with BLAKE2s-128.
 ///
 /// Use [Blake2s] for keyed hash generation.
-const HashBase blake2s256 = Blake2s(null, 256);
-
-/// For generating un-keyed message digest with BLAKE2s-224.
-///
-/// Use [Blake2s] for keyed hash generation.
-const HashBase blake2s224 = Blake2s(null, 224);
+const HashBase blake2s128 = Blake2s(null, 128);
 
 /// For generating un-keyed message digest with BLAKE2s-160.
 ///
 /// Use [Blake2s] for keyed hash generation.
 const HashBase blake2s160 = Blake2s(null, 160);
 
-/// For generating un-keyed message digest with BLAKE2s-128.
+/// For generating un-keyed message digest with BLAKE2s-224.
 ///
 /// Use [Blake2s] for keyed hash generation.
-const HashBase blake2s128 = Blake2s(null, 128);
+const HashBase blake2s224 = Blake2s(null, 224);
+
+/// For generating un-keyed message digest with BLAKE2s-256.
+///
+/// Use [Blake2s] for keyed hash generation.
+const HashBase blake2s256 = Blake2s(null, 256);
 
 /// The BLAKE-2s is a member of BLAKE-2 family optimized for 32-bit platforms
 /// and can generate MACs efficiently.
