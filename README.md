@@ -30,36 +30,36 @@ This library contains implementations of secure hash functions, checksum generat
 | `whirlpool` |    ⌛     |       |
 -->
 
-### Message Authentication Code (MAC) Generators
-
-| Algorithms | (Native | Since) | (Web | Since) |
-| ---------- | :-----: | :----: | :--: | :----: |
-| `hmac`     |   ✔️    | 1.0.0  |  ✔️  | 1.0.0  |
-
-<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
-
-### Checksums Algorithms
-
-| Algorithms | Available Methods       |
-| ---------- | ----------------------- | --------- |
-| Alder32    | `alder32`               | Wikipedia |
-| CRC        | `crc16`,`crc32`,`crc64` | Wikipedia |
-
 <!--
-### Password hashing / Key derivation
+### Password Hashing / Key Derivation
 
 | Algorithms    | Supported | Since |
 | ------------- | :-------: | :---: |
-| `pbkdf2_hmac` |    ⌛     |       |
 | `argon2d`     |    ⌛     |       |
 | `argon2i`     |    ⌛     |       |
 | `argon2id`    |    ⌛     |       |
+| `pbkdf2_hmac` |    ⌛     |       |
 | `bcrypt`      |    ⌛     |       |
 | `scrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
 -->
 
-## Getting started
+### Message Authentication Code (MAC) generators
+
+| Algorithms | Available Methods | Source   |
+| ---------- | ----------------- | -------- |
+| HMAC       | `hmac`            | RFC-2104 |
+
+<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
+
+### Checksum Algorithms
+
+| Algorithms | Available Methods       | Source    |
+| ---------- | ----------------------- | --------- |
+| Alder32    | `alder32`               | Wikipedia |
+| CRC        | `crc16`,`crc32`,`crc64` | Wikipedia |
+
+## Getting Started
 
 The following import will give you access to all of the algorithms in this package.
 
