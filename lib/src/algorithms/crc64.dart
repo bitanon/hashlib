@@ -35,12 +35,13 @@ class CRC64Hash extends HashDigestSink {
   bool get closed => _closed;
 
   @override
-  void add(List<int> data) {
+  void add(List<int> data, [int start = 0, int? end]) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    for (int i, h, l, j = 0; j < data.length; j++) {
-      i = ((low ^ data[j]) & 0xFF) << 1;
+    end ??= data.length;
+    for (int i, h, l; start < end; start++) {
+      i = ((low ^ data[start]) & 0xFF) << 1;
       h = high >>> 8;
       l = (low >>> 8) | ((high & 0xFF) << 24);
       high = table[i] ^ h;

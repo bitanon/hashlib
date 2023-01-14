@@ -26,12 +26,12 @@ class Alder32Hash implements HashDigestSink {
   bool get closed => _closed;
 
   @override
-  void add(List<int> data) {
+  void add(List<int> data, [int start = 0, int? end]) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    for (int i = 0; i < data.length; i++) {
-      a = (a + data[i]) % _alder32Mod;
+    for (end ??= data.length; start < end; start++) {
+      a = (a + data[start]) % _alder32Mod;
       b = (b + a) % _alder32Mod;
     }
   }

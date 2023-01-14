@@ -76,10 +76,17 @@ void main() {
       }
     });
 
-    test('with a file', () async {
+    test('with a file async', () async {
       var file = File('LICENSE');
       var hash = await crypto.md5.bind(file.openRead()).first;
-      var hash2 = await hashlib.md5.bind(file.openRead()).first;
+      var hash2 = await hashlib.md5.file(file);
+      expect(hash2.hex(), toHex(hash.bytes));
+    });
+
+    test('with a file sync', () async {
+      var file = File('LICENSE');
+      var hash = await crypto.md5.bind(file.openRead()).first;
+      var hash2 = hashlib.md5.fileSync(file);
       expect(hash2.hex(), toHex(hash.bytes));
     });
 

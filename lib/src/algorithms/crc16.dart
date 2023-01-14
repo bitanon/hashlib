@@ -29,12 +29,12 @@ class CRC16Hash implements HashDigestSink {
   bool get closed => _closed;
 
   @override
-  void add(List<int> data) {
+  void add(List<int> data, [int start = 0, int? end]) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    for (int i = 0; i < data.length; i++) {
-      _crc = table[(_crc ^ data[i]) & 0xFF] ^ (_crc >>> 8);
+    for (end ??= data.length; start < end; start++) {
+      _crc = table[(_crc ^ data[start]) & 0xFF] ^ (_crc >>> 8);
     }
   }
 

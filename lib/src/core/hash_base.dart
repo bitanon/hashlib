@@ -130,16 +130,28 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   ///
   /// If [end] is present, only bytes up to byte-index [end] will be read.
   /// Otherwise, until end of file.
-  HashDigest fileSync(File input, [int start = 0, int? end]) {
-    var sink = createSink();
+  ///
+  /// If [bufferSize] is present, the file will be read in chunks of this size.
+  /// By default the [bufferSize] is `2048`.
+  HashDigest fileSync(
+    File input, {
+    int start = 0,
+    int? end,
+    int bufferSize = 2048,
+  }) {
     var raf = input.openSync();
-    var buffer = Uint8List(2048);
-    int length = end ?? raf.lengthSync();
-    for (int i = start, l; i < length; i += l) {
-      l = raf.readIntoSync(buffer);
-      sink.add(buffer);
+    try {
+      var sink = createSink();
+      var buffer = Uint8List(bufferSize);
+      int length = end ?? raf.lengthSync();
+      for (int i = start, l; i < length; i += l) {
+        l = raf.readIntoSync(buffer);
+        sink.add(buffer, 0, l);
+      }
+      return sink.digest();
+    } finally {
+      raf.closeSync();
     }
-    return sink.digest();
   }
 }
 
@@ -157,7 +169,7 @@ abstract class HashDigestSink {
   /// The [addSlice] function is preferred over [add]
   ///
   /// Throws [StateError], if it is called after closing the digest.
-  void add(List<int> data);
+  void add(List<int> data, [int start = 0, int? end]);
 
   /// Finalizes the message-digest and returns a [HashDigest]
   HashDigest digest();

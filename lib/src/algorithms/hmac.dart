@@ -65,8 +65,8 @@ class HMACSink implements HashDigestSink {
   int get hashLength => outer.hashLength;
 
   @override
-  void add(List<int> data) {
-    inner.add(data);
+  void add(List<int> data, [int start = 0, int? end]) {
+    inner.add(data, start, end);
   }
 
   @override

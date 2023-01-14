@@ -60,15 +60,17 @@ abstract class BlockHash implements HashDigestSink {
   Uint8List $finalize(Uint8List block, int length);
 
   @override
-  void add(List<int> data) {
+  void add(List<int> data, [int start = 0, int? end]) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    if (messageLength + data.length > _maxMessageLength) {
+
+    end ??= data.length;
+    if (messageLength - start > _maxMessageLength - end) {
       throw StateError('Exceeds the maximum message size limit');
     }
 
-    $process(data, 0, data.length);
+    $process(data, start, end);
   }
 
   /// Processes a chunk of input data
