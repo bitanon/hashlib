@@ -21,7 +21,7 @@ class _SHA512 extends HashBase {
   const _SHA512();
 
   @override
-  SHA512Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA512Hash();
+  SHA512Hash createSink() => SHA512Hash();
 }
 
 /// Generates a SHA-512 checksum in hexadecimal

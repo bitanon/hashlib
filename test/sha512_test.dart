@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/src/algorithms/sha2_1024_32bit.dart' as sha512web;
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
@@ -81,6 +82,26 @@ void main() {
             .map(toBytes);
         final result = await hashlib.sha512.consume(stream);
         expect(result.hex(), entry.value);
+      }
+    });
+
+    test('with mobile', () async {
+      for (final entry in tests.entries) {
+        final web256 = sha512web.SHA2of1024(
+          hashLength: 64,
+          seed: [
+            0x6A09E667, 0xF3BCC908, // a
+            0xBB67AE85, 0x84CAA73B, // b
+            0x3C6EF372, 0xFE94F82B, // c
+            0xA54FF53A, 0x5F1D36F1, // d
+            0x510E527F, 0xADE682D1, // e
+            0x9B05688C, 0x2B3E6C1F, // f
+            0x1F83D9AB, 0xFB41BD6B, // g
+            0x5BE0CD19, 0x137E2179, // h
+          ],
+        );
+        web256.add(entry.key.codeUnits);
+        expect(web256.digest().hex(), entry.value);
       }
     });
 

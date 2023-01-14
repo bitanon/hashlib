@@ -24,8 +24,7 @@ class _SHA3d512 extends HashBase {
   const _SHA3d512();
 
   @override
-  SHA3d512Hash startChunkedConversion([Sink<HashDigest>? sink]) =>
-      SHA3d512Hash();
+  SHA3d512Hash createSink() => SHA3d512Hash();
 }
 
 /// Generates a SHA3-512 checksum in hexadecimal

@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 // Initialize array of round 64-bit constants
 const List<int> _k = [
@@ -49,16 +50,16 @@ class SHA2of1024 extends BlockHash {
   final Uint32List state;
   final Uint64List chunk;
 
+  @override
+  final int hashLength;
+
   /// For internal use only.
   SHA2of1024({
     required this.seed,
-    required int hashLength,
+    required this.hashLength,
   })  : chunk = Uint64List(80),
         state = Uint32List.fromList(seed),
-        super(
-          blockLength: 1024 >>> 3,
-          hashLength: hashLength,
-        );
+        super(1024 >>> 3);
 
   /// Rotates 64-bit number x by n bits
   static int _bsig0(int x) =>
@@ -78,7 +79,7 @@ class SHA2of1024 extends BlockHash {
       ((x >>> 19) | (x << 45)) ^ ((x >>> 61) | (x << 3)) ^ (x >>> 6);
 
   @override
-  void $update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0, bool last = false]) {
     // Convert the block to chunk
     for (int i = 0, j = offset; i < 16; i++, j += 8) {
       chunk[i] = ((block[j] & 0xFF) << 56) |

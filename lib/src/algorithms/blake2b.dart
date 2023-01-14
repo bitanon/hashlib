@@ -61,11 +61,12 @@ const _sigma = [
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
 class Blake2bHash extends BlockHash {
+  final int digestSize;
   final Uint64List state;
 
   /// For internal use only.
   Blake2bHash({
-    int digestSize = 64,
+    this.digestSize = 64,
     List<int>? key,
   })  : assert(
           1 <= digestSize && digestSize <= 64,
@@ -76,10 +77,7 @@ class Blake2bHash extends BlockHash {
           'Invalid key size. The key can be at most 64 bytes',
         ),
         state = Uint64List.fromList(_seed),
-        super(
-          blockLength: 128,
-          hashLength: digestSize,
-        ) {
+        super(128) {
     // Parameter block
     state[0] ^= 0x01010000 ^ hashLength;
     if (key != null && key.isNotEmpty) {
@@ -90,6 +88,9 @@ class Blake2bHash extends BlockHash {
       messageLength += blockLength;
     }
   }
+
+  @override
+  int get hashLength => digestSize;
 
   @override
   void $process(List<int> chunk, int start, int end) {
@@ -117,7 +118,7 @@ class Blake2bHash extends BlockHash {
   // }
 
   @override
-  void $update([List<int>? block, int offset = 0]) {
+  void $update([List<int>? block, int offset = 0, bool last = false]) {
     var m = qbuffer;
     int w0, w1, w2, w3, w4, w5, w6, w7;
     int w8, w9, w10, w11, w12, w13, w14, w15;
@@ -142,7 +143,7 @@ class Blake2bHash extends BlockHash {
     w14 = _seed[6];
     w15 = _seed[7];
 
-    if (closed) {
+    if (last) {
       w14 = ~w14; // invert bits
     }
 
@@ -250,7 +251,7 @@ class Blake2bHash extends BlockHash {
     }
 
     // Update with the final block
-    $update();
+    $update(buffer, 0, true);
 
     // Convert the state to 8-bit byte array
     return state.buffer.asUint8List().sublist(0, hashLength);

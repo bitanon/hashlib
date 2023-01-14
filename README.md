@@ -145,59 +145,59 @@ Libraries:
 
 With string of length 10 (100000 iterations):
 
-| Algorithms    | `hashlib`      | `crypto`                      | `hash`                         | `PointyCastle`                  | `sha3`                        |
-| ------------- | -------------- | ----------------------------- | ------------------------------ | ------------------------------- | ----------------------------- |
-| MD5           | **42.276 ms**  | 93.323 ms <br> `121% slower`  | 196.541 ms <br> `365% slower`  | 134.664 ms <br> `219% slower`   | ➖                            |
-| SHA-1         | **70.194 ms**  | 108.909 ms <br> `55% slower`  | 257.306 ms <br> `267% slower`  | 149.935 ms <br> `114% slower`   | ➖                            |
-| SHA-224       | **89.61 ms**   | 131.638 ms <br> `47% slower`  | 444.125 ms <br> `396% slower`  | 342.773 ms <br> `283% slower`   | ➖                            |
-| SHA-256       | **89.447 ms**  | 131.85 ms <br> `47% slower`   | 445.699 ms <br> `398% slower`  | 347.406 ms <br> `288% slower`   | ➖                            |
-| SHA-384       | **103.699 ms** | 289.271 ms <br> `179% slower` | 1062.919 ms <br> `925% slower` | 2342.641 ms <br> `2159% slower` | ➖                            |
-| SHA-512       | **103.754 ms** | 290.572 ms <br> `180% slower` | 1066.844 ms <br> `928% slower` | 2344.139 ms <br> `2159% slower` | ➖                            |
-| SHA-512/224   | **101.674 ms** | 286.771 ms <br> `182% slower` | ➖                             | 4501.391 ms <br> `4327% slower` | ➖                            |
-| SHA-512/256   | **102.228 ms** | 286.739 ms <br> `180% slower` | ➖                             | 4498.623 ms <br> `4301% slower` | ➖                            |
-| SHA3-256      | **89.147 ms**  | ➖                            | ➖                             | 4535.083 ms <br> `4987% slower` | 400.67 ms <br> `349% slower`  |
-| SHA3-512      | **103.919 ms** | ➖                            | ➖                             | 4512.838 ms <br> `4243% slower` | 399.102 ms <br> `284% slower` |
-| BLAKE-2s      | **61.892 ms**  | ➖                            | ➖                             | ➖                              | ➖                            |
-| BLAKE-2b      | **62.643 ms**  | ➖                            | ➖                             | 1086.441 ms <br> `1634% slower` | ➖                            |
-| HMAC(MD5)     | **223.08 ms**  | 258.091 ms <br> `16% slower`  | 696.94 ms <br> `212% slower`   | ➖                              | ➖                            |
-| HMAC(SHA-256) | **585.78 ms**  | 654.331 ms <br> `12% slower`  | ➖                             | ➖                              | ➖                            |
+| Algorithms    | `hashlib`      | `crypto`                      | `hash`                        | `PointyCastle`                  | `sha3`                        |
+| ------------- | -------------- | ----------------------------- | ----------------------------- | ------------------------------- | ----------------------------- |
+| MD5           | **37.448 ms**  | 99.724 ms <br> `166% slower`  | 136.218 ms <br> `264% slower` | 90.014 ms <br> `140% slower`    | ➖                            |
+| SHA-1         | **62.889 ms**  | 118.287 ms <br> `88% slower`  | 204.516 ms <br> `225% slower` | 137.185 ms <br> `118% slower`   | ➖                            |
+| SHA-224       | **82.708 ms**  | 135.191 ms <br> `63% slower`  | 386.756 ms <br> `368% slower` | 317.11 ms <br> `283% slower`    | ➖                            |
+| SHA-256       | **83.224 ms**  | 135.272 ms <br> `63% slower`  | 375.568 ms <br> `351% slower` | 315.419 ms <br> `279% slower`   | ➖                            |
+| SHA-384       | **106.081 ms** | 339.157 ms <br> `220% slower` | 744.32 ms <br> `602% slower`  | 2625.653 ms <br> `2375% slower` | ➖                            |
+| SHA-512       | **106.95 ms**  | 342.052 ms <br> `220% slower` | 714.804 ms <br> `568% slower` | 2637.157 ms <br> `2366% slower` | ➖                            |
+| SHA-512/224   | **104.302 ms** | 335.923 ms <br> `222% slower` | ➖                            | 5195.99 ms <br> `4882% slower`  | ➖                            |
+| SHA-512/256   | **104.356 ms** | 335.103 ms <br> `221% slower` | ➖                            | 5192.926 ms <br> `4876% slower` | ➖                            |
+| SHA3-256      | **82.621 ms**  | ➖                            | ➖                            | 4396.641 ms <br> `5221% slower` | 407.845 ms <br> `394% slower` |
+| SHA3-512      | **106.798 ms** | ➖                            | ➖                            | 4391.363 ms <br> `4012% slower` | 407.664 ms <br> `282% slower` |
+| BLAKE-2s      | **65.554 ms**  | ➖                            | ➖                            | ➖                              | ➖                            |
+| BLAKE-2b      | **73.147 ms**  | ➖                            | ➖                            | 1143.823 ms <br> `1464% slower` | ➖                            |
+| HMAC(MD5)     | **231.861 ms** | 267.041 ms <br> `15% slower`  | 509.741 ms <br> `120% slower` | ➖                              | ➖                            |
+| HMAC(SHA-256) | **545.099 ms** | 622.546 ms <br> `14% slower`  | ➖                            | ➖                              | ➖                            |
 
 With string of length 1000 (5000 iterations):
 
-| Algorithms    | `hashlib`     | `crypto`                     | `hash`                        | `PointyCastle`                  | `sha3`                        |
-| ------------- | ------------- | ---------------------------- | ----------------------------- | ------------------------------- | ----------------------------- |
-| MD5           | **36.01 ms**  | 39.858 ms <br> `11% slower`  | 72.474 ms <br> `101% slower`  | 104.904 ms <br> `191% slower`   | ➖                            |
-| SHA-1         | **43.245 ms** | 50.977 ms <br> `18% slower`  | 117.81 ms <br> `172% slower`  | 109.037 ms <br> `152% slower`   | ➖                            |
-| SHA-224       | **58.281 ms** | 65.112 ms <br> `12% slower`  | 261.982 ms <br> `350% slower` | 261.985 ms <br> `350% slower`   | ➖                            |
-| SHA-256       | **57.941 ms** | 65.011 ms <br> `12% slower`  | 259.712 ms <br> `348% slower` | 259.007 ms <br> `347% slower`   | ➖                            |
-| SHA-384       | **32.632 ms** | 88.778 ms <br> `172% slower` | 353.296 ms <br> `983% slower` | 885.859 ms <br> `2615% slower`  | ➖                            |
-| SHA-512       | **32.491 ms** | 89.023 ms <br> `174% slower` | 353.802 ms <br> `989% slower` | 884.92 ms <br> `2624% slower`   | ➖                            |
-| SHA-512/224   | **32.363 ms** | 88.61 ms <br> `174% slower`  | ➖                            | 991.488 ms <br> `2964% slower`  | ➖                            |
-| SHA-512/256   | **32.361 ms** | 88.525 ms <br> `174% slower` | ➖                            | 989.959 ms <br> `2959% slower`  | ➖                            |
-| SHA3-256      | **57.67 ms**  | ➖                           | ➖                            | 1743.355 ms <br> `2923% slower` | 226.167 ms <br> `292% slower` |
-| SHA3-512      | **32.586 ms** | ➖                           | ➖                            | 3041.517 ms <br> `9234% slower` | 334.749 ms <br> `927% slower` |
-| BLAKE-2s      | **42.142 ms** | ➖                           | ➖                            | ➖                              | ➖                            |
-| BLAKE-2b      | **23.465 ms** | ➖                           | ➖                            | 380.297 ms <br> `1521% slower`  | ➖                            |
-| HMAC(MD5)     | **45.388 ms** | 49.641 ms <br> `9% slower`   | 98.273 ms <br> `117% slower`  | ➖                              | ➖                            |
-| HMAC(SHA-256) | **81.632 ms** | 92.378 ms <br> `13% slower`  | ➖                            | ➖                              | ➖                            |
+| Algorithms    | `hashlib`     | `crypto`                      | `hash`                        | `PointyCastle`                  | `sha3`                        |
+| ------------- | ------------- | ----------------------------- | ----------------------------- | ------------------------------- | ----------------------------- |
+| MD5           | **30.976 ms** | 42.134 ms <br> `36% slower`   | 54.537 ms <br> `76% slower`   | 60.695 ms <br> `96% slower`     | ➖                            |
+| SHA-1         | **34.96 ms**  | 54.001 ms <br> `54% slower`   | 104.977 ms <br> `200% slower` | 91.316 ms <br> `161% slower`    | ➖                            |
+| SHA-224       | **51.497 ms** | 61.656 ms <br> `20% slower`   | 240.458 ms <br> `367% slower` | 233.668 ms <br> `354% slower`   | ➖                            |
+| SHA-256       | **51.947 ms** | 61.594 ms <br> `19% slower`   | 237.967 ms <br> `358% slower` | 232.312 ms <br> `347% slower`   | ➖                            |
+| SHA-384       | **35.063 ms** | 107.759 ms <br> `207% slower` | 236.312 ms <br> `574% slower` | 1006.556 ms <br> `2771% slower` | ➖                            |
+| SHA-512       | **34.557 ms** | 107.359 ms <br> `211% slower` | 234.373 ms <br> `578% slower` | 1011.268 ms <br> `2826% slower` | ➖                            |
+| SHA-512/224   | **34.614 ms** | 107.133 ms <br> `210% slower` | ➖                            | 1130.86 ms <br> `3167% slower`  | ➖                            |
+| SHA-512/256   | **34.513 ms** | 106.872 ms <br> `210% slower` | ➖                            | 1129.151 ms <br> `3172% slower` | ➖                            |
+| SHA3-256      | **52.012 ms** | ➖                            | ➖                            | 1679.069 ms <br> `3128% slower` | 226.4 ms <br> `335% slower`   |
+| SHA3-512      | **34.777 ms** | ➖                            | ➖                            | 2930.05 ms <br> `8325% slower`  | 336.198 ms <br> `867% slower` |
+| BLAKE-2s      | **36.649 ms** | ➖                            | ➖                            | ➖                              | ➖                            |
+| BLAKE-2b      | **24.342 ms** | ➖                            | ➖                            | 412.321 ms <br> `1594% slower`  | ➖                            |
+| HMAC(MD5)     | **40.465 ms** | 51.914 ms <br> `28% slower`   | 73.211 ms <br> `81% slower`   | ➖                              | ➖                            |
+| HMAC(SHA-256) | **74.768 ms** | 87.488 ms <br> `17% slower`   | ➖                            | ➖                              | ➖                            |
 
 With string of length 500000 (10 iterations):
 
-| Algorithms    | `hashlib`     | `crypto`                     | `hash`                         | `PointyCastle`                   | `sha3`                         |
-| ------------- | ------------- | ---------------------------- | ------------------------------ | -------------------------------- | ------------------------------ |
-| MD5           | **35.057 ms** | 38.494 ms <br> `10% slower`  | 79.518 ms <br> `127% slower`   | 101.072 ms <br> `188% slower`    | ➖                             |
-| SHA-1         | **41.346 ms** | 48.679 ms <br> `18% slower`  | 124.539 ms <br> `201% slower`  | 103.355 ms <br> `150% slower`    | ➖                             |
-| SHA-224       | **53.93 ms**  | 62.588 ms <br> `16% slower`  | 260.972 ms <br> `384% slower`  | 251.336 ms <br> `366% slower`    | ➖                             |
-| SHA-256       | **54.4 ms**   | 62.699 ms <br> `15% slower`  | 260.605 ms <br> `379% slower`  | 250.739 ms <br> `361% slower`    | ➖                             |
-| SHA-384       | **28.829 ms** | 85.269 ms <br> `196% slower` | 352.308 ms <br> `1122% slower` | 861.306 ms <br> `2888% slower`   | ➖                             |
-| SHA-512       | **28.842 ms** | 84.94 ms <br> `195% slower`  | 351.892 ms <br> `1120% slower` | 854.374 ms <br> `2862% slower`   | ➖                             |
-| SHA-512/224   | **28.983 ms** | 85.248 ms <br> `194% slower` | ➖                             | 861.93 ms <br> `2874% slower`    | ➖                             |
-| SHA-512/256   | **28.919 ms** | 85.894 ms <br> `197% slower` | ➖                             | 857.679 ms <br> `2866% slower`   | ➖                             |
-| SHA3-256      | **54.634 ms** | ➖                           | ➖                             | 1617.128 ms <br> `2860% slower`  | 213.12 ms <br> `290% slower`   |
-| SHA3-512      | **28.755 ms** | ➖                           | ➖                             | 3026.285 ms <br> `10424% slower` | 333.488 ms <br> `1060% slower` |
-| BLAKE-2s      | **40.092 ms** | ➖                           | ➖                             | ➖                               | ➖                             |
-| BLAKE-2b      | **22.359 ms** | ➖                           | ➖                             | 363.314 ms <br> `1525% slower`   | ➖                             |
-| HMAC(MD5)     | **35.489 ms** | 38.657 ms <br> `9% slower`   | 82.969 ms <br> `134% slower`   | ➖                               | ➖                             |
-| HMAC(SHA-256) | **54.019 ms** | 62.991 ms <br> `17% slower`  | ➖                             | ➖                               | ➖                             |
+| Algorithms    | `hashlib`     | `crypto`                      | `hash`                        | `PointyCastle`                  | `sha3`                        |
+| ------------- | ------------- | ----------------------------- | ----------------------------- | ------------------------------- | ----------------------------- |
+| MD5           | **29.872 ms** | 40.633 ms <br> `36% slower`   | 70.021 ms <br> `134% slower`  | 57.744 ms <br> `93% slower`     | ➖                            |
+| SHA-1         | **32.407 ms** | 52.164 ms <br> `61% slower`   | 118.789 ms <br> `267% slower` | 87.177 ms <br> `169% slower`    | ➖                            |
+| SHA-224       | **48.625 ms** | 59.259 ms <br> `22% slower`   | 248.668 ms <br> `411% slower` | 226.517 ms <br> `366% slower`   | ➖                            |
+| SHA-256       | **48.786 ms** | 59.439 ms <br> `22% slower`   | 249.149 ms <br> `411% slower` | 225.049 ms <br> `361% slower`   | ➖                            |
+| SHA-384       | **30.729 ms** | 102.777 ms <br> `234% slower` | 282.807 ms <br> `820% slower` | 974.133 ms <br> `3070% slower`  | ➖                            |
+| SHA-512       | **30.774 ms** | 102.945 ms <br> `235% slower` | 283.705 ms <br> `822% slower` | 973.638 ms <br> `3064% slower`  | ➖                            |
+| SHA-512/224   | **30.771 ms** | 103.28 ms <br> `236% slower`  | ➖                            | 976.078 ms <br> `3072% slower`  | ➖                            |
+| SHA-512/256   | **30.814 ms** | 102.666 ms <br> `233% slower` | ➖                            | 974.959 ms <br> `3064% slower`  | ➖                            |
+| SHA3-256      | **48.575 ms** | ➖                            | ➖                            | 1535.807 ms <br> `3062% slower` | 213.54 ms <br> `340% slower`  |
+| SHA3-512      | **30.971 ms** | ➖                            | ➖                            | 2893.653 ms <br> `9243% slower` | 333.166 ms <br> `976% slower` |
+| BLAKE-2s      | **34.646 ms** | ➖                            | ➖                            | ➖                              | ➖                            |
+| BLAKE-2b      | **22.729 ms** | ➖                            | ➖                            | 395.993 ms <br> `1642% slower`  | ➖                            |
+| HMAC(MD5)     | **30.067 ms** | 40.611 ms <br> `35% slower`   | 70.045 ms <br> `133% slower`  | ➖                              | ➖                            |
+| HMAC(SHA-256) | **48.869 ms** | 59.274 ms <br> `21% slower`   | ➖                            | ➖                              | ➖                            |
 
-> These benchmarks were done in _Apple M1 Pro_
+> These benchmarks were done in _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_ on Windows 10

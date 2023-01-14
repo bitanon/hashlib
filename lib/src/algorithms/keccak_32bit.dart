@@ -138,18 +138,21 @@ class KeccakHash extends BlockHash {
   late final Uint32List state;
   final _var = Uint32List(_d + 2);
 
+  @override
+  final int hashLength;
+
   KeccakHash({
     required this.stateSize,
-    this.paddingByte = 0x06,
+    required this.paddingByte,
     int? outputSize, // equals to state size if not provided
   })  : assert(
           stateSize >= 0 && stateSize <= 100,
           'The state size is not valid',
         ),
+        hashLength = outputSize ?? stateSize,
         super(
-          bufferLengthInBytes: 200, // 1600-bit state
-          blockLength: 200 - (stateSize << 1), // rate
-          hashLength: outputSize ?? stateSize, // output length
+          200 - (stateSize << 1), // rate as blockLength
+          bufferLength: 200, // 1600-bit state as buffer
         ) {
     state = buffer.buffer.asUint32List();
   }
@@ -244,7 +247,7 @@ class KeccakHash extends BlockHash {
   }
 
   @override
-  void $update([List<int>? block, int offset = 0]) {
+  void $update([List<int>? block, int offset = 0, bool last = false]) {
     for (int r = 0; r < _rc.length; r += 2) {
       // ---- Theta parity ----
       // c0 = a0 ^ a5 ^ a10 ^ a15 ^ a20;
@@ -439,31 +442,5 @@ class KeccakHash extends BlockHash {
       bytes[i] = buffer[j];
     }
     return bytes;
-  }
-
-  /// Returns a iterable of bytes generated from the Keccak sponge.
-  ///
-  /// It will produce exactly [outputSize] bytes before closing the stream.
-  ///
-  /// If [outputSize] is 0, it will generate an infinite sequence of
-  /// bytes.
-  ///
-  /// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
-  Iterable<int> generate() sync* {
-    // make sure that the digest is closed
-    var b = digest().bytes;
-    if (b.isNotEmpty) {
-      yield* b;
-      return;
-    }
-
-    // infinite sponge construction
-    for (int j = 0;; j++) {
-      if (j == blockLength) {
-        $update();
-        j = 0;
-      }
-      yield buffer[j];
-    }
   }
 }

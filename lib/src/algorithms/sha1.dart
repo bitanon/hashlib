@@ -15,8 +15,12 @@ class SHA1Hash extends BlockHash {
   final Uint32List state;
   final Uint32List chunk;
 
+  @override
+  final int hashLength;
+
   SHA1Hash()
       : chunk = Uint32List(80),
+        hashLength = 160 >>> 3,
         state = Uint32List.fromList([
           0x67452301, // a
           0xEFCDAB89, // b
@@ -24,13 +28,10 @@ class SHA1Hash extends BlockHash {
           0x10325476, // d
           0xC3D2E1F0, // e
         ]),
-        super(
-          hashLength: 160 >>> 3,
-          blockLength: 512 >>> 3,
-        );
+        super(512 >>> 3);
 
   @override
-  void $update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0, bool last = false]) {
     var w = chunk;
 
     int a, b, c, d, e;

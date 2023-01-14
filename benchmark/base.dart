@@ -28,12 +28,12 @@ abstract class Benchmark extends BenchmarkBase {
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
     for (var entry in data.entries) {
-      var message = "${entry.key} Runtime: ${entry.value} µs";
+      var message = "${entry.key} Runtime: ${entry.value / 1000} ms";
       if (entry.value == best) {
         message += " [best]";
       }
       if (entry.key != name) {
-        message += " ~ ${(entry.value - mine)} µs";
+        message += " ~ ${((entry.value - mine) / 1000)} ms";
       }
       print(message);
     }

@@ -18,7 +18,7 @@ class _MD5 extends HashBase {
   const _MD5();
 
   @override
-  MD5Hash startChunkedConversion([Sink<HashDigest>? sink]) => MD5Hash();
+  MD5Hash createSink() => MD5Hash();
 }
 
 /// Generates a MD5 checksum in hexadecimal

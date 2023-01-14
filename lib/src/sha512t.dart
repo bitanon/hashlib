@@ -15,8 +15,7 @@ class _SHA512t256 extends HashBase {
   const _SHA512t256();
 
   @override
-  SHA512t256Hash startChunkedConversion([Sink<HashDigest>? sink]) =>
-      SHA512t256Hash();
+  SHA512t256Hash createSink() => SHA512t256Hash();
 }
 
 /// SHA-512/224 is a variation of SHA-512 which uses 512-bit internal state to
@@ -27,8 +26,7 @@ class _SHA512t224 extends HashBase {
   const _SHA512t224();
 
   @override
-  SHA512t224Hash startChunkedConversion([Sink<HashDigest>? sink]) =>
-      SHA512t224Hash();
+  SHA512t224Hash createSink() => SHA512t224Hash();
 }
 
 /// Generates a SHA-512/256 checksum in hexadecimal

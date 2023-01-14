@@ -42,6 +42,9 @@ const _rc = <int>[
 class MD5Hash extends BlockHash {
   final Uint32List state;
 
+  @override
+  final int hashLength;
+
   MD5Hash()
       : state = Uint32List.fromList([
           0x67452301, // a
@@ -49,10 +52,8 @@ class MD5Hash extends BlockHash {
           0x98BADCFE, // c
           0x10325476, // d
         ]),
-        super(
-          hashLength: 128 >>> 3,
-          blockLength: 512 >>> 3,
-        );
+        hashLength = 128 >>> 3,
+        super(512 >>> 3);
 
   @override
   void $process(List<int> chunk, int start, int end) {
@@ -71,7 +72,7 @@ class MD5Hash extends BlockHash {
   }
 
   @override
-  void $update([List<int>? block, int offset = 0]) {
+  void $update([List<int>? block, int offset = 0, bool last = false]) {
     int a, b, c, d, e, f, g, h, t;
     var x = sbuffer;
 

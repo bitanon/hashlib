@@ -3,7 +3,6 @@
 
 import 'package:hashlib/src/algorithms/blake2s.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// For generating un-keyed message digest with BLAKE2s-128.
 ///
@@ -51,10 +50,7 @@ class Blake2s extends HashBase {
         );
 
   @override
-  Blake2sHash startChunkedConversion([
-    Sink<HashDigest>? sink,
-  ]) =>
-      Blake2sHash(
+  Blake2sHash createSink() => Blake2sHash(
         key: key,
         digestSize: digestSizeInBits >>> 3,
       );

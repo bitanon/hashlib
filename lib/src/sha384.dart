@@ -21,7 +21,7 @@ class _SHA384 extends HashBase {
   const _SHA384();
 
   @override
-  SHA384Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA384Hash();
+  SHA384Hash createSink() => SHA384Hash();
 }
 
 /// Generates a SHA-384 checksum in hexadecimal

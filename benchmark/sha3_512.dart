@@ -51,19 +51,18 @@ class PointyCastleBenchmark extends Benchmark {
 
 void main() {
   print('--------- SHA3-512 ----------');
-  HashlibBenchmark(17, 1000).showDiff([
-    Sha3Benchmark(17, 1000),
-    PointyCastleBenchmark(17, 1000),
-  ]);
-  print('');
-  HashlibBenchmark(1777, 50).showDiff([
-    Sha3Benchmark(1777, 50),
-    PointyCastleBenchmark(7000, 100),
-  ]);
-  print('');
-  HashlibBenchmark(111000, 1).showDiff([
-    Sha3Benchmark(111000, 1),
-    PointyCastleBenchmark(777000, 1),
-  ]);
-  print('');
+  final conditions = [
+    [10, 100000],
+    [1000, 5000],
+    [500000, 10],
+  ];
+  for (var condition in conditions) {
+    int size = condition[0];
+    int iter = condition[1];
+    HashlibBenchmark(size, iter).showDiff([
+      Sha3Benchmark(size, iter),
+      PointyCastleBenchmark(size, iter),
+    ]);
+    print('');
+  }
 }

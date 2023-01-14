@@ -26,7 +26,7 @@ class _Alder32 extends HashBase {
   const _Alder32();
 
   @override
-  Alder32Hash startChunkedConversion([Sink<HashDigest>? sink]) => Alder32Hash();
+  Alder32Hash createSink() => Alder32Hash();
 }
 
 /// Gets the Alder-32 remainder value of a String

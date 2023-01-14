@@ -20,10 +20,15 @@ class HashlibBenchmark extends Benchmark {
 
 void main() {
   print('--------- BLAKE-2b ----------');
-  HashlibBenchmark(17, 1000).showDiff([]);
-  print('');
-  HashlibBenchmark(7000, 100).showDiff([]);
-  print('');
-  HashlibBenchmark(777000, 1).showDiff([]);
-  print('');
+  final conditions = [
+    [10, 100000],
+    [1000, 5000],
+    [500000, 10],
+  ];
+  for (var condition in conditions) {
+    int size = condition[0];
+    int iter = condition[1];
+    HashlibBenchmark(size, iter).showDiff([]);
+    print('');
+  }
 }

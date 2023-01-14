@@ -21,7 +21,7 @@ class _SHA224 extends HashBase {
   const _SHA224();
 
   @override
-  SHA224Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA224Hash();
+  SHA224Hash createSink() => SHA224Hash();
 }
 
 /// Generates a SHA-224 checksum in hexadecimal

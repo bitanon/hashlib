@@ -51,8 +51,7 @@ class Shake256 extends HashBase {
   const Shake256(this.outputSizeInBytes);
 
   @override
-  Shake256Hash startChunkedConversion([Sink<HashDigest>? sink]) =>
-      Shake256Hash(outputSizeInBytes);
+  Shake256Hash createSink() => Shake256Hash(outputSizeInBytes);
 }
 
 /// Generates a SHAKE-256 checksum in hexadecimal of arbitrary length
@@ -82,19 +81,4 @@ extension Shake256StringExtension on String {
   HashDigest shake256digest(int outputSize, [Encoding? encoding]) {
     return Shake256(outputSize).string(this, encoding);
   }
-}
-
-/// Creates a SHAKE-256 based **infinite** hash generator.
-///
-/// If [seed] is provided it will be used as an input to the algorithm.
-/// With a proper seed, this can work as a random number generator.
-///
-/// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
-@Deprecated("Experimental feature. Can be removed or changed in the future.")
-Iterable<int> shake256generator([List<int>? seed]) {
-  final hash = Shake256Hash(0);
-  if (seed != null) {
-    hash.addSlice(seed, 0, seed.length);
-  }
-  return hash.generate();
 }

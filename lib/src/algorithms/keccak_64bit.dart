@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 // Rotation constants
 const int _rot01 = 36;
@@ -76,6 +77,9 @@ class KeccakHash extends BlockHash {
   final int paddingByte;
   late final Uint64List qstate;
 
+  @override
+  final int hashLength;
+
   KeccakHash({
     required this.stateSize,
     this.paddingByte = 0x06,
@@ -84,10 +88,10 @@ class KeccakHash extends BlockHash {
           stateSize >= 0 && stateSize <= 100,
           'The state size is not valid',
         ),
+        hashLength = outputSize ?? stateSize,
         super(
-          bufferLengthInBytes: 200, // 1600-bit state
-          blockLength: 200 - (stateSize << 1), // rate
-          hashLength: outputSize ?? stateSize, // output length
+          200 - (stateSize << 1), // rate as blockLength
+          bufferLength: 200, // 1600-bit state as buffer
         ) {
     qstate = buffer.buffer.asUint64List();
   }
@@ -111,7 +115,7 @@ class KeccakHash extends BlockHash {
   }
 
   @override
-  void $update([List<int>? block, int offset = 0]) {
+  void $update([List<int>? block, int offset = 0, bool last = false]) {
     // Use the 64-bit state
     var st = qstate;
 
@@ -282,31 +286,5 @@ class KeccakHash extends BlockHash {
       bytes[i] = buffer[j];
     }
     return bytes;
-  }
-
-  /// Returns a iterable of bytes generated from the Keccak sponge.
-  ///
-  /// It will produce exactly [outputSize] bytes before closing the stream.
-  ///
-  /// If [outputSize] is 0, it will generate an infinite sequence of
-  /// bytes.
-  ///
-  /// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
-  Iterable<int> generate() sync* {
-    // make sure that the digest is closed
-    var b = digest().bytes;
-    if (b.isNotEmpty) {
-      yield* b;
-      return;
-    }
-
-    // infinite sponge construction
-    for (int j = 0;; j++) {
-      if (j == blockLength) {
-        $update();
-        j = 0;
-      }
-      yield buffer[j];
-    }
   }
 }

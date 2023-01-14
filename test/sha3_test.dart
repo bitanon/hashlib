@@ -1,4 +1,5 @@
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/algorithms/keccak_32bit.dart' as keccakWeb;
 import 'package:hashlib/src/core/utils.dart';
 import 'package:sha3/sha3.dart' as sha3;
 import 'package:test/test.dart';
@@ -87,6 +88,28 @@ void main() {
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }
+    });
+
+    test('with mobile', () async {
+      final input =
+          "3a3a819c48efde2ad914fbf00e18ab6bc4f14513ab27d0c178a188b61431e7f5"
+          "623cb66b23346775d386b50e982c493adbbfc54b9a3cd383382336a1a0b2150a"
+          "15358f336d03ae18f666c7573d55c4fd181c29e6ccfde63ea35f0adf5885cfc0"
+          "a3d84a2b2e4dd24496db789e663170cef74798aa1bbcd4574ea0bba40489d764"
+          "b2f83aadc66b148b4a0cd95246c127d5871c4f11418690a5ddf01246a0c80a43"
+          "c70088b6183639dcfda4125bd113a8f49ee23ed306faac576c3fb0c1e256671d"
+          "817fc2534a52f5b439f72e424de376f4c565cca82307dd9ef76da5b7c4eb7e08"
+          "5172e328807c02d011ffbf33785378d79dc266f6a5be6bb0e4a92eceebaeb1";
+      final output =
+          "6e8b8bd195bdd560689af2348bdc74ab7cd05ed8b9a57711e9be71e9726fda45"
+          "91fee12205edacaf82ffbbaf16dff9e702a708862080166c2ff6ba379bc7ffc2";
+      final web512 = keccakWeb.KeccakHash(
+        outputSize: 64,
+        stateSize: 512 >>> 3,
+        paddingByte: 0x06,
+      );
+      web512.add(fromHex(input));
+      expect(web512.digest().hex(), output);
     });
   });
 }

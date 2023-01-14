@@ -21,7 +21,7 @@ class _SHA256 extends HashBase {
   const _SHA256();
 
   @override
-  SHA256Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA256Hash();
+  SHA256Hash createSink() => SHA256Hash();
 }
 
 /// Generates a SHA-256 checksum in hexadecimal

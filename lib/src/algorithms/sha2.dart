@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'sha2_512.dart';
 import 'sha2_1024_64bit.dart' if (dart.library.js) 'sha2_1024_32bit.dart';
+import 'sha2_512.dart';
 
 class SHA224Hash extends SHA2of512 {
   SHA224Hash()

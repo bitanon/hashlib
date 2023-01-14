@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
@@ -36,16 +37,16 @@ class SHA2of512 extends BlockHash {
   final Uint32List state;
   final Uint32List chunk;
 
+  @override
+  final int hashLength;
+
   /// For internal use only.
   SHA2of512({
     required List<int> seed,
-    required int hashLength,
+    required this.hashLength,
   })  : chunk = Uint32List(64),
         state = Uint32List.fromList(seed),
-        super(
-          blockLength: 64,
-          hashLength: hashLength,
-        );
+        super(64);
 
   /// Rotates x right by n bits.
   static int _bsig0(int x) =>
@@ -69,7 +70,7 @@ class SHA2of512 extends BlockHash {
       (x >>> 10);
 
   @override
-  void $update(List<int> block, [int offset = 0]) {
+  void $update(List<int> block, [int offset = 0, bool last = false]) {
     // Convert the block to chunk
     for (int i = 0, j = offset; i < 16; i++, j += 4) {
       chunk[i] = ((block[j] & 0xFF) << 24) |

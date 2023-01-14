@@ -11,7 +11,7 @@ final Map<int, Uint32List> _tables = {};
 /// A CRC-32 code generator with IEEE 802.3 CRC-32 polynomial.
 ///
 /// Reference: https://pkg.go.dev/hash/crc32
-class CRC32Hash extends HashDigestSink {
+class CRC32Hash implements HashDigestSink {
   final int seed;
   final Uint32List table;
 
@@ -23,21 +23,22 @@ class CRC32Hash extends HashDigestSink {
     this.seed = 0xFFFFFFFF,
     int polynomial = 0xEDB88320,
   })  : _crc = seed,
-        table = _generate32(polynomial),
-        super(hashLength: 4);
+        table = _generate32(polynomial);
+
+  @override
+  int get hashLength => 4;
 
   @override
   bool get closed => _closed;
 
   @override
-  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
+  void add(List<int> data) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    for (; start < end; start++) {
-      _crc = table[(_crc ^ chunk[start]) & 0xFF] ^ (_crc >>> 8);
+    for (int i = 0; i < data.length; i++) {
+      _crc = table[(_crc ^ data[i]) & 0xFF] ^ (_crc >>> 8);
     }
-    if (isLast) digest();
   }
 
   @override

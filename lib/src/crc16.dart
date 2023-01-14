@@ -17,7 +17,7 @@ class _CRC16 extends HashBase {
   const _CRC16();
 
   @override
-  CRC16Hash startChunkedConversion([Sink<HashDigest>? sink]) => CRC16Hash();
+  CRC16Hash createSink() => CRC16Hash();
 }
 
 /// Gets the CRC-16 remainder value of a String

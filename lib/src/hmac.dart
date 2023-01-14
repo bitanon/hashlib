@@ -16,8 +16,7 @@ class HMAC extends HashBase {
   const HMAC(this.algo, this.key);
 
   @override
-  HMACSink startChunkedConversion([Sink<HashDigest>? sink]) =>
-      HMACSink(algo, key);
+  HMACSink createSink() => HMACSink(algo, key);
 }
 
 /// Extension to the HashBase to get an [HMAC] instance

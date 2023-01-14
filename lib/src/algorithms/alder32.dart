@@ -12,26 +12,28 @@ const int _alder32Mod = 65521;
 /// Specification version 3.3][rfc]
 ///
 /// [rfc]: https://rfc-editor.org/rfc/rfc1950.html
-class Alder32Hash extends HashDigestSink {
+class Alder32Hash implements HashDigestSink {
   int a = 1, b = 0;
   HashDigest? _digest;
   bool _closed = false;
 
-  Alder32Hash() : super(hashLength: 4);
+  Alder32Hash();
+
+  @override
+  int get hashLength => 4;
 
   @override
   bool get closed => _closed;
 
   @override
-  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
+  void add(List<int> data) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    for (; start < end; start++) {
-      a = (a + chunk[start]) % _alder32Mod;
+    for (int i = 0; i < data.length; i++) {
+      a = (a + data[i]) % _alder32Mod;
       b = (b + a) % _alder32Mod;
     }
-    if (isLast) digest();
   }
 
   @override

@@ -20,7 +20,7 @@ class _SHA1 extends HashBase {
   const _SHA1();
 
   @override
-  SHA1Hash startChunkedConversion([Sink<HashDigest>? sink]) => SHA1Hash();
+  SHA1Hash createSink() => SHA1Hash();
 }
 
 /// Generates a SHA-1 checksum in hexadecimal

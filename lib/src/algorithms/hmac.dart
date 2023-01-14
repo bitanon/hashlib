@@ -11,13 +11,13 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
 ///
 /// [rfc2104]: https://www.rfc-editor.org/rfc/rfc2104
-class HMACSink extends HashDigestSink {
-  final BlockHash outerSink;
-  final BlockHash innerSink;
+class HMACSink implements HashDigestSink {
+  final BlockHash outer;
+  final BlockHash inner;
 
   factory HMACSink(HashBase algo, List<int> key) {
-    var outer = algo.startChunkedConversion();
-    var inner = algo.startChunkedConversion();
+    var outer = algo.createSink();
+    var inner = algo.createSink();
     if (outer is! BlockHash || inner is! BlockHash) {
       throw StateError('Only block hashes are supported for HMAC');
     }
@@ -36,7 +36,7 @@ class HMACSink extends HashDigestSink {
     for (var i = key.length; i < paddedKey.length; i++) {
       paddedKey[i] = 0x5c;
     }
-    outer.addSlice(paddedKey, 0, outer.blockLength);
+    outer.add(paddedKey);
 
     // Calculated padded key for inner sink
     for (var i = 0; i < key.length; i++) {
@@ -45,38 +45,35 @@ class HMACSink extends HashDigestSink {
     for (var i = key.length; i < paddedKey.length; i++) {
       paddedKey[i] = 0x36;
     }
-    inner.addSlice(paddedKey, 0, outer.blockLength);
+    inner.add(paddedKey);
 
     return HMACSink._(
-      outerSink: outer,
-      innerSink: inner,
+      outer: outer,
+      inner: inner,
     );
   }
 
   HMACSink._({
-    required this.outerSink,
-    required this.innerSink,
-  }) : super(hashLength: outerSink.hashLength);
+    required this.outer,
+    required this.inner,
+  });
 
   @override
-  bool get closed => outerSink.closed;
+  bool get closed => outer.closed;
 
   @override
-  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
-    innerSink.addSlice(chunk, start, end, isLast);
+  int get hashLength => outer.hashLength;
+
+  @override
+  void add(List<int> data) {
+    inner.add(data);
   }
 
   @override
   HashDigest digest() {
-    if (outerSink.closed) {
-      return outerSink.digest();
+    if (!outer.closed) {
+      outer.add(inner.digest().bytes);
     }
-    outerSink.addSlice(
-      innerSink.digest().bytes,
-      0,
-      innerSink.hashLength,
-      true,
-    );
-    return outerSink.digest();
+    return outer.digest();
   }
 }

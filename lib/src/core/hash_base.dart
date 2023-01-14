@@ -9,18 +9,77 @@ import 'dart:typed_data';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// The base class used by the hash algorithm implementations
-abstract class HashBase extends Converter<List<int>, HashDigest> {
+abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   const HashBase();
 
   /// Create a [HashDigestSink] for generating message-digests
+  HashDigestSink createSink();
+
   @override
-  HashDigestSink startChunkedConversion([Sink<HashDigest>? sink]);
+  Stream<HashDigest> bind(Stream<List<int>> stream) {
+    bool _paused = false;
+    bool _cancelled = false;
+    StreamSubscription<List<int>>? subscription;
+    var controller = StreamController<HashDigest>(sync: false);
+    controller.onCancel = () async {
+      _cancelled = true;
+      await subscription?.cancel();
+    };
+    controller.onPause = () {
+      _paused = true;
+      subscription?.pause();
+    };
+    controller.onResume = () {
+      _paused = false;
+      subscription?.resume();
+    };
+    controller.onListen = () {
+      if (_cancelled) return;
+      bool _hasError = false;
+      var sink = createSink();
+      subscription = stream.listen(
+        (List<int> event) {
+          try {
+            sink.add(event);
+          } catch (err, stack) {
+            _hasError = true;
+            subscription?.cancel();
+            controller.addError(err, stack);
+          }
+        },
+        cancelOnError: true,
+        onError: (Object err, [StackTrace? stack]) {
+          _hasError = true;
+          controller.addError(err, stack);
+        },
+        onDone: () {
+          try {
+            if (!_hasError) {
+              controller.add(sink.digest());
+            }
+          } catch (err, stack) {
+            controller.addError(err, stack);
+          } finally {
+            controller.close();
+          }
+        },
+      );
+      if (_paused) {
+        subscription?.pause();
+      }
+    };
+    return controller.stream;
+  }
+
+  @override
+  StreamTransformer<RS, RT> cast<RS, RT>() {
+    throw UnimplementedError('This stream can not be cast');
+  }
 
   /// Converts the byte array [input] and returns a [HashDigest].
-  @override
   HashDigest convert(List<int> input) {
-    var sink = startChunkedConversion();
-    sink.addSlice(input, 0, input.length, true);
+    var sink = createSink();
+    sink.add(input);
     return sink.digest();
   }
 
@@ -28,88 +87,78 @@ abstract class HashBase extends Converter<List<int>, HashDigest> {
   ///
   /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
   HashDigest string(String input, [Encoding? encoding]) {
-    var sink = startChunkedConversion();
+    var sink = createSink();
     if (encoding != null) {
       var data = encoding.encode(input);
-      sink.addSlice(data, 0, data.length, true);
+      sink.add(data);
     } else {
-      sink.addSlice(input.codeUnits, 0, input.length, true);
+      sink.add(input.codeUnits);
     }
     return sink.digest();
   }
 
   /// Consume the entire [stream] of byte array and generate a HashDigest.
-  Future<HashDigest> consume(Stream<List<int>> stream) async {
-    var sink = startChunkedConversion();
-    await stream.forEach((chunk) => sink.addSlice(chunk, 0, chunk.length));
-    return sink.digest();
+  Future<HashDigest> consume(Stream<List<int>> stream) {
+    return bind(stream).first;
   }
 
   /// Consume the entire [stream] of string and generate a HashDigest.
   ///
   /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
-  Future<HashDigest> consumeAs(Stream<String> stream,
-      [Encoding? encoding]) async {
-    var sink = startChunkedConversion();
-    if (encoding != null) {
-      await stream
-          .transform(encoding.encoder)
-          .forEach((chunk) => sink.addSlice(chunk, 0, chunk.length));
-    } else {
-      await stream
-          .forEach((input) => sink.addSlice(input.codeUnits, 0, input.length));
-    }
-    return sink.digest();
+  Future<HashDigest> consumeAs(
+    Stream<String> stream, [
+    Encoding encoding = utf8,
+  ]) {
+    return bind(stream.transform(encoding.encoder)).first;
   }
 
-  /// Converts the [input] file and returns a [HashDigest].
+  /// Converts the [input] file and returns a [HashDigest] asynchronously.
   ///
   /// If [start] is present, the file will be read from byte-offset [start].
   /// Otherwise from the beginning (index 0).
   ///
   /// If [end] is present, only bytes up to byte-index [end] will be read.
   /// Otherwise, until end of file.
-  HashDigest file(File input, [int? start, int? end]) {
-    var sink = startChunkedConversion();
+  Future<HashDigest> file(File input, [int start = 0, int? end]) {
+    return bind(input.openRead(start, end)).first;
+  }
+
+  /// Converts the [input] file and returns a [HashDigest] synchronously.
+  ///
+  /// If [start] is present, the file will be read from byte-offset [start].
+  /// Otherwise from the beginning (index 0).
+  ///
+  /// If [end] is present, only bytes up to byte-index [end] will be read.
+  /// Otherwise, until end of file.
+  HashDigest fileSync(File input, [int start = 0, int? end]) {
+    var sink = createSink();
     var raf = input.openSync();
     var buffer = Uint8List(2048);
-    int length = raf.lengthSync();
-    for (int i = 0, l; i < length; i += l) {
+    int length = end ?? raf.lengthSync();
+    for (int i = start, l; i < length; i += l) {
       l = raf.readIntoSync(buffer);
-      sink.addSlice(buffer, 0, l);
+      sink.add(buffer);
     }
     return sink.digest();
   }
 }
 
-abstract class HashDigestSink implements ByteConversionSink {
-  /// The length of generated hash in bytes
-  final int hashLength;
-
-  const HashDigestSink({
-    required this.hashLength,
-  });
+abstract class HashDigestSink {
+  const HashDigestSink();
 
   /// Returns true if the sink is closed, false otherwise
   bool get closed;
+
+  /// The length of generated hash in bytes
+  int get hashLength;
 
   /// Adds [data] to the message-digest.
   ///
   /// The [addSlice] function is preferred over [add]
   ///
   /// Throws [StateError], if it is called after closing the digest.
-  @override
-  void add(List<int> data) => addSlice(data, 0, data.length);
-
-  /// Adds [data] to the message-digest.
-  ///
-  /// Throws [StateError], if it is called after closing the digest.
-  @override
-  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]);
+  void add(List<int> data);
 
   /// Finalizes the message-digest and returns a [HashDigest]
   HashDigest digest();
-
-  @override
-  void close() => digest();
 }

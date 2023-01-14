@@ -76,9 +76,11 @@ void main() {
       }
     });
 
-    test('with a file', () {
+    test('with a file', () async {
       var file = File('LICENSE');
-      expect(hashlib.md5.file(file).hex(), '488a54b1e0a45266e589c8148a9ff334');
+      var hash = await crypto.md5.bind(file.openRead()).first;
+      var hash2 = await hashlib.md5.bind(file.openRead()).first;
+      expect(hash2.hex(), toHex(hash.bytes));
     });
 
     test('to compare against known implementations', () {

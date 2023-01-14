@@ -27,8 +27,7 @@ class _Keccak256 extends HashBase {
   const _Keccak256();
 
   @override
-  Keccak256Hash startChunkedConversion([Sink<HashDigest>? sink]) =>
-      Keccak256Hash();
+  Keccak256Hash createSink() => Keccak256Hash();
 }
 
 /// Generates a Keccak-256 checksum in hexadecimal

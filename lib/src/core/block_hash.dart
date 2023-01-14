@@ -9,7 +9,7 @@ import 'package:hashlib/src/core/hash_digest.dart';
 // Maximum length of message allowed (considering both the JS and Dart VM)
 const int _maxMessageLength = 0x3FFFFFFFFFFFF; // (1 << 50) - 1
 
-abstract class BlockHash extends HashDigestSink {
+abstract class BlockHash implements HashDigestSink {
   // The digest and closing flag
   HashDigest? _digest;
   bool _closed = false;
@@ -35,12 +35,8 @@ abstract class BlockHash extends HashDigestSink {
   /// The buffer as Uint34List
   late final Uint64List qbuffer;
 
-  BlockHash({
-    required this.blockLength,
-    required int hashLength,
-    int? bufferLengthInBytes,
-  }) : super(hashLength: hashLength) {
-    buffer = Uint8List(bufferLengthInBytes ?? blockLength);
+  BlockHash(this.blockLength, {int? bufferLength}) : super() {
+    buffer = Uint8List(bufferLength ?? blockLength);
     bdata = buffer.buffer.asByteData();
     sbuffer = buffer.buffer.asUint32List();
     qbuffer = buffer.buffer.asUint64List();
@@ -55,7 +51,7 @@ abstract class BlockHash extends HashDigestSink {
   /// Internal method to update the message-digest with a single [block].
   ///
   /// The method starts reading the block from [offset] index
-  void $update(List<int> block, [int offset = 0]);
+  void $update(List<int> block, [int offset = 0, bool last = false]);
 
   /// Finalizes the message digest with the remaining message block,
   /// and returns the output as byte array.
@@ -64,16 +60,15 @@ abstract class BlockHash extends HashDigestSink {
   Uint8List $finalize(Uint8List block, int length);
 
   @override
-  void addSlice(List<int> chunk, int start, int end, [bool isLast = false]) {
+  void add(List<int> data) {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-    if (messageLength - start > _maxMessageLength - end) {
+    if (messageLength + data.length > _maxMessageLength) {
       throw StateError('Exceeds the maximum message size limit');
     }
 
-    $process(chunk, start, end);
-    if (isLast) digest();
+    $process(data, 0, data.length);
   }
 
   /// Processes a chunk of input data
@@ -95,6 +90,7 @@ abstract class BlockHash extends HashDigestSink {
       $update(chunk, t);
       t += blockLength;
     }
+
     messageLength += end - t;
     for (; t < end; pos++, t++) {
       buffer[pos] = chunk[t];

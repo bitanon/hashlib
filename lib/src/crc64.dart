@@ -19,7 +19,7 @@ class _CRC64 extends HashBase {
   const _CRC64();
 
   @override
-  CRC64Hash startChunkedConversion([Sink<HashDigest>? sink]) => CRC64Hash();
+  CRC64Hash createSink() => CRC64Hash();
 }
 
 /// Gets the CRC-64 remainder value of a String

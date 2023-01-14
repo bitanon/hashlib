@@ -19,7 +19,7 @@ class _CRC32 extends HashBase {
   const _CRC32();
 
   @override
-  CRC32Hash startChunkedConversion([Sink<HashDigest>? sink]) => CRC32Hash();
+  CRC32Hash createSink() => CRC32Hash();
 }
 
 /// Gets the CRC-32 remainder value of a String
