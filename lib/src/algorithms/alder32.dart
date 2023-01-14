@@ -17,10 +17,10 @@ class Alder32Hash implements HashDigestSink {
   HashDigest? _digest;
   bool _closed = false;
 
-  Alder32Hash();
-
   @override
-  int get hashLength => 4;
+  final int hashLength = 4;
+
+  Alder32Hash();
 
   @override
   bool get closed => _closed;

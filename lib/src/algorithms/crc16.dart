@@ -12,6 +12,9 @@ class CRC16Hash implements HashDigestSink {
   final int seed;
   final Uint16List table;
 
+  @override
+  final int hashLength = 2;
+
   int _crc;
   HashDigest? _digest;
   bool _closed = false;
@@ -21,9 +24,6 @@ class CRC16Hash implements HashDigestSink {
     int polynomial = 0xA001,
   })  : _crc = seed,
         table = _generate16(polynomial);
-
-  @override
-  int get hashLength => 2;
 
   @override
   bool get closed => _closed;

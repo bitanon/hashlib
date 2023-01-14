@@ -7,22 +7,22 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// For generating un-keyed message digest with BLAKE2b-160.
 ///
 /// Use [Blake2b] for keyed hash generation.
-const HashBase blake2b160 = Blake2b(null, 160);
+const HashBase blake2b160 = Blake2b(outputBits: 160);
 
 /// For generating un-keyed message digest with BLAKE2b-256.
 ///
 /// Use [Blake2b] for keyed hash generation.
-const HashBase blake2b256 = Blake2b(null, 256);
+const HashBase blake2b256 = Blake2b(outputBits: 256);
 
 /// For generating un-keyed message digest with BLAKE2b-384.
 ///
 /// Use [Blake2b] for keyed hash generation.
-const HashBase blake2b384 = Blake2b(null, 384);
+const HashBase blake2b384 = Blake2b(outputBits: 384);
 
 /// For generating un-keyed message digest with BLAKE2b-512.
 ///
 /// Use [Blake2b] for keyed hash generation.
-const HashBase blake2b512 = Blake2b(null, 512);
+const HashBase blake2b512 = Blake2b(outputBits: 512);
 
 /// The BLAKE-2b is a member of BLAKE-2 family optimized for 64-bit platforms
 /// and can generate MACs efficiently.
@@ -39,33 +39,85 @@ const HashBase blake2b512 = Blake2b(null, 512);
 ///
 /// **WARNING: Not supported in Web VM**
 class Blake2b extends HashBase {
+  final int outputBits;
   final List<int>? key;
-  final int digestSizeInBits;
+  final List<int>? salt;
+  final List<int>? personalization;
 
-  /// Create a blake2b instance with optional [key] and [digestSizeInBits]
-  const Blake2b([
+  /// Creates a [Blake2b] instance to generate hash using 64-bit numbers.
+  ///
+  /// Parameters:
+  /// - [outputBits] The number of bits in the output. Must be a multiple of 8.
+  /// - [key] An optional key for MAC generation. Must be less than 64 bytes.
+  /// - [salt] An optional nonce. Must be exactly 16 bytes long.
+  /// - [personalization] Second optional nonce. Must be exactly 16 bytes long.
+  const Blake2b({
+    this.outputBits = 512,
     this.key,
-    this.digestSizeInBits = 512,
-  ]) : assert(
-          (digestSizeInBits & 7) == 0,
-          'Digest size in bits should not make a partial byte',
+    this.salt,
+    this.personalization,
+  }) : assert(
+          (outputBits & 7) == 0,
+          'Output bits should be a multiple of 8',
         );
 
   @override
   Blake2bHash createSink() => Blake2bHash(
+        digestSize: outputBits >>> 3,
         key: key,
-        digestSize: digestSizeInBits >>> 3,
+        salt: salt,
+        personalization: personalization,
       );
 
   /// Get a new blake2b instance generating 160-bit digest.
-  factory Blake2b.of160([List<int>? key]) => Blake2b(key, 160);
+  factory Blake2b.of160({
+    List<int>? key,
+    List<int>? salt,
+    List<int>? personalization,
+  }) =>
+      Blake2b(
+        outputBits: 160,
+        key: key,
+        salt: salt,
+        personalization: personalization,
+      );
 
   /// Get a new blake2b instance generating 256-bit digest.
-  factory Blake2b.of256([List<int>? key]) => Blake2b(key, 256);
+  factory Blake2b.of256({
+    List<int>? key,
+    List<int>? salt,
+    List<int>? personalization,
+  }) =>
+      Blake2b(
+        outputBits: 256,
+        key: key,
+        salt: salt,
+        personalization: personalization,
+      );
 
   /// Get a new blake2b instance generating 384-bit digest.
-  factory Blake2b.of384([List<int>? key]) => Blake2b(key, 384);
+  factory Blake2b.of384({
+    List<int>? key,
+    List<int>? salt,
+    List<int>? personalization,
+  }) =>
+      Blake2b(
+        outputBits: 384,
+        key: key,
+        salt: salt,
+        personalization: personalization,
+      );
 
   /// Get a new blake2b instance generating 512-bit digest.
-  factory Blake2b.of512([List<int>? key]) => Blake2b(key, 512);
+  factory Blake2b.of512({
+    List<int>? key,
+    List<int>? salt,
+    List<int>? personalization,
+  }) =>
+      Blake2b(
+        outputBits: 512,
+        key: key,
+        salt: salt,
+        personalization: personalization,
+      );
 }

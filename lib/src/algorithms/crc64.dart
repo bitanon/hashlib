@@ -15,6 +15,9 @@ class CRC64Hash extends HashDigestSink {
   final int seedHigh, seedLow;
   final Uint32List table;
 
+  @override
+  final int hashLength = 8;
+
   int high, low;
   HashDigest? _digest;
   bool _closed = false;
@@ -27,9 +30,6 @@ class CRC64Hash extends HashDigestSink {
   })  : high = seedHigh,
         low = seedLow,
         table = _generate64(polynomialHigh, polynomialLow);
-
-  @override
-  int get hashLength => 8;
 
   @override
   bool get closed => _closed;

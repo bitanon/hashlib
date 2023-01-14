@@ -61,36 +61,61 @@ const _sigma = [
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
 class Blake2bHash extends BlockHash {
-  final int digestSize;
   final Uint64List state;
+
+  @override
+  final int hashLength;
 
   /// For internal use only.
   Blake2bHash({
-    this.digestSize = 64,
+    int digestSize = 64,
     List<int>? key,
-  })  : assert(
-          1 <= digestSize && digestSize <= 64,
-          'Invalid digest size. Only [1...64] bytes are acceptable.',
-        ),
-        assert(
-          key == null || key.length <= 64,
-          'Invalid key size. The key can be at most 64 bytes',
-        ),
+    List<int>? salt,
+    List<int>? personalization,
+  })  : hashLength = digestSize,
         state = Uint64List.fromList(_seed),
-        super(128) {
+        super(1024 >>> 3) {
+    if (digestSize < 1 || digestSize > 64) {
+      throw ArgumentError('The digest size must be between 1 and 64');
+    }
+
     // Parameter block
     state[0] ^= 0x01010000 ^ hashLength;
+
     if (key != null && key.isNotEmpty) {
-      // If the key is present, the first block is the key padded with zeroes
+      if (key.length > 64) {
+        throw ArgumentError('The key should not be greater than 64 bytes');
+      }
+      // Add key length to parameter
       state[0] ^= key.length << 8;
+      // If the key is present, the first block is the key padded with zeroes
       buffer.setAll(0, key);
       pos = blockLength;
       messageLength += blockLength;
     }
+    if (salt != null && salt.isNotEmpty) {
+      if (salt.length != 16) {
+        throw ArgumentError('The valid length of salt is 16 bytes');
+      }
+      for (int i = 0, p = 0; i < 8; i++, p += 8) {
+        state[4] ^= (salt[i] & 0xFF) << p;
+      }
+      for (int i = 8, p = 0; i < 16; i++, p += 8) {
+        state[5] ^= (salt[i] & 0xFF) << p;
+      }
+    }
+    if (personalization != null && personalization.isNotEmpty) {
+      if (personalization.length != 16) {
+        throw ArgumentError('The valid length of personalization is 16 bytes');
+      }
+      for (int i = 0, p = 0; i < 8; i++, p += 8) {
+        state[6] ^= (personalization[i] & 0xFF) << p;
+      }
+      for (int i = 8, p = 0; i < 16; i++, p += 8) {
+        state[7] ^= (personalization[i] & 0xFF) << p;
+      }
+    }
   }
-
-  @override
-  int get hashLength => digestSize;
 
   @override
   void $process(List<int> chunk, int start, int end) {

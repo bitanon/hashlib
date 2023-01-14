@@ -15,6 +15,9 @@ class CRC32Hash implements HashDigestSink {
   final int seed;
   final Uint32List table;
 
+  @override
+  final int hashLength = 4;
+
   int _crc;
   HashDigest? _digest;
   bool _closed = false;
@@ -24,9 +27,6 @@ class CRC32Hash implements HashDigestSink {
     int polynomial = 0xEDB88320,
   })  : _crc = seed,
         table = _generate32(polynomial);
-
-  @override
-  int get hashLength => 4;
 
   @override
   bool get closed => _closed;
