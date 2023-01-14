@@ -4,7 +4,6 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 // Initialize array of round 64-bit constants
 const List<int> _k = [

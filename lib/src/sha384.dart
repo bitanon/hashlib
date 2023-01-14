@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-384 is a member of SHA-2 family which uses 512-bit internal state to
 /// generate a message digest of 384-bit long.

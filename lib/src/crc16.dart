@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/crc16.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// A CRC or cyclic redundancy check is code commonly used for error detection
 /// and correction of digital data. This generates a 16-bit number as output.

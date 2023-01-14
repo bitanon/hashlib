@@ -1,6 +1,6 @@
 export 'alder32.dart';
-export 'blake2s.dart';
 export 'blake2b.dart';
+export 'blake2s.dart';
 export 'crc16.dart';
 export 'crc32.dart';
 export 'crc64.dart';

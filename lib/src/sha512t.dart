@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-512/256 is a variation of SHA-512 which uses 512-bit internal state to
 /// generate a message digest of 256-bit long truncating the last bits.

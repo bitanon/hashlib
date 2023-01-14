@@ -1,5 +1,5 @@
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/algorithms/keccak_32bit.dart' as keccakWeb;
+import 'package:hashlib/src/algorithms/keccak_32bit.dart' as keccak_web;
 import 'package:hashlib/src/core/utils.dart';
 import 'package:sha3/sha3.dart' as sha3;
 import 'package:test/test.dart';
@@ -103,7 +103,7 @@ void main() {
       final output =
           "6e8b8bd195bdd560689af2348bdc74ab7cd05ed8b9a57711e9be71e9726fda45"
           "91fee12205edacaf82ffbbaf16dff9e702a708862080166c2ff6ba379bc7ffc2";
-      final web512 = keccakWeb.KeccakHash(
+      final web512 = keccak_web.KeccakHash(
         outputSize: 64,
         stateSize: 512 >>> 3,
         paddingByte: 0x06,

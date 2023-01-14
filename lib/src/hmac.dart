@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// HMAC is a hash-based message authentication code that can be used to
 /// simultaneously verify both the data integrity and authenticity of a message.
