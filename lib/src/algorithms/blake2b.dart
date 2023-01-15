@@ -62,6 +62,7 @@ const _sigma = [
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
 class Blake2bHash extends BlockHash {
   final Uint64List state;
+  late final List<int> _initialState;
 
   @override
   final int hashLength;
@@ -93,6 +94,7 @@ class Blake2bHash extends BlockHash {
       pos = blockLength;
       messageLength += blockLength;
     }
+
     if (salt != null && salt.isNotEmpty) {
       if (salt.length != 16) {
         throw ArgumentError('The valid length of salt is 16 bytes');
@@ -104,6 +106,7 @@ class Blake2bHash extends BlockHash {
         state[5] ^= (salt[i] & 0xFF) << p;
       }
     }
+
     if (personalization != null && personalization.isNotEmpty) {
       if (personalization.length != 16) {
         throw ArgumentError('The valid length of personalization is 16 bytes');
@@ -115,6 +118,14 @@ class Blake2bHash extends BlockHash {
         state[7] ^= (personalization[i] & 0xFF) << p;
       }
     }
+
+    _initialState = state.toList(growable: false);
+  }
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, _initialState);
   }
 
   @override

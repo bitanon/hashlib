@@ -51,7 +51,7 @@ class Blake2s extends HashBase {
   /// - [personalization] Second optional nonce. Must be exactly 8 bytes long.
   ///
   const Blake2s({
-    this.outputBits = 512,
+    this.outputBits = 256,
     this.key,
     this.salt,
     this.personalization,

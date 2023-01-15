@@ -59,6 +59,14 @@ abstract class BlockHash implements HashDigestSink {
   /// The [length] must be less than the [blockLength]
   Uint8List $finalize(Uint8List block, int length);
 
+  /// Resets the current state to start from fresh state
+  void reset() {
+    pos = 0;
+    messageLength = 0;
+    _digest = null;
+    _closed = false;
+  }
+
   @override
   void add(List<int> data, [int start = 0, int? end]) {
     if (_closed) {

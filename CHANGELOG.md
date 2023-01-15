@@ -14,6 +14,7 @@
   - `md5digest`
   - `crc32code`
 - Accepts file input in `HashBase`
+- Accepts `salt` and `personalization` values with `Blake2s` and `Blake2b`
 
 ## 1.3.0
 
