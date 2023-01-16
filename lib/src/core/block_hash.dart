@@ -32,14 +32,10 @@ abstract class BlockHash implements HashDigestSink {
   /// The buffer as Uint32List
   late final Uint32List sbuffer;
 
-  /// The buffer as Uint34List
-  late final Uint64List qbuffer;
-
   BlockHash(this.blockLength, {int? bufferLength}) : super() {
     buffer = Uint8List(bufferLength ?? blockLength);
     bdata = buffer.buffer.asByteData();
     sbuffer = buffer.buffer.asUint32List();
-    qbuffer = buffer.buffer.asUint64List();
   }
 
   @override

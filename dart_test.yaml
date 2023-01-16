@@ -1,0 +1,9 @@
+timeout: 15m
+
+platforms: [vm, node]
+
+tags:
+  skip-js:
+    on_platform:
+      node:
+        skip: true

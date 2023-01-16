@@ -1,5 +1,5 @@
 set -ex
 dart format --fix .
-dart analyze
+dart analyze --fatal-infos
 dart test
 dart doc

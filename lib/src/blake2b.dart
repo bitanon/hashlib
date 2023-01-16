@@ -36,8 +36,6 @@ const HashBase blake2b512 = Blake2b(outputBits: 512);
 /// This implementation is based on the [RFC-7693][rfc]
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
-///
-/// **WARNING: Not supported in Web VM**
 class Blake2b extends HashBase {
   final int outputBits;
   final List<int>? key;

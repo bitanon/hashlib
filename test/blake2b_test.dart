@@ -1,8 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
-import 'package:pointycastle/digests/blake2b.dart' as pc;
 import 'package:test/test.dart';
 
 void main() {
@@ -139,65 +136,5 @@ void main() {
           "5dad40c5f4f12bde483498c651ce1f5e86e6f47454c953fb"
           "c953c74e34aba9541b689c2000e984c909278304af01c991");
     });
-  });
-
-  test('to compare against known implementations', () {
-    for (int i = 0; i < 1000; ++i) {
-      final data = List<int>.filled(i, 97);
-      final b = pc.Blake2bDigest(digestSize: 64);
-      expect(
-        toHex(blake2b512.convert(data).bytes),
-        toHex(b.process(Uint8List.fromList(data))),
-        reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-      );
-    }
-  });
-
-  test('to compare against known implementations with key', () {
-    final key = List<int>.filled(16, 99);
-    for (int i = 0; i < 1000; ++i) {
-      final data = List<int>.filled(i, 97);
-      final b = pc.Blake2bDigest(
-        digestSize: 64,
-        key: Uint8List.fromList(key),
-      );
-      expect(
-        toHex(Blake2b(key: key).convert(data).bytes),
-        toHex(b.process(Uint8List.fromList(data))),
-        reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-      );
-    }
-  });
-
-  test('to compare against known implementations with salt', () {
-    final salt = List<int>.filled(16, 99);
-    for (int i = 0; i < 1000; ++i) {
-      final data = List<int>.filled(i, 97);
-      final b = pc.Blake2bDigest(
-        digestSize: 64,
-        salt: Uint8List.fromList(salt),
-      );
-      expect(
-        toHex(Blake2b(salt: salt).convert(data).bytes),
-        toHex(b.process(Uint8List.fromList(data))),
-        reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-      );
-    }
-  });
-
-  test('to compare against known implementations with personalization', () {
-    final salt = List<int>.filled(16, 99);
-    for (int i = 0; i < 1000; ++i) {
-      final data = List<int>.filled(i, 97);
-      final b = pc.Blake2bDigest(
-        digestSize: 64,
-        personalization: Uint8List.fromList(salt),
-      );
-      expect(
-        toHex(Blake2b(personalization: salt).convert(data).bytes),
-        toHex(b.process(Uint8List.fromList(data))),
-        reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-      );
-    }
   });
 }

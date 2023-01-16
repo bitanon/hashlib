@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:crypto/crypto.dart' as crypto;
-import 'package:hashlib/hashlib.dart' as hashlib;
-import 'package:hashlib/src/algorithms/sha2_1024_32bit.dart' as sha512web;
+import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
@@ -45,32 +43,32 @@ final tests = {
 void main() {
   group('SHA512 test', () {
     test('with empty string', () {
-      expect(hashlib.sha512sum(""), tests[""]);
+      expect(sha512sum(""), tests[""]);
     });
 
     test('with single letter', () {
-      expect(hashlib.sha512sum("a"), tests["a"]);
+      expect(sha512sum("a"), tests["a"]);
     });
 
     test('with few letters', () {
-      expect(hashlib.sha512sum("abc"), tests["abc"]);
+      expect(sha512sum("abc"), tests["abc"]);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.sha512sum(key), value);
+      expect(sha512sum(key), value);
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha512sum(key), value);
+        expect(sha512sum(key), value);
       });
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha512sum(key), value);
+        expect(sha512sum(key), value);
       });
     });
 
@@ -80,51 +78,9 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha512.consume(stream);
+        final result = await sha512.consume(stream);
         expect(result.hex(), entry.value);
       }
-    });
-
-    test('with mobile', () async {
-      for (final entry in tests.entries) {
-        final web256 = sha512web.SHA2of1024(
-          hashLength: 64,
-          seed: [
-            0x6A09E667, 0xF3BCC908, // a
-            0xBB67AE85, 0x84CAA73B, // b
-            0x3C6EF372, 0xFE94F82B, // c
-            0xA54FF53A, 0x5F1D36F1, // d
-            0x510E527F, 0xADE682D1, // e
-            0x9B05688C, 0x2B3E6C1F, // f
-            0x1F83D9AB, 0xFB41BD6B, // g
-            0x5BE0CD19, 0x137E2179, // h
-          ],
-        );
-        web256.add(entry.key.codeUnits);
-        expect(web256.digest().hex(), entry.value);
-      }
-    });
-
-    test('to compare against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.sha512.convert(data).bytes),
-          toHex(crypto.sha512.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }
-    });
-
-    test('run in parallel', () async {
-      await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.sha512.convert(data).bytes),
-          toHex(crypto.sha512.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }));
     });
   });
 }

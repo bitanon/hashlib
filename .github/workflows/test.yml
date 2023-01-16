@@ -1,4 +1,4 @@
-name: Dart
+name: test
 
 on:
   push:
@@ -29,14 +29,13 @@ jobs:
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-
-      # Consider passing '--fatal-infos' for slightly stricter analysis.
+ 
       - name: Analyze project source
-        run: dart analyze
+        run: dart analyze --fatal-infos
 
       - if: matrix.sdk != '2.14.0'
         name: Generate documentation
-        run: dart doc .
+        run: dart doc
 
       - name: Run tests
         run: dart test

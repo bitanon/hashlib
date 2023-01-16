@@ -81,7 +81,7 @@ class KeccakHash extends BlockHash {
 
   KeccakHash({
     required this.stateSize,
-    this.paddingByte = 0x06,
+    required this.paddingByte,
     int? outputSize, // equals to state size if not provided
   })  : assert(
           stateSize >= 0 && stateSize <= 100,

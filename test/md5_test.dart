@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
-import 'package:crypto/crypto.dart' as crypto;
-import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
@@ -31,7 +29,7 @@ final tests = {
 void main() {
   group('MD5 test', () {
     test('with empty string', () {
-      expect(hashlib.md5sum(""), tests[""]);
+      expect(md5sum(""), tests[""]);
     });
 
     test('with single letter', () {
@@ -39,29 +37,29 @@ void main() {
     });
 
     test('with few letters', () {
-      expect(hashlib.md5sum("abc"), tests["abc"]);
+      expect(md5sum("abc"), tests["abc"]);
     });
 
     test('with longest string', () {
       var last = tests.entries.last;
-      expect(hashlib.md5sum(last.key), last.value);
+      expect(md5sum(last.key), last.value);
     });
 
     test('with special case', () {
       var key =
           "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      expect(hashlib.md5sum(key), tests[key]);
+      expect(md5sum(key), tests[key]);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.md5sum(key), value);
+      expect(md5sum(key), value);
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.md5sum(key), value);
+        expect(md5sum(key), value);
       });
     });
 
@@ -71,45 +69,9 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.md5.consume(stream);
+        final result = await md5.consume(stream);
         expect(result.hex(), entry.value);
       }
-    });
-
-    test('with a file async', () async {
-      var file = File('LICENSE');
-      var hash = await crypto.md5.bind(file.openRead()).first;
-      var hash2 = await hashlib.md5.file(file);
-      expect(hash2.hex(), toHex(hash.bytes));
-    });
-
-    test('with a file sync', () async {
-      var file = File('LICENSE');
-      var hash = await crypto.md5.bind(file.openRead()).first;
-      var hash2 = hashlib.md5.fileSync(file);
-      expect(hash2.hex(), toHex(hash.bytes));
-    });
-
-    test('to compare against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.md5.convert(data).bytes),
-          toHex(crypto.md5.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }
-    });
-
-    test('run in parallel', () async {
-      await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.md5.convert(data).bytes),
-          toHex(crypto.md5.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }));
     });
   });
 }

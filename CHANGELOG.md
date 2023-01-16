@@ -1,3 +1,8 @@
+## 1.5.0
+
+- Fixes issues with web platform
+- Adds web support to `blake2b`
+
 ## 1.4.0
 
 - Modifies the internal structure for better accessibility

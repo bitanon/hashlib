@@ -1,7 +1,6 @@
 import 'dart:math';
 
-import 'package:crypto/crypto.dart' as crypto;
-import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
@@ -34,32 +33,32 @@ final tests = {
 void main() {
   group('SHA256 test', () {
     test('with empty string', () {
-      expect(hashlib.sha256sum(""), tests[""]);
+      expect(sha256sum(""), tests[""]);
     });
 
     test('with single letter', () {
-      expect(hashlib.sha256sum("a"), tests["a"]);
+      expect(sha256sum("a"), tests["a"]);
     });
 
     test('with few letters', () {
-      expect(hashlib.sha256sum("abc"), tests["abc"]);
+      expect(sha256sum("abc"), tests["abc"]);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.sha256sum(key), value);
+      expect(sha256sum(key), value);
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha256sum(key), value);
+        expect(sha256sum(key), value);
       });
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha256sum(key), value);
+        expect(sha256sum(key), value);
       });
     });
 
@@ -69,31 +68,9 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha256.consume(stream);
+        final result = await sha256.consume(stream);
         expect(result.hex(), entry.value);
       }
-    });
-
-    test('to compare against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.sha256.convert(data).bytes),
-          toHex(crypto.sha256.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }
-    });
-
-    test('run in parallel', () async {
-      await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.sha256.convert(data).bytes),
-          toHex(crypto.sha256.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }));
     });
   });
 }

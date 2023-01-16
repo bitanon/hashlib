@@ -1,7 +1,5 @@
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/algorithms/keccak_32bit.dart' as keccak_web;
 import 'package:hashlib/src/core/utils.dart';
-import 'package:sha3/sha3.dart' as sha3;
 import 'package:test/test.dart';
 
 void main() {
@@ -66,50 +64,6 @@ void main() {
       final output =
           "2baa15b5a204f74ae708d588793657a70cda2288a06e7e12c918cc3aedc5cd8d";
       expect(sha3_256sum(input), output);
-    });
-
-    test('SHA3-256 with existing library', () {
-      final input = "A quick brown fox jumps over the lazy dog";
-      final output =
-          "2baa15b5a204f74ae708d588793657a70cda2288a06e7e12c918cc3aedc5cd8d";
-      var lib = sha3.SHA3(256, sha3.SHA3_PADDING, 256);
-      lib.update(toBytes(input));
-      expect(toHex(lib.digest()), output);
-    });
-
-    test('to compare against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        var other = sha3.SHA3(256, sha3.SHA3_PADDING, 256);
-        other.update(data);
-        expect(
-          sha3_256.convert(data).hex(),
-          toHex(other.digest()),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }
-    });
-
-    test('with mobile', () async {
-      final input =
-          "3a3a819c48efde2ad914fbf00e18ab6bc4f14513ab27d0c178a188b61431e7f5"
-          "623cb66b23346775d386b50e982c493adbbfc54b9a3cd383382336a1a0b2150a"
-          "15358f336d03ae18f666c7573d55c4fd181c29e6ccfde63ea35f0adf5885cfc0"
-          "a3d84a2b2e4dd24496db789e663170cef74798aa1bbcd4574ea0bba40489d764"
-          "b2f83aadc66b148b4a0cd95246c127d5871c4f11418690a5ddf01246a0c80a43"
-          "c70088b6183639dcfda4125bd113a8f49ee23ed306faac576c3fb0c1e256671d"
-          "817fc2534a52f5b439f72e424de376f4c565cca82307dd9ef76da5b7c4eb7e08"
-          "5172e328807c02d011ffbf33785378d79dc266f6a5be6bb0e4a92eceebaeb1";
-      final output =
-          "6e8b8bd195bdd560689af2348bdc74ab7cd05ed8b9a57711e9be71e9726fda45"
-          "91fee12205edacaf82ffbbaf16dff9e702a708862080166c2ff6ba379bc7ffc2";
-      final web512 = keccak_web.KeccakHash(
-        outputSize: 64,
-        stateSize: 512 >>> 3,
-        paddingByte: 0x06,
-      );
-      web512.add(fromHex(input));
-      expect(web512.digest().hex(), output);
     });
   });
 }

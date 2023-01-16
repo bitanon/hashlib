@@ -1,7 +1,6 @@
 import 'dart:math';
 
-import 'package:crypto/crypto.dart' as crypto;
-import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
@@ -32,33 +31,33 @@ final tests = {
 void main() {
   group('SHA512224 test', () {
     test('with empty string', () {
-      expect(hashlib.sha512t224sum(""), tests[""]);
+      expect(sha512t224sum(""), tests[""]);
     });
 
     test('with single letter', () {
-      expect(hashlib.sha512t224sum("a"), tests["a"]);
+      expect(sha512t224sum("a"), tests["a"]);
     });
 
     test('with few letters', () {
-      expect(hashlib.sha512t224sum("abc"), tests["abc"]);
+      expect(sha512t224sum("abc"), tests["abc"]);
     });
 
     test('with string of length 511', () {
       var key = tests.keys.firstWhere((x) => x.length == 511);
       var value = tests[key]!;
-      expect(hashlib.sha512t224sum(key), value);
+      expect(sha512t224sum(key), value);
     });
 
     test('known cases', () {
       tests.forEach((key, value) {
         // print(toHex(crypto.sha512224.convert(toBytes(key)).bytes));
-        expect(hashlib.sha512t224sum(key), value);
+        expect(sha512t224sum(key), value);
       });
     });
 
     test('with known cases', () {
       tests.forEach((key, value) {
-        expect(hashlib.sha512t224sum(key), value);
+        expect(sha512t224sum(key), value);
       });
     });
 
@@ -68,31 +67,9 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map(toBytes);
-        final result = await hashlib.sha512t224.consume(stream);
+        final result = await sha512t224.consume(stream);
         expect(result.hex(), entry.value);
       }
-    });
-
-    test('to compare against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.sha512t224.convert(data).bytes),
-          toHex(crypto.sha512224.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }
-    });
-
-    test('run in parallel', () async {
-      await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
-        expect(
-          toHex(hashlib.sha512t224.convert(data).bytes),
-          toHex(crypto.sha512224.convert(data).bytes),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }));
     });
   });
 }

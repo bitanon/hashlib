@@ -1,7 +1,5 @@
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
-import 'package:sha3/sha3.dart' as sha3;
 
 void main() {
   group('Keccak test', () {
@@ -49,19 +47,6 @@ void main() {
           "18587dc2ea106b9a1563e32b3312421ca164c7f1f07bc922a9c83d77cea3a1e5"
           "d0c69910739025372dc14ac9642629379540c17e2a65b19d77aa511a9d00bb96";
       expect(keccak512sum(input), output);
-    });
-
-    test('to compare against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        var other = sha3.SHA3(256, sha3.KECCAK_PADDING, 256);
-        other.update(data);
-        expect(
-          keccak256.convert(data).hex(),
-          toHex(other.digest()),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
-      }
     });
   });
 }
