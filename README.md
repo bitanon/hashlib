@@ -25,21 +25,20 @@ This library contains implementations of secure hash functions, checksum generat
 | Blake2s   | `blake2s128`,`blake2s160`,`blake2s224`,`blake2s256`                 | RFC-7693    |
 
 <!--
-| `blake3`     |   ⌛    |        |  ⌛  |        |
+| `blake3`     |   ⌛    |        |
 | `ripemd128` |    ⌛     |       |
 | `ripemd160` |    ⌛     |       |
 | `ripemd320` |    ⌛     |       |
 | `whirlpool` |    ⌛     |       |
 -->
 
-<!--
 ### Password Hashing / Key Derivation
 
-| Algorithms    | Supported | Since |
-| ------------- | :-------: | :---: |
-| `argon2d`     |    ⌛     |       |
-| `argon2i`     |    ⌛     |       |
-| `argon2id`    |    ⌛     |       |
+| Algorithm | Available Methods                | Source   |
+| --------- | -------------------------------- | -------- |
+| Argon2    | `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
+
+<!--
 | `pbkdf2_hmac` |    ⌛     |       |
 | `bcrypt`      |    ⌛     |       |
 | `scrypt`      |    ⌛     |       |
