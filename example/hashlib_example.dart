@@ -2,7 +2,7 @@ import 'package:hashlib/hashlib.dart';
 
 void main() {
   // Examples of Hash generation
-  final text = "Happy Hashing!";
+  var text = "Happy Hashing!";
   print('[MD5] $text => ${md5sum(text)}');
   print('[SHA-1] $text => ${sha1sum(text)}');
   print('[SHA-224] $text => ${sha224sum(text)}');
@@ -26,7 +26,7 @@ void main() {
   print('');
 
   // Example of HMAC generation
-  final key = "secret";
+  var key = "secret";
   print('HMAC[MD5] $text => ${md5.hmacBy(key).string(text)}');
   print('HMAC[SHA-1] $text => ${sha1.hmacBy(key).string(text)}');
   print('HMAC[SHA-224] $text => ${sha224.hmacBy(key).string(text)}');
@@ -48,6 +48,19 @@ void main() {
   print('[BLAKE-2s/256] $text => ${Blake2s(key: key.codeUnits).string(text)}');
   print('[BLAKE-2b/256] $text => ${Blake2b(key: key.codeUnits).string(text)}');
   print('');
+
+  // Example of Argon2 Password Hashing
+  var argon2 = Argon2Context(
+    version: Argon2Version.v13,
+    hashType: Argon2Type.argon2id,
+    hashLength: 32,
+    iterations: 8,
+    parallelism: 4,
+    memorySizeKB: 8192,
+    salt: "some salt".codeUnits,
+  ).toInstance();
+  var encoded = argon2.encode('password'.codeUnits).hex();
+  print("Argon2id encoded password: $encoded");
 }
 
 /*
@@ -95,4 +108,5 @@ HMAC[SHAKE-256] Happy Hashing! => 384ef058b61490aaa6fb7c458353179b8401bda1
 [BLAKE-2s/256] Happy Hashing! => 43619f13ca6bf594edd467847bc464fe710f4e7d3c3c6f7e825ea06e1c726b3b
 [BLAKE-2b/256] Happy Hashing! => 096d7333ae6db5120c8eb94e3e921ebf99cdc4602bd030cde411a713b3eb3914f33c90cec62279136b7eb9cabe49eca7e12ba318eecd52a569ebd38a07dfa42d
 
+Argon2id encoded password: 7cfe6b4ffb846d67f1c5b5917d759ea75c1ac7b31a1e4200e9adf9f4b1c0523d
 */

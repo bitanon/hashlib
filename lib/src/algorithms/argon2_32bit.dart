@@ -47,10 +47,11 @@ class Argon2 {
   final _hash0 = Uint8List(64 + 8);
   final _blockR = Uint8List(_blockSize);
   final _blockT = Uint8List(_blockSize);
-  late final _blockR64 = _blockR.buffer.asUint64List();
+  late final _blockR32 = _blockR.buffer.asUint32List();
 
   Argon2(this.ctx) {
-    ctx.validate();
+    throw UnimplementedError('Argon2 is not yet available for Node VM');
+    // ctx.validate();
   }
 
   HashDigest encode(List<int> password) {
@@ -204,7 +205,7 @@ class Argon2 {
     var zero = Uint8List(_blockSize);
     var input = Uint8List(_blockSize);
     var address = Uint8List(_blockSize);
-    var input64 = input.buffer.asUint64List();
+    var input32 = input.buffer.asUint32List();
 
     var dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i) ||
         (ctx.hashType == Argon2Type.argon2id &&
@@ -212,19 +213,25 @@ class Argon2 {
             (slice < (_slices ~/ 2)));
 
     if (dataIndependentAddressing) {
-      input64[0] = pass;
-      input64[1] = lane;
-      input64[2] = slice;
-      input64[3] = _blocks;
-      input64[4] = _passes;
-      input64[5] = ctx.hashType.value;
+      input32[0] = pass;
+      input32[1] = 0;
+      input32[2] = lane;
+      input32[3] = 0;
+      input32[4] = slice;
+      input32[5] = 0;
+      input32[6] = _blocks;
+      input32[7] = _blocks >>> 32;
+      input32[8] = _passes;
+      input32[9] = 0;
+      input32[10] = ctx.hashType.value;
+      input32[11] = 0;
     }
 
     startIndex = 0;
     if (pass == 0 && slice == 0) {
       startIndex = 2;
       if (dataIndependentAddressing) {
-        input64[6]++;
+        _increment(input32, 12);
         _fillBlock(prev: zero, ref: input, next: address);
         _fillBlock(prev: zero, ref: address, next: address);
       }
@@ -251,7 +258,7 @@ class Argon2 {
       /* 1.2.1 Taking pseudo-random value from the previous block */
       if (dataIndependentAddressing) {
         if ((i & 0x7F) == 0) {
-          input64[6]++;
+          _increment(input32, 12);
           _fillBlock(prev: zero, ref: input, next: address);
           _fillBlock(prev: zero, ref: address, next: address);
         }
@@ -317,23 +324,23 @@ class Argon2 {
     // then (16,17,..31)... finally (112,113,...127)
     for (i = j = 0; i < 8; i++, j += 16) {
       _blake2b(
-        _blockR64,
-        j,
-        j + 1,
-        j + 2,
-        j + 3,
-        j + 4,
-        j + 5,
-        j + 6,
-        j + 7,
-        j + 8,
-        j + 9,
-        j + 10,
-        j + 11,
-        j + 12,
-        j + 13,
-        j + 14,
-        j + 15,
+        _blockR32,
+        ((j) << 1),
+        ((j + 1) << 1),
+        ((j + 2) << 1),
+        ((j + 3) << 1),
+        ((j + 4) << 1),
+        ((j + 5) << 1),
+        ((j + 6) << 1),
+        ((j + 7) << 1),
+        ((j + 8) << 1),
+        ((j + 9) << 1),
+        ((j + 10) << 1),
+        ((j + 11) << 1),
+        ((j + 12) << 1),
+        ((j + 13) << 1),
+        ((j + 14) << 1),
+        ((j + 15) << 1),
       );
     }
 
@@ -341,23 +348,23 @@ class Argon2 {
     // then (2,3,18,19,...,114,115).. finally (14,15,30,31,...,126,127)
     for (i = j = 0; i < 8; i++, j += 2) {
       _blake2b(
-        _blockR64,
-        j,
-        j + 1,
-        j + 16,
-        j + 17,
-        j + 32,
-        j + 33,
-        j + 48,
-        j + 49,
-        j + 64,
-        j + 65,
-        j + 80,
-        j + 81,
-        j + 96,
-        j + 97,
-        j + 112,
-        j + 113,
+        _blockR32,
+        ((j) << 1),
+        ((j + 1) << 1),
+        ((j + 16) << 1),
+        ((j + 17) << 1),
+        ((j + 32) << 1),
+        ((j + 33) << 1),
+        ((j + 48) << 1),
+        ((j + 49) << 1),
+        ((j + 64) << 1),
+        ((j + 65) << 1),
+        ((j + 80) << 1),
+        ((j + 81) << 1),
+        ((j + 96) << 1),
+        ((j + 97) << 1),
+        ((j + 112) << 1),
+        ((j + 113) << 1),
       );
     }
 
@@ -401,8 +408,8 @@ class Argon2 {
 
     // 1.2.4. Mapping pseudo_rand to 0..<reference_area_size-1>
     // and produce relative position
-    relPos = (random * random) >>> 32;
-    relPos = refArea - 1 - ((refArea * relPos) >>> 32);
+    relPos = _multiplyAndGetMSB(random, random);
+    relPos = refArea - 1 - _multiplyAndGetMSB(refArea, relPos);
 
     /* 1.2.5 Computing starting position */
     startPos = 0;
@@ -414,25 +421,70 @@ class Argon2 {
     return (startPos + relPos) % columns;
   }
 
-  static void _fBlaMka(Uint64List v, int x, int y) {
-    v[x] += v[y] + ((v[x] & _mask32) * (v[y] & _mask32) << 1);
+  static int _multiplyAndGetMSB(int x, int y) {
+    int x1 = x >>> 16;
+    int x2 = x & 0xFFFF;
+    int y1 = y >>> 16;
+    int y2 = y & 0xFFFF;
+    return ((x1 * y1) & _mask32) +
+        (((x1 * y2 + x2 * y1) + ((x2 * y2) >>> 16)) >>> 16);
   }
 
-  static int _rotr(int x, int n) => (x >>> n) ^ (x << (64 - n));
+  /// `v[i]++`
+  static void _increment(Uint32List v, int i) {
+    if (v[i] == _mask32) {
+      v[i] = 0;
+      v[i + 1]++;
+    } else {
+      v[i]++;
+    }
+  }
 
-  static void _mix(Uint64List v, int a, int b, int c, int d) {
+  static void _fBlaMka(Uint32List v, int x, int y) {
+    var t = v[x] + v[y] + ((v[x] * v[y]) << 1);
+    v[x] = t;
+    v[x + 1] += v[y + 1] + (t >>> 32);
+  }
+
+  /// `v[i] = (v[i] << (64 - n)) | (v[i] >>> n)`
+  static void _rotr(int n, Uint32List v, int i) {
+    var a = v[i + 1];
+    var b = v[i];
+    if (n == 32) {
+      v[i + 1] = b;
+      v[i] = a;
+    } else if (n < 32) {
+      v[i + 1] = (b << (32 - n)) | (a >>> n);
+      v[i] = (a << (32 - n)) | (b >>> n);
+    } else {
+      v[i + 1] = (a << (64 - n)) | (b >>> (n - 32));
+      v[i] = (b << (64 - n)) | (a >>> (n - 32));
+    }
+  }
+
+  /// `v[i] ^= v[j]`
+  static void _xor(Uint32List v, int i, int j) {
+    v[i] ^= v[j];
+    v[i + 1] ^= v[j + 1];
+  }
+
+  static void _mix(Uint32List v, int a, int b, int c, int d) {
     _fBlaMka(v, a, b);
-    v[d] = _rotr(v[d] ^ v[a], 32);
+    _xor(v, d, a);
+    _rotr(32, v, d);
     _fBlaMka(v, c, d);
-    v[b] = _rotr(v[b] ^ v[c], 24);
+    _xor(v, b, c);
+    _rotr(24, v, b);
     _fBlaMka(v, a, b);
-    v[d] = _rotr(v[d] ^ v[a], 16);
+    _xor(v, d, a);
+    _rotr(16, v, d);
     _fBlaMka(v, c, d);
-    v[b] = _rotr(v[b] ^ v[c], 63);
+    _xor(v, b, c);
+    _rotr(63, v, b);
   }
 
   static void _blake2b(
-    Uint64List v,
+    Uint32List v,
     int v0,
     int v1,
     int v2,

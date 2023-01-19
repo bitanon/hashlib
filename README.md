@@ -79,7 +79,7 @@ import 'package:hashlib/hashlib.dart';
 
 void main() {
   // Examples of Hash generation
-  final text = "Happy Hashing!";
+  var text = "Happy Hashing!";
   print('[MD5] $text => ${md5sum(text)}');
   print('[SHA-1] $text => ${sha1sum(text)}');
   print('[SHA-224] $text => ${sha224sum(text)}');
@@ -103,7 +103,7 @@ void main() {
   print('');
 
   // Example of HMAC generation
-  final key = "secret";
+  var key = "secret";
   print('HMAC[MD5] $text => ${md5.hmacBy(key).string(text)}');
   print('HMAC[SHA-1] $text => ${sha1.hmacBy(key).string(text)}');
   print('HMAC[SHA-224] $text => ${sha224.hmacBy(key).string(text)}');
@@ -125,6 +125,19 @@ void main() {
   print('[BLAKE-2s/256] $text => ${Blake2s(key: key.codeUnits).string(text)}');
   print('[BLAKE-2b/256] $text => ${Blake2b(key: key.codeUnits).string(text)}');
   print('');
+
+  // Example of Argon2 Password Hashing
+  var argon2 = Argon2Context(
+    version: Argon2Version.v13,
+    hashType: Argon2Type.argon2id,
+    hashLength: 32,
+    iterations: 8,
+    parallelism: 4,
+    memorySizeKB: 8192,
+    salt: "some salt".codeUnits,
+  ).toInstance();
+  var encoded = argon2.encode('password'.codeUnits).hex();
+  print("Argon2id encoded password: $encoded");
 }
 ```
 

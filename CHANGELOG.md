@@ -2,6 +2,10 @@
 
 - Fixes issues with web platform
 - Adds web support to `blake2b`
+- Adds Argon2, the [Password Hashing Competition](https://www.password-hashing.net/) winner.
+  - `argon2d`
+  - `argon2i`
+  - `argon2id`
 
 ## 1.4.0
 

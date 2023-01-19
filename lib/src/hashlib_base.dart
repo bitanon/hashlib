@@ -1,4 +1,5 @@
 export 'alder32.dart';
+export 'argon2.dart';
 export 'blake2b.dart';
 export 'blake2s.dart';
 export 'crc16.dart';
