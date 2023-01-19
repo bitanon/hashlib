@@ -86,9 +86,9 @@ class Argon2Context {
     this.version = Argon2Version.v13,
     this.hashType = Argon2Type.argon2id,
     this.hashLength = 32,
-    this.iterations = 8,
-    this.parallelism = 4,
-    this.memorySizeKB = 32768,
+    this.iterations = 4,
+    this.parallelism = 2,
+    this.memorySizeKB = 8192,
     this.key,
     this.personalization,
   });

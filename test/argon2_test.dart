@@ -45,46 +45,46 @@ void main() {
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
     }, tags: 'skip-js');
 
-    test("argon2i m=8192, t=8, p=4 @ out = 32", () {
+    test("argon2i m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
         hashType: Argon2Type.argon2i,
         hashLength: 32,
         iterations: 8,
         parallelism: 4,
-        memorySizeKB: 8192,
+        memorySizeKB: 256,
         salt: "some salt".codeUnits,
       ).toInstance();
       final matcher =
-          "d09d33fca16b25523bab27eb9a6970893d5717ccab42c0dcf6b270c5c360431e";
+          "41e318e5092fbb0d6448a833defb795e334667a6fe8343958d7751bba2a0ea81";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
     }, tags: 'skip-js');
-    test("argon2d m=8192, t=8, p=4 @ out = 32", () {
+    test("argon2d m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
         hashType: Argon2Type.argon2d,
         hashLength: 32,
         iterations: 8,
         parallelism: 4,
-        memorySizeKB: 8192,
+        memorySizeKB: 256,
         salt: "some salt".codeUnits,
       ).toInstance();
       final matcher =
-          "8ba5f2da1bc2aec3d29187c3c5b5ea450b38fba2795c997b0bc473d02faed017";
+          "19ccf89f9cc83070d5a734fe5b2ae5e25ebaed4f5a30cf6a03457d3ebf35cb3d";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
     }, tags: 'skip-js');
-    test("argon2id m=8192, t=8, p=4 @ out = 32", () {
+    test("argon2id m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
         hashType: Argon2Type.argon2id,
         hashLength: 32,
         iterations: 8,
         parallelism: 4,
-        memorySizeKB: 8192,
+        memorySizeKB: 256,
         salt: "some salt".codeUnits,
       ).toInstance();
       final matcher =
-          "7cfe6b4ffb846d67f1c5b5917d759ea75c1ac7b31a1e4200e9adf9f4b1c0523d";
+          "262ff20a2bd40ad56d91199a704c03ba68cdf506edf7afebabfe2a200044b1e5";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
     }, tags: 'skip-js');
 

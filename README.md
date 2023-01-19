@@ -80,6 +80,8 @@ import 'package:hashlib/hashlib.dart';
 void main() {
   // Examples of Hash generation
   var text = "Happy Hashing!";
+  print('[CRC32] $text => ${crc32code(text)}');
+  print('[CRC64] $text => ${crc64code(text)}');
   print('[MD5] $text => ${md5sum(text)}');
   print('[SHA-1] $text => ${sha1sum(text)}');
   print('[SHA-224] $text => ${sha224sum(text)}');
@@ -99,31 +101,14 @@ void main() {
   print('[SHAKE-128] $text => ${shake128sum(text, 20)}');
   print('[SHAKE-256] $text => ${shake256sum(text, 20)}');
   print('[BLAKE-2s/256] $text => ${blake2s256.string(text)}');
-  print('[BLAKE-2b/256] $text => ${blake2b512.string(text)}');
+  print('[BLAKE-2b/512] $text => ${blake2b512.string(text)}');
   print('');
 
   // Example of HMAC generation
   var key = "secret";
   print('HMAC[MD5] $text => ${md5.hmacBy(key).string(text)}');
   print('HMAC[SHA-1] $text => ${sha1.hmacBy(key).string(text)}');
-  print('HMAC[SHA-224] $text => ${sha224.hmacBy(key).string(text)}');
   print('HMAC[SHA-256] $text => ${sha256.hmacBy(key).string(text)}');
-  print('HMAC[SHA-384] $text => ${sha384.hmacBy(key).string(text)}');
-  print('HMAC[SHA-512] $text => ${sha512.hmacBy(key).string(text)}');
-  print('HMAC[SHA-512/224] $text => ${sha512t224.hmacBy(key).string(text)}');
-  print('HMAC[SHA-512/256] $text => ${sha512t256.hmacBy(key).string(text)}');
-  print('HMAC[SHA3-224] $text => ${sha3_224.hmacBy(key).string(text)}');
-  print('HMAC[SHA3-256] $text => ${sha3_256.hmacBy(key).string(text)}');
-  print('HMAC[SHA3-384] $text => ${sha3_384.hmacBy(key).string(text)}');
-  print('HMAC[SHA3-512] $text => ${sha3_512.hmacBy(key).string(text)}');
-  print('HMAC[Keccak-224] $text => ${keccak224.hmacBy(key).string(text)}');
-  print('HMAC[Keccak-256] $text => ${keccak256.hmacBy(key).string(text)}');
-  print('HMAC[Keccak-384] $text => ${keccak384.hmacBy(key).string(text)}');
-  print('HMAC[Keccak-512] $text => ${keccak512.hmacBy(key).string(text)}');
-  print('HMAC[SHAKE-128] $text => ${shake128.of(20).hmacBy(key).string(text)}');
-  print('HMAC[SHAKE-256] $text => ${shake256.of(20).hmacBy(key).string(text)}');
-  print('[BLAKE-2s/256] $text => ${Blake2s(key: key.codeUnits).string(text)}');
-  print('[BLAKE-2b/256] $text => ${Blake2b(key: key.codeUnits).string(text)}');
   print('');
 
   // Example of Argon2 Password Hashing
@@ -137,7 +122,7 @@ void main() {
     salt: "some salt".codeUnits,
   ).toInstance();
   var encoded = argon2.encode('password'.codeUnits).hex();
-  print("Argon2id encoded password: $encoded");
+  print("Argon2id password: $encoded");
 }
 ```
 
