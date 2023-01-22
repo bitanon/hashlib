@@ -12,6 +12,11 @@ const int _mask32 = 0xFFFFFFFF;
 
 const int _slices = 4;
 const int _blockSize = 1024;
+const int _blockSize64 = 128;
+
+const int _zero = 0;
+const int _input = _zero + _blockSize64;
+const int _address = _input + _blockSize64;
 
 /// This implementation is derived from [RFC 9106][rfc]: Argon2 Memory-Hard
 /// Function for Password Hashing and Proof-of-Work Applications.
@@ -42,7 +47,10 @@ class Argon2 {
   late final _segments = ctx.memorySizeKB ~/ (_slices * ctx.parallelism);
   late final _blocks = _lanes * _slices * _segments;
   late final _columns = _slices * _segments;
-  late final Uint8List _buffer = Uint8List(_blocks * _blockSize);
+
+  final _blockR = Uint64List(_blockSize64);
+  final _blockT = Uint64List(_blockSize64);
+  final _temp = Uint64List(_address + _blockSize64);
 
   Argon2(this.ctx) {
     ctx.validate();
@@ -51,20 +59,39 @@ class Argon2 {
   HashDigest encode(List<int> password) {
     int i, j, k, p;
     int pass, slice, lane;
-    var _hash0 = Uint8List(64 + 8);
+    var hash0 = Uint8List(64 + 8);
+    var hash0as32 = hash0.buffer.asUint32List();
+    var buffer64 = Uint64List(_blocks * _blockSize64);
+    var buffer = buffer64.buffer.asUint8List();
     var result = Uint8List(ctx.hashLength);
 
     // H_0 Generation (64 + 8 = 72 bytes)
-    _initialHash(_hash0, password);
+    _initialHash(hash0, ctx, password);
 
     // Initial block generation
-    _fillStartingBlocks(_hash0);
+    // Lane Starting Blocks
+    k = 0;
+    hash0as32[16] = 0;
+    for (i = 0; i < _lanes; i++, k += _columns) {
+      // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
+      hash0as32[17] = i;
+      _expandHash(_blockSize, hash0, buffer, k << 10);
+    }
+
+    // Second Lane Blocks
+    k = 1;
+    hash0as32[16] = 1;
+    for (i = 0; i < _lanes; i++, k += _columns) {
+      // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
+      hash0as32[17] = i;
+      _expandHash(_blockSize, hash0, buffer, k << 10);
+    }
 
     // Further block generation
     for (pass = 0; pass < _passes; ++pass) {
       for (slice = 0; slice < _slices; ++slice) {
         for (lane = 0; lane < _lanes; ++lane) {
-          _fillSegment(pass, slice, lane);
+          _fillSegment(buffer64, pass, slice, lane);
         }
       }
     }
@@ -72,12 +99,12 @@ class Argon2 {
     // Finalization
     /* XOR the blocks */
     j = _columns - 1;
-    var block = _buffer.buffer.asUint8List(j << 10, _blockSize);
+    var block = buffer.buffer.asUint8List(j << 10, _blockSize);
     for (k = 1; k < ctx.parallelism; ++k) {
       j += _columns;
       p = j << 10;
       for (i = 0; i < _blockSize; ++i, ++p) {
-        block[i] ^= _buffer[p];
+        block[i] ^= buffer[p];
       }
     }
 
@@ -86,7 +113,11 @@ class Argon2 {
     return HashDigest(result);
   }
 
-  void _initialHash(Uint8List _hash0, List<int> password) {
+  static void _initialHash(
+    Uint8List _hash0,
+    Argon2Context ctx,
+    List<int> password,
+  ) {
     // H_0 = H^(64)(LE32(p) || LE32(T) || LE32(m) || LE32(t) ||
     //         LE32(v) || LE32(y) || LE32(length(P)) || P ||
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
@@ -114,28 +145,6 @@ class Argon2 {
     var hash = blake2b.digest().bytes;
     for (int i = 0; i < 64; ++i) {
       _hash0[i] = hash[i];
-    }
-  }
-
-  void _fillStartingBlocks(Uint8List _hash0) {
-    int i, k;
-
-    // Lane Starting Blocks
-    k = 0;
-    _hash0.setUint32(64, 0);
-    for (i = 0; i < _lanes; i++, k += _columns) {
-      // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
-      _hash0.setUint32(68, i);
-      _expandHash(_blockSize, _hash0, _buffer, k << 10);
-    }
-
-    // Second Lane Blocks
-    k = 1;
-    _hash0.setUint32(64, 1);
-    for (i = 0; i < _lanes; i++, k += _columns) {
-      // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
-      _hash0.setUint32(68, i);
-      _expandHash(_blockSize, _hash0, _buffer, k << 10);
     }
   }
 
@@ -191,37 +200,33 @@ class Argon2 {
     }
   }
 
-  void _fillSegment(int pass, int slice, int lane) {
+  void _fillSegment(Uint64List buffer, int pass, int slice, int lane) {
     int refLane, refIndex; // l, z
     int previous, current;
     int i, j, startIndex, rand0, rand1;
-    const int zero = 0;
-    const int input = zero + _blockSize;
-    const int address = input + _blockSize;
-    var temp = Uint8List(address + _blockSize);
-    var input64 = temp.buffer.asUint64List(input);
 
-    var dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i) ||
-        (ctx.hashType == Argon2Type.argon2id &&
-            (pass == 0) &&
-            (slice < (_slices ~/ 2)));
+    bool dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i);
+    if (ctx.hashType == Argon2Type.argon2id) {
+      dataIndependentAddressing = (pass == 0) && (slice < (_slices ~/ 2));
+    }
 
     if (dataIndependentAddressing) {
-      input64[0] = pass;
-      input64[1] = lane;
-      input64[2] = slice;
-      input64[3] = _blocks;
-      input64[4] = _passes;
-      input64[5] = ctx.hashType.value;
+      _temp[_input + 0] = pass;
+      _temp[_input + 1] = lane;
+      _temp[_input + 2] = slice;
+      _temp[_input + 3] = _blocks;
+      _temp[_input + 4] = _passes;
+      _temp[_input + 5] = ctx.hashType.value;
+      _temp[_input + 6] = 0;
     }
 
     startIndex = 0;
     if (pass == 0 && slice == 0) {
       startIndex = 2;
       if (dataIndependentAddressing) {
-        input64[6]++;
-        _fillBlock(temp, prev: zero, ref: input, next: address);
-        _fillBlock(temp, prev: zero, ref: address, next: address);
+        _temp[_input + 6]++;
+        _fillBlock(_temp, prev: _zero, ref: _input, next: _address);
+        _fillBlock(_temp, prev: _zero, ref: _address, next: _address);
       }
     }
 
@@ -247,15 +252,15 @@ class Argon2 {
       if (dataIndependentAddressing) {
         j = i & 0x7F;
         if (j == 0) {
-          input64[6]++;
-          _fillBlock(temp, prev: zero, ref: input, next: address);
-          _fillBlock(temp, prev: zero, ref: address, next: address);
+          _temp[_input + 6]++;
+          _fillBlock(_temp, prev: _zero, ref: _input, next: _address);
+          _fillBlock(_temp, prev: _zero, ref: _address, next: _address);
         }
-        rand0 = temp.getUint32(address + (j << 3));
-        rand1 = temp.getUint32(4 + address + (j << 3));
+        rand0 = _temp[_address + j] & _mask32;
+        rand1 = _temp[_address + j] >>> 32;
       } else {
-        rand0 = _buffer.getUint32(previous << 10);
-        rand1 = _buffer.getUint32(4 + (previous << 10));
+        rand0 = buffer[previous << 7] & _mask32;
+        rand1 = buffer[previous << 7] >>> 32;
       }
 
       /* 1.2.2 Computing the lane of the reference block */
@@ -280,12 +285,12 @@ class Argon2 {
 
       /* 2 Creating a new block */
       _fillBlock(
-        _buffer,
+        buffer,
+        next: current << 7,
+        prev: previous << 7,
+        ref: (refLane * _columns + refIndex) << 7,
         /* 1.2.1 v10 and earlier: overwrite, not XOR */
         xor: ctx.version != Argon2Version.v10 && pass > 0,
-        next: current << 10,
-        prev: previous << 10,
-        ref: (refLane * _columns + refIndex) << 10,
       );
     }
   }
@@ -293,27 +298,23 @@ class Argon2 {
   // B[next] ^= G(B[prev], B[ref])
   /// Fills a new memory block and optionally XORs the old block over the new one.
   void _fillBlock(
-    Uint8List buffer, {
+    Uint64List buffer, {
     required int prev,
     required int ref,
     required int next,
     bool xor = false,
   }) {
     int i, j;
-    var _blockR = Uint8List(_blockSize);
-    var _blockT = Uint8List(_blockSize);
-    var _blockR64 = _blockR.buffer.asUint64List();
 
     // T = R = ref ^ prev
-    for (i = 0; i < _blockSize; ++i, ++ref, ++prev) {
-      _blockT[i] = _blockR[i] = buffer[ref] ^ buffer[prev];
+    for (i = 0; i < _blockSize64; ++i) {
+      _blockT[i] = _blockR[i] = buffer[ref + i] ^ buffer[prev + i];
     }
 
     if (xor) {
       // T = ref ^ prev ^ next
-      j = next;
-      for (i = 0; i < _blockSize; ++i, ++j) {
-        _blockT[i] ^= buffer[j];
+      for (i = 0; i < _blockSize64; ++i) {
+        _blockT[i] ^= buffer[next + i];
       }
     }
 
@@ -321,7 +322,7 @@ class Argon2 {
     // then (16,17,..31)... finally (112,113,...127)
     for (i = j = 0; i < 8; i++, j += 16) {
       _blake2bMixer(
-        _blockR64,
+        _blockR,
         j,
         j + 1,
         j + 2,
@@ -345,7 +346,7 @@ class Argon2 {
     // then (2,3,18,19,...,114,115).. finally (14,15,30,31,...,126,127)
     for (i = j = 0; i < 8; i++, j += 2) {
       _blake2bMixer(
-        _blockR64,
+        _blockR,
         j,
         j + 1,
         j + 16,
@@ -366,9 +367,8 @@ class Argon2 {
     }
 
     // next = T ^ R
-    j = next;
-    for (i = 0; i < _blockSize; ++i, ++j) {
-      buffer[j] = _blockT[i] ^ _blockR[i];
+    for (i = 0; i < _blockSize64; ++i) {
+      buffer[next + i] = _blockT[i] ^ _blockR[i];
     }
   }
 
@@ -624,21 +624,5 @@ extension on Blake2bHash {
       value >>> 16,
       value >>> 24,
     ]);
-  }
-}
-
-extension on Uint8List {
-  void setUint32(int offset, int value) {
-    this[offset++] = value;
-    this[offset++] = value >>> 8;
-    this[offset++] = value >>> 16;
-    this[offset++] = value >>> 24;
-  }
-
-  int getUint32(int offset) {
-    return (this[offset]) |
-        (this[offset + 1] << 8) |
-        (this[offset + 2] << 16) |
-        (this[offset + 3] << 24);
   }
 }
