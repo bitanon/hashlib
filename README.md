@@ -112,17 +112,12 @@ void main() {
   print('');
 
   // Example of Argon2 Password Hashing
-  var argon2 = Argon2Context(
-    version: Argon2Version.v13,
-    hashType: Argon2Type.argon2id,
-    hashLength: 32,
-    iterations: 8,
-    parallelism: 4,
-    memorySizeKB: 8192,
-    salt: "some salt".codeUnits,
-  ).toInstance();
-  var encoded = argon2.encode('password'.codeUnits).hex();
-  print("Argon2id password: $encoded");
+  print("Argon2id encoded: ${argon2id(
+    "password".codeUnits,
+    "some salt".codeUnits,
+    security: Argon2Security.small,
+    hashLength: 16,
+  ).encoded()}");
 }
 ```
 

@@ -1,14 +1,14 @@
 name: hashlib
 description: Secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 homepage: https://github.com/dipu-bd/hashlib
-version: 1.5.0
+version: 1.6.0
 
 environment:
   sdk: ">=2.14.0 <3.0.0"
 
 dev_dependencies:
   lints: ^1.0.1
-  test: ^1.16.0
+  test: ^1.21.4
   crypto: ^3.0.2
   hash: ^1.0.4
   sha3: ^0.2.0

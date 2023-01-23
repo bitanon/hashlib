@@ -1,11 +1,30 @@
+## 1.6.0
+
+- Optimize Argon2 (Now it is 6 times faster than 1.5.0)
+- Support for Argon2 in Node platform (TODO: requires optimization)
+- Renames `Argon2Context` -> `Argon2` with the following change:
+  - `convert()` will generate password hash and return an `Argon2HashDigest`
+  - `encode()` will generate password hash and return argon2 encoded string.
+  - `toInstance()` is renamed to `instance` to get a singleton instance.
+  - The method `encode()` is renamed to `convert()` inside the `instance`.
+- Adds `Argon2Security` exposing some default parameter choices which can be used with these quick access functions:
+  - `argon2d`
+  - `argon2i`
+  - `argon2id`
+- Argon2 will now return the `Argon2HashDigest`, containing a few changes over `HashDigest`:
+  - `encoded()` will return the argon2 hash as encoded format.
+  - `toString()` will return the encoded hash instead of the password hash.
+- Implement custom `toBase64` and `fromBase64` in utils for faster conversion without padding.
+- Changes to `HashDigest`:
+  - merge `base64` and `base64url` methods into one.
+  - uses custom base64 conversion that does not include `=` padding.
+  - removes `lantin1`
+
 ## 1.5.0
 
 - Fixes issues with web platform
 - Adds web support to `blake2b`
 - Adds Argon2, the [Password Hashing Competition](https://www.password-hashing.net/) winner.
-  - `argon2d`
-  - `argon2i`
-  - `argon2id`
 
 ## 1.4.0
 

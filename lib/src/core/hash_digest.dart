@@ -1,7 +1,6 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/utils.dart' as utils;
@@ -19,22 +18,20 @@ class HashDigest {
   ByteBuffer get buffer => bytes.buffer;
 
   /// The message digest as a string of hexadecimal digits.
+  ///
+  /// If [uppercase] is true, the output will have uppercase alphabets.
   String hex([bool uppercase = false]) => utils.toHex(bytes, uppercase);
 
   /// The message digest as a string of base64.
-  String base64() => cvt.base64.encoder.convert(bytes);
-
-  /// The message digest as a string of URL-safe base64.
-  String base64Url() => cvt.base64Url.encode(bytes);
+  ///
+  /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
+  String base64([bool urlSafe = false]) => utils.toBase64(bytes, urlSafe);
 
   /// The message digest as a string of ASCII alphabets.
   String toAscii() => utils.toAscii(bytes);
 
-  /// The message digest as a string of extended Latin alphabets.
-  String latin1({bool? allowInvalid}) {
-    return cvt.latin1.decode(bytes, allowInvalid: allowInvalid);
-  }
-
+  /// Returns the least significant bytes as a number.
+  ///
   /// If [endian] is big, it will return the last few bytes as a number;
   /// Otherwise, if [endian] is little, it will return the first few bytes
   /// as a number.

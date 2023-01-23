@@ -3,14 +3,11 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_digest.dart';
-
 import 'argon2.dart';
 import 'blake2b.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
-const int _slices = 4;
 const int _blockSize = 1024;
 const int _blockSize32 = 256;
 
@@ -25,54 +22,31 @@ const int _address = _input + _blockSize32;
 ///
 /// [rfc]: https://rfc-editor.org/rfc/rfc9106.html
 /// [repo]: https://github.com/P-H-C/phc-winner-argon2
-class Argon2 {
-  final Argon2Context ctx;
-
-  //     slice 0      slice 1      slice 2      slice 3
-  //   ____/\____   ____/\____   ____/\____   ____/\____
-  //  /          \ /          \ /          \ /          \
-  // +------------+------------+------------+------------+
-  // | segment 0  | segment 1  | segment 2  | segment 3  | -> lane 0
-  // +------------+------------+------------+-----------+
-  // | segment 4  | segment 5  | segment 6  | segment 7  | -> lane 1
-  // +------------+------------+------------+------------+
-  // | segment 8  | segment 9  | segment 10 | segment 11 | -> lane 2
-  // +------------+------------+------------+------------+
-  // |           ...          ...          ...           | ...
-  // +------------+------------+------------+------------+
-  // |            |            |            |            | -> lane p - 1
-  // +------------+------------+------------+------------+
-  late final _passes = ctx.iterations;
-  late final _lanes = ctx.parallelism;
-  late final _segments = ctx.memorySizeKB ~/ (_slices * ctx.parallelism);
-  late final _blocks = _lanes * _slices * _segments;
-  late final _columns = _slices * _segments;
-
+class Argon2Hash extends Argon2HashBase {
   final _blockR = Uint32List(_blockSize32);
   final _blockT = Uint32List(_blockSize32);
   final _temp = Uint32List(_address + _blockSize32);
 
-  Argon2(this.ctx) {
-    ctx.validate();
-  }
+  Argon2Hash(Argon2 ctx) : super(ctx);
 
-  HashDigest encode(List<int> password) {
+  @override
+  Argon2HashDigest convert(List<int> password) {
     int i, j, k, p;
     int pass, slice, lane;
     var hash0 = Uint8List(64 + 8);
     var hash0as32 = hash0.buffer.asUint32List();
-    var buffer32 = Uint32List(_blocks * _blockSize32);
+    var buffer32 = Uint32List(ctx.blocks * _blockSize32);
     var buffer = buffer32.buffer.asUint8List();
     var result = Uint8List(ctx.hashLength);
 
     // H_0 Generation (64 + 8 = 72 bytes)
-    _initialHash(hash0, ctx, password);
+    _initialHash(hash0, password);
 
     // Initial block generation
     // Lane Starting Blocks
     k = 0;
     hash0as32[16] = 0;
-    for (i = 0; i < _lanes; i++, k += _columns) {
+    for (i = 0; i < ctx.lanes; i++, k += ctx.columns) {
       // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
       hash0as32[17] = i;
       _expandHash(_blockSize, hash0, buffer, k << 10);
@@ -81,16 +55,16 @@ class Argon2 {
     // Second Lane Blocks
     k = 1;
     hash0as32[16] = 1;
-    for (i = 0; i < _lanes; i++, k += _columns) {
+    for (i = 0; i < ctx.lanes; i++, k += ctx.columns) {
       // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
       hash0as32[17] = i;
       _expandHash(_blockSize, hash0, buffer, k << 10);
     }
 
     // Further block generation
-    for (pass = 0; pass < _passes; ++pass) {
-      for (slice = 0; slice < _slices; ++slice) {
-        for (lane = 0; lane < _lanes; ++lane) {
+    for (pass = 0; pass < ctx.passes; ++pass) {
+      for (slice = 0; slice < ctx.slices; ++slice) {
+        for (lane = 0; lane < ctx.lanes; ++lane) {
           _fillSegment(buffer32, pass, slice, lane);
         }
       }
@@ -98,10 +72,10 @@ class Argon2 {
 
     // Finalization
     /* XOR the blocks */
-    j = _columns - 1;
+    j = ctx.columns - 1;
     var block = buffer.buffer.asUint8List(j << 10, _blockSize);
     for (k = 1; k < ctx.parallelism; ++k) {
-      j += _columns;
+      j += ctx.columns;
       p = j << 10;
       for (i = 0; i < _blockSize; ++i, ++p) {
         block[i] ^= buffer[p];
@@ -110,14 +84,10 @@ class Argon2 {
 
     /* Hash the result */
     _expandHash(ctx.hashLength, block, result, 0);
-    return HashDigest(result);
+    return Argon2HashDigest(ctx, result);
   }
 
-  static void _initialHash(
-    Uint8List _hash0,
-    Argon2Context ctx,
-    List<int> password,
-  ) {
+  void _initialHash(Uint8List _hash0, List<int> password) {
     // H_0 = H^(64)(LE32(p) || LE32(T) || LE32(m) || LE32(t) ||
     //         LE32(v) || LE32(y) || LE32(length(P)) || P ||
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
@@ -128,7 +98,7 @@ class Argon2 {
     blake2b.addUint32(ctx.memorySizeKB);
     blake2b.addUint32(ctx.iterations);
     blake2b.addUint32(ctx.version.value);
-    blake2b.addUint32(ctx.hashType.value);
+    blake2b.addUint32(ctx.hashType.index);
     blake2b.addUint32(password.length);
     blake2b.add(password);
     blake2b.addUint32(ctx.salt.length);
@@ -207,7 +177,7 @@ class Argon2 {
 
     bool dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i);
     if (ctx.hashType == Argon2Type.argon2id) {
-      dataIndependentAddressing = (pass == 0) && (slice < (_slices ~/ 2));
+      dataIndependentAddressing = (pass == 0) && (slice < ctx.midSlice);
     }
 
     if (dataIndependentAddressing) {
@@ -217,11 +187,11 @@ class Argon2 {
       _temp[_input + 3] = 0;
       _temp[_input + 4] = slice;
       _temp[_input + 5] = 0;
-      _temp[_input + 6] = _blocks;
-      _temp[_input + 7] = _blocks >>> 32;
-      _temp[_input + 8] = _passes;
+      _temp[_input + 6] = ctx.blocks;
+      _temp[_input + 7] = ctx.blocks >>> 32;
+      _temp[_input + 8] = ctx.passes;
       _temp[_input + 9] = 0;
-      _temp[_input + 10] = ctx.hashType.value;
+      _temp[_input + 10] = ctx.hashType.index;
       _temp[_input + 11] = 0;
       _temp[_input + 12] = 0;
       _temp[_input + 13] = 0;
@@ -238,19 +208,19 @@ class Argon2 {
     }
 
     /* Offset of the current block */
-    current = lane * _columns + slice * _segments + startIndex;
+    current = lane * ctx.columns + slice * ctx.segments + startIndex;
 
-    if (current % _columns == 0) {
+    if (current % ctx.columns == 0) {
       /* Last block in this lane */
-      previous = current + _columns - 1;
+      previous = current + ctx.columns - 1;
     } else {
       /* Previous block */
       previous = current - 1;
     }
 
-    for (i = startIndex; i < _segments; ++i, ++current, ++previous) {
+    for (i = startIndex; i < ctx.segments; ++i, ++current, ++previous) {
       /* 1.1 Rotating prev_offset if needed */
-      if (current % _columns == 1) {
+      if (current % ctx.columns == 1) {
         previous = current - 1;
       }
 
@@ -271,7 +241,7 @@ class Argon2 {
       }
 
       /* 1.2.2 Computing the lane of the reference block */
-      refLane = rand1 % _lanes;
+      refLane = rand1 % ctx.lanes;
 
       if (pass == 0 && slice == 0) {
         /* Can not reference other lanes yet */
@@ -284,8 +254,6 @@ class Argon2 {
         slice: slice,
         lane: lane,
         index: i,
-        columns: _columns,
-        segments: _segments,
         random: rand0,
         sameLane: refLane == lane,
       );
@@ -295,7 +263,7 @@ class Argon2 {
         buffer,
         next: current << 8,
         prev: previous << 8,
-        ref: (refLane * _columns + refIndex) << 8,
+        ref: (refLane * ctx.columns + refIndex) << 8,
         /* 1.2.1 v10 and earlier: overwrite, not XOR */
         xor: ctx.version != Argon2Version.v10 && pass > 0,
       );
@@ -379,14 +347,12 @@ class Argon2 {
     }
   }
 
-  static int _alphaIndex({
+  int _alphaIndex({
     required int pass,
     required int slice,
     required int lane,
     required int index,
     required int random,
-    required int segments,
-    required int columns,
     required bool sameLane,
   }) {
     int area, pos, start;
@@ -398,16 +364,16 @@ class Argon2 {
         area = index - 1; // all but the previous
       } else if (sameLane) {
         // The same lane => add current segment
-        area = slice * segments + index - 1;
+        area = slice * ctx.segments + index - 1;
       } else {
-        area = slice * segments + (index == 0 ? -1 : 0);
+        area = slice * ctx.segments + (index == 0 ? -1 : 0);
       }
     } else {
       // Other passes
       if (sameLane) {
-        area = columns - segments + index - 1;
+        area = ctx.columns - ctx.segments + index - 1;
       } else {
-        area = columns - segments + (index == 0 ? -1 : 0);
+        area = ctx.columns - ctx.segments + (index == 0 ? -1 : 0);
       }
     }
 
@@ -418,12 +384,12 @@ class Argon2 {
 
     /* 1.2.5 Computing starting position */
     start = 0;
-    if (pass != 0 && slice != _slices - 1) {
-      start = (slice + 1) * segments;
+    if (pass != 0 && slice != ctx.slices - 1) {
+      start = (slice + 1) * ctx.segments;
     }
 
     /* 1.2.6. Computing absolute position */
-    return (start + pos) % columns;
+    return (start + pos) % ctx.columns;
   }
 
   /// `v[i]++`
@@ -521,34 +487,6 @@ class Argon2 {
     _mix(v, v1, v6, v11, v12);
     _mix(v, v2, v7, v8, v13);
     _mix(v, v3, v4, v9, v14);
-  }
-}
-
-extension on Argon2Type {
-  int get value {
-    switch (this) {
-      case Argon2Type.argon2d:
-        return 0;
-      case Argon2Type.argon2i:
-        return 1;
-      case Argon2Type.argon2id:
-        return 2;
-      default:
-        throw ArgumentError('Invalid version');
-    }
-  }
-}
-
-extension on Argon2Version {
-  int get value {
-    switch (this) {
-      case Argon2Version.v10:
-        return 0x10;
-      case Argon2Version.v13:
-        return 0x13;
-      default:
-        throw ArgumentError('Invalid version');
-    }
   }
 }
 
