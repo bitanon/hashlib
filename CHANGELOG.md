@@ -1,3 +1,7 @@
+## 1.6.1
+
+- Fixes enum name getter usage issue for Dart < 2.15.0
+
 ## 1.6.0
 
 - Optimize Argon2 (Now it is 6 times faster than 1.5.0)

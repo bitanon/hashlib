@@ -126,7 +126,7 @@ void main() {
 To obtain the following benchmarks, run this command:
 
 ```sh
-dart run ./benchmark/benchmark.dart
+dart compile exe ./benchmark/benchmark.dart && ./benchmark/benchmark.exe
 ```
 
 Libraries:
@@ -193,5 +193,13 @@ With string of length 500000 (10 iterations):
 | BLAKE-2b      | **23.761 ms** | ➖                            | ➖                            | 393.928 ms <br> `1558% slower`  | ➖                            |
 | HMAC(MD5)     | **31.094 ms** | 42.317 ms <br> `36% slower`   | 69.942 ms <br> `125% slower`  | ➖                              | ➖                            |
 | HMAC(SHA-256) | **50.258 ms** | 62.296 ms <br> `24% slower`   | ➖                            | ➖                              | ➖                            |
+
+Argon2 benchmarks on different security parameters:
+
+| Algorithms | test     | small    | moderate  | good       | strong      |
+| ---------- | -------- | -------- | --------- | ---------- | ----------- |
+| argon2i    | 0.708 ms | 4.391 ms | 26.042 ms | 253.649 ms | 2820.983 ms |
+| argon2d    | 0.319 ms | 3.112 ms | 28.06 ms  | 247.545 ms | 2791.431 ms |
+| argon2id   | 0.324 ms | 3.167 ms | 20.008 ms | 250.295 ms | 2837.003 ms |
 
 > These benchmarks were done in _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_ on Windows 10

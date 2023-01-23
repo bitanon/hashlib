@@ -144,7 +144,8 @@ class Argon2 {
       throw ArgumentError('Invalid Argon2 encoded hash');
     }
 
-    Argon2Type type = Argon2Type.values.firstWhere((e) => e.name == data[1]);
+    Argon2Type type =
+        Argon2Type.values.firstWhere((e) => "$e".split('.').last == data[1]);
 
     Argon2Version version =
         Argon2Version.values.firstWhere((e) => 'v=${e.value}' == data[2]);
@@ -275,7 +276,7 @@ class Argon2HashDigest extends HashDigest {
 
   /// Gets the encoded Argon2 string
   String encoded() {
-    return "\$${ctx.hashType.name}"
+    return "\$${ctx.hashType.toString().split('.').last}"
         "\$v=${ctx.version.value}"
         "\$m=${ctx.memorySizeKB}"
         ",t=${ctx.iterations}"

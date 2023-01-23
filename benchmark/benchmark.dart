@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:hashlib/hashlib.dart';
+
 import 'blake2b.dart' as blake2b;
 import 'blake2s.dart' as blake2s;
 import 'md5.dart' as md5;
@@ -14,6 +16,7 @@ import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
 import 'sha512_224.dart' as sha512t224;
 import 'sha512_256.dart' as sha512t256;
+import 'argon2.dart' as argon2;
 
 void main(List<String> args) {
   final conditions = [
@@ -156,7 +159,50 @@ void main(List<String> args) {
       message += " |";
       print(message);
     }
-
     print('');
   }
+
+  print('Argon2 benchmarks on different security parameters:');
+  print('');
+  var argon2Levels = [
+    Argon2Security.test,
+    Argon2Security.small,
+    Argon2Security.moderate,
+    Argon2Security.good,
+    Argon2Security.strong,
+  ];
+
+  var stopwatch = Stopwatch()..start();
+  var names = argon2Levels.map((e) => e.name);
+  var separator = names.map((e) => ('-' * (e.length + 2)));
+  print('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
+  print('|------------|${separator.join('|')}|');
+  {
+    var message = '| argon2i    |';
+    for (var level in argon2Levels) {
+      stopwatch.reset();
+      argon2.Argon2iBenchmark(level).run();
+      message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
+    }
+    print(message);
+  }
+  {
+    var message = '| argon2d    |';
+    for (var level in argon2Levels) {
+      stopwatch.reset();
+      argon2.Argon2dBenchmark(level).run();
+      message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
+    }
+    print(message);
+  }
+  {
+    var message = '| argon2id   |';
+    for (var level in argon2Levels) {
+      stopwatch.reset();
+      argon2.Argon2idBenchmark(level).run();
+      message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
+    }
+    print(message);
+  }
+  print('');
 }
