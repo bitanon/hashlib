@@ -17,7 +17,7 @@ void main() {
       ).toInstance();
       final matcher = "bb5794ea66451b8fce3a84dd02d33949";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
     test("argon2d m=16, t=2, p=1 @ out = 16", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
@@ -30,7 +30,7 @@ void main() {
       ).toInstance();
       final matcher = "cf916880b91ba8a1390fff6b624baa27";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
     test("argon2id m=16, t=2, p=1 @ out = 16", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
@@ -43,7 +43,7 @@ void main() {
       ).toInstance();
       final matcher = "88c91661b3cea3c3853593608881f324";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
 
     test("argon2i m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2Context(
@@ -58,7 +58,7 @@ void main() {
       final matcher =
           "41e318e5092fbb0d6448a833defb795e334667a6fe8343958d7751bba2a0ea81";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
     test("argon2d m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
@@ -72,7 +72,7 @@ void main() {
       final matcher =
           "19ccf89f9cc83070d5a734fe5b2ae5e25ebaed4f5a30cf6a03457d3ebf35cb3d";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
     test("argon2id m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2Context(
         version: Argon2Version.v13,
@@ -86,7 +86,7 @@ void main() {
       final matcher =
           "262ff20a2bd40ad56d91199a704c03ba68cdf506edf7afebabfe2a200044b1e5";
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
 
     test("multiple call with same instance", () {
       final argon2 = Argon2Context(
@@ -102,6 +102,6 @@ void main() {
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
       expect(argon2.encode('password'.codeUnits).hex(), matcher);
-    }, tags: 'skip-js');
+    });
   });
 }

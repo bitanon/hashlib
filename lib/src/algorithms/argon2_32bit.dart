@@ -12,6 +12,11 @@ const int _mask32 = 0xFFFFFFFF;
 
 const int _slices = 4;
 const int _blockSize = 1024;
+const int _blockSize32 = 256;
+
+const int _zero = 0;
+const int _input = _zero + _blockSize32;
+const int _address = _input + _blockSize32;
 
 /// This implementation is derived from [RFC 9106][rfc]: Argon2 Memory-Hard
 /// Function for Password Hashing and Proof-of-Work Applications.
@@ -42,58 +47,77 @@ class Argon2 {
   late final _segments = ctx.memorySizeKB ~/ (_slices * ctx.parallelism);
   late final _blocks = _lanes * _slices * _segments;
   late final _columns = _slices * _segments;
-  late final Uint8List _buffer = Uint8List(_blocks * _blockSize);
 
-  final _hash0 = Uint8List(64 + 8);
-  final _blockR = Uint8List(_blockSize);
-  final _blockT = Uint8List(_blockSize);
-  late final _blockR32 = _blockR.buffer.asUint32List();
+  final _blockR = Uint32List(_blockSize32);
+  final _blockT = Uint32List(_blockSize32);
+  final _temp = Uint32List(_address + _blockSize32);
 
   Argon2(this.ctx) {
-    throw UnimplementedError('Argon2 is not yet available for Node VM');
-    // ctx.validate();
+    ctx.validate();
   }
 
   HashDigest encode(List<int> password) {
+    int i, j, k, p;
+    int pass, slice, lane;
+    var hash0 = Uint8List(64 + 8);
+    var hash0as32 = hash0.buffer.asUint32List();
+    var buffer32 = Uint32List(_blocks * _blockSize32);
+    var buffer = buffer32.buffer.asUint8List();
+    var result = Uint8List(ctx.hashLength);
+
     // H_0 Generation (64 + 8 = 72 bytes)
-    _initialHash(password);
+    _initialHash(hash0, ctx, password);
 
     // Initial block generation
-    _fillStartingBlocks();
+    // Lane Starting Blocks
+    k = 0;
+    hash0as32[16] = 0;
+    for (i = 0; i < _lanes; i++, k += _columns) {
+      // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
+      hash0as32[17] = i;
+      _expandHash(_blockSize, hash0, buffer, k << 10);
+    }
+
+    // Second Lane Blocks
+    k = 1;
+    hash0as32[16] = 1;
+    for (i = 0; i < _lanes; i++, k += _columns) {
+      // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
+      hash0as32[17] = i;
+      _expandHash(_blockSize, hash0, buffer, k << 10);
+    }
 
     // Further block generation
-    int pass, slice, lane;
     for (pass = 0; pass < _passes; ++pass) {
       for (slice = 0; slice < _slices; ++slice) {
         for (lane = 0; lane < _lanes; ++lane) {
-          _fillSegment(pass, slice, lane);
+          _fillSegment(buffer32, pass, slice, lane);
         }
       }
     }
 
     // Finalization
     /* XOR the blocks */
-    int i, j, k, p;
     j = _columns - 1;
-    p = j << 10;
-    for (i = 0; i < _blockSize; ++i, ++p) {
-      _blockR[i] = _buffer[p];
-    }
+    var block = buffer.buffer.asUint8List(j << 10, _blockSize);
     for (k = 1; k < ctx.parallelism; ++k) {
       j += _columns;
       p = j << 10;
       for (i = 0; i < _blockSize; ++i, ++p) {
-        _blockR[i] ^= _buffer[p];
+        block[i] ^= buffer[p];
       }
     }
 
     /* Hash the result */
-    var result = Uint8List(ctx.hashLength);
-    _expandHash(ctx.hashLength, _blockR, result, 0);
+    _expandHash(ctx.hashLength, block, result, 0);
     return HashDigest(result);
   }
 
-  void _initialHash(List<int> password) {
+  static void _initialHash(
+    Uint8List _hash0,
+    Argon2Context ctx,
+    List<int> password,
+  ) {
     // H_0 = H^(64)(LE32(p) || LE32(T) || LE32(m) || LE32(t) ||
     //         LE32(v) || LE32(y) || LE32(length(P)) || P ||
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
@@ -117,31 +141,10 @@ class Argon2 {
     if (ctx.personalization != null) {
       blake2b.add(ctx.personalization!);
     }
+
     var hash = blake2b.digest().bytes;
     for (int i = 0; i < 64; ++i) {
       _hash0[i] = hash[i];
-    }
-  }
-
-  void _fillStartingBlocks() {
-    int i, k;
-
-    // Lane Starting Blocks
-    k = 0;
-    _hash0.setUint32(64, 0);
-    for (i = 0; i < _lanes; i++, k += _columns) {
-      // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
-      _hash0.setUint32(68, i);
-      _expandHash(_blockSize, _hash0, _buffer, k << 10);
-    }
-
-    // Second Lane Blocks
-    k = 1;
-    _hash0.setUint32(64, 1);
-    for (i = 0; i < _lanes; i++, k += _columns) {
-      // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
-      _hash0.setUint32(68, i);
-      _expandHash(_blockSize, _hash0, _buffer, k << 10);
     }
   }
 
@@ -197,43 +200,40 @@ class Argon2 {
     }
   }
 
-  void _fillSegment(int pass, int slice, int lane) {
+  void _fillSegment(Uint32List buffer, int pass, int slice, int lane) {
     int refLane, refIndex; // l, z
-    int previous, current, reference;
-    int i, startIndex;
-    Uint32List rand;
-    var zero = Uint8List(_blockSize);
-    var input = Uint8List(_blockSize);
-    var address = Uint8List(_blockSize);
-    var input32 = input.buffer.asUint32List();
+    int previous, current;
+    int i, j, startIndex, rand0, rand1;
 
-    var dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i) ||
-        (ctx.hashType == Argon2Type.argon2id &&
-            (pass == 0) &&
-            (slice < (_slices ~/ 2)));
+    bool dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i);
+    if (ctx.hashType == Argon2Type.argon2id) {
+      dataIndependentAddressing = (pass == 0) && (slice < (_slices ~/ 2));
+    }
 
     if (dataIndependentAddressing) {
-      input32[0] = pass;
-      input32[1] = 0;
-      input32[2] = lane;
-      input32[3] = 0;
-      input32[4] = slice;
-      input32[5] = 0;
-      input32[6] = _blocks;
-      input32[7] = _blocks >>> 32;
-      input32[8] = _passes;
-      input32[9] = 0;
-      input32[10] = ctx.hashType.value;
-      input32[11] = 0;
+      _temp[_input + 0] = pass;
+      _temp[_input + 1] = 0;
+      _temp[_input + 2] = lane;
+      _temp[_input + 3] = 0;
+      _temp[_input + 4] = slice;
+      _temp[_input + 5] = 0;
+      _temp[_input + 6] = _blocks;
+      _temp[_input + 7] = _blocks >>> 32;
+      _temp[_input + 8] = _passes;
+      _temp[_input + 9] = 0;
+      _temp[_input + 10] = ctx.hashType.value;
+      _temp[_input + 11] = 0;
+      _temp[_input + 12] = 0;
+      _temp[_input + 13] = 0;
     }
 
     startIndex = 0;
     if (pass == 0 && slice == 0) {
       startIndex = 2;
       if (dataIndependentAddressing) {
-        _increment(input32, 12);
-        _fillBlock(prev: zero, ref: input, next: address);
-        _fillBlock(prev: zero, ref: address, next: address);
+        _increment(_temp, _input + 12);
+        _fillBlock(_temp, prev: _zero, ref: _input, next: _address);
+        _fillBlock(_temp, prev: _zero, ref: _address, next: _address);
       }
     }
 
@@ -257,18 +257,21 @@ class Argon2 {
       /* 1.2 Computing the index of the reference block */
       /* 1.2.1 Taking pseudo-random value from the previous block */
       if (dataIndependentAddressing) {
-        if ((i & 0x7F) == 0) {
-          _increment(input32, 12);
-          _fillBlock(prev: zero, ref: input, next: address);
-          _fillBlock(prev: zero, ref: address, next: address);
+        j = i & 0x7F;
+        if (j == 0) {
+          _increment(_temp, _input + 12);
+          _fillBlock(_temp, prev: _zero, ref: _input, next: _address);
+          _fillBlock(_temp, prev: _zero, ref: _address, next: _address);
         }
-        rand = address.buffer.asUint32List((i & 0x7F) << 3, 2);
+        rand0 = _temp[_address + (j << 1)];
+        rand1 = _temp[_address + (j << 1) + 1];
       } else {
-        rand = _buffer.buffer.asUint32List(previous << 10, 2);
+        rand0 = buffer[previous << 8];
+        rand1 = buffer[(previous << 8) + 1];
       }
 
       /* 1.2.2 Computing the lane of the reference block */
-      refLane = rand[1] % _lanes;
+      refLane = rand1 % _lanes;
 
       if (pass == 0 && slice == 0) {
         /* Can not reference other lanes yet */
@@ -283,94 +286,96 @@ class Argon2 {
         index: i,
         columns: _columns,
         segments: _segments,
-        random: rand[0],
+        random: rand0,
         sameLane: refLane == lane,
       );
 
       /* 2 Creating a new block */
-      reference = refLane * _columns + refIndex;
       _fillBlock(
+        buffer,
+        next: current << 8,
+        prev: previous << 8,
+        ref: (refLane * _columns + refIndex) << 8,
         /* 1.2.1 v10 and earlier: overwrite, not XOR */
         xor: ctx.version != Argon2Version.v10 && pass > 0,
-        next: _buffer.buffer.asUint8List(current << 10, _blockSize),
-        prev: _buffer.buffer.asUint8List(previous << 10, _blockSize),
-        ref: _buffer.buffer.asUint8List(reference << 10, _blockSize),
       );
     }
   }
 
   // B[next] ^= G(B[prev], B[ref])
   /// Fills a new memory block and optionally XORs the old block over the new one.
-  void _fillBlock({
-    required Uint8List prev,
-    required Uint8List ref,
-    required Uint8List next,
+  void _fillBlock(
+    Uint32List buffer, {
+    required int prev,
+    required int ref,
+    required int next,
     bool xor = false,
   }) {
     int i, j;
 
     // T = R = ref ^ prev
-    for (i = 0; i < _blockSize; ++i) {
-      _blockT[i] = _blockR[i] = ref[i] ^ prev[i];
+    for (i = 0; i < _blockSize32; ++i) {
+      _blockT[i] = _blockR[i] = buffer[ref + i] ^ buffer[prev + i];
     }
+
     if (xor) {
       // T = ref ^ prev ^ next
-      for (i = 0; i < _blockSize; ++i) {
-        _blockT[i] ^= next[i];
+      for (i = 0; i < _blockSize32; ++i) {
+        _blockT[i] ^= buffer[next + i];
       }
     }
 
     // Apply Blake2 on columns of 64-bit words: (0,1,...,15),
     // then (16,17,..31)... finally (112,113,...127)
     for (i = j = 0; i < 8; i++, j += 16) {
-      _blake2b(
-        _blockR32,
-        ((j) << 1),
-        ((j + 1) << 1),
-        ((j + 2) << 1),
-        ((j + 3) << 1),
-        ((j + 4) << 1),
-        ((j + 5) << 1),
-        ((j + 6) << 1),
-        ((j + 7) << 1),
-        ((j + 8) << 1),
-        ((j + 9) << 1),
-        ((j + 10) << 1),
-        ((j + 11) << 1),
-        ((j + 12) << 1),
-        ((j + 13) << 1),
-        ((j + 14) << 1),
-        ((j + 15) << 1),
+      _blake2bMixer(
+        _blockR,
+        (j) << 1,
+        (j + 1) << 1,
+        (j + 2) << 1,
+        (j + 3) << 1,
+        (j + 4) << 1,
+        (j + 5) << 1,
+        (j + 6) << 1,
+        (j + 7) << 1,
+        (j + 8) << 1,
+        (j + 9) << 1,
+        (j + 10) << 1,
+        (j + 11) << 1,
+        (j + 12) << 1,
+        (j + 13) << 1,
+        (j + 14) << 1,
+        (j + 15) << 1,
       );
     }
 
     // Apply Blake2 on rows of 64-bit words: (0,1,16,17,...112,113),
     // then (2,3,18,19,...,114,115).. finally (14,15,30,31,...,126,127)
     for (i = j = 0; i < 8; i++, j += 2) {
-      _blake2b(
-        _blockR32,
-        ((j) << 1),
-        ((j + 1) << 1),
-        ((j + 16) << 1),
-        ((j + 17) << 1),
-        ((j + 32) << 1),
-        ((j + 33) << 1),
-        ((j + 48) << 1),
-        ((j + 49) << 1),
-        ((j + 64) << 1),
-        ((j + 65) << 1),
-        ((j + 80) << 1),
-        ((j + 81) << 1),
-        ((j + 96) << 1),
-        ((j + 97) << 1),
-        ((j + 112) << 1),
-        ((j + 113) << 1),
+      _blake2bMixer(
+        _blockR,
+        (j) << 1,
+        (j + 1) << 1,
+        (j + 16) << 1,
+        (j + 17) << 1,
+        (j + 32) << 1,
+        (j + 33) << 1,
+        (j + 48) << 1,
+        (j + 49) << 1,
+        (j + 64) << 1,
+        (j + 65) << 1,
+        (j + 80) << 1,
+        (j + 81) << 1,
+        (j + 96) << 1,
+        (j + 97) << 1,
+        (j + 112) << 1,
+        (j + 113) << 1,
       );
     }
 
     // next = T ^ R
-    for (i = 0; i < _blockSize; ++i) {
-      next[i] = _blockT[i] ^ _blockR[i];
+    for (i = 0; i < _blockSize32; ++i) {
+      buffer[next + i] = _blockT[i] ^ _blockR[i];
     }
   }
 
@@ -384,50 +389,41 @@ class Argon2 {
     required int columns,
     required bool sameLane,
   }) {
-    int refArea, relPos, startPos;
+    int area, pos, start;
 
     if (pass == 0) {
       // First pass
       if (slice == 0) {
         // First slice
-        refArea = index - 1; // all but the previous
+        area = index - 1; // all but the previous
       } else if (sameLane) {
         // The same lane => add current segment
-        refArea = slice * segments + index - 1;
+        area = slice * segments + index - 1;
       } else {
-        refArea = slice * segments + (index == 0 ? -1 : 0);
+        area = slice * segments + (index == 0 ? -1 : 0);
       }
     } else {
       // Other passes
       if (sameLane) {
-        refArea = columns - segments + index - 1;
+        area = columns - segments + index - 1;
       } else {
-        refArea = columns - segments + (index == 0 ? -1 : 0);
+        area = columns - segments + (index == 0 ? -1 : 0);
       }
     }
 
     // 1.2.4. Mapping pseudo_rand to 0..<reference_area_size-1>
     // and produce relative position
-    relPos = _multiplyAndGetMSB(random, random);
-    relPos = refArea - 1 - _multiplyAndGetMSB(refArea, relPos);
+    pos = _multiplyAndGetMSB(random, random);
+    pos = area - 1 - _multiplyAndGetMSB(area, pos);
 
     /* 1.2.5 Computing starting position */
-    startPos = 0;
-    if (pass != 0) {
-      startPos = slice == _slices - 1 ? 0 : (slice + 1) * segments;
+    start = 0;
+    if (pass != 0 && slice != _slices - 1) {
+      start = (slice + 1) * segments;
     }
 
     /* 1.2.6. Computing absolute position */
-    return (startPos + relPos) % columns;
-  }
-
-  static int _multiplyAndGetMSB(int x, int y) {
-    int x1 = x >>> 16;
-    int x2 = x & 0xFFFF;
-    int y1 = y >>> 16;
-    int y2 = y & 0xFFFF;
-    return ((x1 * y1) & _mask32) +
-        (((x1 * y2 + x2 * y1) + ((x2 * y2) >>> 16)) >>> 16);
+    return (start + pos) % columns;
   }
 
   /// `v[i]++`
@@ -440,50 +436,65 @@ class Argon2 {
     }
   }
 
-  static void _fBlaMka(Uint32List v, int x, int y) {
-    var t = v[x] + v[y] + ((v[x] * v[y]) << 1);
-    v[x] = t;
-    v[x + 1] += v[y + 1] + (t >>> 32);
+  /// `((x * y) mod 2^64) >> 32`
+  static int _multiplyAndGetMSB(int x, int y) {
+    return ((BigInt.from(x) * BigInt.from(y)) >> 32).toUnsigned(32).toInt();
   }
 
-  /// `v[i] = (v[i] << (64 - n)) | (v[i] >>> n)`
-  static void _rotr(int n, Uint32List v, int i) {
+  /// `v[x] += v[y] + ((v[x] & _mask32) * (v[y] & _mask32) << 1)`
+  static void _fBlaMka(Uint32List v, int x, int y) {
+    var t = BigInt.two * BigInt.from(v[x]) * BigInt.from(v[y]);
+    t += (BigInt.from(v[x + 1]) << 32) + BigInt.from(v[x]);
+    t += (BigInt.from(v[y + 1]) << 32) + BigInt.from(v[y]);
+    v[x] = t.toUnsigned(32).toInt();
+    v[x + 1] = (t >> 32).toUnsigned(32).toInt();
+  }
+
+  // v[k] = (v[i] << (64 - n)) | (v[i] >>> n)
+  static void _rotr(int n, List<int> v, int i, int k) {
     var a = v[i + 1];
     var b = v[i];
     if (n == 32) {
-      v[i + 1] = b;
-      v[i] = a;
+      v[k + 1] = b;
+      v[k] = a;
     } else if (n < 32) {
-      v[i + 1] = (b << (32 - n)) | (a >>> n);
-      v[i] = (a << (32 - n)) | (b >>> n);
+      v[k + 1] = (b << (32 - n)) | (a >>> n);
+      v[k] = (a << (32 - n)) | (b >>> n);
     } else {
-      v[i + 1] = (a << (64 - n)) | (b >>> (n - 32));
-      v[i] = (b << (64 - n)) | (a >>> (n - 32));
+      v[k + 1] = (a << (64 - n)) | (b >>> (n - 32));
+      v[k] = (b << (64 - n)) | (a >>> (n - 32));
     }
   }
 
-  /// `v[i] ^= v[j]`
-  static void _xor(Uint32List v, int i, int j) {
-    v[i] ^= v[j];
-    v[i + 1] ^= v[j + 1];
+  /// `v[k] = v[i] ^ v[j]`
+  static void _xor(List<int> v, int i, int j, int k) {
+    v[k] = v[i] ^ v[j];
+    v[k + 1] = v[i + 1] ^ v[j + 1];
   }
 
   static void _mix(Uint32List v, int a, int b, int c, int d) {
     _fBlaMka(v, a, b);
-    _xor(v, d, a);
-    _rotr(32, v, d);
+    // v[d] = _rotr(v[d] ^ v[a], 32);
+    _xor(v, d, a, d);
+    _rotr(32, v, d, d);
+
     _fBlaMka(v, c, d);
-    _xor(v, b, c);
-    _rotr(24, v, b);
+    // v[b] = _rotr(v[b] ^ v[c], 24);
+    _xor(v, b, c, b);
+    _rotr(24, v, b, b);
+
     _fBlaMka(v, a, b);
-    _xor(v, d, a);
-    _rotr(16, v, d);
+    // v[d] = _rotr(v[d] ^ v[a], 16);
+    _xor(v, d, a, d);
+    _rotr(16, v, d, d);
+
     _fBlaMka(v, c, d);
-    _xor(v, b, c);
-    _rotr(63, v, b);
+    // v[b] = _rotr(v[b] ^ v[c], 63);
+    _xor(v, b, c, b);
+    _rotr(63, v, b, b);
   }
 
-  static void _blake2b(
+  static void _blake2bMixer(
     Uint32List v,
     int v0,
     int v1,
@@ -549,14 +560,5 @@ extension on Blake2bHash {
       value >>> 16,
       value >>> 24,
     ]);
-  }
-}
-
-extension on Uint8List {
-  void setUint32(int offset, int value) {
-    this[offset++] = value;
-    this[offset++] = value >>> 8;
-    this[offset++] = value >>> 16;
-    this[offset++] = value >>> 24;
   }
 }
