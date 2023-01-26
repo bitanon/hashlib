@@ -115,7 +115,7 @@ void main() {
   print("Argon2id encoded: ${argon2id(
     "password".codeUnits,
     "some salt".codeUnits,
-    security: Argon2Security.small,
+    security: Argon2Security.test,
     hashLength: 16,
   ).encoded()}");
 }

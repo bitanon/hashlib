@@ -1,3 +1,4 @@
+#!/bin/sh
 set -ex
 dart format --fix .
 dart analyze --fatal-infos

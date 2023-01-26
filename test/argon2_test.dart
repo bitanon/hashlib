@@ -8,7 +8,7 @@ void main() {
     test("argon2i m=16, t=2, p=1 @ out = 16", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2i,
+        type: Argon2Type.argon2i,
         hashLength: 16,
         iterations: 2,
         parallelism: 1,
@@ -25,7 +25,7 @@ void main() {
     test("argon2d m=16, t=2, p=1 @ out = 16", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2d,
+        type: Argon2Type.argon2d,
         hashLength: 16,
         iterations: 2,
         parallelism: 1,
@@ -38,7 +38,7 @@ void main() {
     test("argon2id m=16, t=2, p=1 @ out = 16", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2id,
+        type: Argon2Type.argon2id,
         hashLength: 16,
         iterations: 2,
         parallelism: 1,
@@ -52,7 +52,7 @@ void main() {
     test("argon2i m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2i,
+        type: Argon2Type.argon2i,
         hashLength: 32,
         iterations: 8,
         parallelism: 4,
@@ -66,7 +66,7 @@ void main() {
     test("argon2d m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2d,
+        type: Argon2Type.argon2d,
         hashLength: 32,
         iterations: 8,
         parallelism: 4,
@@ -80,7 +80,7 @@ void main() {
     test("argon2id m=256, t=8, p=4 @ out = 32", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2id,
+        type: Argon2Type.argon2id,
         hashLength: 32,
         iterations: 8,
         parallelism: 4,
@@ -97,11 +97,11 @@ void main() {
           r"$argon2i$v=19$m=128,t=4,p=2$c29tZSBzYWx0$/UTBaG/OPVS53KFzcpJt9ujnXFMahdK/";
       final matcher = "fd44c1686fce3d54b9dca17372926df6e8e75c531a85d2bf";
       final argon2 = Argon2.fromEncoded(encoded);
-      expect(argon2.hashType, Argon2Type.argon2i);
+      expect(argon2.type, Argon2Type.argon2i);
       expect(argon2.version, Argon2Version.v13);
       expect(argon2.memorySizeKB, 128);
-      expect(argon2.parallelism, 2);
-      expect(argon2.iterations, 4);
+      expect(argon2.lanes, 2);
+      expect(argon2.passes, 4);
       expect(argon2.hashLength, 24);
       expect(argon2.salt, "some salt".codeUnits);
       var result = argon2.convert("password".codeUnits);
@@ -112,7 +112,7 @@ void main() {
     test("multiple call with same instance", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
-        hashType: Argon2Type.argon2i,
+        type: Argon2Type.argon2i,
         hashLength: 16,
         iterations: 2,
         parallelism: 1,

@@ -19,12 +19,6 @@ import 'sha512_256.dart' as sha512t256;
 import 'argon2.dart' as argon2;
 
 void main(List<String> args) {
-  final conditions = [
-    [10, 100000],
-    [1000, 5000],
-    [500000, 10],
-  ];
-
   print("# Benchmarks");
   print('');
   print("Libraries:");
@@ -33,9 +27,13 @@ void main(List<String> args) {
   print("- **Crypto** : https://pub.dev/packages/crypto");
   print("- **PointyCastle** : https://pub.dev/packages/pointycastle");
   print("- **Hash** : https://pub.dev/packages/hash");
-  print("- **Sha3** : https://pub.dev/packages/sha3");
   print('');
 
+  final conditions = [
+    [10, 100000],
+    [1000, 5000],
+    [500000, 10],
+  ];
   for (var condition in conditions) {
     var size = condition[0];
     var iter = condition[1];
@@ -89,12 +87,10 @@ void main(List<String> args) {
       ],
       "SHA3-256": [
         sha3_256.HashlibBenchmark(size, iter),
-        sha3_256.Sha3Benchmark(size, iter),
         sha3_256.PointyCastleBenchmark(size, iter),
       ],
       "SHA3-512": [
         sha3_512.HashlibBenchmark(size, iter),
-        sha3_512.Sha3Benchmark(size, iter),
         sha3_512.PointyCastleBenchmark(size, iter),
       ],
       "BLAKE-2s": [
@@ -171,35 +167,24 @@ void main(List<String> args) {
     Argon2Security.good,
     Argon2Security.strong,
   ];
+  var algorithms = {
+    'argon2i': argon2Levels.map((e) => argon2.HashlibArgon2iBenchmark(e)),
+    'argon2d': argon2Levels.map((e) => argon2.HashlibArgon2dBenchmark(e)),
+    'argon2id': argon2Levels.map((e) => argon2.HashlibArgon2idBenchmark(e)),
+  };
 
   var stopwatch = Stopwatch()..start();
   var names = argon2Levels.map((e) => e.name);
   var separator = names.map((e) => ('-' * (e.length + 2)));
   print('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
   print('|------------|${separator.join('|')}|');
-  {
-    var message = '| argon2i    |';
-    for (var level in argon2Levels) {
+  for (var entry in algorithms.entries) {
+    var algorithm = entry.key;
+    var items = entry.value;
+    var message = '| $algorithm   |';
+    for (var item in items) {
       stopwatch.reset();
-      argon2.Argon2iBenchmark(level).run();
-      message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
-    }
-    print(message);
-  }
-  {
-    var message = '| argon2d    |';
-    for (var level in argon2Levels) {
-      stopwatch.reset();
-      argon2.Argon2dBenchmark(level).run();
-      message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
-    }
-    print(message);
-  }
-  {
-    var message = '| argon2id   |';
-    for (var level in argon2Levels) {
-      stopwatch.reset();
-      argon2.Argon2idBenchmark(level).run();
+      item.run();
       message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
     }
     print(message);

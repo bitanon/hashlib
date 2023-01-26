@@ -15,19 +15,55 @@ const int _zero = 0;
 const int _input = _zero + _blockSize32;
 const int _address = _input + _blockSize32;
 
-/// This implementation is derived from [RFC 9106][rfc]: Argon2 Memory-Hard
-/// Function for Password Hashing and Proof-of-Work Applications.
-///
-/// The C++ implementation at [phc-winner-argon2][repo] was a great help.
-///
-/// [rfc]: https://rfc-editor.org/rfc/rfc9106.html
-/// [repo]: https://github.com/P-H-C/phc-winner-argon2
-class Argon2Hash extends Argon2HashBase {
+//     slice 0      slice 1      slice 2      slice 3
+//   ____/\____   ____/\____   ____/\____   ____/\____
+//  /          \ /          \ /          \ /          \
+// +------------+------------+------------+------------+
+// | segment 0  | segment 1  | segment 2  | segment 3  | -> lane 0
+// +------------+------------+------------+-----------+
+// | segment 4  | segment 5  | segment 6  | segment 7  | -> lane 1
+// +------------+------------+------------+------------+
+// | segment 8  | segment 9  | segment 10 | segment 11 | -> lane 2
+// +------------+------------+------------+------------+
+// |           ...          ...          ...           | ...
+// +------------+------------+------------+------------+
+// |            |            |            |            | -> lane p - 1
+// +------------+------------+------------+------------+
+
+class Argon2Internal extends Argon2 {
   final _blockR = Uint32List(_blockSize32);
   final _blockT = Uint32List(_blockSize32);
   final _temp = Uint32List(_address + _blockSize32);
 
-  Argon2Hash(Argon2 ctx) : super(ctx);
+  Argon2Internal({
+    required List<int> salt,
+    required int hashLength,
+    required int passes,
+    required int memorySizeKB,
+    required int lanes,
+    required int segments,
+    required int columns,
+    required int blocks,
+    required int slices,
+    required List<int>? key,
+    required List<int>? personalization,
+    required Argon2Type hashType,
+    required Argon2Version version,
+  }) : super.internal(
+          salt: salt,
+          slices: slices,
+          version: version,
+          type: hashType,
+          hashLength: hashLength,
+          passes: passes,
+          lanes: lanes,
+          memorySizeKB: memorySizeKB,
+          segments: segments,
+          columns: columns,
+          blocks: blocks,
+          key: key,
+          personalization: personalization,
+        );
 
   @override
   Argon2HashDigest convert(List<int> password) {
@@ -35,9 +71,9 @@ class Argon2Hash extends Argon2HashBase {
     int pass, slice, lane;
     var hash0 = Uint8List(64 + 8);
     var hash0as32 = hash0.buffer.asUint32List();
-    var buffer32 = Uint32List(ctx.blocks * _blockSize32);
+    var buffer32 = Uint32List(blocks * _blockSize32);
     var buffer = buffer32.buffer.asUint8List();
-    var result = Uint8List(ctx.hashLength);
+    var result = Uint8List(hashLength);
 
     // H_0 Generation (64 + 8 = 72 bytes)
     _initialHash(hash0, password);
@@ -46,7 +82,7 @@ class Argon2Hash extends Argon2HashBase {
     // Lane Starting Blocks
     k = 0;
     hash0as32[16] = 0;
-    for (i = 0; i < ctx.lanes; i++, k += ctx.columns) {
+    for (i = 0; i < lanes; i++, k += columns) {
       // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
       hash0as32[17] = i;
       _expandHash(_blockSize, hash0, buffer, k << 10);
@@ -55,16 +91,16 @@ class Argon2Hash extends Argon2HashBase {
     // Second Lane Blocks
     k = 1;
     hash0as32[16] = 1;
-    for (i = 0; i < ctx.lanes; i++, k += ctx.columns) {
+    for (i = 0; i < lanes; i++, k += columns) {
       // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
       hash0as32[17] = i;
       _expandHash(_blockSize, hash0, buffer, k << 10);
     }
 
     // Further block generation
-    for (pass = 0; pass < ctx.passes; ++pass) {
-      for (slice = 0; slice < ctx.slices; ++slice) {
-        for (lane = 0; lane < ctx.lanes; ++lane) {
+    for (pass = 0; pass < passes; ++pass) {
+      for (slice = 0; slice < slices; ++slice) {
+        for (lane = 0; lane < lanes; ++lane) {
           _fillSegment(buffer32, pass, slice, lane);
         }
       }
@@ -72,10 +108,10 @@ class Argon2Hash extends Argon2HashBase {
 
     // Finalization
     /* XOR the blocks */
-    j = ctx.columns - 1;
+    j = columns - 1;
     var block = buffer.buffer.asUint8List(j << 10, _blockSize);
-    for (k = 1; k < ctx.parallelism; ++k) {
-      j += ctx.columns;
+    for (k = 1; k < lanes; ++k) {
+      j += columns;
       p = j << 10;
       for (i = 0; i < _blockSize; ++i, ++p) {
         block[i] ^= buffer[p];
@@ -83,8 +119,8 @@ class Argon2Hash extends Argon2HashBase {
     }
 
     /* Hash the result */
-    _expandHash(ctx.hashLength, block, result, 0);
-    return Argon2HashDigest(ctx, result);
+    _expandHash(hashLength, block, result, 0);
+    return Argon2HashDigest(this, result);
   }
 
   void _initialHash(Uint8List _hash0, List<int> password) {
@@ -93,23 +129,23 @@ class Argon2Hash extends Argon2HashBase {
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
     //         LE32(length(X)) || X)
     var blake2b = Blake2bHash(digestSize: 64);
-    blake2b.addUint32(ctx.parallelism);
-    blake2b.addUint32(ctx.hashLength);
-    blake2b.addUint32(ctx.memorySizeKB);
-    blake2b.addUint32(ctx.iterations);
-    blake2b.addUint32(ctx.version.value);
-    blake2b.addUint32(ctx.hashType.index);
+    blake2b.addUint32(lanes);
+    blake2b.addUint32(hashLength);
+    blake2b.addUint32(memorySizeKB);
+    blake2b.addUint32(passes);
+    blake2b.addUint32(version.value);
+    blake2b.addUint32(type.index);
     blake2b.addUint32(password.length);
     blake2b.add(password);
-    blake2b.addUint32(ctx.salt.length);
-    blake2b.add(ctx.salt);
-    blake2b.addUint32(ctx.key?.length ?? 0);
-    if (ctx.key != null) {
-      blake2b.add(ctx.key!);
+    blake2b.addUint32(salt.length);
+    blake2b.add(salt);
+    blake2b.addUint32(key?.length ?? 0);
+    if (key != null) {
+      blake2b.add(key!);
     }
-    blake2b.addUint32(ctx.personalization?.length ?? 0);
-    if (ctx.personalization != null) {
-      blake2b.add(ctx.personalization!);
+    blake2b.addUint32(personalization?.length ?? 0);
+    if (personalization != null) {
+      blake2b.add(personalization!);
     }
 
     var hash = blake2b.digest().bytes;
@@ -175,9 +211,9 @@ class Argon2Hash extends Argon2HashBase {
     int previous, current;
     int i, j, startIndex, rand0, rand1;
 
-    bool dataIndependentAddressing = (ctx.hashType == Argon2Type.argon2i);
-    if (ctx.hashType == Argon2Type.argon2id) {
-      dataIndependentAddressing = (pass == 0) && (slice < ctx.midSlice);
+    bool dataIndependentAddressing = (type == Argon2Type.argon2i);
+    if (type == Argon2Type.argon2id) {
+      dataIndependentAddressing = (pass == 0) && (slice < midSlice);
     }
 
     if (dataIndependentAddressing) {
@@ -187,11 +223,11 @@ class Argon2Hash extends Argon2HashBase {
       _temp[_input + 3] = 0;
       _temp[_input + 4] = slice;
       _temp[_input + 5] = 0;
-      _temp[_input + 6] = ctx.blocks;
-      _temp[_input + 7] = ctx.blocks >>> 32;
-      _temp[_input + 8] = ctx.passes;
+      _temp[_input + 6] = blocks;
+      _temp[_input + 7] = blocks >>> 32;
+      _temp[_input + 8] = passes;
       _temp[_input + 9] = 0;
-      _temp[_input + 10] = ctx.hashType.index;
+      _temp[_input + 10] = type.index;
       _temp[_input + 11] = 0;
       _temp[_input + 12] = 0;
       _temp[_input + 13] = 0;
@@ -208,19 +244,19 @@ class Argon2Hash extends Argon2HashBase {
     }
 
     /* Offset of the current block */
-    current = lane * ctx.columns + slice * ctx.segments + startIndex;
+    current = lane * columns + slice * segments + startIndex;
 
-    if (current % ctx.columns == 0) {
+    if (current % columns == 0) {
       /* Last block in this lane */
-      previous = current + ctx.columns - 1;
+      previous = current + columns - 1;
     } else {
       /* Previous block */
       previous = current - 1;
     }
 
-    for (i = startIndex; i < ctx.segments; ++i, ++current, ++previous) {
+    for (i = startIndex; i < segments; ++i, ++current, ++previous) {
       /* 1.1 Rotating prev_offset if needed */
-      if (current % ctx.columns == 1) {
+      if (current % columns == 1) {
         previous = current - 1;
       }
 
@@ -241,7 +277,7 @@ class Argon2Hash extends Argon2HashBase {
       }
 
       /* 1.2.2 Computing the lane of the reference block */
-      refLane = rand1 % ctx.lanes;
+      refLane = rand1 % lanes;
 
       if (pass == 0 && slice == 0) {
         /* Can not reference other lanes yet */
@@ -263,9 +299,9 @@ class Argon2Hash extends Argon2HashBase {
         buffer,
         next: current << 8,
         prev: previous << 8,
-        ref: (refLane * ctx.columns + refIndex) << 8,
+        ref: (refLane * columns + refIndex) << 8,
         /* 1.2.1 v10 and earlier: overwrite, not XOR */
-        xor: ctx.version != Argon2Version.v10 && pass > 0,
+        xor: version != Argon2Version.v10 && pass > 0,
       );
     }
   }
@@ -364,16 +400,16 @@ class Argon2Hash extends Argon2HashBase {
         area = index - 1; // all but the previous
       } else if (sameLane) {
         // The same lane => add current segment
-        area = slice * ctx.segments + index - 1;
+        area = slice * segments + index - 1;
       } else {
-        area = slice * ctx.segments + (index == 0 ? -1 : 0);
+        area = slice * segments + (index == 0 ? -1 : 0);
       }
     } else {
       // Other passes
       if (sameLane) {
-        area = ctx.columns - ctx.segments + index - 1;
+        area = columns - segments + index - 1;
       } else {
-        area = ctx.columns - ctx.segments + (index == 0 ? -1 : 0);
+        area = columns - segments + (index == 0 ? -1 : 0);
       }
     }
 
@@ -384,12 +420,12 @@ class Argon2Hash extends Argon2HashBase {
 
     /* 1.2.5 Computing starting position */
     start = 0;
-    if (pass != 0 && slice != ctx.slices - 1) {
-      start = (slice + 1) * ctx.segments;
+    if (pass != 0 && slice != slices - 1) {
+      start = (slice + 1) * segments;
     }
 
     /* 1.2.6. Computing absolute position */
-    return (start + pos) % ctx.columns;
+    return (start + pos) % columns;
   }
 
   /// `v[i]++`

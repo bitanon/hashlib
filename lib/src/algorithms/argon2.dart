@@ -3,13 +3,16 @@
 
 import 'dart:typed_data';
 
+import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/utils.dart';
 
 import 'argon2_64bit.dart' if (dart.library.js) 'argon2_32bit.dart';
 
+const int _slices = 4;
 const int _minParallelism = 1;
-const int _maxParallelism = 0xFFFFFF;
+const int _maxParallelism = 0x7FFF;
 const int _minDigestSize = 4;
 const int _maxDigestSize = 0x3FFFFFF;
 const int _minIterations = 1;
@@ -45,7 +48,7 @@ enum Argon2Version {
 /// ```dart
 /// final argon2 = Argon2(
 ///   version: Argon2Version.v13,
-///   hashType: Argon2Type.argon2id,
+///   type: Argon2Type.argon2id,
 ///   hashLength: 32,
 ///   iterations: 2,
 ///   parallelism: 8,
@@ -58,15 +61,15 @@ enum Argon2Version {
 ///
 /// [phc]: https://www.password-hashing.net/
 /// [wiki]: https://en.wikipedia.org/wiki/Argon2
-class Argon2 {
+abstract class Argon2 extends KeyDerivationFunction {
   /// Argon2 Hash Type
-  final Argon2Type hashType;
+  final Argon2Type type;
 
   /// The current version is 0x13 (decimal: 19)
   final Argon2Version version;
 
   /// Degree of parallelism (i.e. number of threads)
-  final int parallelism;
+  final int lanes;
 
   /// Desired number of returned bytes
   final int hashLength;
@@ -75,7 +78,7 @@ class Argon2 {
   final int memorySizeKB;
 
   /// Number of iterations to perform
-  final int iterations;
+  final int passes;
 
   /// Salt (16 bytes recommended for password hashing)
   List<int> salt;
@@ -86,60 +89,151 @@ class Argon2 {
   /// Optional arbitrary additional data
   List<int>? personalization;
 
-  //     slice 0      slice 1      slice 2      slice 3
-  //   ____/\____   ____/\____   ____/\____   ____/\____
-  //  /          \ /          \ /          \ /          \
-  // +------------+------------+------------+------------+
-  // | segment 0  | segment 1  | segment 2  | segment 3  | -> lane 0
-  // +------------+------------+------------+-----------+
-  // | segment 4  | segment 5  | segment 6  | segment 7  | -> lane 1
-  // +------------+------------+------------+------------+
-  // | segment 8  | segment 9  | segment 10 | segment 11 | -> lane 2
-  // +------------+------------+------------+------------+
-  // |           ...          ...          ...           | ...
-  // +------------+------------+------------+------------+
-  // |            |            |            |            | -> lane p - 1
-  // +------------+------------+------------+------------+
-
   /// Number of slices per column
-  final int slices = 4;
-  final int midSlice = 2;
+  final int slices;
 
-  /// Number of passes (= iterations)
-  late final passes = iterations;
-
-  /// Number of lanes (= parallelism)
-  late final lanes = parallelism;
+  /// The start index of the second half of the slices
+  final int midSlice;
 
   /// Number of segments per lane
-  late final segments = memorySizeKB ~/ (slices * parallelism);
+  final int segments;
 
   /// Total number of columns per lane
-  late final columns = slices * segments;
+  final int columns;
 
   /// Total number of memory blocks (1024 bytes each)
-  late final blocks = lanes * slices * segments;
+  final int blocks;
 
-  /// The Argon2 instance for encoding or verifying password hash
-  late final Argon2Hash instance;
+  @override
+  int get derivedKeyLength => hashLength;
 
-  Argon2({
+  Argon2.internal({
     required this.salt,
-    this.version = Argon2Version.v13,
-    this.hashType = Argon2Type.argon2id,
+    required this.version,
+    required this.type,
     required this.hashLength,
-    required this.iterations,
-    required this.parallelism,
+    required this.passes,
+    required this.lanes,
     required this.memorySizeKB,
-    this.key,
-    this.personalization,
-  }) {
-    _validate();
-    instance = Argon2Hash(this);
+    required this.slices,
+    required this.segments,
+    required this.columns,
+    required this.blocks,
+    required this.key,
+    required this.personalization,
+  }) : midSlice = slices ~/ 2 {
+    if (hashLength < _minDigestSize) {
+      throw ArgumentError('The tag length must be at least $_minDigestSize');
+    }
+    if (hashLength > _maxDigestSize) {
+      throw ArgumentError('The tag length must be at most $_maxDigestSize');
+    }
+    if (lanes < _minParallelism) {
+      throw ArgumentError('The parallelism must be at least $_minParallelism');
+    }
+    if (lanes > _maxParallelism) {
+      throw ArgumentError('The parallelism must be at most $_maxParallelism');
+    }
+    if (passes < _minIterations) {
+      throw ArgumentError('The iterations must be at least $_minIterations');
+    }
+    if (passes > _maxIterations) {
+      throw ArgumentError('The iterations must be at most $_maxIterations');
+    }
+    if (memorySizeKB < 8 * lanes) {
+      throw ArgumentError('The memory size must be at least 8 * parallelism');
+    }
+    if (memorySizeKB > _maxMemory) {
+      throw ArgumentError('The memorySizeKB must be at most $_maxMemory');
+    }
+    if (salt.length < _minSaltSize) {
+      throw ArgumentError('The salt must be at least $_minSaltSize bytes long');
+    }
+    if (salt.length > _maxSaltSize) {
+      throw ArgumentError('The salt must be at most $_maxSaltSize bytes long');
+    }
+    if (key != null && key!.isNotEmpty) {
+      if (key!.length < _minKeySize) {
+        throw ArgumentError('The key must be at least $_minKeySize bytes long');
+      }
+      if (key!.length > _maxKeySize) {
+        throw ArgumentError('The key must be at most $_maxKeySize bytes long');
+      }
+    }
+    if (personalization != null && personalization!.isNotEmpty) {
+      if (personalization!.length < _minAD) {
+        throw ArgumentError('The extra data must be at least $_minAD bytes');
+      }
+      if (personalization!.length > _maxAD) {
+        throw ArgumentError('The extra data must be at most $_maxAD');
+      }
+    }
   }
 
-  factory Argon2.fromEncoded(String encodedHash) {
-    var data = encodedHash.split('\$');
+  factory Argon2({
+    required List<int> salt,
+    required int hashLength,
+    required int iterations,
+    required int parallelism,
+    required int memorySizeKB,
+    List<int>? key,
+    List<int>? personalization,
+    Argon2Version version = Argon2Version.v13,
+    Argon2Type type = Argon2Type.argon2id,
+  }) {
+    int segments = memorySizeKB ~/ (_slices * parallelism);
+    int columns = _slices * segments;
+    int blocks = parallelism * _slices * segments;
+    return Argon2Internal(
+      salt: salt,
+      version: version,
+      type: type,
+      hashLength: hashLength,
+      passes: iterations,
+      slices: _slices,
+      lanes: parallelism,
+      memorySizeKB: memorySizeKB,
+      columns: columns,
+      segments: segments,
+      blocks: blocks,
+      key: key,
+      personalization: personalization,
+    );
+  }
+
+  /// Creates an [Argon2] instance from [Argon2Security] parameter.
+  factory Argon2.fromSecurity(
+    Argon2Security security, {
+    required List<int> salt,
+    int hashLength = 32,
+    List<int>? key,
+    List<int>? personalization,
+    Argon2Version version = Argon2Version.v13,
+    Argon2Type type = Argon2Type.argon2id,
+  }) {
+    return Argon2(
+      salt: salt,
+      version: version,
+      type: type,
+      hashLength: hashLength,
+      iterations: security.t,
+      parallelism: security.p,
+      memorySizeKB: security.m,
+      key: key,
+      personalization: personalization,
+    );
+  }
+
+  /// Creates an [Argon2] instance from an [encoded].
+  ///
+  /// The encoded hash may look like this:
+  /// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
+  factory Argon2.fromEncoded(
+    String encoded, {
+    List<int>? key,
+    List<int>? personalization,
+  }) {
+    var data = encoded.split('\$');
     if (data.length < 6) {
       throw ArgumentError('Invalid Argon2 encoded hash');
     }
@@ -177,71 +271,35 @@ class Argon2 {
     }
 
     return Argon2(
-      hashType: type,
+      type: type,
       version: version,
       iterations: t,
       parallelism: p,
       memorySizeKB: m,
       salt: fromBase64(data[4]),
       hashLength: (data[5].length * 6) ~/ 8,
+      key: key,
+      personalization: personalization,
     );
   }
 
-  /// Generates password hash using Argon2 algorithm
-  Argon2HashDigest convert(List<int> password) => instance.convert(password);
+  /// Generate a derived key from a [password] using Argon2 algorithm
+  @override
+  Argon2HashDigest convert(List<int> password);
 
-  /// Generate Argon2 encoded string for a password
-  String encode(List<int> password) => instance.convert(password).encoded();
+  /// Generate an Argon2 encoded string from a [password]
+  String encode(List<int> password) => convert(password).encoded();
+}
 
-  /// Checks validity of the parameters of this context
-  void _validate() {
-    if (hashLength < _minDigestSize) {
-      throw ArgumentError('The tag length must be at least $_minDigestSize');
-    }
-    if (hashLength > _maxDigestSize) {
-      throw ArgumentError('The tag length must be at most $_maxDigestSize');
-    }
-    if (parallelism < _minParallelism) {
-      throw ArgumentError('The parallelism must be at least $_minParallelism');
-    }
-    if (parallelism > _maxParallelism) {
-      throw ArgumentError('The parallelism must be at most $_maxParallelism');
-    }
-    if (iterations < _minIterations) {
-      throw ArgumentError('The iterations must be at least $_minIterations');
-    }
-    if (iterations > _maxIterations) {
-      throw ArgumentError('The iterations must be at most $_maxIterations');
-    }
-    if (memorySizeKB < 8 * parallelism) {
-      throw ArgumentError('The memory size must be at least 8 * parallelism');
-    }
-    if (memorySizeKB > _maxMemory) {
-      throw ArgumentError('The memorySizeKB must be at most $_maxMemory');
-    }
-    if (salt.length < _minSaltSize) {
-      throw ArgumentError('The salt must be at least $_minSaltSize bytes long');
-    }
-    if (salt.length > _maxSaltSize) {
-      throw ArgumentError('The salt must be at most $_maxSaltSize bytes long');
-    }
-    if (key != null && key!.isNotEmpty) {
-      if (key!.length < _minKeySize) {
-        throw ArgumentError('The key must be at least $_minKeySize bytes long');
-      }
-      if (key!.length > _maxKeySize) {
-        throw ArgumentError('The key must be at most $_maxKeySize bytes long');
-      }
-    }
-    if (personalization != null && personalization!.isNotEmpty) {
-      if (personalization!.length < _minAD) {
-        throw ArgumentError('The extra data must be at least $_minAD bytes');
-      }
-      if (personalization!.length > _maxAD) {
-        throw ArgumentError('The extra data must be at most $_maxAD');
-      }
-    }
-  }
+/// Verifies if the original [password] was derived from the [encoded]
+/// Argon2 hash.
+///
+/// The encoded hash may look like this:
+/// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
+bool argon2verify(String encoded, List<int> password) {
+  var instance = Argon2.fromEncoded(encoded);
+  var key = fromBase64(encoded.split('\$').last);
+  return instance.verify(key, password);
 }
 
 extension Argon2VersionValue on Argon2Version {
@@ -258,15 +316,6 @@ extension Argon2VersionValue on Argon2Version {
   }
 }
 
-/// Use the Argon2Context to obtain an instance of this type.
-abstract class Argon2HashBase {
-  final Argon2 ctx;
-  const Argon2HashBase(this.ctx);
-
-  /// Encodes a password using Argon2 algorithm
-  Argon2HashDigest convert(List<int> password);
-}
-
 class Argon2HashDigest extends HashDigest {
   final Argon2 ctx;
   Argon2HashDigest(this.ctx, Uint8List bytes) : super(bytes);
@@ -276,66 +325,12 @@ class Argon2HashDigest extends HashDigest {
 
   /// Gets the encoded Argon2 string
   String encoded() {
-    return "\$${ctx.hashType.toString().split('.').last}"
+    return "\$${ctx.type.toString().split('.').last}"
         "\$v=${ctx.version.value}"
         "\$m=${ctx.memorySizeKB}"
-        ",t=${ctx.iterations}"
-        ",p=${ctx.parallelism}"
+        ",t=${ctx.passes}"
+        ",p=${ctx.lanes}"
         "\$${toBase64(ctx.salt)}"
         "\$${toBase64(bytes)}";
   }
-}
-
-class Argon2Security {
-  final String name;
-
-  /// The amount of memory to use in KB. The more the better, but slower.
-  final int m;
-
-  /// Number of threads or lanes to use. The more the better, but slower.
-  final int p;
-
-  /// Number of iterations. The more the better, but slower.
-  final int t;
-
-  const Argon2Security(
-    this.name, {
-    required this.m,
-    required this.p,
-    required this.t,
-  });
-
-  /// Provides a very low security. Use it for test purposes.
-  ///
-  /// It uses 32KB of RAM, 4 lanes, and 3 iterations.
-  ///
-  /// **WARNING: Not recommended for general use.**
-  static const test = Argon2Security('test', m: 32, p: 4, t: 3);
-
-  /// Provides low security but faster. Suitable for low-end devices.
-  ///
-  /// It uses 1MB of RAM, 4 lanes, and 2 iterations.
-  static const small = Argon2Security('small', m: (1 << 10), p: 4, t: 2);
-
-  /// Provides moderate security. Suitable for modern mobile devices.
-  ///
-  /// It uses 8MB of RAM, 4 lanes, and 2 iterations.
-  /// This is 10x slower than the [small] one.
-  static const moderate = Argon2Security('moderate', m: 1 << 13, p: 4, t: 2);
-
-  /// Provides good security. Second recommended option by [RFC-9106][rfc].
-  ///
-  /// It uses 64MB of RAM, 4 lanes, and 3 iterations.
-  /// This is 10x slower than the [moderate] one.
-  ///
-  /// [rfc]: https://rfc-editor.org/rfc/rfc9106.html
-  static const good = Argon2Security('good', m: 1 << 16, p: 4, t: 3);
-
-  /// Provides strong security. First recommended option by [RFC-9106][rfc].
-  ///
-  /// It uses 2GB of RAM, 4 threads, and 1 iteration.
-  /// This is 10x slower than the [good] one.
-  ///
-  /// [rfc]: https://rfc-editor.org/rfc/rfc9106.html
-  static const strong = Argon2Security('strong', m: 1 << 21, p: 4, t: 1);
 }

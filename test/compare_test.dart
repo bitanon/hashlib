@@ -4,8 +4,9 @@ import 'dart:typed_data';
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:sha3/sha3.dart' as sha3;
-import 'package:pointycastle/digests/blake2b.dart' as pc;
+import 'package:pointycastle/digests/sha3.dart' as pc_sha3;
+import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
+import 'package:pointycastle/digests/blake2b.dart' as pc_blake2b;
 import 'package:test/test.dart';
 
 void main() {
@@ -13,7 +14,7 @@ void main() {
     test('with pointycastle', () {
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
-        final b = pc.Blake2bDigest(digestSize: 64);
+        final b = pc_blake2b.Blake2bDigest(digestSize: 64);
         expect(
           toHex(blake2b512.convert(data).bytes),
           toHex(b.process(Uint8List.fromList(data))),
@@ -26,7 +27,7 @@ void main() {
       final key = List<int>.filled(16, 99);
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
-        final b = pc.Blake2bDigest(
+        final b = pc_blake2b.Blake2bDigest(
           digestSize: 64,
           key: Uint8List.fromList(key),
         );
@@ -42,7 +43,7 @@ void main() {
       final salt = List<int>.filled(16, 99);
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
-        final b = pc.Blake2bDigest(
+        final b = pc_blake2b.Blake2bDigest(
           digestSize: 64,
           salt: Uint8List.fromList(salt),
         );
@@ -58,7 +59,7 @@ void main() {
       final salt = List<int>.filled(16, 99);
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
-        final b = pc.Blake2bDigest(
+        final b = pc_blake2b.Blake2bDigest(
           digestSize: 64,
           personalization: Uint8List.fromList(salt),
         );
@@ -113,36 +114,27 @@ void main() {
   });
 
   group('Keccak comparison', () {
-    test('with sha3', () {
+    test('with keccak256', () {
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
-        var other = sha3.SHA3(256, sha3.KECCAK_PADDING, 256);
-        other.update(data);
+        var pc = pc_keccak.KeccakDigest(256);
+        var other = pc.process(Uint8List.fromList(data));
         expect(
           keccak256.convert(data).hex(),
-          toHex(other.digest()),
+          toHex(other),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }
     });
 
-    test('SHA3-256 with existing library', () {
-      final input = "A quick brown fox jumps over the lazy dog";
-      final output =
-          "2baa15b5a204f74ae708d588793657a70cda2288a06e7e12c918cc3aedc5cd8d";
-      var lib = sha3.SHA3(256, sha3.SHA3_PADDING, 256);
-      lib.update(toBytes(input));
-      expect(toHex(lib.digest()), output);
-    });
-
-    test('against known implementations', () {
+    test('with sha3', () {
       for (int i = 0; i < 1000; ++i) {
         final data = List<int>.filled(i, 97);
-        var other = sha3.SHA3(256, sha3.SHA3_PADDING, 256);
-        other.update(data);
+        var pc = pc_sha3.SHA3Digest(256);
+        var other = pc.process(Uint8List.fromList(data));
         expect(
           sha3_256.convert(data).hex(),
-          toHex(other.digest()),
+          toHex(other),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
       }

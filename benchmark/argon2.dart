@@ -2,109 +2,163 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:argon2/argon2.dart' as argon2;
 import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:hashlib/hashlib.dart';
 
 Random random = Random();
 
-class Argon2iBenchmark extends BenchmarkBase {
+class HashlibArgon2iBenchmark extends BenchmarkBase {
   final Argon2Security security;
 
-  Argon2iBenchmark(this.security) : super('argon2i[${security.name}]');
+  HashlibArgon2iBenchmark(this.security) : super('hashlib');
 
   @override
   void run() {
-    argon2i(
-      'password'.codeUnits,
-      'some salt'.codeUnits,
-      security: security,
-    );
+    Argon2(
+      hashLength: 24,
+      iterations: security.t,
+      memorySizeKB: security.m,
+      parallelism: security.p,
+      salt: 'some salt'.codeUnits,
+      type: Argon2Type.argon2i,
+    ).convert('password'.codeUnits);
   }
 }
 
-class Argon2dBenchmark extends BenchmarkBase {
+class HashlibArgon2dBenchmark extends BenchmarkBase {
   final Argon2Security security;
 
-  Argon2dBenchmark(this.security) : super('argon2d[${security.name}]');
+  HashlibArgon2dBenchmark(this.security) : super('hashlib');
 
   @override
   void run() {
-    argon2d(
-      'password'.codeUnits,
-      'some salt'.codeUnits,
-      security: security,
-    );
+    Argon2(
+      hashLength: 24,
+      iterations: security.t,
+      memorySizeKB: security.m,
+      parallelism: security.p,
+      salt: 'some salt'.codeUnits,
+      type: Argon2Type.argon2d,
+    ).convert('password'.codeUnits);
   }
 }
 
-class Argon2idBenchmark extends BenchmarkBase {
+class HashlibArgon2idBenchmark extends BenchmarkBase {
   final Argon2Security security;
 
-  Argon2idBenchmark(this.security) : super('argon2id[${security.name}]');
+  HashlibArgon2idBenchmark(this.security) : super('hashlib');
 
   @override
   void run() {
-    argon2id(
-      'password'.codeUnits,
-      'some salt'.codeUnits,
-      security: security,
+    Argon2(
+      hashLength: 24,
+      iterations: security.t,
+      memorySizeKB: security.m,
+      parallelism: security.p,
+      salt: 'some salt'.codeUnits,
+      type: Argon2Type.argon2id,
+    ).convert('password'.codeUnits);
+  }
+}
+
+class Argon2Argon2idBenchmark extends BenchmarkBase {
+  final Argon2Security security;
+
+  Argon2Argon2idBenchmark(this.security) : super('argon2');
+
+  @override
+  void run() {
+    var password = 'password'.toBytesLatin1();
+    var salt = 'some salt'.toBytesLatin1();
+    var parameters = argon2.Argon2Parameters(
+      argon2.Argon2Parameters.ARGON2_id,
+      salt,
+      version: argon2.Argon2Parameters.ARGON2_VERSION_13,
+      iterations: security.t,
+      memory: security.m,
+      lanes: security.p,
     );
+    var instance = argon2.Argon2BytesGenerator();
+    instance.init(parameters);
+    var res = Uint8List(24);
+    instance.generateBytes(password, res, 0, res.length);
   }
 }
 
 void main() {
-  print('--------- Argon2i ----------');
   final watch = Stopwatch()..start();
-  Argon2iBenchmark(Argon2Security.test).run();
-  print('argon2i[test]: ${watch.elapsedMicroseconds / 1000} ms');
+  print('--------- Argon2i ----------');
   watch.reset();
-  Argon2iBenchmark(Argon2Security.small).run();
-  print('argon2i[small]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2iBenchmark(Argon2Security.test).run();
+  print('hashlib/argon2i[test]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2iBenchmark(Argon2Security.moderate).run();
-  print('argon2i[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2iBenchmark(Argon2Security.little).run();
+  print('hashlib/argon2i[little]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2iBenchmark(Argon2Security.good).run();
-  print('argon2i[good]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2iBenchmark(Argon2Security.moderate).run();
+  print('hashlib/argon2i[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2iBenchmark(Argon2Security.strong).run();
-  print('argon2i[strong]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2iBenchmark(Argon2Security.good).run();
+  print('hashlib/argon2i[good]: ${watch.elapsedMicroseconds / 1000} ms');
+  watch.reset();
+  HashlibArgon2iBenchmark(Argon2Security.strong).run();
+  print('hashlib/argon2i[strong]: ${watch.elapsedMicroseconds / 1000} ms');
   print('');
 
   print('--------- Argon2d ----------');
   watch.reset();
-  Argon2dBenchmark(Argon2Security.test).run();
-  print('argon2d[test]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2dBenchmark(Argon2Security.test).run();
+  print('hashlib/argon2d[test]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2dBenchmark(Argon2Security.small).run();
-  print('argon2d[small]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2dBenchmark(Argon2Security.little).run();
+  print('hashlib/argon2d[little]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2dBenchmark(Argon2Security.moderate).run();
-  print('argon2d[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2dBenchmark(Argon2Security.moderate).run();
+  print('hashlib/argon2d[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2dBenchmark(Argon2Security.good).run();
-  print('argon2d[good]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2dBenchmark(Argon2Security.good).run();
+  print('hashlib/argon2d[good]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2dBenchmark(Argon2Security.strong).run();
-  print('argon2d[strong]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2dBenchmark(Argon2Security.strong).run();
+  print('hashlib/argon2d[strong]: ${watch.elapsedMicroseconds / 1000} ms');
   print('');
 
   print('--------- Argon2id ----------');
   watch.reset();
-  Argon2idBenchmark(Argon2Security.test).run();
-  print('argon2id[test]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2idBenchmark(Argon2Security.test).run();
+  print('hashlib/argon2id[test]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2idBenchmark(Argon2Security.small).run();
-  print('argon2id[small]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2idBenchmark(Argon2Security.little).run();
+  print('hashlib/argon2id[little]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2idBenchmark(Argon2Security.moderate).run();
-  print('argon2id[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2idBenchmark(Argon2Security.moderate).run();
+  print('hashlib/argon2id[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2idBenchmark(Argon2Security.good).run();
-  print('argon2id[good]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2idBenchmark(Argon2Security.good).run();
+  print('hashlib/argon2id[good]: ${watch.elapsedMicroseconds / 1000} ms');
   watch.reset();
-  Argon2idBenchmark(Argon2Security.strong).run();
-  print('argon2id[strong]: ${watch.elapsedMicroseconds / 1000} ms');
+  HashlibArgon2idBenchmark(Argon2Security.strong).run();
+  print('hashlib/argon2id[strong]: ${watch.elapsedMicroseconds / 1000} ms');
+  print('');
+
+  print('--------- Other argon2 argon2id ----------');
+  watch.reset();
+  Argon2Argon2idBenchmark(Argon2Security.test).run();
+  print('argon2/argon2id[test]: ${watch.elapsedMicroseconds / 1000} ms');
+  watch.reset();
+  Argon2Argon2idBenchmark(Argon2Security.little).run();
+  print('argon2/argon2id[little]: ${watch.elapsedMicroseconds / 1000} ms');
+  watch.reset();
+  Argon2Argon2idBenchmark(Argon2Security.moderate).run();
+  print('argon2/argon2id[moderate]: ${watch.elapsedMicroseconds / 1000} ms');
+  watch.reset();
+  Argon2Argon2idBenchmark(Argon2Security.good).run();
+  print('argon2/argon2id[good]: ${watch.elapsedMicroseconds / 1000} ms');
+  watch.reset();
+  Argon2Argon2idBenchmark(Argon2Security.strong).run();
+  print('argon2/argon2id[strong]: ${watch.elapsedMicroseconds / 1000} ms');
   print('');
 }
