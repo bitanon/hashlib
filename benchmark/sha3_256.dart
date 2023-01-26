@@ -5,7 +5,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart' as hashlib;
-import 'package:sha3/sha3.dart' as sha3;
 import 'package:pointycastle/digests/sha3.dart' as pc;
 
 import 'base.dart';
@@ -18,17 +17,6 @@ class HashlibBenchmark extends Benchmark {
   @override
   void run() {
     hashlib.sha256.convert(input).bytes;
-  }
-}
-
-class Sha3Benchmark extends Benchmark {
-  Sha3Benchmark(int size, int iter) : super('sha3', size, iter);
-
-  @override
-  void run() {
-    sha3.SHA3(256, sha3.SHA3_PADDING, 256)
-      ..update(input)
-      ..digest();
   }
 }
 
@@ -60,7 +48,6 @@ void main() {
     int size = condition[0];
     int iter = condition[1];
     HashlibBenchmark(size, iter).showDiff([
-      Sha3Benchmark(size, iter),
       PointyCastleBenchmark(size, iter),
     ]);
     print('');

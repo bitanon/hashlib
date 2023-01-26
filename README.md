@@ -14,7 +14,7 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Secure Hash Functions
 
-| Algorithm | Available Class/Methods                                            | Source      |
+| Algorithm | Available implementations                                          | Source      |
 | --------- | ------------------------------------------------------------------ | ----------- |
 | MD5       | `md5`                                                              | RFC-1321    |
 | SHA-1     | `sha1`                                                             | RFC-3174    |
@@ -35,18 +35,18 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Message Authentication Code (MAC) generators
 
-| Algorithms | Available Class/Methods  | Source   |
-| ---------- | ------------------------ | -------- |
-| HMAC       | `HMAC`, `hmac`, `hmacBy` | RFC-2104 |
+| Algorithms | Available implementations | Source   |
+| ---------- | ------------------------- | -------- |
+| HMAC       | `HMAC`                    | RFC-2104 |
 
 <!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
 
 ### Password Hashing / Key Derivation
 
-| Algorithm | Available Class/Methods                    | Source   |
+| Algorithm | Available implementations                  | Source   |
 | --------- | ------------------------------------------ | -------- |
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
-| PBKDF2    | `PBKDF2`, `pbkdf2`                         | RFC-9106 |
+| PBKDF2    | `PBKDF2`                                   | RFC-9106 |
 
 <!--
 | `pbkdf2_hmac` |    ⌛     |       |
@@ -198,10 +198,10 @@ With string of length 500000 (10 iterations):
 
 Argon2 benchmarks on different security parameters:
 
-| Algorithms | test     | small    | moderate  | good       | strong      |
+| Algorithms | test     | little   | moderate  | good       | strong      |
 | ---------- | -------- | -------- | --------- | ---------- | ----------- |
-| argon2i    | 0.708 ms | 4.391 ms | 26.042 ms | 253.649 ms | 2820.983 ms |
-| argon2d    | 0.319 ms | 3.112 ms | 28.06 ms  | 247.545 ms | 2791.431 ms |
-| argon2id   | 0.324 ms | 3.167 ms | 20.008 ms | 250.295 ms | 2837.003 ms |
+| argon2i    | 0.391 ms | 2.889 ms | 19.686 ms | 250.008 ms | 2718.1 ms   |
+| argon2d    | 0.29 ms  | 3.207 ms | 19.368 ms | 245.818 ms | 2664.177 ms |
+| argon2id   | 0.382 ms | 5.554 ms | 20.352 ms | 250.707 ms | 2683.672 ms |
 
 > These benchmarks were done in _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_ on Windows 10

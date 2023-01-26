@@ -162,7 +162,7 @@ void main(List<String> args) {
   print('');
   var argon2Levels = [
     Argon2Security.test,
-    Argon2Security.small,
+    Argon2Security.little,
     Argon2Security.moderate,
     Argon2Security.good,
     Argon2Security.strong,
