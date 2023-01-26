@@ -1,3 +1,17 @@
+## 1.7.0
+
+- Renames `Argon2Security.small` -> `Argon2Security.little`
+- Adds `Argon2Security.optimize` method to find optimal parameters for a desired runtime
+- Define `KeyDerivationFunction` and extend it for `Argon2`
+- Modify internal structure of `Argon2` to make it faster
+- Implement `reset` functionality for all hash sinks
+- Define and use `BlockHashBase` for some algorithms
+- Renames `BlockHash` -> `BlockHashSink`
+- Replaces the RFC links to ietf domain
+- Adds PBKDF2 with HMAC key derivation function:
+  - `PBKDF2`
+  - Adds extension to `HashBase` for it
+
 ## 1.6.1
 
 - Fixes enum name getter usage issue for Dart < 2.15.0

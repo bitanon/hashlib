@@ -30,9 +30,10 @@ const List<int> _k = [
 /// The implementation is derived from [RFC6234][rfc6234] which follows the
 /// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
 ///
-/// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
+/// [rfc6234]: https://www.ietf.org/rfc/rfc6234.html
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-class SHA2of512 extends BlockHash {
+class SHA2of512 extends BlockHashSink {
+  final List<int> seed;
   final Uint32List state;
   final Uint32List chunk;
 
@@ -41,11 +42,17 @@ class SHA2of512 extends BlockHash {
 
   /// For internal use only.
   SHA2of512({
-    required List<int> seed,
+    required this.seed,
     required this.hashLength,
   })  : chunk = Uint32List(64),
         state = Uint32List.fromList(seed),
         super(64);
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, seed);
+  }
 
   /// Rotates x right by n bits.
   static int _bsig0(int x) =>

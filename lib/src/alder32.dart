@@ -15,7 +15,7 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// - `a` is initialized to 1, `b` to 0.
 /// - Final output is `b * 65536 + a`
 ///
-/// [rfc]: https://rfc-editor.org/rfc/rfc1950.html
+/// [rfc]: https://www.ietf.org/rfc/rfc1950.html
 /// [wiki]: https://en.wikipedia.org/wiki/Adler-32
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**

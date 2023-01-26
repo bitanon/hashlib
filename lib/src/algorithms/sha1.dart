@@ -7,11 +7,19 @@ import 'package:hashlib/src/core/block_hash.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
+const _iv = <int>[
+  0x67452301, // a
+  0xEFCDAB89, // b
+  0x98BADCFE, // c
+  0x10325476, // d
+  0xC3D2E1F0, // e
+];
+
 /// This implementation is derived from The Internet Society
 /// [US Secure Hash Algorithm 1 (SHA1)][rfc3174].
 ///
-/// [rfc3174]: https://www.rfc-editor.org/rfc/rfc3174
-class SHA1Hash extends BlockHash {
+/// [rfc3174]: https://www.ietf.org/rfc/rfc3174.html
+class SHA1Hash extends BlockHashSink {
   final Uint32List state;
   final Uint32List chunk;
 
@@ -21,14 +29,14 @@ class SHA1Hash extends BlockHash {
   SHA1Hash()
       : chunk = Uint32List(80),
         hashLength = 160 >>> 3,
-        state = Uint32List.fromList([
-          0x67452301, // a
-          0xEFCDAB89, // b
-          0x98BADCFE, // c
-          0x10325476, // d
-          0xC3D2E1F0, // e
-        ]),
+        state = Uint32List.fromList(_iv),
         super(512 >>> 3);
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, _iv);
+  }
 
   @override
   void $update(List<int> block, [int offset = 0, bool last = false]) {

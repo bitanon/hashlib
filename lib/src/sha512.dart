@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-512 is a member of SHA-2 family which uses 512-bit internal state to
@@ -15,9 +15,9 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// [FIPS 180-4][fips180].
 ///
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-const HashBase sha512 = _SHA512();
+const BlockHashBase sha512 = _SHA512();
 
-class _SHA512 extends HashBase {
+class _SHA512 extends BlockHashBase {
   const _SHA512();
 
   @override

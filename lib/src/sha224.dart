@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-224 is a member of SHA-2 family which uses 256-bit internal state to
@@ -15,9 +15,9 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// [FIPS 180-4][fips180].
 ///
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-const HashBase sha224 = _SHA224();
+const BlockHashBase sha224 = _SHA224();
 
-class _SHA224 extends HashBase {
+class _SHA224 extends BlockHashBase {
   const _SHA224();
 
   @override

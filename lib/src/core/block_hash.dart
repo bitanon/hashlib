@@ -9,7 +9,14 @@ import 'package:hashlib/src/core/hash_digest.dart';
 // Maximum length of message allowed (considering both the JS and Dart VM)
 const int _maxMessageLength = 0x3FFFFFFFFFFFF; // (1 << 50) - 1
 
-abstract class BlockHash implements HashDigestSink {
+abstract class BlockHashBase extends HashBase {
+  const BlockHashBase();
+
+  @override
+  BlockHashSink createSink();
+}
+
+abstract class BlockHashSink implements HashDigestSink {
   // The digest and closing flag
   HashDigest? _digest;
   bool _closed = false;
@@ -32,7 +39,7 @@ abstract class BlockHash implements HashDigestSink {
   /// The buffer as Uint32List
   late final Uint32List sbuffer;
 
-  BlockHash(this.blockLength, {int? bufferLength}) : super() {
+  BlockHashSink(this.blockLength, {int? bufferLength}) : super() {
     buffer = Uint8List(bufferLength ?? blockLength);
     bdata = buffer.buffer.asByteData();
     sbuffer = buffer.buffer.asUint32List();

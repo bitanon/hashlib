@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/keccak.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 
 /// Keccak-512 is a member of Keccak family hash functions that generates
 /// a 512-bit hash.
@@ -20,9 +20,9 @@ import 'package:hashlib/src/core/hash_base.dart';
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-const HashBase keccak512 = _Keccak512();
+const BlockHashBase keccak512 = _Keccak512();
 
-class _Keccak512 extends HashBase {
+class _Keccak512 extends BlockHashBase {
   const _Keccak512();
 
   @override

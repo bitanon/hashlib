@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha1.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-1 produces a message digest based on principle similar to MD5, except
@@ -14,9 +14,9 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// data integrity.
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
-const HashBase sha1 = _SHA1();
+const BlockHashBase sha1 = _SHA1();
 
-class _SHA1 extends HashBase {
+class _SHA1 extends BlockHashBase {
   const _SHA1();
 
   @override

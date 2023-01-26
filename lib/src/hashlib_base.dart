@@ -11,6 +11,7 @@ export 'keccak256.dart';
 export 'keccak384.dart';
 export 'keccak512.dart';
 export 'md5.dart';
+export 'pbkdf2.dart';
 export 'sha1.dart';
 export 'sha224.dart';
 export 'sha256.dart';

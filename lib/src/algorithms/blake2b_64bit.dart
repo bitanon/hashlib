@@ -58,9 +58,9 @@ const _sigma = [
 ///
 /// Note that blake2b uses 64-bit operations.
 ///
-/// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
+/// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2bHash extends BlockHash {
+class Blake2bHash extends BlockHashSink {
   final Uint64List state;
   late final Uint64List qbuffer;
   late final List<int> _initialState;

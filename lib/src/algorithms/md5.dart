@@ -7,6 +7,13 @@ import 'package:hashlib/src/core/block_hash.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
+const _iv = <int>[
+  0x67452301, // a
+  0xEFCDAB89, // b
+  0x98BADCFE, // c
+  0x10325476, // d
+];
+
 /// 64 constants [Formula: floor(2^32 * abs(sin(i + 1)))]
 const _k = <int>[
   0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, //
@@ -38,22 +45,23 @@ const _rc = <int>[
 /// This implementation is derived from the RSA Data Security, Inc.
 /// [MD5 Message-Digest Algorithm][rfc1321].
 ///
-/// [rfc1321]: https://www.rfc-editor.org/rfc/rfc1321
-class MD5Hash extends BlockHash {
+/// [rfc1321]: https://www.ietf.org/rfc/rfc1321.html
+class MD5Hash extends BlockHashSink {
   final Uint32List state;
 
   @override
   final int hashLength;
 
   MD5Hash()
-      : state = Uint32List.fromList([
-          0x67452301, // a
-          0xEFCDAB89, // b
-          0x98BADCFE, // c
-          0x10325476, // d
-        ]),
+      : state = Uint32List.fromList(_iv),
         hashLength = 128 >>> 3,
         super(512 >>> 3);
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, _iv);
+  }
 
   @override
   void $process(List<int> chunk, int start, int end) {
@@ -162,6 +170,6 @@ class MD5Hash extends BlockHash {
     $update();
 
     // Convert the state to 8-bit byte array
-    return state.buffer.asUint8List();
+    return state.buffer.asUint8List().sublist(0, hashLength);
   }
 }

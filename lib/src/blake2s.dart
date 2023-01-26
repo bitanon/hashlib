@@ -35,7 +35,7 @@ const HashBase blake2s256 = Blake2s(outputBits: 256);
 ///
 /// This implementation is based on the [RFC-7693][rfc]
 ///
-/// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
+/// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 class Blake2s extends HashBase {
   final int outputBits;
   final List<int>? key;

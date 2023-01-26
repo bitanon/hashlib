@@ -42,9 +42,9 @@ const List<int> _k = [
 /// It uses 64-bit integer operations internally which is not supported by
 /// Web VM, but a lot faster.
 ///
-/// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
+/// [rfc6234]: https://www.ietf.org/rfc/rfc6234.html
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-class SHA2of1024 extends BlockHash {
+class SHA2of1024 extends BlockHashSink {
   final List<int> seed;
   final Uint32List state;
   final Uint64List chunk;
@@ -59,6 +59,12 @@ class SHA2of1024 extends BlockHash {
   })  : chunk = Uint64List(80),
         state = Uint32List.fromList(seed),
         super(1024 >>> 3);
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, seed);
+  }
 
   /// Rotates 64-bit number x by n bits
   static int _bsig0(int x) =>

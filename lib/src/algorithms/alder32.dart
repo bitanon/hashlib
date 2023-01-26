@@ -11,7 +11,7 @@ const int _alder32Mod = 65521;
 /// This implementation is derived from the [ZLIB Compressed Data Format
 /// Specification version 3.3][rfc]
 ///
-/// [rfc]: https://rfc-editor.org/rfc/rfc1950.html
+/// [rfc]: https://www.ietf.org/rfc/rfc1950.html
 class Alder32Hash implements HashDigestSink {
   int a = 1, b = 0;
   HashDigest? _digest;

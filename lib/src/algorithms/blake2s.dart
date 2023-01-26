@@ -59,10 +59,11 @@ const _sigma = [
 ///
 /// Note that blake2s uses only 32-bit operations.
 ///
-/// [rfc]: https://www.rfc-editor.org/rfc/rfc7693
+/// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2sHash extends BlockHash {
+class Blake2sHash extends BlockHashSink {
   final Uint32List state;
+  late final List<int> _initialState;
 
   @override
   final int hashLength;
@@ -79,6 +80,7 @@ class Blake2sHash extends BlockHash {
     if (digestSize < 1 || digestSize > 32) {
       throw ArgumentError('The digest size must be between 1 and 32');
     }
+
     // Parameter block
     state[0] ^= 0x01010000 ^ hashLength;
     if (key != null && key.isNotEmpty) {
@@ -92,6 +94,7 @@ class Blake2sHash extends BlockHash {
       pos = blockLength;
       messageLength += blockLength;
     }
+
     if (salt != null && salt.isNotEmpty) {
       if (salt.length != 8) {
         throw ArgumentError('The valid length of salt is 8 bytes');
@@ -103,6 +106,7 @@ class Blake2sHash extends BlockHash {
         state[5] ^= (salt[i] & 0xFF) << p;
       }
     }
+
     if (personalization != null && personalization.isNotEmpty) {
       if (personalization.length != 8) {
         throw ArgumentError('The valid length of personalization is 8 bytes');
@@ -114,6 +118,14 @@ class Blake2sHash extends BlockHash {
         state[7] ^= (personalization[i] & 0xFF) << p;
       }
     }
+
+    _initialState = state.toList(growable: false);
+  }
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, _initialState);
   }
 
   @override

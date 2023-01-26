@@ -10,70 +10,75 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// This implementation is derived from the RFC document
 /// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
 ///
-/// [rfc2104]: https://www.rfc-editor.org/rfc/rfc2104
+/// [rfc2104]: https://www.ietf.org/rfc/rfc2104.html
 class HMACSink implements HashDigestSink {
-  final BlockHash outer;
-  final BlockHash inner;
+  final BlockHashSink sink;
+  final Uint8List outerKey;
+  bool _closed = false;
+  HashDigest? _digest;
+
+  HMACSink._(this.sink, this.outerKey);
 
   factory HMACSink(HashBase algo, List<int> key) {
-    var outer = algo.createSink();
-    var inner = algo.createSink();
-    if (outer is! BlockHash || inner is! BlockHash) {
-      throw StateError('Only block hashes are supported for HMAC');
+    var sink = algo.createSink();
+    if (sink is! BlockHashSink) {
+      throw StateError('Only Block Hashes are supported for MAC generation');
     }
 
-    var paddedKey = Uint8List(outer.blockLength);
+    int i;
+    var paddedKey = Uint8List(sink.blockLength);
 
     // Keys longer than blockLength are shortened by hashing them
-    if (key.length > outer.blockLength) {
-      key = algo.convert(key).bytes;
+    if (key.length > sink.blockLength) {
+      sink.add(key);
+      key = sink.digest().bytes;
+      sink.reset();
     }
-
-    // Calculated padded key for outer sink
-    for (var i = 0; i < key.length; i++) {
-      paddedKey[i] = key[i] ^ 0x5c;
-    }
-    for (var i = key.length; i < paddedKey.length; i++) {
-      paddedKey[i] = 0x5c;
-    }
-    outer.add(paddedKey);
 
     // Calculated padded key for inner sink
-    for (var i = 0; i < key.length; i++) {
+    for (i = 0; i < key.length; i++) {
       paddedKey[i] = key[i] ^ 0x36;
     }
-    for (var i = key.length; i < paddedKey.length; i++) {
+    for (; i < paddedKey.length; i++) {
       paddedKey[i] = 0x36;
     }
-    inner.add(paddedKey);
+    sink.add(paddedKey);
 
-    return HMACSink._(
-      outer: outer,
-      inner: inner,
-    );
+    // Calculated padded key for outer sink
+    for (i = 0; i < key.length; i++) {
+      paddedKey[i] = key[i] ^ 0x5c;
+    }
+    for (; i < paddedKey.length; i++) {
+      paddedKey[i] = 0x5c;
+    }
+
+    return HMACSink._(sink, paddedKey);
   }
 
-  HMACSink._({
-    required this.outer,
-    required this.inner,
-  });
+  @override
+  bool get closed => _closed;
 
   @override
-  bool get closed => outer.closed;
-
-  @override
-  int get hashLength => outer.hashLength;
+  int get hashLength => sink.hashLength;
 
   @override
   void add(List<int> data, [int start = 0, int? end]) {
-    inner.add(data, start, end);
+    if (_closed) {
+      throw StateError('The message-digest is already closed');
+    }
+    sink.add(data, start, end);
   }
 
   @override
   HashDigest digest() {
-    if (!outer.closed) {
-      outer.add(inner.digest().bytes);
+    if (_closed) {
+      return _digest!;
     }
-    return outer.digest();
+    _closed = true;
+    var hash = sink.digest().bytes;
+    sink.reset();
+    sink.add(outerKey);
+    sink.add(hash);
+    return _digest = sink.digest();
   }
 }

@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/keccak.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 
 /// Keccak-224 is a member of Keccak family hash functions that generates
 /// a 224-bit hash.
@@ -20,9 +20,9 @@ import 'package:hashlib/src/core/hash_base.dart';
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-const HashBase keccak224 = _Keccak224();
+const BlockHashBase keccak224 = _Keccak224();
 
-class _Keccak224 extends HashBase {
+class _Keccak224 extends BlockHashBase {
   const _Keccak224();
 
   @override

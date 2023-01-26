@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/md5.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// MD5 can be used as a checksum to verify data integrity against unintentional
@@ -12,9 +12,9 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// once, it has been found to suffer from extensive vulnerabilities.
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
-const HashBase md5 = _MD5();
+const BlockHashBase md5 = _MD5();
 
-class _MD5 extends HashBase {
+class _MD5 extends BlockHashBase {
   const _MD5();
 
   @override

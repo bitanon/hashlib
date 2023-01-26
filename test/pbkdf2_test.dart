@@ -1,0 +1,150 @@
+import 'package:hashlib/hashlib.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('PBKDF2 test', () {
+    test("with MD5", () {
+      var hash = PBKDF2(
+        md5,
+        salt: "some salt".codeUnits,
+        iterations: 100,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '592e779487b7c4dc20ca5cd276163bbb760a40960bb17187cd4895238361d201';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-1", () {
+      var hash = PBKDF2(
+        sha1,
+        salt: "some salt".codeUnits,
+        iterations: 100,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          'a001e5ddf0b823ccc74edc957ab881e7924ef5c608956cd7d32606b8d7c8acb1';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-224", () {
+      var hash = PBKDF2(
+        sha224,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '57f86bc67aad5fa335f8f0f8ecd7b550c7f2462502d3058897299f49111f8948';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-256", () {
+      var hash = PBKDF2(
+        sha256,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '09d106dccc35eae63c48aa472394de511547ce296ab55685b7ba8b304bec68fe';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-384", () {
+      var hash = PBKDF2(
+        sha384,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '6091b46523e28ffa34d777f81c9ef446cd2983601a6dbdd8cc63aa0fa461b624';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-512", () {
+      var hash = PBKDF2(
+        sha512,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '05f45e131d21985a38c25cb30c9edee0bfe697d19fb84a0d55e89e2a347c7905';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-512/224", () {
+      var hash = PBKDF2(
+        sha512t224,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '7b03e2f53046cf52a0d8ace8f469bef3fdbe0a2b4b112b10586d33119a98aa94';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA-512/256", () {
+      var hash = PBKDF2(
+        sha512t256,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '73b02a03a67fe08ab8fee80f2d135f4afb954380406994b0f2670a0f5d0c7faa';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA3-224", () {
+      var hash = PBKDF2(
+        sha3_224,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '3543a75506759d603c2058847f39969f8d6c164ebc50c53eb44f290c7835521c';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA3-256", () {
+      var hash = PBKDF2(
+        sha3_256,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          'c4aae4cbf79071757bf167a8cff387a615295bed94320d394e9ed15a4b53a9c1';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA3-384", () {
+      var hash = PBKDF2(
+        sha3_384,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          'e39eef6add54c1b1cddb35dcf44cce8163941b1e73a26bd6f422dbdf4a98b7c0';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with SHA3-512", () {
+      var hash = PBKDF2(
+        sha3_512,
+        salt: "some salt".codeUnits,
+        iterations: 50,
+        keyLength: 32,
+      ).convert('password'.codeUnits);
+      var matcher =
+          '349d16a5e9cb37d277c0d05235c63bf1d094367c27968262d9d9460d96bbed79';
+      expect(hash.hex(), matcher);
+    });
+  });
+}

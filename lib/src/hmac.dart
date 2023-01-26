@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/hmac.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
 /// HMAC is a hash-based message authentication code that can be used to
@@ -19,7 +20,7 @@ class HMAC extends HashBase {
 }
 
 /// Extension to the HashBase to get an [HMAC] instance
-extension HashBaseToHMAC on HashBase {
+extension HashBaseToHMAC on BlockHashBase {
   /// Get an [HMAC] instance for this hash algorithm.
   ///
   /// HMAC is a hash-based message authentication code that can be used to

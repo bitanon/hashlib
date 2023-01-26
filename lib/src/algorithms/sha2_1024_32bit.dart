@@ -61,9 +61,9 @@ const int _t5 = _t4 + 2;
 /// specially to be supported by Web VM. It is albeit slower than the native
 /// implementation.
 ///
-/// [rfc6234]: https://www.rfc-editor.org/rfc/rfc6234
+/// [rfc6234]: https://www.ietf.org/rfc/rfc6234.html
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-class SHA2of1024 extends BlockHash {
+class SHA2of1024 extends BlockHashSink {
   final List<int> seed;
   final Uint32List state;
   final Uint32List chunk;
@@ -79,6 +79,12 @@ class SHA2of1024 extends BlockHash {
   })  : chunk = Uint32List(160),
         state = Uint32List.fromList(seed),
         super(1024 >>> 3);
+
+  @override
+  void reset() {
+    super.reset();
+    state.setAll(0, seed);
+  }
 
   /// z = x ^ y
   static void _xor(List<int> x, int i, List<int> y, int j, List<int> z, int k) {

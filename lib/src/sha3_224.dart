@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha3.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA3-224 is a member of SHA-3 family which uses 224-bit blocks to
@@ -18,9 +18,9 @@ import 'package:hashlib/src/core/hash_digest.dart';
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-const HashBase sha3_224 = _SHA3d224();
+const BlockHashBase sha3_224 = _SHA3d224();
 
-class _SHA3d224 extends HashBase {
+class _SHA3d224 extends BlockHashBase {
   const _SHA3d224();
 
   @override

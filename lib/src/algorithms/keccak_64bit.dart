@@ -71,7 +71,7 @@ const _rc = <int>[
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
 /// [keccak]: https://github.com/Legrandin/pycryptodome/blob/master/src/keccak.c
 /// [tiny_sha3]: https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
-class KeccakHash extends BlockHash {
+class KeccakHash extends BlockHashSink {
   final int stateSize;
   final int paddingByte;
   late final Uint64List qstate;
@@ -83,16 +83,21 @@ class KeccakHash extends BlockHash {
     required this.stateSize,
     required this.paddingByte,
     int? outputSize, // equals to state size if not provided
-  })  : assert(
-          stateSize >= 0 && stateSize <= 100,
-          'The state size is not valid',
-        ),
-        hashLength = outputSize ?? stateSize,
+  })  : hashLength = outputSize ?? stateSize,
         super(
           200 - (stateSize << 1), // rate as blockLength
           bufferLength: 200, // 1600-bit state as buffer
         ) {
+    if (stateSize < 0 || stateSize > 100) {
+      throw ArgumentError('The state size is not valid');
+    }
     qstate = buffer.buffer.asUint64List();
+  }
+
+  @override
+  void reset() {
+    super.reset();
+    buffer.fillRange(0, buffer.length, 0);
   }
 
   /// Rotates 64-bit number x by n bits

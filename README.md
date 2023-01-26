@@ -14,15 +14,16 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Secure Hash Functions
 
-| Algorithm | Available Methods                                                   | Source      |
-| --------- | ------------------------------------------------------------------- | ----------- |
-| MD5       | `md5`                                                               | RFC-1321    |
-| SHA-1     | `sha1`                                                              | RFC-3174    |
-| SHA-2     | `sha224`,`sha256`,`sha384`,`sha512`, `sha512t224`, `sha512t256`     | RCC-6234    |
-| SHA-3     | `sha3_224`,`sha3_256`,`sha3_384`,`sha3_512`, `shake128`, `shake256` | FIPS-202    |
-| Keccak    | `keccak224`,`keccak256`,`keccak384`,`keccak512`                     | Team Keccak |
-| Blake2b   | `blake2b160`,`blake2b256`,`blake2b384`, `blake2b512`                | RFC-7693    |
-| Blake2s   | `blake2s128`,`blake2s160`,`blake2s224`,`blake2s256`                 | RFC-7693    |
+| Algorithm | Available Class/Methods                                            | Source      |
+| --------- | ------------------------------------------------------------------ | ----------- |
+| MD5       | `md5`                                                              | RFC-1321    |
+| SHA-1     | `sha1`                                                             | RFC-3174    |
+| SHA-2     | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RCC-6234    |
+| SHA-3     | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
+| SHAKE     | `Shake128`, `Shake256`, `shake128`, `shake256`                     | FIPS-202    |
+| Keccak    | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 | Team Keccak |
+| Blake2b   | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             | RFC-7693    |
+| Blake2s   | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             | RFC-7693    |
 
 <!--
 | `blake3`     |   ⌛    |        |
@@ -32,11 +33,20 @@ This library contains implementations of secure hash functions, checksum generat
 | `whirlpool` |    ⌛     |       |
 -->
 
+### Message Authentication Code (MAC) generators
+
+| Algorithms | Available Class/Methods  | Source   |
+| ---------- | ------------------------ | -------- |
+| HMAC       | `HMAC`, `hmac`, `hmacBy` | RFC-2104 |
+
+<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
+
 ### Password Hashing / Key Derivation
 
-| Algorithm | Available Methods                | Source   |
-| --------- | -------------------------------- | -------- |
-| Argon2    | `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
+| Algorithm | Available Class/Methods                    | Source   |
+| --------- | ------------------------------------------ | -------- |
+| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
+| PBKDF2    | `PBKDF2`, `pbkdf2`                         | RFC-9106 |
 
 <!--
 | `pbkdf2_hmac` |    ⌛     |       |
@@ -44,14 +54,6 @@ This library contains implementations of secure hash functions, checksum generat
 | `scrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
 -->
-
-### Message Authentication Code (MAC) generators
-
-| Algorithms | Available Methods | Source   |
-| ---------- | ----------------- | -------- |
-| HMAC       | `hmac`            | RFC-2104 |
-
-<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
 
 ### Checksum Algorithms
 

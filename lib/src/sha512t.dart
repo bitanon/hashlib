@@ -4,13 +4,13 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 
 /// SHA-512/256 is a variation of SHA-512 which uses 512-bit internal state to
 /// generate a message digest of 256-bit long truncating the last bits.
-const HashBase sha512t256 = _SHA512t256();
+const BlockHashBase sha512t256 = _SHA512t256();
 
-class _SHA512t256 extends HashBase {
+class _SHA512t256 extends BlockHashBase {
   const _SHA512t256();
 
   @override
@@ -19,9 +19,9 @@ class _SHA512t256 extends HashBase {
 
 /// SHA-512/224 is a variation of SHA-512 which uses 512-bit internal state to
 /// generate a message digest of 224-bit long truncating the last bits.
-const HashBase sha512t224 = _SHA512t224();
+const BlockHashBase sha512t224 = _SHA512t224();
 
-class _SHA512t224 extends HashBase {
+class _SHA512t224 extends BlockHashBase {
   const _SHA512t224();
 
   @override

@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 
 /// SHA-384 is a member of SHA-2 family which uses 512-bit internal state to
 /// generate a message digest of 384-bit long.
@@ -14,9 +14,9 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// [FIPS 180-4][fips180].
 ///
 /// [fips180]: https://csrc.nist.gov/publications/detail/fips/180/4/final
-const HashBase sha384 = _SHA384();
+const BlockHashBase sha384 = _SHA384();
 
-class _SHA384 extends HashBase {
+class _SHA384 extends BlockHashBase {
   const _SHA384();
 
   @override
