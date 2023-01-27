@@ -165,7 +165,7 @@ class Argon2Security {
   /// Get Argon2 parameters optimized for security on the current device. This
   /// function may take `50 * desiredRuntime` amount of time to compute.
   ///
-  /// Here is the method used to compute these parameters:
+  /// Here is how it computes these parameters:
   ///
   /// - Pick a [desiredRuntime] for optimization. Recommended is at least 1s.
   ///   Higher runtime means more safety against a brute-force attack.
@@ -175,12 +175,13 @@ class Argon2Security {
   /// - Now check how many passes [t] can be done within the [desiredRuntime].
   static Future<Argon2Security> optimize(
     Duration desiredRuntime, {
-    int strictness = 100,
+    int strictness = 10,
     int saltLength = 16,
     int hashLength = 32,
     int maxMemoryAsPowerOf2 = 22,
     Argon2Type type = Argon2Type.argon2i,
     Argon2Version version = Argon2Version.v13,
+    bool verbose = false,
   }) async {
     if (strictness < 1) {
       throw ArgumentError('Strictness value must be at least 1');
@@ -189,70 +190,84 @@ class Argon2Security {
       throw ArgumentError('Max memory as power of 2 must be at least 3');
     }
 
+    var watch = Stopwatch()..start();
     var salt = List.filled(saltLength, 1);
     var password = List.filled(4 * saltLength, 2);
     int target = desiredRuntime.inMicroseconds;
 
     // maximize memory
-    int pow = 3, lanes = 1;
+    int pow = 3, memory, lanes = 1, passes = 1;
     for (; pow <= maxMemoryAsPowerOf2; pow++) {
-      lanes = min(16, 1 << (pow - 3));
-      var samples = await Future.wait(
-        List.generate(10, (_) async {
-          var watch = Stopwatch();
-          var f = Argon2(
-            salt: salt,
-            hashLength: hashLength,
-            type: type,
-            version: version,
-            iterations: 1,
-            memorySizeKB: 1 << pow,
-            parallelism: lanes,
-          );
-          watch.start();
-          f.convert(password);
-          return watch.elapsedMicroseconds;
-        }),
-      );
+      memory = 1 << pow;
+      lanes = min(16, memory >> 3);
+      var samples = List.generate(10, (_) {
+        var f = Argon2(
+          salt: salt,
+          hashLength: hashLength,
+          type: type,
+          version: version,
+          iterations: passes,
+          parallelism: lanes,
+          memorySizeKB: memory,
+        );
+        watch.reset();
+        f.convert(password);
+        return watch.elapsedMicroseconds;
+      });
       int best = samples.fold(samples.first, min);
-      int factor = (strictness * target / best).round();
-      print("2^$pow ~ $best us | diff: ${target - best} us");
-      if (factor < strictness) {
-        pow--;
+      if (verbose) {
+        int delta = target - best;
+        print("[Argon2Security] t=$passes,p=$lanes,m=$memory ~ $delta us");
+      }
+      if ((strictness * target / best).round() < strictness) {
+        if (pow > 12) {
+          pow -= 2;
+        } else {
+          pow--;
+        }
         break;
       }
     }
 
     // found the maximum memory
-    int memory = 1 << pow;
+    memory = 1 << pow;
 
     // now maximize the passes
-    int passes = 2;
-    for (;; passes++) {
-      var samples = await Future.wait(
-        List.generate(10, (_) async {
-          var watch = Stopwatch();
-          var f = Argon2(
-            salt: salt,
-            hashLength: hashLength,
-            type: type,
-            version: version,
-            iterations: passes,
-            parallelism: lanes,
-            memorySizeKB: memory,
-          );
-          watch.start();
-          f.convert(password);
-          return watch.elapsedMicroseconds;
-        }),
-      );
+    for (passes++;; passes++) {
+      var samples = List.generate(10, (_) {
+        var f = Argon2(
+          salt: salt,
+          hashLength: hashLength,
+          type: type,
+          version: version,
+          iterations: passes,
+          parallelism: lanes,
+          memorySizeKB: memory,
+        );
+        watch.reset();
+        f.convert(password);
+        return watch.elapsedMicroseconds;
+      });
       int best = samples.fold(samples.first, min);
-      int factor = (strictness * target / best).round();
-      print("$passes ~ $best us | diff: ${target - best} us");
-      if (factor < strictness) {
+      if (verbose) {
+        int delta = target - best;
+        print("[Argon2Security] t=$passes,p=$lanes,m=$memory ~ $delta us");
+      }
+      if ((strictness * target / best).round() < strictness) {
         passes--;
         break;
       }
+    }
+    if (passes == 1 && pow > 10) {
+      pow++;
+      memory = 1 << pow;
+    }
+
+    if (verbose) {
+      print('[Argon2Security] ------------');
+      print('[Argon2Security] t: $passes');
+      print('[Argon2Security] p: $lanes');
+      print('[Argon2Security] m: $memory (2^$pow)');
     }
 
     return Argon2Security('optimized', m: memory, t: passes, p: lanes);

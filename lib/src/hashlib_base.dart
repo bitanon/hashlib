@@ -1,3 +1,6 @@
+// Copyright (c) 2021, Sudipto Chandra
+// All rights reserved. Check LICENSE file for details.
+
 export 'alder32.dart';
 export 'argon2.dart';
 export 'blake2b.dart';

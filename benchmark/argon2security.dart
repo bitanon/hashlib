@@ -4,11 +4,13 @@
 import 'package:hashlib/hashlib.dart';
 
 void main() async {
+  var target = Duration(milliseconds: 100);
   var watch = Stopwatch()..start();
   var optimized = await Argon2Security.optimize(
-    Duration(milliseconds: 5000),
+    target,
+    verbose: false,
   );
-  print(watch.elapsed.inSeconds);
+  print(watch.elapsedMilliseconds / target.inMilliseconds);
   watch.reset();
   print(argon2i(
     "password".codeUnits,

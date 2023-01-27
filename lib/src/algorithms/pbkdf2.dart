@@ -55,6 +55,10 @@ class PBKDF2 extends KeyDerivatorBase {
     );
   }
 
+  /// Generate a derived key using the [mac] function.
+  ///
+  /// This function will throw an [StateError] if the [mac] is not initialized
+  /// and the [password] is not provided.
   @override
   HashDigest convert([List<int>? password]) {
     int i, j, k, t;

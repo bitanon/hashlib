@@ -53,6 +53,9 @@ class HMACSink extends MACSinkBase {
   bool get closed => _closed;
 
   @override
+  bool get initialized => _initialized;
+
+  @override
   int get hashLength => sink.hashLength;
 
   /// The internal block length of the algorithm in bytes
