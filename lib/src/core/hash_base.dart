@@ -8,13 +8,61 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_digest.dart';
 
-/// The base class used by the hash algorithm implementations
+/// This sink allows adding arbitrary length byte arrays
+/// and produces a [HashDigest] on [close].
+abstract class HashDigestSink implements Sink<List<int>> {
+  const HashDigestSink();
+
+  /// Returns true if the sink is closed, false otherwise
+  bool get closed;
+
+  /// The length of generated hash in bytes
+  int get hashLength;
+
+  /// Adds [data] to the message-digest.
+  ///
+  /// Throws [StateError], if it is called after closing the digest.
+  @override
+  void add(List<int> data, [int start = 0, int? end]);
+
+  /// Finalizes the message-digest. It calls [digest] method internally.
+  @override
+  void close() => digest();
+
+  /// Finalizes the message-digest and returns a [HashDigest]
+  HashDigest digest();
+
+  /// Resets the current state to start from fresh state
+  void reset();
+}
+
+/// The base class used by the hash algorithm implementations. It implements
+/// the [StreamTransformer] and exposes few convenient methods to handle any
+/// types of data source.
 abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   const HashBase();
 
   /// Create a [HashDigestSink] for generating message-digests
   HashDigestSink createSink();
 
+  /// Transforms the byte array input stream to generate a new stream
+  /// which contains a single [HashDigest]
+  ///
+  /// The expected behavior of this method is described below:
+  ///
+  /// - When the returned stream has a subscriber (calling [Stream.listen]),
+  ///   the message-digest generation begins from the input [stream].
+  /// - If the returned stream is paused, the processing of the input [stream]
+  ///   is also paused, and on resume, it continue processing from where it was
+  ///   left off.
+  /// - If the returned stream is cancelled, the subscription to the input
+  ///   [stream] is also cancelled.
+  /// - When the input [stream] is closed, the returned stream also gets closed
+  ///   with a [HashDigest] data. The returned stream may produce only one
+  ///   such data event in its life-time.
+  /// - On error reading the input [stream], or while processing the message
+  ///   digest, the subscription to input [stream] cancels immediately and the
+  ///   returned stream closes with an error event.
   @override
   Stream<HashDigest> bind(Stream<List<int>> stream) {
     bool _paused = false;
@@ -72,18 +120,17 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   }
 
   @override
-  StreamTransformer<RS, RT> cast<RS, RT>() {
-    throw UnimplementedError('This stream can not be cast');
-  }
+  StreamTransformer<RS, RT> cast<RS, RT>() =>
+      StreamTransformer.castFrom<List<int>, HashDigest, RS, RT>(this);
 
-  /// Converts the byte array [input] and returns a [HashDigest].
+  /// Process the byte array [input] and returns a [HashDigest].
   HashDigest convert(List<int> input) {
     var sink = createSink();
     sink.add(input);
     return sink.digest();
   }
 
-  /// Converts the [input] string and returns a [HashDigest].
+  /// Process the [input] string and returns a [HashDigest].
   ///
   /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
   HashDigest string(String input, [Encoding? encoding]) {
@@ -97,17 +144,17 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
     return sink.digest();
   }
 
-  /// Consume the entire [stream] of byte array and generate a HashDigest.
+  /// Consumes the entire [stream] of byte array and generates a [HashDigest].
   Future<HashDigest> consume(Stream<List<int>> stream) {
     return bind(stream).first;
   }
 
-  /// Consume the entire [stream] of string and generate a HashDigest.
+  /// Consumes the entire [stream] of string and generates a [HashDigest].
   ///
-  /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
+  /// Default [encoding] scheme to get the input bytes is [latin1].
   Future<HashDigest> consumeAs(
     Stream<String> stream, [
-    Encoding encoding = utf8,
+    Encoding encoding = latin1,
   ]) {
     return bind(stream.transform(encoding.encoder)).first;
   }
@@ -152,50 +199,5 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
     } finally {
       raf.closeSync();
     }
-  }
-}
-
-abstract class HashDigestSink {
-  const HashDigestSink();
-
-  /// Returns true if the sink is closed, false otherwise
-  bool get closed;
-
-  /// The length of generated hash in bytes
-  int get hashLength;
-
-  /// Adds [data] to the message-digest.
-  ///
-  /// The [addSlice] function is preferred over [add]
-  ///
-  /// Throws [StateError], if it is called after closing the digest.
-  void add(List<int> data, [int start = 0, int? end]);
-
-  /// Finalizes the message-digest and returns a [HashDigest]
-  HashDigest digest();
-}
-
-abstract class KeyDerivationFunction {
-  const KeyDerivationFunction();
-
-  /// The length of derived key in bytes
-  int get derivedKeyLength;
-
-  /// Generate a derived key from a [password]
-  HashDigest convert(List<int> password);
-
-  /// Verify if the [derivedKey] was derived from the original [password]
-  /// using the current parameters.
-  bool verify(List<int> derivedKey, List<int> password) {
-    if (derivedKey.length != derivedKeyLength) {
-      return false;
-    }
-    var other = convert(password).bytes;
-    for (int i = 0; i < other.length; ++i) {
-      if (derivedKey[i] != other[i]) {
-        return false;
-      }
-    }
-    return true;
   }
 }

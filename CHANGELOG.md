@@ -1,16 +1,17 @@
 ## 1.7.0
 
 - Renames `Argon2Security.small` -> `Argon2Security.little`
-- Adds `Argon2Security.optimize` method to find optimal parameters for a desired runtime
-- Define `KeyDerivationFunction` and extend it for `Argon2`
-- Modify internal structure of `Argon2` to make it faster
-- Implement `reset` functionality for all hash sinks
-- Define and use `BlockHashBase` for some algorithms
+- Adds `Argon2Security.optimize` method to find optimal parameters for a desired runtime.
+- Define `KeyDerivator` and extend it for `Argon2`
+- Modify internal structure of `Argon2` to make it faster.
+- Implement `reset` functionality for all hash sinks.
+- Define and use `BlockHashBase` for some algorithms.
 - Renames `BlockHash` -> `BlockHashSink`
-- Replaces the RFC links to ietf domain
-- Adds PBKDF2 with HMAC key derivation function:
-  - `PBKDF2`
-  - Adds extension to `HashBase` for it
+- Replaces the RFC links to ietf domain.
+- Adds `PBKDF2` key derivator.
+- Adds extension to `HMAC` to create `PBKDF2` instance.
+- Define `MACSinkBase` for Message Authentication Code generators.
+- Reset features for `crc16`, `crc32`, `crc64`, `alder32`, and `hmac` internal sinks.
 
 ## 1.6.1
 

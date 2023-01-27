@@ -8,12 +8,9 @@ import 'package:hashlib/src/core/hash_digest.dart';
 
 final Map<int, Uint16List> _tables = {};
 
-class CRC16Hash implements HashDigestSink {
+class CRC16Hash extends HashDigestSink {
   final int seed;
   final Uint16List table;
-
-  @override
-  final int hashLength = 2;
 
   int _crc;
   HashDigest? _digest;
@@ -26,7 +23,17 @@ class CRC16Hash implements HashDigestSink {
         table = _generate16(polynomial);
 
   @override
+  final int hashLength = 2;
+
+  @override
   bool get closed => _closed;
+
+  @override
+  void reset() {
+    _closed = false;
+    _digest = null;
+    _crc = seed;
+  }
 
   @override
   void add(List<int> data, [int start = 0, int? end]) {

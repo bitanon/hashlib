@@ -4,8 +4,8 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
+import 'package:hashlib/src/core/kdf_base.dart';
 import 'package:hashlib/src/core/utils.dart';
 
 import 'argon2_64bit.dart' if (dart.library.js) 'argon2_32bit.dart';
@@ -61,7 +61,7 @@ enum Argon2Version {
 ///
 /// [phc]: https://www.password-hashing.net/
 /// [wiki]: https://en.wikipedia.org/wiki/Argon2
-abstract class Argon2 extends KeyDerivationFunction {
+abstract class Argon2 extends KeyDerivatorBase {
   /// Argon2 Hash Type
   final Argon2Type type;
 

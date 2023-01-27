@@ -10,17 +10,17 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// HMAC is a hash-based message authentication code that can be used to
 /// simultaneously verify both the data integrity and authenticity of a message.
 class HMAC extends HashBase {
-  final HashBase algo;
   final List<int> key;
+  final BlockHashBase algo;
 
   const HMAC(this.algo, this.key);
 
   @override
-  HMACSink createSink() => HMACSink(algo, key);
+  HMACSink createSink() => HMACSink(algo.createSink())..init(key);
 }
 
-/// Extension to the HashBase to get an [HMAC] instance
-extension HashBaseToHMAC on BlockHashBase {
+/// Extension on [BlockHashBase] to get an [HMAC] instance
+extension HMAConBlockHashBase on BlockHashBase {
   /// Get an [HMAC] instance for this hash algorithm.
   ///
   /// HMAC is a hash-based message authentication code that can be used to

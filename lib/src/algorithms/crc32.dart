@@ -11,12 +11,9 @@ final Map<int, Uint32List> _tables = {};
 /// A CRC-32 code generator with IEEE 802.3 CRC-32 polynomial.
 ///
 /// Reference: https://pkg.go.dev/hash/crc32
-class CRC32Hash implements HashDigestSink {
+class CRC32Hash extends HashDigestSink {
   final int seed;
   final Uint32List table;
-
-  @override
-  final int hashLength = 4;
 
   int _crc;
   HashDigest? _digest;
@@ -29,7 +26,17 @@ class CRC32Hash implements HashDigestSink {
         table = _generate32(polynomial);
 
   @override
+  final int hashLength = 4;
+
+  @override
   bool get closed => _closed;
+
+  @override
+  void reset() {
+    _closed = false;
+    _digest = null;
+    _crc = seed;
+  }
 
   @override
   void add(List<int> data, [int start = 0, int? end]) {

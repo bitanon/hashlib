@@ -4,55 +4,49 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
+import 'package:hashlib/src/core/mac_base.dart';
 
 /// This implementation is derived from the RFC document
 /// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
 ///
 /// [rfc2104]: https://www.ietf.org/rfc/rfc2104.html
-class HMACSink implements HashDigestSink {
+class HMACSink extends MACSinkBase {
   final BlockHashSink sink;
+  final Uint8List innerKey;
   final Uint8List outerKey;
-  bool _closed = false;
+
   HashDigest? _digest;
+  bool _closed = false;
+  bool _initialized = false;
 
-  HMACSink._(this.sink, this.outerKey);
+  HMACSink(this.sink)
+      : innerKey = Uint8List(sink.blockLength),
+        outerKey = Uint8List(sink.blockLength);
 
-  factory HMACSink(HashBase algo, List<int> key) {
-    var sink = algo.createSink();
-    if (sink is! BlockHashSink) {
-      throw StateError('Only Block Hashes are supported for MAC generation');
-    }
-
-    int i;
-    var paddedKey = Uint8List(sink.blockLength);
-
+  @override
+  void init(List<int> key) {
     // Keys longer than blockLength are shortened by hashing them
     if (key.length > sink.blockLength) {
+      sink.reset();
       sink.add(key);
       key = sink.digest().bytes;
-      sink.reset();
     }
 
-    // Calculated padded key for inner sink
-    for (i = 0; i < key.length; i++) {
-      paddedKey[i] = key[i] ^ 0x36;
+    // Calculated padded keys for inner and outer sinks
+    int i = 0;
+    for (; i < key.length; i++) {
+      innerKey[i] = key[i] ^ 0x36;
+      outerKey[i] = key[i] ^ 0x5c;
     }
-    for (; i < paddedKey.length; i++) {
-      paddedKey[i] = 0x36;
-    }
-    sink.add(paddedKey);
-
-    // Calculated padded key for outer sink
-    for (i = 0; i < key.length; i++) {
-      paddedKey[i] = key[i] ^ 0x5c;
-    }
-    for (; i < paddedKey.length; i++) {
-      paddedKey[i] = 0x5c;
+    for (; i < sink.blockLength; i++) {
+      innerKey[i] = 0x36;
+      outerKey[i] = 0x5c;
     }
 
-    return HMACSink._(sink, paddedKey);
+    sink.reset();
+    sink.add(innerKey);
+    _initialized = true;
   }
 
   @override
@@ -61,8 +55,28 @@ class HMACSink implements HashDigestSink {
   @override
   int get hashLength => sink.hashLength;
 
+  /// The internal block length of the algorithm in bytes
+  int get blockLength => sink.blockLength;
+
+  /// The message length in bytes
+  int get messageLength => sink.messageLength;
+
+  @override
+  void reset() {
+    if (!_initialized) {
+      throw StateError('The MAC instance is not initialized');
+    }
+    _closed = false;
+    _digest = null;
+    sink.reset();
+    sink.add(innerKey);
+  }
+
   @override
   void add(List<int> data, [int start = 0, int? end]) {
+    if (!_initialized) {
+      throw StateError('The MAC instance is not initialized');
+    }
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
@@ -71,6 +85,9 @@ class HMACSink implements HashDigestSink {
 
   @override
   HashDigest digest() {
+    if (!_initialized) {
+      throw StateError('The MAC instance is not initialized');
+    }
     if (_closed) {
       return _digest!;
     }

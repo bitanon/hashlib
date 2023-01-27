@@ -15,9 +15,6 @@ class CRC64Hash extends HashDigestSink {
   final int seedHigh, seedLow;
   final Uint32List table;
 
-  @override
-  final int hashLength = 8;
-
   int high, low;
   HashDigest? _digest;
   bool _closed = false;
@@ -33,6 +30,17 @@ class CRC64Hash extends HashDigestSink {
 
   @override
   bool get closed => _closed;
+
+  @override
+  final int hashLength = 8;
+
+  @override
+  void reset() {
+    _closed = false;
+    _digest = null;
+    high = seedHigh;
+    low = seedLow;
+  }
 
   @override
   void add(List<int> data, [int start = 0, int? end]) {

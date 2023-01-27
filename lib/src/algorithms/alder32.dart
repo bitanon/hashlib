@@ -12,18 +12,26 @@ const int _alder32Mod = 65521;
 /// Specification version 3.3][rfc]
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc1950.html
-class Alder32Hash implements HashDigestSink {
+class Alder32Hash extends HashDigestSink {
   int a = 1, b = 0;
   HashDigest? _digest;
   bool _closed = false;
 
-  @override
-  final int hashLength = 4;
-
   Alder32Hash();
 
   @override
+  final int hashLength = 4;
+
+  @override
   bool get closed => _closed;
+
+  @override
+  void reset() {
+    _closed = false;
+    _digest = null;
+    a = 1;
+    b = 0;
+  }
 
   @override
   void add(List<int> data, [int start = 0, int? end]) {
