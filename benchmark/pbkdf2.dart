@@ -20,9 +20,9 @@ class HashlibBenchmark extends Benchmark {
   @override
   void run() {
     hashlib.sha256.pbkdf2(
-      password: input,
-      salt: salt,
-      iterations: iter,
+      input,
+      salt,
+      iter,
       keyLength: 64,
     );
   }

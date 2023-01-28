@@ -128,7 +128,7 @@ class Argon2Internal extends Argon2 {
     //         LE32(v) || LE32(y) || LE32(length(P)) || P ||
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
     //         LE32(length(X)) || X)
-    var blake2b = Blake2bHash(digestSize: 64);
+    var blake2b = Blake2bHash(64);
     blake2b.addUint32(lanes);
     blake2b.addUint32(hashLength);
     blake2b.addUint32(memorySizeKB);
@@ -164,7 +164,7 @@ class Argon2Internal extends Argon2 {
 
     // Take smaller hash unchanged
     if (digestSize <= 64) {
-      var blake2b = Blake2bHash(digestSize: digestSize);
+      var blake2b = Blake2bHash(digestSize);
       blake2b.addUint32(digestSize);
       blake2b.add(message);
       var hash = blake2b.digest().bytes;
@@ -177,7 +177,7 @@ class Argon2Internal extends Argon2 {
     // Otherwise, expand to digestSize by repeatedly hashing
     // and taking the first 32-bytes from the each hash
 
-    var blake2b = Blake2bHash(digestSize: 64);
+    var blake2b = Blake2bHash(64);
     blake2b.addUint32(digestSize);
     blake2b.add(message);
     var hash = blake2b.digest().bytes;

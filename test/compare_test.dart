@@ -4,12 +4,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/utils.dart';
-import 'package:crypto/crypto.dart' as crypto;
-import 'package:pointycastle/digests/sha3.dart' as pc_sha3;
-import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
 import 'package:pointycastle/digests/blake2b.dart' as pc_blake2b;
+import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
+import 'package:pointycastle/digests/sha3.dart' as pc_sha3;
 import 'package:test/test.dart';
 
 void main() {
@@ -35,7 +35,7 @@ void main() {
           key: Uint8List.fromList(key),
         );
         expect(
-          toHex(Blake2b(key: key).convert(data).bytes),
+          toHex(blake2b512.config(key: key).convert(data).bytes),
           toHex(b.process(Uint8List.fromList(data))),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
@@ -51,7 +51,7 @@ void main() {
           salt: Uint8List.fromList(salt),
         );
         expect(
-          toHex(Blake2b(salt: salt).convert(data).bytes),
+          toHex(blake2b512.config(salt: salt).convert(data).bytes),
           toHex(b.process(Uint8List.fromList(data))),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );
@@ -67,7 +67,7 @@ void main() {
           personalization: Uint8List.fromList(salt),
         );
         expect(
-          toHex(Blake2b(personalization: salt).convert(data).bytes),
+          toHex(blake2b512.config(personalization: salt).convert(data).bytes),
           toHex(b.process(Uint8List.fromList(data))),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );

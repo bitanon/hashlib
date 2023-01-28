@@ -64,13 +64,13 @@ void main() {
 
     test('with a secret', () {
       expect(
-          Blake2b(key: toBytes('secret')).string("a").hex(),
+          blake2b512.mac(toBytes('secret')).string("a").hex(),
           "4a1f6558272af9c63689a9383883671379cab5ff6a38b69643529bd27c5b61fe"
           "e24bc919c36d1bb3747630bf90d3459a453c2c3bb5775bbe0c15cc324222114c");
     });
     test('with empty string and a secret', () {
       expect(
-          Blake2b(key: toBytes('secret')).string('').hex(),
+          blake2b512.mac(toBytes('secret')).string('').hex(),
           "865aca2ba0b9b941352e4680e14f543d1af37f7a3479304262a5da8c97468d9f"
           "e22636bae941d9c7b83b93efc36e82177606c72a1c00af48bb182c69d1f1abc3");
     });
@@ -86,11 +86,11 @@ void main() {
           "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319");
     });
     test('with empty string and a secret', () {
-      expect(Blake2b.of256(key: toBytes('secret')).string('').hex(),
+      expect(blake2b256.mac(toBytes('secret')).string('').hex(),
           "080989147a9b01f885f00d9b90cee0855cfb08aa68d57dc2c92333b2df70a5ea");
     });
     test('with abc and a secret', () {
-      expect(Blake2b.of256(key: toBytes('secret')).string('abc').hex(),
+      expect(blake2b256.mac(toBytes('secret')).string('abc').hex(),
           "e23c35713e7249f369b7c6f60291c0af9d6ac0231d80f46e13b1313fe7f4a4d5");
     });
   });
@@ -105,11 +105,11 @@ void main() {
           "384264f676f39536840523f284921cdc68b6846b");
     });
     test('with empty string and a secret', () {
-      expect(Blake2b.of160(key: toBytes('secret')).string('').hex(),
+      expect(blake2b160.mac(toBytes('secret')).string('').hex(),
           "f8630ddf0a315edbc8977f2c52040e9cedb70a85");
     });
     test('with abc and a secret', () {
-      expect(Blake2b.of160(key: toBytes('secret')).string('abc').hex(),
+      expect(blake2b160.mac(toBytes('secret')).string('abc').hex(),
           "0c3d973f5f44547f37c0c0c34ae8cd9015c324ef");
     });
   });
@@ -129,13 +129,13 @@ void main() {
     });
     test('with empty string and a secret', () {
       expect(
-          Blake2b.of384(key: toBytes('secret')).string('').hex(),
+          blake2b384.mac(toBytes('secret')).string('').hex(),
           "6f65d5a686d1eb9783f19bc3fe7dbd077d61714ceba63b2d"
           "11594faee11f98950c2c221379d98d397dfe04c697839472");
     });
     test('with abc and a secret', () {
       expect(
-          Blake2b.of384(key: toBytes('secret')).string('abc').hex(),
+          blake2b384.mac(toBytes('secret')).string('abc').hex(),
           "5dad40c5f4f12bde483498c651ce1f5e86e6f47454c953fb"
           "c953c74e34aba9541b689c2000e984c909278304af01c991");
     });

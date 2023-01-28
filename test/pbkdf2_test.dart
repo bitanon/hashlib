@@ -8,9 +8,9 @@ void main() {
   group('PBKDF2 test', () {
     test("with MD5", () {
       var hash = md5.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 100,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        100,
         keyLength: 32,
       );
       var matcher =
@@ -19,21 +19,16 @@ void main() {
     });
 
     test("with MD5 through HMAC", () {
-      var hash = md5.hmacBy('password').pbkdf2(
-            salt: "some salt".codeUnits,
-            iterations: 100,
-            keyLength: 32,
-          );
-      var matcher =
-          '592e779487b7c4dc20ca5cd276163bbb760a40960bb17187cd4895238361d201';
+      var hash = md5.hmacBy('password').pbkdf2("some salt".codeUnits, 100);
+      var matcher = '592e779487b7c4dc20ca5cd276163bbb';
       expect(hash.hex(), matcher);
     });
 
     test("with SHA-1", () {
       var hash = sha1.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 100,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        100,
         keyLength: 32,
       );
       var matcher =
@@ -43,9 +38,9 @@ void main() {
 
     test("with SHA-224", () {
       var hash = sha224.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -55,9 +50,9 @@ void main() {
 
     test("with SHA-256", () {
       var hash = sha256.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -67,9 +62,9 @@ void main() {
 
     test("with SHA-384", () {
       var hash = sha384.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -79,9 +74,9 @@ void main() {
 
     test("with SHA-512", () {
       var hash = sha512.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -91,9 +86,9 @@ void main() {
 
     test("with SHA-512/224", () {
       var hash = sha512t224.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -103,9 +98,9 @@ void main() {
 
     test("with SHA-512/256", () {
       var hash = sha512t256.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -115,9 +110,9 @@ void main() {
 
     test("with SHA3-224", () {
       var hash = sha3_224.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -127,9 +122,9 @@ void main() {
 
     test("with SHA3-256", () {
       var hash = sha3_256.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -139,9 +134,9 @@ void main() {
 
     test("with SHA3-384", () {
       var hash = sha3_384.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =
@@ -151,9 +146,9 @@ void main() {
 
     test("with SHA3-512", () {
       var hash = sha3_512.pbkdf2(
-        password: 'password'.codeUnits,
-        salt: "some salt".codeUnits,
-        iterations: 50,
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
         keyLength: 32,
       );
       var matcher =

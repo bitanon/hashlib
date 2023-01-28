@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/mac_base.dart';
 
 /*
               | BLAKE2s          |
@@ -61,21 +62,20 @@ const _sigma = [
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2sHash extends BlockHashSink {
-  final Uint32List state;
-  late final List<int> _initialState;
+class Blake2sHash extends BlockHashSink with MACSinkBase {
+  final Uint32List state = Uint32List.fromList(_seed);
+  final Uint32List _initialState = Uint32List(_seed.length);
 
   @override
   final int hashLength;
 
   /// For internal use only.
-  Blake2sHash({
-    int digestSize = 32,
+  Blake2sHash(
+    int digestSize, {
     List<int>? key,
     List<int>? salt,
     List<int>? personalization,
   })  : hashLength = digestSize,
-        state = Uint32List.fromList(_seed),
         super(64) {
     if (digestSize < 1 || digestSize > 32) {
       throw ArgumentError('The digest size must be between 1 and 32');
@@ -119,13 +119,30 @@ class Blake2sHash extends BlockHashSink {
       }
     }
 
-    _initialState = state.toList(growable: false);
+    // Save state
+    _initialState.setAll(0, state);
   }
 
   @override
   void reset() {
     super.reset();
     state.setAll(0, _initialState);
+  }
+
+  @override
+  void init(List<int> key) {
+    if (key.length > 64) {
+      throw ArgumentError('The key should not be greater than 64 bytes');
+    }
+    reset();
+    // The first block is the key padded with zeroes
+    buffer.setAll(0, key);
+    pos = blockLength;
+    messageLength += blockLength;
+    // Parameter block
+    state[0] ^= 0x01010000 ^ hashLength ^ (key.length << 8);
+    // Save state
+    _initialState.setAll(0, state);
   }
 
   @override

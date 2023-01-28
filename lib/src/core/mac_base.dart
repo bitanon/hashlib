@@ -4,14 +4,18 @@
 import 'package:hashlib/src/core/hash_base.dart';
 
 abstract class MACSinkBase implements HashDigestSink {
-  const MACSinkBase();
-
-  /// Whether the MAC instance is initialized with a key
-  bool get initialized;
+  /// The length of generated key in bytes
+  int get derivedKeyLength => hashLength;
 
   /// Initialize the MAC sink with the authentication key
   void init(List<int> key);
+}
+
+abstract class MACHashBase extends HashBase {
+  final List<int> key;
+
+  const MACHashBase(this.key);
 
   @override
-  void close() => digest();
+  MACSinkBase createSink();
 }

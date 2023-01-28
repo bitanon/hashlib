@@ -77,49 +77,73 @@ Check the [API Reference](https://pub.dev/documentation/hashlib/latest/) for det
 Examples can be found inside the `example` folder.
 
 ```dart
+import 'dart:convert';
+
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/core/utils.dart';
 
 void main() {
-  // Examples of Hash generation
   var text = "Happy Hashing!";
-  print('[CRC32] $text => ${crc32code(text)}');
-  print('[CRC64] $text => ${crc64code(text)}');
-  print('[MD5] $text => ${md5sum(text)}');
-  print('[SHA-1] $text => ${sha1sum(text)}');
-  print('[SHA-224] $text => ${sha224sum(text)}');
-  print('[SHA-256] $text => ${sha256sum(text)}');
-  print('[SHA-384] $text => ${sha384sum(text)}');
-  print('[SHA-512] $text => ${sha512sum(text)}');
-  print('[SHA-512/224] $text => ${sha512t224sum(text)}');
-  print('[SHA-512/256] $text => ${sha512t256sum(text)}');
-  print('[SHA3-224] $text => ${sha3_224sum(text)}');
-  print('[SHA3-256] $text => ${sha3_256sum(text)}');
-  print('[SHA3-384] $text => ${sha3_384sum(text)}');
-  print('[SHA3-512] $text => ${sha3_512sum(text)}');
-  print('[Keccak-224] $text => ${keccak224sum(text)}');
-  print('[Keccak-256] $text => ${keccak256sum(text)}');
-  print('[Keccak-384] $text => ${keccak384sum(text)}');
-  print('[Keccak-512] $text => ${keccak512sum(text)}');
-  print('[SHAKE-128] $text => ${shake128sum(text, 20)}');
-  print('[SHAKE-256] $text => ${shake256sum(text, 20)}');
-  print('[BLAKE-2s/256] $text => ${blake2s256.string(text)}');
-  print('[BLAKE-2b/512] $text => ${blake2b512.string(text)}');
+  var key = "password";
+  var pw = key.codeUnits;
+  var salt = "some salt".codeUnits;
+  print("text => $text");
+  print("key => $key");
+  print("salt => ${toHex(salt)}");
   print('');
 
-  // Example of HMAC generation
-  var key = "secret";
-  print('HMAC[MD5] $text => ${md5.hmacBy(key).string(text)}');
-  print('HMAC[SHA-1] $text => ${sha1.hmacBy(key).string(text)}');
-  print('HMAC[SHA-256] $text => ${sha256.hmacBy(key).string(text)}');
+  // Examples of Hash generation
+  print('[MD5] => ${md5.string(text)}');
+  print('[SHA-1] => ${sha1.string(text)}');
+  print('[SHA-224] => ${sha224.string(text)}');
+  print('[SHA-256] => ${sha256.string(text)}');
+  print('[SHA-384] => ${sha384.string(text)}');
+  print('[SHA-512] => ${sha512.string(text)}');
+  print('[SHA-512/224] => ${sha512t224.string(text)}');
+  print('[SHA-512/256] => ${sha512t256.string(text)}');
+  print('[SHA3-224] => ${sha3_224.string(text)}');
+  print('[SHA3-256] => ${sha3_256.string(text)}');
+  print('[SHA3-384] => ${sha3_384.string(text)}');
+  print('[SHA3-512] => ${sha3_512.string(text)}');
+  print('[Keccak-224] => ${keccak224.string(text)}');
+  print('[Keccak-256] => ${keccak256.string(text)}');
+  print('[Keccak-384] => ${keccak384.string(text)}');
+  print('[Keccak-512] => ${keccak512.string(text)}');
+  print('[SHAKE-128] => ${shake128.of(20).string(text)}');
+  print('[SHAKE-256] => ${shake256.of(20).string(text)}');
+  print('[BLAKE-2s/256] => ${blake2s256.string(text)}');
+  print('[BLAKE-2b/512] => ${blake2b512.string(text)}');
   print('');
 
-  // Example of Argon2 Password Hashing
-  print("Argon2id encoded: ${argon2id(
-    "password".codeUnits,
-    "some salt".codeUnits,
-    security: Argon2Security.test,
-    hashLength: 16,
-  ).encoded()}");
+  // Examples of MAC generations
+  print('HMAC[MD5] => ${md5.hmac(pw).string(text)}');
+  print('HMAC[MD5] => ${md5.hmacBy(key, utf8).string(text)}');
+  print('HMAC[MD5] => ${md5.hmacBy(key).string(text)}');
+  print('HMAC[MD5] => ${HMAC(md5, pw).string(text)}');
+  print("[BLAKE-2b/256] => ${blake2b256.mac(pw).string(text)}");
+  print("[BLAKE-2b/256] => ${Blake2bMAC(256, pw).string(text)}");
+  print('');
+
+  // Examples of PBKDF2 key derivation
+  print("PBKDF2[HMAC[SHA-256]] => ${sha256.pbkdf2(pw, salt, 100)}");
+  print("PBKDF2[HMAC[SHA-256]] => ${sha256.hmac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[BLAKE-2b-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.pbkdf2(pw, salt, 100)}");
+  print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.hmac(pw).pbkdf2(salt, 100)}");
+  print('');
+
+  // Examples of Argon2 key derivation
+  var security = Argon2Security.test;
+  print("[Argon2i] => ${argon2i(pw, salt, security: security)}");
+  print("[Argon2d] => ${argon2d(pw, salt, security: security)}");
+  print("[Argon2id] => ${argon2id(pw, salt, security: security)}");
+  print('');
+
+  // Example of checksum code generators
+  print('[CRC16] => ${crc16code(text)}');
+  print('[CRC32] => ${crc32code(text)}');
+  print('[CRC64] => ${crc64code(text)}');
+  print('[Alder32] => ${alder32code(text)}');
 }
 ```
 

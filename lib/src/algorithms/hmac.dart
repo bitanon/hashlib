@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
@@ -11,7 +12,7 @@ import 'package:hashlib/src/core/mac_base.dart';
 /// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
 ///
 /// [rfc2104]: https://www.ietf.org/rfc/rfc2104.html
-class HMACSink extends MACSinkBase {
+class HMACSink extends HashDigestSink with MACSinkBase {
   final BlockHashSink sink;
   final Uint8List innerKey;
   final Uint8List outerKey;
@@ -51,9 +52,6 @@ class HMACSink extends MACSinkBase {
 
   @override
   bool get closed => _closed;
-
-  @override
-  bool get initialized => _initialized;
 
   @override
   int get hashLength => sink.hashLength;

@@ -10,8 +10,12 @@
 - Replaces the RFC links to ietf domain.
 - Adds `PBKDF2` key derivator.
 - Adds extension to `HMAC` to create `PBKDF2` instance.
-- Define `MACSinkBase` for Message Authentication Code generators.
+- Define `MACHashBase` and `MACSinkBase` for Message Authentication Code generators.
 - Reset features for `crc16`, `crc32`, `crc64`, `alder32`, and `hmac` internal sinks.
+- Enhance `blake2b` and `blake2s` for MAC generation
+- **Breaking change**:
+  - Accept number of bytes instead of bits for `Blake2b` and `Blake2s`
+  - Removes all `Blake2b.of##` and `Blake2s.of##` methods
 
 ## 1.6.1
 

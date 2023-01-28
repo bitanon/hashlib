@@ -23,7 +23,7 @@ import 'package:hashlib/src/core/mac_base.dart';
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc8018.html#section-5.2
 class PBKDF2 extends KeyDerivatorBase {
   /// The underlying Pseudo Random Function (PRF)
-  final MACSinkBase mac;
+  final MACSinkBase sink;
 
   /// The byte array containing salt
   final List<int> salt;
@@ -34,30 +34,42 @@ class PBKDF2 extends KeyDerivatorBase {
   @override
   final int derivedKeyLength;
 
-  const PBKDF2._(
-    this.mac, {
+  const PBKDF2._({
+    required this.sink,
     required this.salt,
     required this.iterations,
     required this.derivedKeyLength,
   });
 
-  factory PBKDF2(
-    MACSinkBase mac, {
+  factory PBKDF2.sink(
+    MACSinkBase sink,
+    List<int> salt,
+    int iterations, {
     int? keyLength,
-    required List<int> salt,
-    required int iterations,
-  }) {
-    return PBKDF2._(
-      mac,
-      salt: salt,
-      iterations: iterations,
-      derivedKeyLength: keyLength ?? mac.hashLength,
-    );
-  }
+  }) =>
+      PBKDF2._(
+        sink: sink,
+        salt: salt,
+        iterations: iterations,
+        derivedKeyLength: keyLength ?? sink.hashLength,
+      );
 
-  /// Generate a derived key using the [mac] function.
+  factory PBKDF2(
+    MACHashBase mac,
+    List<int> salt,
+    int iterations, {
+    int? keyLength,
+  }) =>
+      PBKDF2.sink(
+        mac.createSink(),
+        salt,
+        iterations,
+        keyLength: keyLength,
+      );
+
+  /// Generate a derived key using the [sink] function.
   ///
-  /// This function will throw an [StateError] if the [mac] is not initialized
+  /// This function will throw an [StateError] if the [sink] is not initialized
   /// and the [password] is not provided.
   @override
   HashDigest convert([List<int>? password]) {
@@ -67,25 +79,25 @@ class PBKDF2 extends KeyDerivatorBase {
 
     // Initialize the MAC with provided password
     if (password != null) {
-      mac.init(password);
+      sink.init(password);
     }
 
     k = 0;
     for (i = 1; k < derivedKeyLength; i++) {
       // Generate the first HMAC: U_1
-      mac.reset();
-      mac.add(salt);
-      mac.add([i >>> 24, i >>> 16, i >>> 8, i]);
-      hash = mac.digest().bytes;
+      sink.reset();
+      sink.add(salt);
+      sink.add([i >>> 24, i >>> 16, i >>> 8, i]);
+      hash = sink.digest().bytes;
 
       // For storing the combined XORs
       block = hash;
 
       // Subsequence HMAC generation: U_2 .. U_c
       for (t = 1; t < iterations; ++t) {
-        mac.reset();
-        mac.add(hash);
-        hash = mac.digest().bytes;
+        sink.reset();
+        sink.add(hash);
+        hash = sink.digest().bytes;
 
         for (j = 0; j < hash.length; ++j) {
           block[j] ^= hash[j];
