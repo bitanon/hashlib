@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/algorithms/argon2.dart';
+import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -51,64 +52,83 @@ void main() {
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
     });
 
-    test("argon2i m=256, t=8, p=4 @ out = 32", () {
+    test("argon2i m=256, t=2, p=4 @ out = 32", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
         type: Argon2Type.argon2i,
         hashLength: 32,
-        iterations: 8,
+        iterations: 2,
         parallelism: 4,
         memorySizeKB: 256,
         salt: "some salt".codeUnits,
       );
       final matcher =
-          "41e318e5092fbb0d6448a833defb795e334667a6fe8343958d7751bba2a0ea81";
+          "aaef1c23ce86889c7d76f5ea214760fb66900916546cde42ebdc47914daed123";
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
     });
-    test("argon2d m=256, t=8, p=4 @ out = 32", () {
+    test("argon2d m=256, t=2, p=4 @ out = 32", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
         type: Argon2Type.argon2d,
         hashLength: 32,
-        iterations: 8,
+        iterations: 2,
         parallelism: 4,
         memorySizeKB: 256,
         salt: "some salt".codeUnits,
       );
       final matcher =
-          "19ccf89f9cc83070d5a734fe5b2ae5e25ebaed4f5a30cf6a03457d3ebf35cb3d";
+          "c31433dbefadf7aa527bbbcc7beace0d8d70973719c6efb1c24fb21278569701";
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
     });
-    test("argon2id m=256, t=8, p=4 @ out = 32", () {
+    test("argon2id m=256, t=2, p=4 @ out = 32", () {
       final argon2 = Argon2(
         version: Argon2Version.v13,
         type: Argon2Type.argon2id,
         hashLength: 32,
-        iterations: 8,
+        iterations: 2,
         parallelism: 4,
         memorySizeKB: 256,
         salt: "some salt".codeUnits,
       );
       final matcher =
-          "262ff20a2bd40ad56d91199a704c03ba68cdf506edf7afebabfe2a200044b1e5";
+          "c23e4a305f649971527eda884bda6b481004aedd31740460da3d43db8946786f";
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
     });
 
     test("encoded hash instance check", () {
       final encoded =
-          r"$argon2i$v=19$m=128,t=4,p=2$c29tZSBzYWx0$/UTBaG/OPVS53KFzcpJt9ujnXFMahdK/";
-      final matcher = "fd44c1686fce3d54b9dca17372926df6e8e75c531a85d2bf";
+          r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0$24VHMpaU5EkkdH5rpdnb5zeOf3Y";
+      final matcher = "db8547329694e44924747e6ba5d9dbe7378e7f76";
       final argon2 = Argon2.fromEncoded(encoded);
-      expect(argon2.type, Argon2Type.argon2i);
+      expect(argon2.type, Argon2Type.argon2id);
       expect(argon2.version, Argon2Version.v13);
       expect(argon2.memorySizeKB, 128);
-      expect(argon2.lanes, 2);
-      expect(argon2.passes, 4);
-      expect(argon2.hashLength, 24);
+      expect(argon2.lanes, 4);
+      expect(argon2.passes, 1);
+      expect(argon2.hashLength, 20);
       expect(argon2.salt, "some salt".codeUnits);
       var result = argon2.convert("password".codeUnits);
       expect(result.hex(), matcher);
       expect(result.encoded(), encoded);
+    });
+
+    test("argon2verify with encoded", () {
+      final encoded =
+          r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0$24VHMpaU5EkkdH5rpdnb5zeOf3Y";
+      expect(argon2verify(encoded, "password".codeUnits), true);
+    });
+
+    test("argon2verify with password", () {
+      final matcher = "db8547329694e44924747e6ba5d9dbe7378e7f76";
+      var result = Argon2(
+        type: Argon2Type.argon2id,
+        salt: 'some salt'.codeUnits,
+        hashLength: 20,
+        iterations: 1,
+        parallelism: 4,
+        memorySizeKB: 128,
+      ).verify(fromHex(matcher), "password".codeUnits);
+      expect(result, true);
     });
 
     test("multiple call with same instance", () {

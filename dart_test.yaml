@@ -1,5 +1,8 @@
-timeout: 15m
+# package:test configuration
+# https://github.com/dart-lang/test/blob/master/pkgs/test/doc/configuration.md
 
+timeout: 1m
+concurrency: 5
 platforms: [vm, node]
 
 tags:
