@@ -199,7 +199,7 @@ class KeccakHash extends BlockHashSink {
   //     z[k] = b;
   //     z[k + 1] = 0;
   //   } else if (n < 32) {
-  //     z[k] = (a << n) | (b >> (32 - n));
+  //     z[k] = (a << n) | (b >>> (32 - n));
   //     z[k + 1] = b << n;
   //   } else {
   //     z[k] = b << (n - 32);
@@ -224,7 +224,7 @@ class KeccakHash extends BlockHashSink {
       z[k] = b;
       z[k + 1] = a;
     } else if (n < 32) {
-      z[k] = (a << n) | (b >> (32 - n));
+      z[k] = (a << n) | (b >>> (32 - n));
       z[k + 1] = (b << n) | a >>> (32 - n);
     } else {
       z[k] = (b << (n - 32)) | (a >>> (64 - n));
@@ -421,7 +421,7 @@ class KeccakHash extends BlockHashSink {
   }
 
   @override
-  Uint8List $finalize([Uint8List? block, int? length]) {
+  Uint8List $finalize() {
     // Update the final block
     if (pos == blockLength) {
       $update();

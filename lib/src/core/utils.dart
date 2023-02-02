@@ -116,7 +116,7 @@ String toBase64(Iterable<int> bytes, [bool urlSafe = false]) {
   for (int x in bytes) {
     p = (p << 8) | x;
     for (n += 8; n >= 6; n -= 6, p &= (1 << n) - 1) {
-      result.add(alpha[p >> (n - 6)]);
+      result.add(alpha[p >>> (n - 6)]);
     }
   }
   if (n > 0) {
@@ -132,7 +132,7 @@ Uint8List fromBase64(String data, [bool urlSafe = false]) {
   for (int x in data.codeUnits) {
     p = (p << 6) | map[x];
     for (n += 6; n >= 8; n -= 8, p &= (1 << n) - 1) {
-      result[i++] = p >> (n - 8);
+      result[i++] = p >>> (n - 8);
     }
   }
   if (p > 0) {

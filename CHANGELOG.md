@@ -1,3 +1,12 @@
+## 1.8.0
+
+- Adds xxHash32
+  - New class: `XXHash32`
+  - New constants: `xxHash32`, `xxHash32_1`, `xxHash32_2`, `xxHash32_3`, `xxHash32_4`, `xxHash32_5`
+- Internal changes:
+  - Removes the parameters from `$finalize` method in `BlockHash`
+  - Uses `>>>` instead of `>>`
+
 ## 1.7.0
 
 - Renames `Argon2Security.small` -> `Argon2Security.little`

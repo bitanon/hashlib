@@ -199,7 +199,7 @@ class Argon2Security {
     int pow = 3, memory, lanes = 1, passes = 1;
     for (; pow <= maxMemoryAsPowerOf2; pow++) {
       memory = 1 << pow;
-      lanes = min(16, memory >> 3);
+      lanes = min(16, memory >>> 3);
       var samples = List.generate(10, (_) {
         var f = Argon2(
           salt: salt,

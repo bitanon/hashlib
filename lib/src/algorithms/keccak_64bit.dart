@@ -264,7 +264,7 @@ class KeccakHash extends BlockHashSink {
   }
 
   @override
-  Uint8List $finalize([Uint8List? block, int? length]) {
+  Uint8List $finalize() {
     // Update the final block
     if (pos == blockLength) {
       $update();

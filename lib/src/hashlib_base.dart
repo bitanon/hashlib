@@ -27,3 +27,4 @@ export 'sha512.dart';
 export 'sha512t.dart';
 export 'shake128.dart';
 export 'shake256.dart';
+export 'xxhash32.dart';

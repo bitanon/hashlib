@@ -48,7 +48,12 @@ class Alder32Hash extends HashDigestSink {
   HashDigest digest() {
     if (_closed) return _digest!;
     _closed = true;
-    Uint8List bytes = Uint8List.fromList([b >> 8, b, a >> 8, a]);
+    Uint8List bytes = Uint8List.fromList([
+      b >>> 8,
+      b,
+      a >>> 8,
+      a,
+    ]);
     _digest = HashDigest(bytes);
     return _digest!;
   }

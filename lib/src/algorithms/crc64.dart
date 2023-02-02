@@ -87,7 +87,7 @@ Uint32List _generate64(int high, int low) {
     var table = Uint32List(512);
     for (i = 0; i < 512; i += 2) {
       h = 0;
-      l = i >> 1;
+      l = i >>> 1;
       for (j = 0; j < 8; ++j) {
         f = l & 1;
         l >>>= 1;

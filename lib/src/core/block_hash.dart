@@ -58,9 +58,7 @@ abstract class BlockHashSink implements HashDigestSink {
 
   /// Finalizes the message digest with the remaining message block,
   /// and returns the output as byte array.
-  ///
-  /// The [length] must be less than the [blockLength]
-  Uint8List $finalize(Uint8List block, int length);
+  Uint8List $finalize();
 
   @override
   void reset() {
@@ -117,7 +115,7 @@ abstract class BlockHashSink implements HashDigestSink {
   HashDigest digest() {
     if (_closed) return _digest!;
     _closed = true;
-    _digest = HashDigest($finalize(buffer, pos));
+    _digest = HashDigest($finalize());
     return _digest!;
   }
 }

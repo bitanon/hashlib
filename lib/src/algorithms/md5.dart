@@ -144,7 +144,7 @@ class MD5Hash extends BlockHashSink {
   }
 
   @override
-  Uint8List $finalize([Uint8List? block, int? length]) {
+  Uint8List $finalize() {
     // Adding the signature byte
     buffer[pos++] = 0x80;
 
@@ -164,7 +164,7 @@ class MD5Hash extends BlockHashSink {
 
     // Append original message length in bits to message
     bdata.setUint32(56, messageLengthInBits, Endian.little);
-    bdata.setUint32(60, messageLengthInBits >> 32, Endian.little);
+    bdata.setUint32(60, messageLengthInBits >>> 32, Endian.little);
 
     // Update with the final block
     $update();

@@ -118,37 +118,37 @@ class SHA1Hash extends BlockHashSink {
   }
 
   @override
-  Uint8List $finalize(Uint8List block, int length) {
+  Uint8List $finalize() {
     // Adding the signature byte
-    block[length++] = 0x80;
+    buffer[pos++] = 0x80;
 
     // If no more space left in buffer for the message length
-    if (length > 56) {
-      for (; length < 64; length++) {
-        block[length] = 0;
+    if (pos > 56) {
+      for (; pos < 64; pos++) {
+        buffer[pos] = 0;
       }
-      $update(block);
-      length = 0;
+      $update(buffer);
+      pos = 0;
     }
 
     // Fill remaining buffer to put the message length at the end
-    for (; length < 56; length++) {
-      block[length] = 0;
+    for (; pos < 56; pos++) {
+      buffer[pos] = 0;
     }
 
     // Append original message length in bits to message
     int n = messageLengthInBits;
-    block[56] = n >>> 56;
-    block[57] = n >>> 48;
-    block[58] = n >>> 40;
-    block[59] = n >>> 32;
-    block[60] = n >>> 24;
-    block[61] = n >>> 16;
-    block[62] = n >>> 8;
-    block[63] = n;
+    buffer[56] = n >>> 56;
+    buffer[57] = n >>> 48;
+    buffer[58] = n >>> 40;
+    buffer[59] = n >>> 32;
+    buffer[60] = n >>> 24;
+    buffer[61] = n >>> 16;
+    buffer[62] = n >>> 8;
+    buffer[63] = n;
 
     // Update with the final block
-    $update(block);
+    $update(buffer);
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);

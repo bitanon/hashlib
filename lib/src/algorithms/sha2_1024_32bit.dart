@@ -260,37 +260,37 @@ class SHA2of1024 extends BlockHashSink {
   }
 
   @override
-  Uint8List $finalize(Uint8List block, int length) {
+  Uint8List $finalize() {
     // Adding the signature byte
-    block[length++] = 0x80;
+    buffer[pos++] = 0x80;
 
     // If no more space left in buffer for the message length
-    if (length > 112) {
-      for (; length < 128; length++) {
-        block[length] = 0;
+    if (pos > 112) {
+      for (; pos < 128; pos++) {
+        buffer[pos] = 0;
       }
-      $update(block);
-      length = 0;
+      $update(buffer);
+      pos = 0;
     }
 
     // Fill remaining buffer to put the message length at the end
-    for (; length < 120; length++) {
-      block[length] = 0;
+    for (; pos < 120; pos++) {
+      buffer[pos] = 0;
     }
 
     // Append original message length in bits to message
     int n = messageLengthInBits;
-    block[120] = n >>> 56;
-    block[121] = n >>> 48;
-    block[122] = n >>> 40;
-    block[123] = n >>> 32;
-    block[124] = n >>> 24;
-    block[125] = n >>> 16;
-    block[126] = n >>> 8;
-    block[127] = n;
+    buffer[120] = n >>> 56;
+    buffer[121] = n >>> 48;
+    buffer[122] = n >>> 40;
+    buffer[123] = n >>> 32;
+    buffer[124] = n >>> 24;
+    buffer[125] = n >>> 16;
+    buffer[126] = n >>> 8;
+    buffer[127] = n;
 
     // Update with the final block
-    $update(block);
+    $update(buffer);
 
     // Convert the state to 8-bit byte array
     var bytes = Uint8List(hashLength);

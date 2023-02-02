@@ -298,7 +298,7 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
   }
 
   @override
-  Uint8List $finalize([Uint8List? block, int? length]) {
+  Uint8List $finalize() {
     // Fill remaining buffer to put the message length at the end
     for (; pos < blockLength; pos++) {
       buffer[pos] = 0;
