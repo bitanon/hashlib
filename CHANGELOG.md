@@ -1,8 +1,11 @@
 ## 1.8.0
 
+- Adds xxHash64
+  - New class: `XXHash64`
+  - New constants: `xxh64`, `xxh64code`
 - Adds xxHash32
   - New class: `XXHash32`
-  - New constants: `xxh32`, `xxh32_1`, `xxh32_2`, `xxh32_3`, `xxh32_4`, `xxh32_5`
+  - New constants: `xxh32`, `xxh32code`
 - Internal changes:
   - Removes the parameters from `$finalize` method in `BlockHash`
   - Uses `>>>` instead of `>>`

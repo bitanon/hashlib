@@ -14,11 +14,12 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Checksum Algorithms
 
-| Algorithms | Available methods                                                    | Source    |
-| ---------- | -------------------------------------------------------------------- | --------- |
-| CRC        | `crc16`,`crc32`,`crc64`                                              | Wikipedia |
-| Alder32    | `alder32`                                                            | Wikipedia |
-| xxHash32   | `XXHash32`,`xxh32`,`xxh32_1`,`xxh32_2`,`xxh32_3`,`xxh32_4`,`xxh32_5` | Cyan4973  |
+| Algorithms | Available methods              | Source    |
+| ---------- | ------------------------------ | --------- |
+| CRC        | `crc16`,`crc32`,`crc64`        | Wikipedia |
+| Alder32    | `alder32`                      | Wikipedia |
+| xxHash32   | `XXHash32`,`xxh32`,`xxh32code` | Cyan4973  |
+| xxHash64   | `XXHash64`,`xxh64`,`xxh64code` | Cyan4973  |
 
 ### Secure Hash Functions
 
