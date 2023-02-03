@@ -22,7 +22,7 @@ const int prime64_5 = 0x27D4EB2F165667C5;
 
 class XXHash64Sink extends BlockHashSink {
   final int seed;
-  late final qbuffer = buffer.buffer.asUint64List();
+  late final Uint64List qbuffer = buffer.buffer.asUint64List();
 
   int _acc1 = 0;
   int _acc2 = 0;
