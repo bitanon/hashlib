@@ -2,7 +2,7 @@
 
 - Adds xxHash32
   - New class: `XXHash32`
-  - New constants: `xxHash32`, `xxHash32_1`, `xxHash32_2`, `xxHash32_3`, `xxHash32_4`, `xxHash32_5`
+  - New constants: `xxh32`, `xxh32_1`, `xxh32_2`, `xxh32_3`, `xxh32_4`, `xxh32_5`
 - Internal changes:
   - Removes the parameters from `$finalize` method in `BlockHash`
   - Uses `>>>` instead of `>>`

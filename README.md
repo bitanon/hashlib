@@ -12,9 +12,17 @@ This library contains implementations of secure hash functions, checksum generat
 
 ## Features
 
+### Checksum Algorithms
+
+| Algorithms | Available methods                                                    | Source    |
+| ---------- | -------------------------------------------------------------------- | --------- |
+| CRC        | `crc16`,`crc32`,`crc64`                                              | Wikipedia |
+| Alder32    | `alder32`                                                            | Wikipedia |
+| xxHash32   | `XXHash32`,`xxh32`,`xxh32_1`,`xxh32_2`,`xxh32_3`,`xxh32_4`,`xxh32_5` | Cyan4973  |
+
 ### Secure Hash Functions
 
-| Algorithm | Available implementations                                          | Source      |
+| Algorithm | Available methods                                                  | Source      |
 | --------- | ------------------------------------------------------------------ | ----------- |
 | MD5       | `md5`                                                              | RFC-1321    |
 | SHA-1     | `sha1`                                                             | RFC-3174    |
@@ -35,32 +43,24 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Message Authentication Code (MAC) generators
 
-| Algorithms | Available implementations | Source   |
-| ---------- | ------------------------- | -------- |
-| HMAC       | `HMAC`                    | RFC-2104 |
+| Algorithms | Available methods | Source   |
+| ---------- | ----------------- | -------- |
+| HMAC       | `HMAC`            | RFC-2104 |
 
 <!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
 
 ### Password Hashing / Key Derivation
 
-| Algorithm | Available implementations                  | Source   |
+| Algorithm | Available methods                          | Source   |
 | --------- | ------------------------------------------ | -------- |
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
 | PBKDF2    | `PBKDF2`                                   | RFC-9106 |
 
 <!--
-| `pbkdf2_hmac` |    ⌛     |       |
-| `bcrypt`      |    ⌛     |       |
 | `scrypt`      |    ⌛     |       |
+| `bcrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
 -->
-
-### Checksum Algorithms
-
-| Algorithms | Available Methods       | Source    |
-| ---------- | ----------------------- | --------- |
-| Alder32    | `alder32`               | Wikipedia |
-| CRC        | `crc16`,`crc32`,`crc64` | Wikipedia |
 
 ## Getting Started
 

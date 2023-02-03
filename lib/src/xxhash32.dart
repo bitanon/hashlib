@@ -5,22 +5,22 @@ import 'package:hashlib/src/algorithms/xxhash32.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// An instance of [XXHash32] with seed = 0
-const XXHash32 xxHash32 = XXHash32(0);
+const XXHash32 xxh32 = XXHash32(0);
 
 /// An instance of [XXHash32] with seed = [prime32_1]
-const XXHash32 xxHash32_1 = XXHash32(prime32_1);
+const XXHash32 xxh32_1 = XXHash32(prime32_1);
 
 /// An instance of [XXHash32] with seed = [prime32_2]
-const XXHash32 xxHash32_2 = XXHash32(prime32_2);
+const XXHash32 xxh32_2 = XXHash32(prime32_2);
 
 /// An instance of [XXHash32] with seed = [prime32_3]
-const XXHash32 xxHash32_3 = XXHash32(prime32_3);
+const XXHash32 xxh32_3 = XXHash32(prime32_3);
 
 /// An instance of [XXHash32] with seed = [prime32_4]
-const XXHash32 xxHash32_4 = XXHash32(prime32_4);
+const XXHash32 xxh32_4 = XXHash32(prime32_4);
 
 /// An instance of [XXHash32] with seed = [prime32_5]
-const XXHash32 xxHash32_5 = XXHash32(prime32_5);
+const XXHash32 xxh32_5 = XXHash32(prime32_5);
 
 /// This is an implementation of 32-bit Hash algorithm from xxHash family that
 /// is derived from https://github.com/Cyan4973/xxHash
@@ -38,4 +38,7 @@ class XXHash32 extends BlockHashBase {
 
   @override
   BlockHashSink createSink() => XXHash32Sink(seed);
+
+  /// Get and instance of [XXHash32] with an specific seed
+  XXHash32 withSeed(int seed) => XXHash32(seed);
 }
