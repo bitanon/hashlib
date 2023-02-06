@@ -19,7 +19,7 @@ class _CRC16 extends HashBase {
   CRC16Hash createSink() => CRC16Hash();
 }
 
-/// Gets the CRC-16 remainder value of a String
+/// Gets the CRC-16 value of a String
 ///
 /// Parameters:
 /// - [input] is the string to hash

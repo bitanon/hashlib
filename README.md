@@ -12,21 +12,10 @@ This library contains implementations of secure hash functions, checksum generat
 
 ## Features
 
-### Checksum Algorithms
-
-| Algorithms | Available methods              | Source    |
-| ---------- | ------------------------------ | --------- |
-| CRC        | `crc16`,`crc32`,`crc64`        | Wikipedia |
-| Alder32    | `alder32`                      | Wikipedia |
-| xxHash32   | `XXHash32`,`xxh32`,`xxh32code` | Cyan4973  |
-| xxHash64   | `XXHash64`,`xxh64`,`xxh64code` | Cyan4973  |
-
-### Secure Hash Functions
+### Secure Hash Algorithms
 
 | Algorithm | Available methods                                                  | Source      |
 | --------- | ------------------------------------------------------------------ | ----------- |
-| MD5       | `md5`                                                              | RFC-1321    |
-| SHA-1     | `sha1`                                                             | RFC-3174    |
 | SHA-2     | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RCC-6234    |
 | SHA-3     | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
 | SHAKE     | `Shake128`, `Shake256`, `shake128`, `shake256`                     | FIPS-202    |
@@ -42,26 +31,38 @@ This library contains implementations of secure hash functions, checksum generat
 | `whirlpool` |    ⌛     |       |
 -->
 
-### Message Authentication Code (MAC) generators
+### Non-Cryptographic Hash Algorithms
 
-| Algorithms | Available methods | Source   |
-| ---------- | ----------------- | -------- |
-| HMAC       | `HMAC`            | RFC-2104 |
+| Algorithms | Available methods              | Source    |
+| ---------- | ------------------------------ | --------- |
+| CRC        | `crc16`,`crc32`,`crc64`        | Wikipedia |
+| Alder32    | `alder32`                      | Wikipedia |
+| xxHash32   | `XXHash32`,`xxh32`,`xxh32code` | Cyan4973  |
+| xxHash64   | `XXHash64`,`xxh64`,`xxh64code` | Cyan4973  |
+| XXH3       | `XXH3`,`xxh3`,`xxh3code`       | Cyan4973  |
+| MD5        | `md5`                          | RFC-1321  |
+| SHA-1      | `sha1`                         | RFC-3174  |
 
-<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
-
-### Password Hashing / Key Derivation
+### Password / Key Derivation Algorithms
 
 | Algorithm | Available methods                          | Source   |
 | --------- | ------------------------------------------ | -------- |
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
-| PBKDF2    | `PBKDF2`                                   | RFC-9106 |
+| PBKDF2    | `PBKDF2`                                   | RFC-8081 |
 
 <!--
 | `scrypt`      |    ⌛     |       |
 | `bcrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
 -->
+
+### Message Authentication Code (MAC) Generators
+
+| Algorithms | Available methods | Source   |
+| ---------- | ----------------- | -------- |
+| HMAC       | `HMAC`            | RFC-2104 |
+
+<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
 
 ## Getting Started
 

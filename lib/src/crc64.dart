@@ -21,7 +21,7 @@ class _CRC64 extends HashBase {
   CRC64Hash createSink() => CRC64Hash();
 }
 
-/// Gets the CRC-64 remainder value of a String
+/// Gets the CRC-64 value of a String
 ///
 /// Parameters:
 /// - [input] is the string to hash

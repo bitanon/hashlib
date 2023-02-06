@@ -8,30 +8,22 @@ import 'package:hashlib/src/core/block_hash.dart';
 const int _mask16 = 0xFFFF;
 const int _mask32 = 0xFFFFFFFF;
 
-/// 0b10011110001101110111100110110001 = 0x9E3779B1
-const int prime32_1 = 0x9E3779B1;
-
-/// 0b10000101111010111100101001110111 = 0x85EBCA77
-const int prime32_2 = 0x85EBCA77;
-
-/// 0b11000010101100101010111000111101 = 0xC2B2AE3D
-const int prime32_3 = 0xC2B2AE3D;
-
-/// 0b00100111110101001110101100101111 = 0x27D4EB2F
-const int prime32_4 = 0x27D4EB2F;
-
-/// 0b00010110010101100110011110110001 = 0x165667B1
-const int prime32_5 = 0x165667B1;
-
 class XXHash32Sink extends BlockHashSink {
   final int seed;
+
+  @override
+  final int hashLength = 4;
+
+  static const int prime32_1 = 0x9E3779B1;
+  static const int prime32_2 = 0x85EBCA77;
+  static const int prime32_3 = 0xC2B2AE3D;
+  static const int prime32_4 = 0x27D4EB2F;
+  static const int prime32_5 = 0x165667B1;
+
   int _acc1 = 0;
   int _acc2 = 0;
   int _acc3 = 0;
   int _acc4 = 0;
-
-  @override
-  final int hashLength = 4;
 
   XXHash32Sink(this.seed) : super(16) {
     reset();
@@ -55,6 +47,10 @@ class XXHash32Sink extends BlockHashSink {
         pos = 0;
       }
       buffer[pos] = chunk[start];
+    }
+    if (pos == blockLength) {
+      $update();
+      pos = 0;
     }
   }
 

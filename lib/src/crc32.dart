@@ -21,7 +21,7 @@ class _CRC32 extends HashBase {
   CRC32Hash createSink() => CRC32Hash();
 }
 
-/// Gets the CRC-32 remainder value of a String
+/// Gets the CRC-32 value of a String
 ///
 /// Parameters:
 /// - [input] is the string to hash
@@ -32,7 +32,7 @@ int crc32code(String input, [Encoding? encoding]) {
 
 /// Extension to [String] to generate [crc32] code
 extension CRC32StringExtension on String {
-  /// Gets the CRC-32 remainder value of a String
+  /// Gets the CRC-32 value of a String
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.

@@ -17,16 +17,16 @@ const data = <int>[
 void main() {
   group('XXHash32 test', () {
     test('with seed = 0 and an empty string', () {
-      expect(xxh32.convert([]).hex(true), "02CC5D05");
+      expect(xxhash32.convert([]).hex(true), "02CC5D05");
     });
     test('with seed = 0 and a single letter', () {
-      expect(xxh32.convert([data[0]]).hex(true), "B85CBEE5");
+      expect(xxhash32.convert([data[0]]).hex(true), "B85CBEE5");
     });
     test('with seed = 0 and 14 letters', () {
-      expect(xxh32.convert(data.take(14).toList()).hex(true), "E5AA0AB4");
+      expect(xxhash32.convert(data.take(14).toList()).hex(true), "E5AA0AB4");
     });
     test('with seed = 0 and 101 letters', () {
-      expect(xxh32.convert(data).hex(true), "1F1AA412");
+      expect(xxhash32.convert(data).hex(true), "1F1AA412");
     });
 
     test('with seed = $seed and an empty string', () {

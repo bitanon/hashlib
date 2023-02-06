@@ -28,7 +28,7 @@ class _Alder32 extends HashBase {
   Alder32Hash createSink() => Alder32Hash();
 }
 
-/// Gets the Alder-32 remainder value of a String
+/// Gets the Alder-32 value of a String
 ///
 /// Parameters:
 /// - [input] is the string to hash

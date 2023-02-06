@@ -6,12 +6,10 @@ import 'dart:typed_data';
 import 'package:hashlib/src/core/block_hash.dart';
 
 class XXHash64Sink extends BlockHashSink {
-  final int seed;
-
   @override
   final int hashLength = 8;
 
-  XXHash64Sink(this.seed) : super(32) {
+  XXHash64Sink(int seed) : super(32) {
     throw UnimplementedError('XXHash64 is not supported in Node platform');
   }
 
