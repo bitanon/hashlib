@@ -5,15 +5,15 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 
-class XX3Hash64bSink extends BlockHashSink {
+class XXH3Sink64bit extends BlockHashSink {
   @override
   final int hashLength = 8;
 
-  factory XX3Hash64bSink.withSeed(int seed) {
+  factory XXH3Sink64bit.withSeed(int seed) {
     throw UnimplementedError('XXH3 is not supported in Node platform');
   }
 
-  factory XX3Hash64bSink.withSecret([Uint64List? secret]) {
+  factory XXH3Sink64bit.withSecret([List<int>? secret]) {
     throw UnimplementedError('XXH3 is not supported in Node platform');
   }
 

@@ -36,7 +36,9 @@ class XXH3 extends BlockHashBase {
   factory XXH3.withSecret(List<int> secret) => XXH3(secret: secret);
 
   @override
-  BlockHashSink createSink() => XX3Hash64bSink.withSeed(seed);
+  BlockHashSink createSink() => secret == null
+      ? XXH3Sink64bit.withSeed(seed)
+      : XXH3Sink64bit.withSecret(secret);
 }
 
 /// Gets the 64-bit XXH3 value of a String.

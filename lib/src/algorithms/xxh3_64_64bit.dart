@@ -32,12 +32,15 @@ const List<int> _kSecret = <int>[
   0x95, 0x16, 0x04, 0x28, 0xaf, 0xd7, 0xfb, 0xca, 0xbb, 0x4b, 0x40, 0x7e,
 ];
 
-class XX3Hash64bSink extends BlockHashSink {
+class XXH3Sink64bit extends BlockHashSink {
   final int seed;
-  final Uint64List secret;
+  final int rounds;
+  final Uint8List secret;
   final Uint64List acc = Uint64List(8);
   final ListQueue<int> last = ListQueue<int>(_midSizeMax);
   late final Uint64List qbuffer = buffer.buffer.asUint64List();
+  late final ByteData secretBD = secret.buffer.asByteData();
+  late final Uint64List secret64 = secret.buffer.asUint64List();
 
   @override
   final int hashLength = 8;
@@ -51,38 +54,42 @@ class XX3Hash64bSink extends BlockHashSink {
   static const int prime64_4 = 0x85EBCA77C2B2AE63;
   static const int prime64_5 = 0x27D4EB2F165667C5;
 
-  factory XX3Hash64bSink.withSeed(int seed) {
+  factory XXH3Sink64bit.withSeed(int seed) {
     if (seed == 0) {
-      return XX3Hash64bSink.withSecret();
+      return XXH3Sink64bit.withSecret();
     }
-    Uint64List secret = Uint8List.fromList(_kSecret).buffer.asUint64List();
-    for (int i = 0; i < secret.length; i += 2) {
-      secret[i] += seed;
+    var secret = Uint8List.fromList(_kSecret);
+    var secret64 = secret.buffer.asUint64List();
+    for (int i = 0; i < secret64.length; i += 2) {
+      secret64[i] += seed;
     }
-    for (int i = 1; i < secret.length; i += 2) {
-      secret[i] -= seed;
+    for (int i = 1; i < secret64.length; i += 2) {
+      secret64[i] -= seed;
     }
-    return XX3Hash64bSink._(
+    return XXH3Sink64bit._(
       seed: seed,
       secret: secret,
+      rounds: (secret.lengthInBytes - _stripeLen) >>> 3,
     );
   }
 
-  factory XX3Hash64bSink.withSecret([Uint64List? secret]) {
-    secret ??= Uint8List.fromList(_kSecret).buffer.asUint64List();
-    if (secret.lengthInBytes < _minSecretSize) {
+  factory XXH3Sink64bit.withSecret([List<int>? secret]) {
+    var key = Uint8List.fromList(secret ?? _kSecret);
+    if (key.lengthInBytes < _minSecretSize) {
       throw ArgumentError('The secret length must be at least $_minSecretSize');
     }
-    return XX3Hash64bSink._(
+    return XXH3Sink64bit._(
       seed: 0,
-      secret: secret,
+      secret: key,
+      rounds: (key.lengthInBytes - _stripeLen) >>> 3,
     );
   }
 
-  XX3Hash64bSink._({
+  XXH3Sink64bit._({
     required this.seed,
     required this.secret,
-  }) : super((secret.lengthInBytes - _stripeLen) << 3) {
+    required this.rounds,
+  }) : super(rounds << 6) {
     reset();
   }
 
@@ -122,21 +129,21 @@ class XX3Hash64bSink extends BlockHashSink {
   @override
   void $update([List<int>? block, int offset = 0, bool last = false]) {
     int n, i, v, l, k;
-    k = secret.length - 8;
     // accumulate
-    for (n = 0; n < k; n++) {
+    for (n = 0; n < rounds; n++) {
       l = n << 3;
       for (i = 0; i < acc.length; i++) {
         v = qbuffer[l + i];
         acc[i] += v;
-        v ^= secret[n + i];
+        v ^= secret64[n + i];
         acc[i] += (v & _mask32) * (v >>> 32);
       }
     }
     // scramble
+    k = secret.lengthInBytes - _stripeLen;
     for (i = 0; i < 8; ++i) {
       acc[i] ^= acc[i] >>> 47;
-      acc[i] ^= secret[k + i];
+      acc[i] ^= secretBD.getUint64(k + (i << 3), Endian.little);
       acc[i] *= prime32_1;
     }
   }
@@ -151,38 +158,34 @@ class XX3Hash64bSink extends BlockHashSink {
   int _finalizeLong(Uint64List stripe) {
     int _hash;
     int t, n, i, v, l, a, b;
-    var key = secret.buffer.asByteData();
 
     // accumulate last partial block
-    for (t = n = 0; t + 64 <= pos; n++, t += 64) {
+    for (t = n = 0; t + _stripeLen <= pos; n++, t += _stripeLen) {
       l = n << 3;
       for (i = 0; i < acc.length; i++) {
         v = qbuffer[l + i];
         acc[i] += v;
-        v ^= secret[n + i];
+        v ^= secret64[n + i];
         acc[i] += (v & _mask32) * (v >>> 32);
       }
     }
 
-    // print(acc.buffer.asUint32List());
-
     // last stripe
     if (messageLength & 63 != 0) {
-      t = key.lengthInBytes - 64 - 7;
-      for (i = 0; i < acc.length; i++) {
+      t = secret.lengthInBytes - _stripeLen - 7;
+      for (i = 0; i < acc.length; i++, t += 8) {
         v = stripe[i];
         acc[i] += v;
-        v ^= key.getUint64(t + (i << 3), Endian.little);
+        v ^= secretBD.getUint64(t, Endian.little);
         acc[i] += (v & _mask32) * (v >>> 32);
       }
     }
 
     // converge into final hash
     _hash = messageLength * prime64_1;
-    for (i = 0; i < 8; i += 2) {
-      t = i << 3;
-      a = key.getUint64(11 + t, Endian.little);
-      b = key.getUint64(11 + t + 8, Endian.little);
+    for (i = t = 0; i < 8; i += 2, t += 16) {
+      a = secretBD.getUint64(11 + t, Endian.little);
+      b = secretBD.getUint64(11 + t + 8, Endian.little);
       _hash += _fold64(acc[i] ^ a, acc[i + 1] ^ b);
     }
 
@@ -324,6 +327,7 @@ class XX3Hash64bSink extends BlockHashSink {
   Uint8List $finalize() {
     int i;
     int _hash;
+    ByteData key;
     Uint64List input = Uint64List(_midSizeMax >>> 3);
     Uint8List input8 = input.buffer.asUint8List();
 
@@ -332,7 +336,11 @@ class XX3Hash64bSink extends BlockHashSink {
       for (i = 0; it.moveNext(); ++i) {
         input8[i] = it.current;
       }
-      var key = Uint8List.fromList(_kSecret).buffer.asByteData();
+      if (seed == 0) {
+        key = secretBD;
+      } else {
+        key = Uint8List.fromList(_kSecret).buffer.asByteData();
+      }
       _hash = _finalizeShort(input.buffer.asByteData(), i, key);
     } else {
       for (i = 63; i >= 0; --i) {
