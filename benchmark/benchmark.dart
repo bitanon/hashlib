@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 
+import 'base.dart';
 import 'blake2b.dart' as blake2b;
 import 'blake2s.dart' as blake2s;
 import 'md5.dart' as md5;
@@ -127,8 +128,12 @@ void main(List<String> args) {
 
     for (var entry in algorithms.entries) {
       var diff = <String, int>{};
+      var rate = <String, String>{};
       for (var benchmark in entry.value.reversed) {
-        diff[benchmark.name] = benchmark.measure().round();
+        var runtime = benchmark.measure();
+        var hashRate = 1e6 * iter * size / runtime;
+        diff[benchmark.name] = runtime.round();
+        rate[benchmark.name] = formatSize(hashRate) + '/s';
       }
       var me = entry.value.first;
       var mine = diff[me.name]!;
@@ -143,9 +148,9 @@ void main(List<String> args) {
         }
         var value = diff[name]!;
         if (value == best) {
-          message += '**${value / 1000} ms**';
+          message += '**${rate[name]}**';
         } else {
-          message += '${value / 1000} ms';
+          message += '${rate[name]}';
         }
         if (value > mine) {
           var p = (100 * (value - mine) / mine).round();

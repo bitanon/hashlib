@@ -40,24 +40,12 @@ abstract class Benchmark extends BenchmarkBase {
   }
 
   void measureRate() {
-    const suffix = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s', 'PB/s'];
-
-    Stopwatch watch = Stopwatch()..start();
-    warmup();
-    watch.reset();
-    exercise();
-    var runtime = watch.elapsedMicroseconds;
-
+    var runtime = measure();
     var nbhps = 1e6 * iter / runtime;
     var rate = nbhps * size;
-    int i = 0;
-    for (; rate >= 1000; i++) {
-      rate /= 1000;
-    }
-
     var rtms = runtime.round() / 1000;
-    var speed = '${rate.toStringAsFixed(2)} ${suffix[i]}';
-    print('$name ($size x $iter): $rtms ms => #${nbhps.round()} @ $speed');
+    var speed = formatSize(rate) + '/s';
+    print('$name ($size x $iter): $rtms ms => nb# ${nbhps.round()} @ $speed');
   }
 }
 
@@ -67,4 +55,13 @@ Map<String, int> measureDiff(Iterable<BenchmarkBase> benchmarks) {
     data[benchmark.name] = benchmark.measure().round();
   }
   return data;
+}
+
+String formatSize(double size) {
+  const suffix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  int i;
+  for (i = 0; size >= 1000; i++) {
+    size /= 1000;
+  }
+  return '${size.toStringAsFixed(2)}${suffix[i]}';
 }
