@@ -32,18 +32,18 @@ const List<int> _kSecret = <int>[
   0x95, 0x16, 0x04, 0x28, 0xaf, 0xd7, 0xfb, 0xca, 0xbb, 0x4b, 0x40, 0x7e,
 ];
 
-class XXH3Sink64bit extends BlockHashSink {
+class XXH3Sink128bit extends BlockHashSink {
   final int seed;
   final int rounds;
   final Uint8List secret;
-  final Uint64List acc = Uint64List(8);
+  final Uint64List state = Uint64List(8);
   final ListQueue<int> last = ListQueue<int>(_midSizeMax);
   late final Uint64List qbuffer = buffer.buffer.asUint64List();
   late final ByteData secretBD = secret.buffer.asByteData();
   late final Uint64List secret64 = secret.buffer.asUint64List();
 
   @override
-  final int hashLength = 8;
+  final int hashLength = 16;
 
   static const int prime32_1 = 0x9E3779B1;
   static const int prime32_2 = 0x85EBCA77;
@@ -54,9 +54,9 @@ class XXH3Sink64bit extends BlockHashSink {
   static const int prime64_4 = 0x85EBCA77C2B2AE63;
   static const int prime64_5 = 0x27D4EB2F165667C5;
 
-  factory XXH3Sink64bit.withSeed(int seed) {
+  factory XXH3Sink128bit.withSeed(int seed) {
     if (seed == 0) {
-      return XXH3Sink64bit.withSecret();
+      return XXH3Sink128bit.withSecret();
     }
     var secret = Uint8List.fromList(_kSecret);
     var secret64 = secret.buffer.asUint64List();
@@ -66,26 +66,26 @@ class XXH3Sink64bit extends BlockHashSink {
     for (int i = 1; i < secret64.length; i += 2) {
       secret64[i] -= seed;
     }
-    return XXH3Sink64bit._(
+    return XXH3Sink128bit._(
       seed: seed,
       secret: secret,
       rounds: (secret.lengthInBytes - _stripeLen) >>> 3,
     );
   }
 
-  factory XXH3Sink64bit.withSecret([List<int>? secret]) {
+  factory XXH3Sink128bit.withSecret([List<int>? secret]) {
     var key = Uint8List.fromList(secret ?? _kSecret);
     if (key.lengthInBytes < _minSecretSize) {
       throw ArgumentError('The secret length must be at least $_minSecretSize');
     }
-    return XXH3Sink64bit._(
+    return XXH3Sink128bit._(
       seed: 0,
       secret: key,
       rounds: (key.lengthInBytes - _stripeLen) >>> 3,
     );
   }
 
-  XXH3Sink64bit._({
+  XXH3Sink128bit._({
     required this.seed,
     required this.secret,
     required this.rounds,
@@ -96,14 +96,14 @@ class XXH3Sink64bit extends BlockHashSink {
   @override
   void reset() {
     super.reset();
-    acc[0] = prime32_3;
-    acc[1] = prime64_1;
-    acc[2] = prime64_2;
-    acc[3] = prime64_3;
-    acc[4] = prime64_4;
-    acc[5] = prime32_2;
-    acc[6] = prime64_5;
-    acc[7] = prime32_1;
+    state[0] = prime32_3;
+    state[1] = prime64_1;
+    state[2] = prime64_2;
+    state[3] = prime64_3;
+    state[4] = prime64_4;
+    state[5] = prime32_2;
+    state[6] = prime64_5;
+    state[7] = prime32_1;
   }
 
   @override
@@ -132,19 +132,19 @@ class XXH3Sink64bit extends BlockHashSink {
     // accumulate
     for (n = 0; n < rounds; n++) {
       l = n << 3;
-      for (i = 0; i < acc.length; i++) {
+      for (i = 0; i < state.length; i++) {
         v = qbuffer[l + i];
-        acc[i] += v;
+        state[i ^ 1] += v;
         v ^= secret64[n + i];
-        acc[i] += (v & _mask32) * (v >>> 32);
+        state[i] += (v & _mask32) * (v >>> 32);
       }
     }
     // scramble
     k = secret.lengthInBytes - _stripeLen;
     for (i = 0; i < 8; ++i) {
-      acc[i] ^= acc[i] >>> 47;
-      acc[i] ^= secretBD.getUint64(k + (i << 3), Endian.little);
-      acc[i] *= prime32_1;
+      state[i] ^= state[i] >>> 47;
+      state[i] ^= secretBD.getUint64(k + (i << 3), Endian.little);
+      state[i] *= prime32_1;
     }
   }
 
@@ -155,42 +155,54 @@ class XXH3Sink64bit extends BlockHashSink {
     return _hash;
   }
 
-  int _finalizeLong(Uint64List stripe) {
-    int _hash;
+  static Uint8List _combine(int a, int b) {
+    return Uint64List.fromList([a, b]).buffer.asUint8List();
+  }
+
+  Uint8List _finalizeLong(Uint64List stripe) {
+    // XXH3_hashLong_128b
+    int low, high;
     int t, n, i, v, l, a, b;
 
     // accumulate last partial block
     for (t = n = 0; t + _stripeLen <= pos; n++, t += _stripeLen) {
       l = n << 3;
-      for (i = 0; i < acc.length; i++) {
+      for (i = 0; i < state.length; i++) {
         v = qbuffer[l + i];
-        acc[i] += v;
+        state[i ^ 1] += v;
         v ^= secret64[n + i];
-        acc[i] += (v & _mask32) * (v >>> 32);
+        state[i] += (v & _mask32) * (v >>> 32);
       }
     }
 
     // last stripe
     if (messageLength & 63 != 0) {
       t = secret.lengthInBytes - _stripeLen - 7;
-      for (i = 0; i < acc.length; i++, t += 8) {
+      for (i = 0; i < state.length; i++, t += 8) {
         v = stripe[i];
-        acc[i] += v;
+        state[i ^ 1] += v;
         v ^= secretBD.getUint64(t, Endian.little);
-        acc[i] += (v & _mask32) * (v >>> 32);
+        state[i] += (v & _mask32) * (v >>> 32);
       }
     }
 
     // converge into final hash
-    _hash = messageLength * prime64_1;
+    low = messageLength * prime64_1;
+    high = ~(messageLength * prime64_2);
     for (i = t = 0; i < 8; i += 2, t += 16) {
-      a = secretBD.getUint64(11 + t, Endian.little);
-      b = secretBD.getUint64(11 + t + 8, Endian.little);
-      _hash += _fold64(acc[i] ^ a, acc[i + 1] ^ b);
+      l = t + 11;
+      a = secretBD.getUint64(l, Endian.little);
+      b = secretBD.getUint64(l + 8, Endian.little);
+      low += _fold64(state[i] ^ a, state[i + 1] ^ b);
+
+      l = t + secret.lengthInBytes - _stripeLen - 11;
+      a = secretBD.getUint64(l, Endian.little);
+      b = secretBD.getUint64(l + 8, Endian.little);
+      high += _fold64(state[i] ^ a, state[i + 1] ^ b);
     }
 
     // avalanche
-    return _avalanche(_hash);
+    return _combine(_avalanche(low), _avalanche(high));
   }
 
   static int _swap32(int x) =>
@@ -209,11 +221,11 @@ class XXH3Sink64bit extends BlockHashSink {
       ((x >>> 40) & 0x000000000000ff00) |
       ((x >>> 56) & 0x00000000000000ff);
 
-  static int _rotl64(int x, int n) => (x << n) | (x >>> (64 - n));
+  static int _rotl32(int x, int n) =>
+      ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
-  // Multiply two 64-bit numbers to get 128-bit number and
-  // xor the low bits of the product with the high bits
-  static int _fold64(int a, int b) {
+  // Multiply two 64-bit numbers to get 128-bit number
+  static List<int> _cross128(int a, int b) {
     int al = a & _mask32;
     int ah = a >>> 32;
     int bl = b & _mask32;
@@ -228,7 +240,14 @@ class XXH3Sink64bit extends BlockHashSink {
     int upper = (hl >>> 32) + (cross >>> 32) + hh;
     int lower = (cross << 32) | (ll & _mask32);
 
-    return upper ^ lower;
+    return [lower, upper];
+  }
+
+  // Multiply two 64-bit numbers to get 128-bit number and
+  // xor the low bits of the product with the high bits
+  static int _fold64(int a, int b) {
+    var r = _cross128(a, b);
+    return r[0] ^ r[1];
   }
 
   static int _mix16B(ByteData input, int i, ByteData key, int j, int seed) {
@@ -240,88 +259,186 @@ class XXH3Sink64bit extends BlockHashSink {
     return _fold64(lhs, rhs);
   }
 
-  int _finalizeShort(ByteData input, int length, ByteData key) {
-    int _hash, i, lhs, rhs, a, b, c;
+  static void _mix32B(
+    Uint64List acc,
+    ByteData input,
+    int a,
+    int b,
+    ByteData key,
+    int c,
+    int seed,
+  ) {
+    acc[0] += _mix16B(input, a, key, c, seed);
+    acc[0] ^= input.getUint64(b, Endian.little) +
+        input.getUint64(b + 8, Endian.little);
+    acc[1] += _mix16B(input, b, key, c + 16, seed);
+    acc[1] ^= input.getUint64(a, Endian.little) +
+        input.getUint64(a + 8, Endian.little);
+  }
+
+  Uint8List _finalizeShort(ByteData input, int length, ByteData key) {
+    int low, high;
+    int i, lhs, rhs, a, b, c, x;
+    Uint64List acc = Uint64List(2);
     if (length == 0) {
-      // XXH3_len_0_64b
-      _hash = seed;
-      _hash += prime64_1;
-      _hash ^= key.getUint64(56, Endian.little);
-      _hash ^= key.getUint64(64, Endian.little);
+      // XXH3_len_0_128b
+      low = prime64_1 + seed;
+      low ^= key.getUint64(64, Endian.little);
+      low ^= key.getUint64(72, Endian.little);
+
+      high = prime64_2 - seed;
+      high ^= key.getUint64(80, Endian.little);
+      high ^= key.getUint64(88, Endian.little);
+
+      low = _avalanche(low);
+      high = _avalanche(high);
     } else if (length <= 3) {
-      // XXH3_len_1to3_64b
+      // XXH3_len_1to3_128b
       a = input.getUint8(0);
       b = input.getUint8(length > 1 ? 1 : 0);
       c = input.getUint8(length - 1);
-      _hash = key.getUint32(0, Endian.little);
-      _hash ^= key.getUint32(4, Endian.little);
-      _hash += seed;
-      _hash ^= (a << 16) | (b << 24) | (c) | (length << 8);
-      _hash *= prime64_1;
+      x = (a << 16) | (b << 24) | (c) | (length << 8);
+
+      low = key.getUint32(0, Endian.little);
+      low ^= key.getUint32(4, Endian.little);
+      low += seed;
+      low ^= x;
+      low *= prime64_1;
+
+      high = key.getUint32(8, Endian.little);
+      high ^= key.getUint32(12, Endian.little);
+      high -= seed;
+      high ^= _rotl32(_swap32(x), 13);
+      high *= prime64_5;
+
+      low = _avalanche(low);
+      high = _avalanche(high);
     } else if (length <= 8) {
-      // XXH3_len_4to8_64b
-      rhs = input.getUint32(0, Endian.little);
-      lhs = input.getUint32(length - 4, Endian.little);
-      _hash = key.getUint64(8, Endian.little);
-      _hash ^= key.getUint64(16, Endian.little);
-      _hash -= seed ^ (_swap32(seed & _mask32) << 32);
-      _hash ^= (rhs << 32) | lhs;
-      // rrmxmx mix
-      _hash ^= _rotl64(_hash, 49) ^ _rotl64(_hash, 24);
-      _hash *= 0x9FB21C651E98DF25;
-      _hash ^= (_hash >>> 35) + length;
-      _hash *= 0x9FB21C651E98DF25;
-      _hash ^= _hash >>> 28;
-      return _hash; // skips avalanche
+      // XXH3_len_4to8_128b
+      lhs = input.getUint32(0, Endian.little);
+      rhs = input.getUint32(length - 4, Endian.little);
+
+      x = key.getUint64(16, Endian.little);
+      x ^= key.getUint64(24, Endian.little);
+      x += seed ^ (_swap32(seed & _mask32) << 32);
+      x ^= (rhs << 32) | lhs;
+
+      var r = _cross128(x, prime64_1 + (length << 2));
+      low = r[0];
+      high = r[1];
+
+      high += low << 1;
+      low ^= high >>> 3;
+
+      low ^= low >>> 35;
+      low *= 0x9FB21C651E98DF25;
+      low ^= low >>> 28;
+
+      high = _avalanche(high);
     } else if (length <= 16) {
-      // XXH3_len_9to16_64b
-      lhs = key.getUint64(24, Endian.little);
-      lhs ^= key.getUint64(32, Endian.little);
-      lhs += seed;
+      // XXH3_len_9to16_128b
+      lhs = key.getUint64(32, Endian.little);
+      lhs ^= key.getUint64(40, Endian.little);
+      lhs -= seed;
       lhs ^= input.getUint64(0, Endian.little);
-      rhs = key.getUint64(40, Endian.little);
-      rhs ^= key.getUint64(48, Endian.little);
-      rhs -= seed;
+      lhs ^= input.getUint64(length - 8, Endian.little);
+
+      rhs = key.getUint64(48, Endian.little);
+      rhs ^= key.getUint64(56, Endian.little);
+      rhs += seed;
       rhs ^= input.getUint64(length - 8, Endian.little);
-      _hash = length + _swap64(lhs) + rhs + _fold64(lhs, rhs);
+
+      var r = _cross128(lhs, prime64_1);
+      low = r[0];
+      high = r[1];
+      low += length - 1 << 54;
+      high += (rhs & (_mask32 << 32)) + ((rhs & _mask32) * prime32_2);
+
+      low ^= _swap64(high);
+      r = _cross128(low, prime64_2);
+      low = r[0];
+      high = r[1] + (high * prime64_2);
+
+      low = _avalanche(low);
+      high = _avalanche(high);
     } else if (length <= 128) {
-      // XXH3_len_17to128_64b
-      _hash = length * prime64_1;
+      // XXH3_len_17to128_128b
+      acc[0] = length * prime64_1;
+      acc[1] = 0;
       i = (length - 1) >>> 5;
       for (; i >= 0; i--) {
-        a = i << 4;
-        b = length - (a + 16);
-        c = i << 5;
-        _hash += _mix16B(input, a, key, c, seed);
-        _hash += _mix16B(input, b, key, c + 16, seed);
+        _mix32B(
+          acc,
+          input,
+          i << 4,
+          length - ((i + 1) << 4),
+          key,
+          i << 5,
+          seed,
+        );
       }
+      // mid-range avalanche
+      low = _avalanche(acc[0] + acc[1]);
+      high = acc[1] * prime64_4;
+      high += acc[0] * prime64_1;
+      high += (length - seed) * prime64_2;
+      high = -_avalanche(high);
     } else {
-      // XXH3_len_129to240_64b
+      // XXH3_len_129to240_128b
       const int _startOffset = 3;
       const int _lastOffset = 17;
-      _hash = length * prime64_1;
+      acc[0] = length * prime64_1;
+      acc[1] = 0;
       // first 128 bytes
-      for (i = 0; i < 128; i += 16) {
-        _hash += _mix16B(input, i, key, i, seed);
+      for (i = 0; i < 128; i += 32) {
+        _mix32B(
+          acc,
+          input,
+          i,
+          i + 16,
+          key,
+          i,
+          seed,
+        );
       }
-      _hash = _avalanche(_hash);
+      acc[0] = _avalanche(acc[0]);
+      acc[1] = _avalanche(acc[1]);
       // remaining bytes
-      for (i = 128; i + 16 <= length; i += 16) {
-        c = _startOffset + i - 128;
-        _hash += _mix16B(input, i, key, c, seed);
+      for (i = 128; i + 32 <= length; i += 32) {
+        _mix32B(
+          acc,
+          input,
+          i,
+          i + 16,
+          key,
+          _startOffset + i - 128,
+          seed,
+        );
       }
       // last byte
-      c = _minSecretSize - _lastOffset;
-      _hash += _mix16B(input, length - 16, key, c, seed);
+      _mix32B(
+        acc,
+        input,
+        length - 16,
+        length - 32,
+        key,
+        _minSecretSize - _lastOffset - 16,
+        -seed,
+      );
+      // mid-range avalanche
+      low = _avalanche(acc[0] + acc[1]);
+      high = acc[1] * prime64_4;
+      high += acc[0] * prime64_1;
+      high += (length - seed) * prime64_2;
+      high = -_avalanche(high);
     }
-    // avalanche
-    return _avalanche(_hash);
+    // combine
+    return _combine(low, high);
   }
 
   @override
   Uint8List $finalize() {
     int i;
-    int _hash;
     ByteData key;
     Uint64List input = Uint64List(_midSizeMax >>> 3);
     Uint8List input8 = input.buffer.asUint8List();
@@ -336,23 +453,12 @@ class XXH3Sink64bit extends BlockHashSink {
       } else {
         key = Uint8List.fromList(_kSecret).buffer.asByteData();
       }
-      _hash = _finalizeShort(input.buffer.asByteData(), i, key);
+      return _finalizeShort(input.buffer.asByteData(), i, key);
     } else {
-      for (i = 63; i >= 0; --i) {
+      for (i = _stripeLen - 1; i >= 0; --i) {
         input8[i] = last.removeLast();
       }
-      _hash = _finalizeLong(input);
+      return _finalizeLong(input);
     }
-
-    return Uint8List.fromList([
-      _hash >>> 56,
-      _hash >>> 48,
-      _hash >>> 40,
-      _hash >>> 32,
-      _hash >>> 24,
-      _hash >>> 16,
-      _hash >>> 8,
-      _hash,
-    ]);
   }
 }

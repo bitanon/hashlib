@@ -2,16 +2,20 @@
 
 - Adds xxHash64
   - New class: `XXHash64`
-  - New constants: `xxhash64`, `xxhash64code`
-  - String extension: `xxhash64code`
+  - New constants: `xxh64`, `xxh64code`
+  - String extension: `xxh64code`
 - Adds xxHash32
   - New class: `XXHash32`
-  - New constants: `xxhash32`, `xxhash32code`
-  - String extension: `xxhash32code`
-- Adds XXH3
+  - New constants: `xxh32`, `xxh32code`
+  - String extension: `xxh32code`
+- Adds XXH3-64
   - New class: `XXH3`
   - New constants: `xxh3`, `xxh3code`
   - String extension: `xxh3code`
+- Adds XXH3-128
+  - New class: `XXH128`
+  - New constants: `xxh128`, `xxh128code`
+  - String extension: `xxh128code`
 - Internal changes:
   - Removes the parameters from `$finalize` method in `BlockHash`
   - Uses `>>>` instead of `>>`

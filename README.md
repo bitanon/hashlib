@@ -39,7 +39,8 @@ This library contains implementations of secure hash functions, checksum generat
 | Alder32    | `alder32`                      | Wikipedia |
 | xxHash32   | `XXHash32`,`xxh32`,`xxh32code` | Cyan4973  |
 | xxHash64   | `XXHash64`,`xxh64`,`xxh64code` | Cyan4973  |
-| XXH3       | `XXH3`,`xxh3`,`xxh3code`       | Cyan4973  |
+| XXH3-64    | `XXH3`,`xxh3`,`xxh3code`       | Cyan4973  |
+| XXH3-128   | `XXH128`,`xxh128`,`xxh128code` | Cyan4973  |
 | MD5        | `md5`                          | RFC-1321  |
 | SHA-1      | `sha1`                         | RFC-3174  |
 

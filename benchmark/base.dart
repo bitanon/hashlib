@@ -23,7 +23,7 @@ abstract class Benchmark extends BenchmarkBase {
     }
   }
 
-  void showDiff(List<BenchmarkBase> others) {
+  void showDiff([List<BenchmarkBase> others = const []]) {
     var data = measureDiff({this, ...others});
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
@@ -37,6 +37,27 @@ abstract class Benchmark extends BenchmarkBase {
       }
       print(message);
     }
+  }
+
+  void measureRate() {
+    const suffix = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s', 'PB/s'];
+
+    Stopwatch watch = Stopwatch()..start();
+    warmup();
+    watch.reset();
+    exercise();
+    var runtime = watch.elapsedMicroseconds;
+
+    var nbhps = 1e6 * iter / runtime;
+    var rate = nbhps * size;
+    int i = 0;
+    for (; rate >= 1000; i++) {
+      rate /= 1000;
+    }
+
+    var rtms = runtime.round() / 1000;
+    var speed = '${rate.toStringAsFixed(2)} ${suffix[i]}';
+    print('$name : $rtms ms => #${nbhps.round()} @ $speed ');
   }
 }
 

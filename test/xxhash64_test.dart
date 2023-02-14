@@ -17,17 +17,16 @@ const data = <int>[
 void main() {
   group('XXHash64 test', () {
     test('with seed = 0 and an empty string', () {
-      expect(xxhash64.convert([]).hex(), "ef46db3751d8e999");
+      expect(xxh64.convert([]).hex(), "ef46db3751d8e999");
     }, tags: 'skip-js');
     test('with seed = 0 and a single letter', () {
-      expect(xxhash64.convert([data[0]]).hex(), "4fce394cc88952d8");
+      expect(xxh64.convert([data[0]]).hex(), "4fce394cc88952d8");
     }, tags: 'skip-js');
     test('with seed = 0 and 14 letters', () {
-      expect(
-          xxhash64.convert(data.take(14).toList()).hex(), "cffa8db881bc3a3d");
+      expect(xxh64.convert(data.take(14).toList()).hex(), "cffa8db881bc3a3d");
     }, tags: 'skip-js');
     test('with seed = 0 and 101 letters', () {
-      expect(xxhash64.convert(data).hex(), "0eab543384f878ad");
+      expect(xxh64.convert(data).hex(), "0eab543384f878ad");
     }, tags: 'skip-js');
 
     test('with seed = $seed and an empty string', () {

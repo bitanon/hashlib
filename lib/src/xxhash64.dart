@@ -7,7 +7,7 @@ import 'package:hashlib/src/algorithms/xxhash64.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// An instance of [XXHash64] with seed = 0
-const XXHash64 xxhash64 = XXHash64(0);
+const XXHash64 xxh64 = XXHash64(0);
 
 /// XXHash64 is a fast and efficient non-cryptographic hash function for
 /// 64-bit platforms. It is designed for producing a quick and reliable hash
@@ -37,17 +37,17 @@ class XXHash64 extends BlockHashBase {
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-int xxhash64code(String input, [Encoding? encoding]) {
-  return xxhash64.string(input, encoding).remainder();
+int xxh64code(String input, [Encoding? encoding]) {
+  return xxh64.string(input, encoding).remainder();
 }
 
-/// Extension to [String] to generate [xxhash64] code
+/// Extension to [String] to generate [xxh64] code
 extension XXHash64StringExtension on String {
   /// Gets the 64-bit xxHash value of a String
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  int xxhash64code([Encoding? encoding]) {
-    return xxhash64.string(this, encoding).remainder();
+  int xxh64code([Encoding? encoding]) {
+    return xxh64.string(this, encoding).remainder();
   }
 }

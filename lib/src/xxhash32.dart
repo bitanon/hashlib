@@ -7,7 +7,7 @@ import 'package:hashlib/src/algorithms/xxhash32.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// An instance of [XXHash32] with seed = 0
-const XXHash32 xxhash32 = XXHash32(0);
+const XXHash32 xxh32 = XXHash32(0);
 
 /// XXHash32 is a fast and efficient non-cryptographic hash function for
 /// 32-bit platforms. It is designed for producing a quick and reliable hash
@@ -37,17 +37,17 @@ class XXHash32 extends BlockHashBase {
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-int xxhash32code(String input, [Encoding? encoding]) {
-  return xxhash32.string(input, encoding).remainder();
+int xxh32code(String input, [Encoding? encoding]) {
+  return xxh32.string(input, encoding).remainder();
 }
 
-/// Extension to [String] to generate [xxhash32] code
+/// Extension to [String] to generate [xxh32] code
 extension XXHash32StringExtension on String {
   /// Gets the 32-bit xxHash value of a String
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  int xxhash32code([Encoding? encoding]) {
-    return xxhash32.string(this, encoding).remainder();
+  int xxh32code([Encoding? encoding]) {
+    return xxh32.string(this, encoding).remainder();
   }
 }
