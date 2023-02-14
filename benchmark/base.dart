@@ -57,7 +57,7 @@ abstract class Benchmark extends BenchmarkBase {
 
     var rtms = runtime.round() / 1000;
     var speed = '${rate.toStringAsFixed(2)} ${suffix[i]}';
-    print('$name : $rtms ms => #${nbhps.round()} @ $speed ');
+    print('$name ($size x $iter): $rtms ms => #${nbhps.round()} @ $speed');
   }
 }
 
