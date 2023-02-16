@@ -10,7 +10,8 @@ import 'base.dart';
 Random random = Random();
 
 class XXH32Benchmark extends Benchmark {
-  XXH32Benchmark(int size, int iter) : super('XXH32', size, iter);
+  XXH32Benchmark(int size, int iter, [String name = 'XXH32'])
+      : super(name, size, iter);
 
   @override
   void run() {
@@ -19,7 +20,8 @@ class XXH32Benchmark extends Benchmark {
 }
 
 class XXH64Benchmark extends Benchmark {
-  XXH64Benchmark(int size, int iter) : super('XXH64', size, iter);
+  XXH64Benchmark(int size, int iter, [String name = 'XXH64'])
+      : super(name, size, iter);
 
   @override
   void run() {
@@ -28,7 +30,8 @@ class XXH64Benchmark extends Benchmark {
 }
 
 class XXH3Benchmark extends Benchmark {
-  XXH3Benchmark(int size, int iter) : super('XXH3', size, iter);
+  XXH3Benchmark(int size, int iter, [String name = 'XXH3'])
+      : super(name, size, iter);
 
   @override
   void run() {
@@ -37,7 +40,8 @@ class XXH3Benchmark extends Benchmark {
 }
 
 class XXH128Benchmark extends Benchmark {
-  XXH128Benchmark(int size, int iter) : super('XXH128', size, iter);
+  XXH128Benchmark(int size, int iter, [String name = 'XXH128'])
+      : super(name, size, iter);
 
   @override
   void run() {
@@ -48,7 +52,7 @@ class XXH128Benchmark extends Benchmark {
 void main() {
   final conditions = [
     [1 << 9, 100000],
-    [1 << 15, 10000],
+    [1 << 15, 1000],
     [1 << 23, 10],
   ];
   print('--------- XXH3 ----------');

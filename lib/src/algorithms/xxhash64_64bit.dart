@@ -5,6 +5,8 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 
+/// This implementation is derived from
+/// https://github.com/easyaspi314/xxhash-clean/blob/master/xxhash64-ref.c
 class XXHash64Sink extends BlockHashSink {
   final int seed;
 

@@ -21,6 +21,7 @@ import 'sha512.dart' as sha512;
 import 'sha512_224.dart' as sha512t224;
 import 'sha512_256.dart' as sha512t256;
 import 'argon2.dart' as argon2;
+import 'xxhash.dart' as xxhash;
 
 void main(List<String> args) {
   print("# Benchmarks");
@@ -43,6 +44,12 @@ void main(List<String> args) {
     var iter = condition[1];
 
     var algorithms = {
+      "XXH64": [
+        xxhash.XXH64Benchmark(size, iter, "hashlib"),
+      ],
+      "XXH3": [
+        xxhash.XXH3Benchmark(size, iter, "hashlib"),
+      ],
       "MD5": [
         md5.HashlibBenchmark(size, iter),
         md5.CryptoBenchmark(size, iter),

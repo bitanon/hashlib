@@ -7,6 +7,8 @@ import 'package:hashlib/src/core/block_hash.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
+/// This implementation is derived from
+/// https://github.com/easyaspi314/xxhash-clean/blob/master/xxhash32-ref.c
 class XXHash32Sink extends BlockHashSink {
   final int seed;
 

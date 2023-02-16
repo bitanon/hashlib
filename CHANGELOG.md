@@ -19,6 +19,7 @@
 - Internal changes:
   - Removes the parameters from `$finalize` method in `BlockHash`
   - Uses `>>>` instead of `>>`
+- Uses Hash Rate instead of Runtime for benchmarks
 
 ## 1.7.0
 

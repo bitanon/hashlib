@@ -9,6 +9,9 @@ import 'package:hashlib/src/core/block_hash.dart';
 /// An instance of [XXH128] with seed = 0
 const XXH128 xxh128 = XXH128(seed: 0);
 
+/// An instance of [XXH128] with seed = 0
+const XXH128 xxh3_128 = xxh128;
+
 /// This is an implementation of 128-bit XXH3 hash algorithm of xxHash family
 /// derived from https://github.com/Cyan4973/xxHash
 ///

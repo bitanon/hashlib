@@ -9,6 +9,9 @@ import 'package:hashlib/src/core/block_hash.dart';
 /// An instance of [XXH3] with seed = 0
 const XXH3 xxh3 = XXH3(seed: 0);
 
+/// An instance of [XXH3] with seed = 0
+const XXH3 xxh3_64 = xxh3;
+
 /// This is an implementation of 64-bit XXH3 hash algorithm of xxHash family
 /// derived from https://github.com/Cyan4973/xxHash
 ///

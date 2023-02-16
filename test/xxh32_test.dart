@@ -17,32 +17,32 @@ const data = <int>[
 void main() {
   group('XXHash32 test', () {
     test('with seed = 0 and an empty string', () {
-      expect(xxh32.convert([]).hex(true), "02CC5D05");
+      expect(xxh32.convert([]).hex(), "02cc5d05");
     });
     test('with seed = 0 and a single letter', () {
-      expect(xxh32.convert([data[0]]).hex(true), "B85CBEE5");
+      expect(xxh32.convert([data[0]]).hex(), "b85cbee5");
     });
     test('with seed = 0 and 14 letters', () {
-      expect(xxh32.convert(data.take(14).toList()).hex(true), "E5AA0AB4");
+      expect(xxh32.convert(data.take(14).toList()).hex(), "e5aa0ab4");
     });
     test('with seed = 0 and 101 letters', () {
-      expect(xxh32.convert(data).hex(true), "1F1AA412");
+      expect(xxh32.convert(data).hex(), "1f1aa412");
     });
 
     test('with seed = $seed and an empty string', () {
-      expect(xxh32_1.convert([]).hex(true), "36B78AE7");
+      expect(xxh32_1.convert([]).hex(), "36b78ae7");
     });
 
     test('with seed = $seed and a single letter', () {
-      expect(xxh32_1.convert([data[0]]).hex(true), "D5845D64");
+      expect(xxh32_1.convert([data[0]]).hex(), "d5845d64");
     });
 
     test('with seed = $seed and 14 letters', () {
-      expect(xxh32_1.convert(data.take(14).toList()).hex(true), "4481951D");
+      expect(xxh32_1.convert(data.take(14).toList()).hex(), "4481951d");
     });
 
     test('with seed = $seed and 101 letters', () {
-      expect(xxh32_1.convert(data).hex(true), "498EC8E2");
+      expect(xxh32_1.convert(data).hex(), "498ec8e2");
     });
   });
 }

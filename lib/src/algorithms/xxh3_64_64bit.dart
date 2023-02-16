@@ -9,7 +9,7 @@ import 'package:hashlib/src/core/block_hash.dart';
 const int _mask32 = 0xFFFFFFFF;
 
 const int _stripeLen = 64;
-const int _midSizeMax = 240;
+const int _midsizeMax = 240;
 const int _minSecretSize = 136;
 
 // Pseudorandom secret taken directly from FARSH (little-endian)
@@ -32,12 +32,14 @@ const List<int> _kSecret = <int>[
   0x95, 0x16, 0x04, 0x28, 0xaf, 0xd7, 0xfb, 0xca, 0xbb, 0x4b, 0x40, 0x7e,
 ];
 
+/// This implementation is derived from
+/// https://github.com/RedSpah/xxhash_cpp/blob/master/include/xxhash.hpp
 class XXH3Sink64bit extends BlockHashSink {
   final int seed;
   final int rounds;
   final Uint8List secret;
   final Uint64List acc = Uint64List(8);
-  final ListQueue<int> last = ListQueue<int>(_midSizeMax);
+  final ListQueue<int> last = ListQueue<int>(_midsizeMax);
   late final Uint64List qbuffer = buffer.buffer.asUint64List();
   late final ByteData secretBD = secret.buffer.asByteData();
   late final Uint64List secret64 = secret.buffer.asUint64List();
@@ -115,14 +117,10 @@ class XXH3Sink64bit extends BlockHashSink {
         pos = 0;
       }
       buffer[pos] = chunk[start];
-      if (last.length == _midSizeMax) {
+      if (last.length == _midsizeMax) {
         last.removeFirst();
       }
-      last.add(buffer[pos]);
-    }
-    if (pos == blockLength) {
-      $update();
-      pos = 0;
+      last.add(chunk[start]);
     }
   }
 
@@ -134,7 +132,7 @@ class XXH3Sink64bit extends BlockHashSink {
       l = n << 3;
       for (i = 0; i < acc.length; i++) {
         v = qbuffer[l + i];
-        acc[i] += v;
+        acc[i ^ 1] += v;
         v ^= secret64[n + i];
         acc[i] += (v & _mask32) * (v >>> 32);
       }
@@ -155,38 +153,58 @@ class XXH3Sink64bit extends BlockHashSink {
     return _hash;
   }
 
+  static int _midsizeAvalanche(int _hash) {
+    _hash ^= _hash >>> 33;
+    _hash *= prime64_2;
+    _hash ^= _hash >>> 29;
+    _hash *= prime64_3;
+    _hash ^= _hash >>> 32;
+    return _hash;
+  }
+
+  static int _rrmxmx(int _hash, int length) {
+    _hash ^= _rotl64(_hash, 49) ^ _rotl64(_hash, 24);
+    _hash *= 0x9FB21C651E98DF25;
+    _hash ^= (_hash >>> 35) + length;
+    _hash *= 0x9FB21C651E98DF25;
+    _hash ^= _hash >>> 28;
+    return _hash;
+  }
+
   int _finalizeLong(Uint64List stripe) {
+    // void hash_long_internal_loop
     int _hash;
     int t, n, i, v, l, a, b;
+    const int _lastAccStart = 7;
+    const int _mergeAccStart = 11;
 
-    // accumulate last partial block
-    for (t = n = 0; t + _stripeLen <= pos; n++, t += _stripeLen) {
+    // last partial block
+    for (t = n = 0; t + _stripeLen < pos; n++, t += _stripeLen) {
       l = n << 3;
       for (i = 0; i < acc.length; i++) {
         v = qbuffer[l + i];
-        acc[i] += v;
+        acc[i ^ 1] += v;
         v ^= secret64[n + i];
         acc[i] += (v & _mask32) * (v >>> 32);
       }
     }
 
     // last stripe
-    if (messageLength & 63 != 0) {
-      t = secret.lengthInBytes - _stripeLen - 7;
-      for (i = 0; i < acc.length; i++, t += 8) {
-        v = stripe[i];
-        acc[i] += v;
-        v ^= secretBD.getUint64(t, Endian.little);
-        acc[i] += (v & _mask32) * (v >>> 32);
-      }
+    t = secret.lengthInBytes - _stripeLen - _lastAccStart;
+    for (i = 0; i < acc.length; i++, t += 8) {
+      v = stripe[i];
+      acc[i ^ 1] += v;
+      v ^= secretBD.getUint64(t, Endian.little);
+      acc[i] += (v & _mask32) * (v >>> 32);
     }
 
-    // converge into final hash
+    // converge into final hash: uint64_t merge_accs
     _hash = messageLength * prime64_1;
-    for (i = t = 0; i < 8; i += 2, t += 16) {
-      a = secretBD.getUint64(11 + t, Endian.little);
-      b = secretBD.getUint64(11 + t + 8, Endian.little);
-      _hash += _fold64(acc[i] ^ a, acc[i + 1] ^ b);
+    t = _mergeAccStart;
+    for (i = 0; i < 8; i += 2, t += 16) {
+      a = acc[i] ^ secretBD.getUint64(t, Endian.little);
+      b = acc[i + 1] ^ secretBD.getUint64(t + 8, Endian.little);
+      _hash += _mul128fold64(a, b);
     }
 
     // avalanche
@@ -213,90 +231,97 @@ class XXH3Sink64bit extends BlockHashSink {
 
   // Multiply two 64-bit numbers to get 128-bit number and
   // xor the low bits of the product with the high bits
-  static int _fold64(int a, int b) {
-    int al = a & _mask32;
-    int ah = a >>> 32;
-    int bl = b & _mask32;
-    int bh = b >>> 32;
+  static int _mul128fold64(int a, int b) {
+    int al, ah, bl, bh, ll, hl, lh, hh, cross, upper, lower;
 
-    int ll = al * bl;
-    int hl = ah * bl;
-    int lh = al * bh;
-    int hh = ah * bh;
+    al = a & _mask32;
+    ah = a >>> 32;
+    bl = b & _mask32;
+    bh = b >>> 32;
 
-    int cross = (ll >>> 32) + (hl & _mask32) + lh;
-    int upper = (hl >>> 32) + (cross >>> 32) + hh;
-    int lower = (cross << 32) | (ll & _mask32);
+    ll = al * bl;
+    hl = ah * bl;
+    lh = al * bh;
+    hh = ah * bh;
+
+    cross = (ll >>> 32) + (hl & _mask32) + lh;
+    upper = (hl >>> 32) + (cross >>> 32) + hh;
+    lower = (cross << 32) | (ll & _mask32);
 
     return upper ^ lower;
   }
 
   static int _mix16B(ByteData input, int i, ByteData key, int j, int seed) {
     int lhs, rhs;
-    lhs = key.getUint64(j, Endian.little) + seed;
-    rhs = key.getUint64(j + 8, Endian.little) - seed;
-    lhs ^= input.getUint64(i, Endian.little);
-    rhs ^= input.getUint64(i + 8, Endian.little);
-    return _fold64(lhs, rhs);
+    lhs = input.getUint64(i, Endian.little);
+    rhs = input.getUint64(i + 8, Endian.little);
+    lhs ^= key.getUint64(j, Endian.little) + seed;
+    rhs ^= key.getUint64(j + 8, Endian.little) - seed;
+    return _mul128fold64(lhs, rhs);
   }
 
   int _finalizeShort(ByteData input, int length, ByteData key) {
-    int _hash, i, lhs, rhs, a, b, c;
+    int _hash, lhs, rhs, a, b, c, i;
     if (length == 0) {
-      // XXH3_len_0_64b
+      // hash_t<N> len_0to16
       _hash = seed;
-      _hash += prime64_1;
       _hash ^= key.getUint64(56, Endian.little);
       _hash ^= key.getUint64(64, Endian.little);
+      return _midsizeAvalanche(_hash);
     } else if (length <= 3) {
-      // XXH3_len_1to3_64b
+      // hash_t<N> len_1to3
       a = input.getUint8(0);
-      b = input.getUint8(length > 1 ? 1 : 0);
+      b = input.getUint8(length >>> 1);
       c = input.getUint8(length - 1);
       _hash = key.getUint32(0, Endian.little);
       _hash ^= key.getUint32(4, Endian.little);
       _hash += seed;
       _hash ^= (a << 16) | (b << 24) | (c) | (length << 8);
-      _hash *= prime64_1;
+      return _midsizeAvalanche(_hash);
     } else if (length <= 8) {
-      // XXH3_len_4to8_64b
-      rhs = input.getUint32(0, Endian.little);
-      lhs = input.getUint32(length - 4, Endian.little);
+      // hash_t<N> len_4to8
+      lhs = input.getUint32(0, Endian.little);
+      rhs = input.getUint32(length - 4, Endian.little);
       _hash = key.getUint64(8, Endian.little);
       _hash ^= key.getUint64(16, Endian.little);
-      _hash -= seed ^ (_swap32(seed & _mask32) << 32);
-      _hash ^= (rhs << 32) | lhs;
-      // rrmxmx mix
-      _hash ^= _rotl64(_hash, 49) ^ _rotl64(_hash, 24);
-      _hash *= 0x9FB21C651E98DF25;
-      _hash ^= (_hash >>> 35) + length;
-      _hash *= 0x9FB21C651E98DF25;
-      _hash ^= _hash >>> 28;
-      return _hash; // skips avalanche
+      _hash -= seed ^ ((_swap32(seed) & _mask32) << 32);
+      _hash ^= (lhs << 32) | rhs;
+      return _rrmxmx(_hash, length);
     } else if (length <= 16) {
-      // XXH3_len_9to16_64b
+      // hash_t<N> len_9to16
       lhs = key.getUint64(24, Endian.little);
       lhs ^= key.getUint64(32, Endian.little);
       lhs += seed;
-      lhs ^= input.getUint64(0, Endian.little);
+
       rhs = key.getUint64(40, Endian.little);
       rhs ^= key.getUint64(48, Endian.little);
       rhs -= seed;
+
+      lhs ^= input.getUint64(0, Endian.little);
       rhs ^= input.getUint64(length - 8, Endian.little);
-      _hash = length + _swap64(lhs) + rhs + _fold64(lhs, rhs);
+
+      _hash = length + _swap64(lhs) + rhs + _mul128fold64(lhs, rhs);
+      return _avalanche(_hash);
     } else if (length <= 128) {
-      // XXH3_len_17to128_64b
+      // hash_t<N> len_17to128
       _hash = length * prime64_1;
-      i = (length - 1) >>> 5;
-      for (; i >= 0; i--) {
-        a = i << 4;
-        b = length - (a + 16);
-        c = i << 5;
-        _hash += _mix16B(input, a, key, c, seed);
-        _hash += _mix16B(input, b, key, c + 16, seed);
+      if (length > 32) {
+        if (length > 64) {
+          if (length > 96) {
+            _hash += _mix16B(input, 48, key, 96, seed);
+            _hash += _mix16B(input, length - 64, key, 112, seed);
+          }
+          _hash += _mix16B(input, 32, key, 64, seed);
+          _hash += _mix16B(input, length - 48, key, 80, seed);
+        }
+        _hash += _mix16B(input, 16, key, 32, seed);
+        _hash += _mix16B(input, length - 32, key, 48, seed);
       }
+      _hash += _mix16B(input, 0, key, 0, seed);
+      _hash += _mix16B(input, length - 16, key, 16, seed);
+      return _avalanche(_hash);
     } else {
-      // XXH3_len_129to240_64b
+      // hash_t<N> len_129to240
       const int _startOffset = 3;
       const int _lastOffset = 17;
       _hash = length * prime64_1;
@@ -313,9 +338,8 @@ class XXH3Sink64bit extends BlockHashSink {
       // last byte
       c = _minSecretSize - _lastOffset;
       _hash += _mix16B(input, length - 16, key, c, seed);
+      return _avalanche(_hash);
     }
-    // avalanche
-    return _avalanche(_hash);
   }
 
   @override
@@ -323,10 +347,10 @@ class XXH3Sink64bit extends BlockHashSink {
     int i;
     int _hash;
     ByteData key;
-    Uint64List input = Uint64List(_midSizeMax >>> 3);
+    Uint64List input = Uint64List(_midsizeMax >>> 3);
     Uint8List input8 = input.buffer.asUint8List();
 
-    if (messageLength <= _midSizeMax) {
+    if (messageLength <= _midsizeMax) {
       var it = last.iterator;
       for (i = 0; it.moveNext(); ++i) {
         input8[i] = it.current;
