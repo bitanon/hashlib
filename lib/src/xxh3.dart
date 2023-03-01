@@ -53,6 +53,15 @@ int xxh3code(String input, [Encoding? encoding]) {
   return xxh3.string(input, encoding).remainder();
 }
 
+/// Gets the 64-bit XXH3 hash of a String in hexadecimal.
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+String xxh3sum(String input, [Encoding? encoding]) {
+  return xxh3.string(input, encoding).hex();
+}
+
 /// Extension to [String] to generate [xxh3] code
 extension XXH3StringExtension on String {
   /// Gets the 64-bit XXH3 value of a String.
@@ -61,5 +70,13 @@ extension XXH3StringExtension on String {
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int xxh3code([Encoding? encoding]) {
     return xxh3.string(this, encoding).remainder();
+  }
+
+  /// Gets the 64-bit XXH3 hash of a String in hexadecimal.
+  ///
+  /// Parameters:
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  String xxh3sum([Encoding? encoding]) {
+    return xxh3.string(this, encoding).hex();
   }
 }

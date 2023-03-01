@@ -21,11 +21,20 @@ class _CRC64 extends HashBase {
   CRC64Hash createSink() => CRC64Hash();
 }
 
-/// Gets the CRC-64 value of a String
+/// Gets the CRC-64 value of a String.
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int crc64code(String input, [Encoding? encoding]) {
   return crc64.string(input, encoding).remainder();
+}
+
+/// Gets the CRC-64 hash of a String in hexadecimal.
+///
+/// Parameters:
+/// - [input] is the string to hash
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+String crc64sum(String input, [Encoding? encoding]) {
+  return crc64.string(input, encoding).hex();
 }

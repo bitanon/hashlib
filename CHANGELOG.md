@@ -1,3 +1,13 @@
+## Next
+
+- Adds new methods:
+  - `crc64sum`
+  - `xxh64sum`
+  - `xxh3sum`
+  - `xxh128sum`
+- Removes methods:
+  - `xxh128code`
+
 ## 1.8.0
 
 - Adds xxHash64

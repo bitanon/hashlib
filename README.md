@@ -95,7 +95,18 @@ void main() {
   print("salt => ${toHex(salt)}");
   print('');
 
+  // Example of hash code generations
+  print('[XXH32] => ${xxh32code(text)}');
+  print('[CRC32] => ${crc32code(text)}');
+  print('[Alder32] => ${alder32code(text)}');
+  print('[CRC16] => ${crc16code(text)}');
+  print('');
+
   // Examples of Hash generation
+  print('[CRC64] => ${crc64sum(text)}');
+  print('[XXH64] => ${xxh64sum(text)}');
+  print('[XXH3] => ${xxh3sum(text)}');
+  print('[XXH128] => ${xxh128sum(text)}');
   print('[MD5] => ${md5.string(text)}');
   print('[SHA-1] => ${sha1.string(text)}');
   print('[SHA-224] => ${sha224.string(text)}');
@@ -124,7 +135,7 @@ void main() {
   print('HMAC[MD5] => ${md5.hmacBy(key).string(text)}');
   print('HMAC[MD5] => ${HMAC(md5, pw).string(text)}');
   print("[BLAKE-2b/256] => ${blake2b256.mac(pw).string(text)}");
-  print("[BLAKE-2b/256] => ${Blake2bMAC(256, pw).string(text)}");
+  print("[BLAKE-2b/256] => ${Blake2bMAC(32, pw).string(text)}");
   print('');
 
   // Examples of PBKDF2 key derivation
@@ -140,13 +151,6 @@ void main() {
   print("[Argon2i] => ${argon2i(pw, salt, security: security)}");
   print("[Argon2d] => ${argon2d(pw, salt, security: security)}");
   print("[Argon2id] => ${argon2id(pw, salt, security: security)}");
-  print('');
-
-  // Example of checksum code generators
-  print('[CRC16] => ${crc16code(text)}');
-  print('[CRC32] => ${crc32code(text)}');
-  print('[CRC64] => ${crc64code(text)}');
-  print('[Alder32] => ${alder32code(text)}');
 }
 ```
 

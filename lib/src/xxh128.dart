@@ -44,22 +44,22 @@ class XXH128 extends BlockHashBase {
       : XXH3Sink128bit.withSecret(secret);
 }
 
-/// Gets the 128-bit XXH3 value of a String.
+/// Gets the 128-bit XXH3 hash of a String in hexadecimal.
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-int xxh128code(String input, [Encoding? encoding]) {
-  return xxh128.string(input, encoding).remainder();
+String xxh128sum(String input, [Encoding? encoding]) {
+  return xxh128.string(input, encoding).hex();
 }
 
 /// Extension to [String] to generate [xxh128] code
 extension XXH128StringExtension on String {
-  /// Gets the 128-bit XXH3 value of a String.
+  /// Gets the 128-bit XXH3 hash of a String in hexadecimal.
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  int xxh128code([Encoding? encoding]) {
-    return xxh128.string(this, encoding).remainder();
+  String xxh128sum([Encoding? encoding]) {
+    return xxh128.string(this, encoding).hex();
   }
 }

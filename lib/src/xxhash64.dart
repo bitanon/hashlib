@@ -32,22 +32,39 @@ class XXHash64 extends BlockHashBase {
   XXHash64 withSeed(int seed) => XXHash64(seed);
 }
 
-/// Gets the 64-bit xxHash value of a String
+/// Gets the 64-bit xxHash value of a String.
 ///
 /// Parameters:
-/// - [input] is the string to hash
-/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+/// - [input] is the string to hash.
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`.
 int xxh64code(String input, [Encoding? encoding]) {
   return xxh64.string(input, encoding).remainder();
 }
 
-/// Extension to [String] to generate [xxh64] code
+/// Gets the 64-bit xxHash hash of a String in hexadecimal.
+///
+/// Parameters:
+/// - [input] is the string to hash.
+/// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+String xxh64sum(String input, [Encoding? encoding]) {
+  return xxh64.string(input, encoding).hex();
+}
+
+/// Extension to [String] to generate [xxh64] code.
 extension XXHash64StringExtension on String {
-  /// Gets the 64-bit xxHash value of a String
-  ///
+  /// Gets the 64-bit xxHash value of a String.
+  ///.
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int xxh64code([Encoding? encoding]) {
     return xxh64.string(this, encoding).remainder();
+  }
+
+  /// Gets the 64-bit xxHash hash of a String in hexadecimal.
+  ///
+  /// Parameters:
+  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  String xxh64sum([Encoding? encoding]) {
+    return xxh64.string(this, encoding).hex();
   }
 }
