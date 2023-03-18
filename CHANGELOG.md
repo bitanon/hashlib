@@ -1,5 +1,6 @@
 ## Next
 
+- Improves dart run for Argon2 using pragmas
 - Adds new methods:
   - `crc64sum`
   - `xxh64sum`
