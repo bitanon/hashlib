@@ -55,80 +55,64 @@ class XXHash64Sink extends BlockHashSink {
     }
   }
 
+  @pragma('vm:prefer-inline')
+  static int _rotl(int x, int n) => (x << n) | (x >>> (64 - n));
+
+  @pragma('vm:prefer-inline')
+  static int _accumulate(int x, int y) =>
+      _rotl((x + y * prime64_2), 31) * prime64_1;
+
   @override
   void $update([List<int>? block, int offset = 0, bool last = false]) {
-    _acc1 += qbuffer[0] * prime64_2;
-    _acc1 = (_acc1 << 31) | (_acc1 >>> 33);
-    _acc1 *= prime64_1;
-
-    _acc2 += qbuffer[1] * prime64_2;
-    _acc2 = (_acc2 << 31) | (_acc2 >>> 33);
-    _acc2 *= prime64_1;
-
-    _acc3 += qbuffer[2] * prime64_2;
-    _acc3 = (_acc3 << 31) | (_acc3 >>> 33);
-    _acc3 *= prime64_1;
-
-    _acc4 += qbuffer[3] * prime64_2;
-    _acc4 = (_acc4 << 31) | (_acc4 >>> 33);
-    _acc4 *= prime64_1;
+    _acc1 = _accumulate(_acc1, qbuffer[0]);
+    _acc2 = _accumulate(_acc2, qbuffer[1]);
+    _acc3 = _accumulate(_acc3, qbuffer[2]);
+    _acc4 = _accumulate(_acc4, qbuffer[3]);
   }
+
+  @pragma('vm:prefer-inline')
+  static int _merge(int h, int a) =>
+      (h ^ _accumulate(0, a)) * prime64_1 + prime64_4;
 
   @override
   Uint8List $finalize() {
-    int i, t, p;
+    int i, t;
     int _hash;
 
     if (messageLength < 32) {
       _hash = seed + prime64_5;
     } else {
       // accumulate
-      _hash = (_acc1 << 1) | (_acc1 >>> 63);
-      _hash += (_acc2 << 7) | (_acc2 >>> 57);
-      _hash += (_acc3 << 12) | (_acc3 >>> 52);
-      _hash += (_acc4 << 18) | (_acc4 >>> 46);
+      _hash = _rotl(_acc1, 1);
+      _hash += _rotl(_acc2, 7);
+      _hash += _rotl(_acc3, 12);
+      _hash += _rotl(_acc4, 18);
 
       // merge round
-      _acc1 *= prime64_2;
-      _acc1 = (_acc1 << 31) | (_acc1 >>> 33);
-      _acc1 *= prime64_1;
-      _hash = (_hash ^ _acc1) * prime64_1 + prime64_4;
-
-      _acc2 *= prime64_2;
-      _acc2 = (_acc2 << 31) | (_acc2 >>> 33);
-      _acc2 *= prime64_1;
-      _hash = (_hash ^ _acc2) * prime64_1 + prime64_4;
-
-      _acc3 *= prime64_2;
-      _acc3 = (_acc3 << 31) | (_acc3 >>> 33);
-      _acc3 *= prime64_1;
-      _hash = (_hash ^ _acc3) * prime64_1 + prime64_4;
-
-      _acc4 *= prime64_2;
-      _acc4 = (_acc4 << 31) | (_acc4 >>> 33);
-      _acc4 *= prime64_1;
-      _hash = (_hash ^ _acc4) * prime64_1 + prime64_4;
+      _hash = _merge(_hash, _acc1);
+      _hash = _merge(_hash, _acc2);
+      _hash = _merge(_hash, _acc3);
+      _hash = _merge(_hash, _acc4);
     }
 
     _hash += messageLength;
 
     // process the remaining data
     for (i = t = 0; t + 8 <= pos; ++i, t += 8) {
-      p = qbuffer[i] * prime64_2;
-      p = (p << 31) | (p >>> 33);
-      p *= prime64_1;
-      _hash ^= p;
-      _hash = (_hash << 27) | (_hash >>> 37);
-      _hash = (_hash * prime64_1) + prime64_4;
+      _hash ^= _accumulate(0, qbuffer[i]);
+      _hash = _rotl(_hash, 27);
+      _hash *= prime64_1;
+      _hash += prime64_4;
     }
     for (i <<= 1; t + 4 <= pos; ++i, t += 4) {
       _hash ^= sbuffer[i] * prime64_1;
-      _hash = (_hash << 23) | (_hash >>> 41);
-      _hash = (_hash * prime64_2) + prime64_3;
+      _hash = _rotl(_hash, 23);
+      _hash *= prime64_2;
+      _hash += prime64_3;
     }
     for (; t < pos; t++) {
       _hash ^= buffer[t] * prime64_5;
-      _hash = (_hash << 11) | (_hash >>> 53);
+      _hash = _rotl(_hash, 11);
       _hash *= prime64_1;
     }
 

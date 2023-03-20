@@ -1,6 +1,6 @@
-## Next
+## 1.8.1
 
-- Improves dart run for Argon2 using pragmas
+- Improves `dart run` using `@pragma('vm:prefer-inline')`
 - Adds new methods:
   - `crc64sum`
   - `xxh64sum`

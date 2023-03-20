@@ -101,6 +101,7 @@ class KeccakHash extends BlockHashSink {
   }
 
   /// Rotates 64-bit number x by n bits
+  @pragma('vm:always-consider-inlining')
   static int _rotl(int x, int n) => (x << n) | (x >>> (64 - n));
 
   @override

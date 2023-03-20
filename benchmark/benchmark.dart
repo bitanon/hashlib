@@ -188,7 +188,6 @@ void main(List<String> args) {
     'argon2id': argon2Levels.map((e) => argon2.HashlibArgon2idBenchmark(e)),
   };
 
-  var stopwatch = Stopwatch()..start();
   var names = argon2Levels.map((e) => e.name);
   var separator = names.map((e) => ('-' * (e.length + 2)));
   print('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
@@ -198,9 +197,8 @@ void main(List<String> args) {
     var items = entry.value;
     var message = '| $algorithm   |';
     for (var item in items) {
-      stopwatch.reset();
-      item.run();
-      message += ' ${stopwatch.elapsedMicroseconds / 1000} ms |';
+      var runtime = item.measure();
+      message += ' ${runtime / 1000} ms |';
     }
     print(message);
   }

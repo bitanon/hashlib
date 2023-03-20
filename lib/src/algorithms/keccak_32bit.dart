@@ -177,45 +177,8 @@ class KeccakHash extends BlockHashSink {
     }
   }
 
-  // static void _shr(int n, List<int> x, int i, List<int> z, int k) {
-  //   var a = x[i];
-  //   var b = x[i + 1];
-  //   if (n == 32) {
-  //     z[k] = 0;
-  //     z[k + 1] = a;
-  //   } else if (n < 32) {
-  //     z[k] = a >>> n;
-  //     z[k + 1] = (a << (32 - n)) | (b >>> n);
-  //   } else {
-  //     z[k] = 0;
-  //     z[k + 1] = a >>> (n - 32);
-  //   }
-  // }
-
-  // static void _shl(int n, List<int> x, int i, List<int> z, int k) {
-  //   var a = x[i];
-  //   var b = x[i + 1];
-  //   if (n == 32) {
-  //     z[k] = b;
-  //     z[k + 1] = 0;
-  //   } else if (n < 32) {
-  //     z[k] = (a << n) | (b >>> (32 - n));
-  //     z[k + 1] = b << n;
-  //   } else {
-  //     z[k] = b << (n - 32);
-  //     z[k + 1] = 0;
-  //   }
-  // }
-
-  // static void _rotl(int n, List<int> x, int i, List<int> z, int k) {
-  //   var t = Uint32List(4);
-  //   _shl(n, x, i, t, 0);
-  //   _shr(64 - n, x, i, t, 2);
-  //   z[k] = t[0] | t[2];
-  //   z[k + 1] = t[1] | t[3];
-  // }
-
   // (x << n) | (x >>> (64 - n))
+  @pragma('vm:prefer-inline')
   static void _rotl(int n, List<int> x, int i, List<int> z, int k) {
     // *numbers are in little-endian order*
     var a = x[i];
@@ -233,12 +196,14 @@ class KeccakHash extends BlockHashSink {
   }
 
   // z = x ^ y
+  @pragma('vm:prefer-inline')
   static void _xor(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
     z[k] = x[i] ^ y[j];
     z[k + 1] = x[i + 1] ^ y[j + 1];
   }
 
   // z = x[i1] ^ x[i2] ^ x[i3] ^ x[i4] ^ x[i5]
+  @pragma('vm:prefer-inline')
   static void _xor5(
       List<int> x, int i1, int i2, int i3, int i4, int i5, List<int> z, int k) {
     z[k] = x[i1] ^ x[i2] ^ x[i3] ^ x[i4] ^ x[i5];
@@ -246,6 +211,7 @@ class KeccakHash extends BlockHashSink {
   }
 
   // z = x[i1] ^ (~x[i2] & x[i3]);
+  @pragma('vm:prefer-inline')
   static void _chi(List<int> x, int i1, int i2, int i3, List<int> z, int k) {
     z[k] = x[i1] ^ (~x[i2] & x[i3]);
     z[k + 1] = x[i1 + 1] ^ (~x[i2 + 1] & x[i3 + 1]);

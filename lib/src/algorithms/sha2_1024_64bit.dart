@@ -67,19 +67,23 @@ class SHA2of1024 extends BlockHashSink {
   }
 
   /// Rotates 64-bit number x by n bits
+  @pragma('vm:prefer-inline')
   static int _bsig0(int x) =>
       ((x >>> 28) | (x << 36)) ^
       ((x >>> 34) | (x << 30)) ^
       ((x >>> 39) | (x << 25));
 
+  @pragma('vm:prefer-inline')
   static int _bsig1(int x) =>
       ((x >>> 14) | (x << 50)) ^
       ((x >>> 18) | (x << 46)) ^
       ((x >>> 41) | (x << 23));
 
+  @pragma('vm:prefer-inline')
   static int _ssig0(int x) =>
       ((x >>> 1) | (x << 63)) ^ ((x >>> 8) | (x << 56)) ^ (x >>> 7);
 
+  @pragma('vm:prefer-inline')
   static int _ssig1(int x) =>
       ((x >>> 19) | (x << 45)) ^ ((x >>> 61) | (x << 3)) ^ (x >>> 6);
 

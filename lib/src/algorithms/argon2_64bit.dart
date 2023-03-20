@@ -469,10 +469,10 @@ class Argon2Internal extends Argon2 {
     }
   }
 
-  @pragma('vm:always-consider-inlining')
+  @pragma('vm:prefer-inline')
   static int _mul32(int a, int b) => (a & _mask32) * (b & _mask32);
 
-  @pragma('vm:always-consider-inlining')
+  @pragma('vm:prefer-inline')
   static int _rotr(int x, int n) => (x >>> n) ^ (x << (64 - n));
 
   @pragma('vm:prefer-inline')

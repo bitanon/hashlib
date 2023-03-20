@@ -124,6 +124,9 @@ class XXH3Sink128bit extends BlockHashSink {
     }
   }
 
+  @pragma('vm:prefer-inline')
+  static int _crossSwap(int x) => (x & _mask32) * (x >>> 32);
+
   @override
   void $update([List<int>? block, int offset = 0, bool last = false]) {
     int n, i, v, l, k;
@@ -134,7 +137,7 @@ class XXH3Sink128bit extends BlockHashSink {
         v = qbuffer[l + i];
         state[i ^ 1] += v;
         v ^= secret64[n + i];
-        state[i] += (v & _mask32) * (v >>> 32);
+        state[i] += _crossSwap(v);
       }
     }
     // scramble
@@ -146,6 +149,7 @@ class XXH3Sink128bit extends BlockHashSink {
     }
   }
 
+  @pragma('vm:prefer-inline')
   static int _avalanche(int _hash) {
     _hash ^= _hash >>> 37;
     _hash *= 0x165667919E3779F9;
@@ -153,6 +157,7 @@ class XXH3Sink128bit extends BlockHashSink {
     return _hash;
   }
 
+  @pragma('vm:prefer-inline')
   static int _midsizeAvalanche(int _hash) {
     _hash ^= _hash >>> 33;
     _hash *= prime64_2;
@@ -162,6 +167,7 @@ class XXH3Sink128bit extends BlockHashSink {
     return _hash;
   }
 
+  @pragma('vm:prefer-inline')
   static Uint8List _combine(int a, int b) {
     return Uint8List.fromList([
       b >>> 56,
@@ -197,7 +203,7 @@ class XXH3Sink128bit extends BlockHashSink {
         v = qbuffer[l + i];
         state[i ^ 1] += v;
         v ^= secret64[n + i];
-        state[i] += (v & _mask32) * (v >>> 32);
+        state[i] += _crossSwap(v);
       }
     }
 
@@ -207,7 +213,7 @@ class XXH3Sink128bit extends BlockHashSink {
       v = stripe[i];
       state[i ^ 1] += v;
       v ^= secretBD.getUint64(t, Endian.little);
-      state[i] += (v & _mask32) * (v >>> 32);
+      state[i] += _crossSwap(v);
     }
 
     // converge into final hash
@@ -230,12 +236,14 @@ class XXH3Sink128bit extends BlockHashSink {
     return _combine(_avalanche(low), _avalanche(high));
   }
 
+  @pragma('vm:prefer-inline')
   static int _swap32(int x) =>
       ((x << 24) & 0xff000000) |
       ((x << 8) & 0x00ff0000) |
       ((x >>> 8) & 0x0000ff00) |
       ((x >>> 24) & 0x000000ff);
 
+  @pragma('vm:prefer-inline')
   static int _swap64(int x) =>
       ((x << 56) & 0xff00000000000000) |
       ((x << 40) & 0x00ff000000000000) |
@@ -246,10 +254,12 @@ class XXH3Sink128bit extends BlockHashSink {
       ((x >>> 40) & 0x000000000000ff00) |
       ((x >>> 56) & 0x00000000000000ff);
 
+  @pragma('vm:prefer-inline')
   static int _rotl32(int x, int n) =>
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   // Multiply two 64-bit numbers to get 128-bit number
+  @pragma('vm:prefer-inline')
   static void _mul128(int a, int b, Uint64List result) {
     int al, ah, bl, bh, ll, hl, lh, hh, cross;
 
@@ -270,6 +280,7 @@ class XXH3Sink128bit extends BlockHashSink {
 
   // Multiply two 64-bit numbers to get 128-bit number and
   // xor the low bits of the product with the high bits
+  @pragma('vm:prefer-inline')
   static int _mul128fold64(int a, int b) {
     int al, ah, bl, bh, ll, hl, lh, hh, cross, upper, lower;
 
@@ -290,6 +301,7 @@ class XXH3Sink128bit extends BlockHashSink {
     return upper ^ lower;
   }
 
+  @pragma('vm:prefer-inline')
   static int _mix16B(ByteData input, int i, ByteData key, int j, int seed) {
     int lhs, rhs;
     lhs = key.getUint64(j, Endian.little) + seed;
@@ -299,6 +311,7 @@ class XXH3Sink128bit extends BlockHashSink {
     return _mul128fold64(lhs, rhs);
   }
 
+  @pragma('vm:prefer-inline')
   static void _mix32B(
     Uint64List acc,
     ByteData input,
