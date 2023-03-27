@@ -1,3 +1,13 @@
+## next
+
+- Adds SCRYPT:
+  - New class: `Scrypt`
+  - New method: `scrypt`
+- Changes in `PBKDF2` and extensions:
+  - parameter type of `keyLength`
+  - use default iterations = 1000
+  - adds validation in the constructor
+
 ## 1.8.1
 
 - Improves `dart run` using `@pragma('vm:prefer-inline')`

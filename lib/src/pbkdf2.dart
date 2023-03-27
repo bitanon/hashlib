@@ -12,36 +12,36 @@ export 'package:hashlib/src/algorithms/pbkdf2.dart' show PBKDF2;
 /// Extension on [BlockHashBase] to get an [PBKDF2] instance
 extension PBKDF2onBlockHashBase on BlockHashBase {
   /// Get an [PBKDF2] instance that uses this hash function for key derivation.
+  @pragma('vm:prefer-inline')
   HashDigest pbkdf2(
     List<int> password,
-    List<int> salt,
-    int iterations, {
+    List<int> salt, [
+    int iterations = 1000,
     int? keyLength,
-  }) {
-    return PBKDF2
-        .sink(
-          HMACSink(createSink()),
-          salt,
-          iterations,
-          keyLength: keyLength,
-        )
-        .convert(password);
-  }
+  ]) =>
+      PBKDF2(
+        HMACSink(createSink()),
+        salt,
+        iterations,
+        keyLength: keyLength,
+      ).convert(password);
 }
 
 /// Extension to the HashBase to get an [PBKDF2] instance
 extension PBKDF2onHMAC on MACHashBase {
   /// Get an [PBKDF2] instance that uses this hash function for key derivation.
+  @pragma('vm:prefer-inline')
   HashDigest pbkdf2(
-    List<int> salt,
-    int iterations, {
+    List<int> salt, [
+    int iterations = 1000,
     int? length,
-  }) {
-    return PBKDF2(
-      this,
-      salt,
-      iterations,
-      keyLength: length,
-    ).convert();
-  }
+  ]) =>
+      PBKDF2
+          .mac(
+            this,
+            salt,
+            iterations,
+            keyLength: length,
+          )
+          .convert();
 }

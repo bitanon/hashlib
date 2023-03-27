@@ -475,7 +475,6 @@ class Argon2Internal extends Argon2 {
   @pragma('vm:prefer-inline')
   static int _rotr(int x, int n) => (x >>> n) ^ (x << (64 - n));
 
-  @pragma('vm:prefer-inline')
   static void _blake2bMixer(
     Uint64List v,
     int _i0,
@@ -514,115 +513,83 @@ class Argon2Internal extends Argon2 {
 
     // _mix(v, v0, v4, v8, v12);
     v0 += v4 + (_mul32(v0, v4) << 1);
-    v12 ^= v0;
-    v12 = _rotr(v12, 32);
+    v12 = _rotr(v12 ^ v0, 32);
     v8 += v12 + (_mul32(v8, v12) << 1);
-    v4 ^= v8;
-    v4 = _rotr(v4, 24);
+    v4 = _rotr(v4 ^ v8, 24);
     v0 += v4 + (_mul32(v0, v4) << 1);
-    v12 ^= v0;
-    v12 = _rotr(v12, 16);
+    v12 = _rotr(v12 ^ v0, 16);
     v8 += v12 + (_mul32(v8, v12) << 1);
-    v4 ^= v8;
-    v4 = _rotr(v4, 63);
+    v4 = _rotr(v4 ^ v8, 63);
 
     // _mix(v, v1, v5, v9, v13);
     v1 += v5 + (_mul32(v1, v5) << 1);
-    v13 ^= v1;
-    v13 = _rotr(v13, 32);
+    v13 = _rotr(v13 ^ v1, 32);
     v9 += v13 + (_mul32(v9, v13) << 1);
-    v5 ^= v9;
-    v5 = _rotr(v5, 24);
+    v5 = _rotr(v5 ^ v9, 24);
     v1 += v5 + (_mul32(v1, v5) << 1);
-    v13 ^= v1;
-    v13 = _rotr(v13, 16);
+    v13 = _rotr(v13 ^ v1, 16);
     v9 += v13 + (_mul32(v9, v13) << 1);
-    v5 ^= v9;
-    v5 = _rotr(v5, 63);
+    v5 = _rotr(v5 ^ v9, 63);
 
     // _mix(v, v2, v6, v10, v14);
     v2 += v6 + (_mul32(v2, v6) << 1);
-    v14 ^= v2;
-    v14 = _rotr(v14, 32);
+    v14 = _rotr(v14 ^ v2, 32);
     v10 += v14 + (_mul32(v10, v14) << 1);
-    v6 ^= v10;
-    v6 = _rotr(v6, 24);
+    v6 = _rotr(v6 ^ v10, 24);
     v2 += v6 + (_mul32(v2, v6) << 1);
-    v14 ^= v2;
-    v14 = _rotr(v14, 16);
+    v14 = _rotr(v14 ^ v2, 16);
     v10 += v14 + (_mul32(v10, v14) << 1);
-    v6 ^= v10;
-    v6 = _rotr(v6, 63);
+    v6 = _rotr(v6 ^ v10, 63);
 
     // _mix(v, v3, v7, v11, v15);
     v3 += v7 + (_mul32(v3, v7) << 1);
-    v15 ^= v3;
-    v15 = _rotr(v15, 32);
+    v15 = _rotr(v15 ^ v3, 32);
     v11 += v15 + (_mul32(v11, v15) << 1);
-    v7 ^= v11;
-    v7 = _rotr(v7, 24);
+    v7 = _rotr(v7 ^ v11, 24);
     v3 += v7 + (_mul32(v3, v7) << 1);
-    v15 ^= v3;
-    v15 = _rotr(v15, 16);
+    v15 = _rotr(v15 ^ v3, 16);
     v11 += v15 + (_mul32(v11, v15) << 1);
-    v7 ^= v11;
-    v7 = _rotr(v7, 63);
+    v7 = _rotr(v7 ^ v11, 63);
 
     // _mix(v, v0, v5, v10, v15);
     v0 += v5 + (_mul32(v0, v5) << 1);
-    v15 ^= v0;
-    v15 = _rotr(v15, 32);
+    v15 = _rotr(v15 ^ v0, 32);
     v10 += v15 + (_mul32(v10, v15) << 1);
-    v5 ^= v10;
-    v5 = _rotr(v5, 24);
+    v5 = _rotr(v5 ^ v10, 24);
     v0 += v5 + (_mul32(v0, v5) << 1);
-    v15 ^= v0;
-    v15 = _rotr(v15, 16);
+    v15 = _rotr(v15 ^ v0, 16);
     v10 += v15 + (_mul32(v10, v15) << 1);
-    v5 ^= v10;
-    v5 = _rotr(v5, 63);
+    v5 = _rotr(v5 ^ v10, 63);
 
     // _mix(v, v1, v6, v11, v12);
     v1 += v6 + (_mul32(v1, v6) << 1);
-    v12 ^= v1;
-    v12 = _rotr(v12, 32);
+    v12 = _rotr(v12 ^ v1, 32);
     v11 += v12 + (_mul32(v11, v12) << 1);
-    v6 ^= v11;
-    v6 = _rotr(v6, 24);
+    v6 = _rotr(v6 ^ v11, 24);
     v1 += v6 + (_mul32(v1, v6) << 1);
-    v12 ^= v1;
-    v12 = _rotr(v12, 16);
+    v12 = _rotr(v12 ^ v1, 16);
     v11 += v12 + (_mul32(v11, v12) << 1);
-    v6 ^= v11;
-    v6 = _rotr(v6, 63);
+    v6 = _rotr(v6 ^ v11, 63);
 
     // _mix(v, v2, v7, v8, v13);
     v2 += v7 + (_mul32(v2, v7) << 1);
-    v13 ^= v2;
-    v13 = _rotr(v13, 32);
+    v13 = _rotr(v13 ^ v2, 32);
     v8 += v13 + (_mul32(v8, v13) << 1);
-    v7 ^= v8;
-    v7 = _rotr(v7, 24);
+    v7 = _rotr(v7 ^ v8, 24);
     v2 += v7 + (_mul32(v2, v7) << 1);
-    v13 ^= v2;
-    v13 = _rotr(v13, 16);
+    v13 = _rotr(v13 ^ v2, 16);
     v8 += v13 + (_mul32(v8, v13) << 1);
-    v7 ^= v8;
-    v7 = _rotr(v7, 63);
+    v7 = _rotr(v7 ^ v8, 63);
 
     // _mix(v, v3, v4, v9, v14);
     v3 += v4 + (_mul32(v3, v4) << 1);
-    v14 ^= v3;
-    v14 = _rotr(v14, 32);
+    v14 = _rotr(v14 ^ v3, 32);
     v9 += v14 + (_mul32(v9, v14) << 1);
-    v4 ^= v9;
-    v4 = _rotr(v4, 24);
+    v4 = _rotr(v4 ^ v9, 24);
     v3 += v4 + (_mul32(v3, v4) << 1);
-    v14 ^= v3;
-    v14 = _rotr(v14, 16);
+    v14 = _rotr(v14 ^ v3, 16);
     v9 += v14 + (_mul32(v9, v14) << 1);
-    v4 ^= v9;
-    v4 = _rotr(v4, 63);
+    v4 = _rotr(v4 ^ v9, 63);
 
     v[_i0] = v0;
     v[_i1] = v1;

@@ -41,26 +41,41 @@ class PBKDF2 extends KeyDerivatorBase {
     required this.derivedKeyLength,
   });
 
-  factory PBKDF2.sink(
+  /// Create a [PBKDF2] instance with an sink for MAC generation.
+  factory PBKDF2(
     MACSinkBase sink,
     List<int> salt,
     int iterations, {
     int? keyLength,
-  }) =>
-      PBKDF2._(
-        sink: sink,
-        salt: salt,
-        iterations: iterations,
-        derivedKeyLength: keyLength ?? sink.hashLength,
-      );
+  }) {
+    // validate parameters
+    if (iterations < 1) {
+      throw StateError('The iterations must be at least 1');
+    }
+    if (iterations > 0xFFFFFFFF) {
+      throw StateError('The iterations must be less than 2^32');
+    }
+    if (keyLength != null && keyLength < 1) {
+      throw StateError('The keyLength must be at least 1');
+    }
 
-  factory PBKDF2(
+    // create instance
+    return PBKDF2._(
+      sink: sink,
+      salt: salt,
+      iterations: iterations,
+      derivedKeyLength: keyLength ?? sink.hashLength,
+    );
+  }
+
+  /// Create a [PBKDF2] instance with a MAC instance.
+  factory PBKDF2.mac(
     MACHashBase mac,
     List<int> salt,
     int iterations, {
     int? keyLength,
   }) =>
-      PBKDF2.sink(
+      PBKDF2(
         mac.createSink(),
         salt,
         iterations,

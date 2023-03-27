@@ -50,9 +50,9 @@ This library contains implementations of secure hash functions, checksum generat
 | --------- | ------------------------------------------ | -------- |
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
 | PBKDF2    | `PBKDF2`                                   | RFC-8081 |
+| scrypt    | `Scrypt`                                   | RFC-7914 |
 
 <!--
-| `scrypt`      |    ⌛     |       |
 | `bcrypt`      |    ⌛     |       |
 | `balloon`     |    ⌛     |       |
 -->
@@ -239,5 +239,13 @@ Argon2 benchmarks on different security parameters:
 | argon2i    | 0.378 ms | 2.62 ms  | 17.917 ms | 219.696 ms | 2504.115 ms |
 | argon2d    | 0.334 ms | 2.747 ms | 19.035 ms | 239.565 ms | 2508.532 ms |
 | argon2id   | 0.323 ms | 2.631 ms | 17.18 ms  | 214.449 ms | 2538.26 ms  |
+
+SCRYPT benchmarks on different security parameters:
+
+--------- Hashlib/SCRYPT ----------
+hashlib/scrypt[n=1<<4,r=16,p=4]: 1.835 ms
+hashlib/scrypt[n=1<<8,r=16,p=4]: 13.703 ms
+hashlib/scrypt[n=1<<12,r=16,p=4]: 205.096 ms
+hashlib/scrypt[n=1<<15,r=16,p=4]: 1587.488 ms
 
 > These benchmarks were done in _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_ on Windows 10

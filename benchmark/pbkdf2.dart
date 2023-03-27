@@ -23,7 +23,7 @@ class HashlibBenchmark extends Benchmark {
       input,
       salt,
       iter,
-      keyLength: 64,
+      64,
     );
   }
 
