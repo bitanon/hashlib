@@ -34,6 +34,9 @@ void main(List<String> args) {
   print("- **Hash** : https://pub.dev/packages/hash");
   print('');
 
+  // ---------------------------------------------------------------------
+  // Hash function benchmarks
+  // ---------------------------------------------------------------------
   final conditions = [
     [10, 100000],
     [1000, 5000],
@@ -172,6 +175,10 @@ void main(List<String> args) {
     }
     print('');
   }
+
+  // ---------------------------------------------------------------------
+  // Argon2 Benchmarks
+  // ---------------------------------------------------------------------
 
   print('Argon2 benchmarks on different security parameters:');
   print('');

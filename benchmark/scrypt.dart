@@ -4,7 +4,7 @@
 import 'dart:math';
 
 import 'package:benchmark_harness/benchmark_harness.dart';
-import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/hashlib.dart';
 
 Random random = Random();
 
@@ -32,13 +32,13 @@ class HashlibBenchmark extends ScryptBenchmarkBase {
 
   @override
   void run() {
-    hashlib.scrypt(
-      'long password'.codeUnits,
-      'secret salt'.codeUnits,
-      N: n,
-      r: r,
-      p: p,
-    );
+    Scrypt(
+      salt: 'secret salt'.codeUnits,
+      cost: n,
+      blockSize: r,
+      parallelism: p,
+      derivedKeyLength: 64,
+    ).convert('long password'.codeUnits);
   }
 }
 

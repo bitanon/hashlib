@@ -17,18 +17,26 @@ class HMACSink extends HashDigestSink with MACSinkBase {
   final Uint8List innerKey;
   final Uint8List outerKey;
 
+  /// The internal block length of the algorithm in bytes
+  final int blockLength;
+
+  /// The message length in bytes
+  final int messageLength;
+
   HashDigest? _digest;
   bool _closed = false;
   bool _initialized = false;
 
   HMACSink(this.sink)
-      : innerKey = Uint8List(sink.blockLength),
+      : blockLength = sink.blockLength,
+        messageLength = sink.messageLength,
+        innerKey = Uint8List(sink.blockLength),
         outerKey = Uint8List(sink.blockLength);
 
   @override
   void init(List<int> key) {
     // Keys longer than blockLength are shortened by hashing them
-    if (key.length > sink.blockLength) {
+    if (key.length > blockLength) {
       sink.reset();
       sink.add(key);
       key = sink.digest().bytes;
@@ -40,7 +48,7 @@ class HMACSink extends HashDigestSink with MACSinkBase {
       innerKey[i] = key[i] ^ 0x36;
       outerKey[i] = key[i] ^ 0x5c;
     }
-    for (; i < sink.blockLength; i++) {
+    for (; i < blockLength; i++) {
       innerKey[i] = 0x36;
       outerKey[i] = 0x5c;
     }
@@ -55,12 +63,6 @@ class HMACSink extends HashDigestSink with MACSinkBase {
 
   @override
   int get hashLength => sink.hashLength;
-
-  /// The internal block length of the algorithm in bytes
-  int get blockLength => sink.blockLength;
-
-  /// The message length in bytes
-  int get messageLength => sink.messageLength;
 
   @override
   void reset() {

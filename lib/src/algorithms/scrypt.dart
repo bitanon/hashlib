@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
 
@@ -48,8 +49,6 @@ class Scrypt extends KeyDerivatorBase {
   });
 
   /// Creates an [Scrypt] instance with a sink for MAC generation.
-  ///
-  /// If [sink] is not provided the HMAC-SHA256 will be used by default.
   factory Scrypt({
     required List<int> salt,
     required int cost,
@@ -90,9 +89,7 @@ class Scrypt extends KeyDerivatorBase {
     );
   }
 
-  /// Generate a derived key using the [sink] function.
-  ///
-  /// This function may throw an [StateError] if the [sink] is not initialized.
+  /// Generate a derived key using the scrypt algorithm.
   @override
   HashDigest convert(List<int> password) {
     int midRO = (blockSize << 4);
@@ -152,7 +149,8 @@ class Scrypt extends KeyDerivatorBase {
     }
 
     // Derive the inner blocks
-    var inner = sha256.pbkdf2(password, salt, 1, innerKeyLength);
+    var sink = HMACSink(sha256.createSink());
+    var inner = PBKDF2(sink, salt, 1, innerKeyLength).convert(password);
 
     // Mix the inner blocks to derive the outer salt
     for (int i = 0; i < innerKeyLength; i += roLength) {
@@ -160,7 +158,7 @@ class Scrypt extends KeyDerivatorBase {
     }
 
     // Derive final blocks with the outer salt
-    return sha256.pbkdf2(password, inner.bytes, 1, derivedKeyLength);
+    return PBKDF2(sink, inner.bytes, 1, derivedKeyLength).convert(password);
   }
 
   @pragma('vm:prefer-inline')

@@ -31,6 +31,7 @@ export 'package:hashlib/src/algorithms/scrypt.dart' show Scrypt;
 /// optimum values for both r and p will increase.
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7914.html
+@pragma('vm:prefer-inline')
 HashDigest scrypt(
   List<int> password,
   List<int> salt, {

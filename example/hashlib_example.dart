@@ -52,16 +52,19 @@ void main() {
   print('HMAC[MD5] => ${md5.hmacBy(key, utf8).string(text)}');
   print('HMAC[MD5] => ${md5.hmacBy(key).string(text)}');
   print('HMAC[MD5] => ${HMAC(md5, pw).string(text)}');
+  print("[BLAKE-2b/*] => ${Blake2bMAC(32, pw).string(text)}");
   print("[BLAKE-2b/256] => ${blake2b256.mac(pw).string(text)}");
-  print("[BLAKE-2b/256] => ${Blake2bMAC(32, pw).string(text)}");
   print('');
 
   // Examples of PBKDF2 key derivation
-  print("PBKDF2[HMAC[SHA-256]] => ${sha256.pbkdf2(pw, salt, 100)}");
-  print("PBKDF2[HMAC[SHA-256]] => ${sha256.hmac(pw).pbkdf2(salt, 100)}");
-  print("PBKDF2[BLAKE-2b-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[HMAC[SHA-256]] => ${pbkdf2(pw, salt, 100)}");
+  print("PBKDF2[HMAC[SHA-1]] => ${sha1.hmac(pw).pbkdf2(salt, 100)}");
   print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.pbkdf2(pw, salt, 100)}");
-  print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.hmac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[BLAKE-2b-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print('');
+
+  // Examples of scrypt key derivation
+  print("[scrypt] => ${scrypt(pw, salt, N: 16, r: 8, p: 1, dklen: 32)}");
   print('');
 
   // Examples of Argon2 key derivation

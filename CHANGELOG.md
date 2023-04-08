@@ -1,4 +1,4 @@
-## next
+## 1.9.0
 
 - Adds SCRYPT:
   - New class: `Scrypt`
@@ -7,6 +7,7 @@
   - parameter type of `keyLength`
   - use default iterations = 1000
   - adds validation in the constructor
+  - adds global `pbkdf2` function
 
 ## 1.8.1
 

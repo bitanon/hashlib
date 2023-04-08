@@ -109,6 +109,7 @@ abstract class BlockHashSink implements HashDigestSink {
   }
 
   @override
+  @pragma('vm:prefer-inline')
   void close() => digest();
 
   @override

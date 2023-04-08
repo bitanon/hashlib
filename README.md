@@ -49,8 +49,8 @@ This library contains implementations of secure hash functions, checksum generat
 | Algorithm | Available methods                          | Source   |
 | --------- | ------------------------------------------ | -------- |
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
-| PBKDF2    | `PBKDF2`                                   | RFC-8081 |
-| scrypt    | `Scrypt`                                   | RFC-7914 |
+| PBKDF2    | `PBKDF2`, `pbkdf2`                         | RFC-8081 |
+| scrypt    | `scrypt`, `Scrypt`                         | RFC-7914 |
 
 <!--
 | `bcrypt`      |    ⌛     |       |
@@ -134,16 +134,19 @@ void main() {
   print('HMAC[MD5] => ${md5.hmacBy(key, utf8).string(text)}');
   print('HMAC[MD5] => ${md5.hmacBy(key).string(text)}');
   print('HMAC[MD5] => ${HMAC(md5, pw).string(text)}');
+  print("[BLAKE-2b/*] => ${Blake2bMAC(32, pw).string(text)}");
   print("[BLAKE-2b/256] => ${blake2b256.mac(pw).string(text)}");
-  print("[BLAKE-2b/256] => ${Blake2bMAC(32, pw).string(text)}");
   print('');
 
   // Examples of PBKDF2 key derivation
-  print("PBKDF2[HMAC[SHA-256]] => ${sha256.pbkdf2(pw, salt, 100)}");
-  print("PBKDF2[HMAC[SHA-256]] => ${sha256.hmac(pw).pbkdf2(salt, 100)}");
-  print("PBKDF2[BLAKE-2b-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[HMAC[SHA-256]] => ${pbkdf2(pw, salt, 100)}");
+  print("PBKDF2[HMAC[SHA-1]] => ${sha1.hmac(pw).pbkdf2(salt, 100)}");
   print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.pbkdf2(pw, salt, 100)}");
-  print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.hmac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[BLAKE-2b-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print('');
+
+  // Examples of scrypt key derivation
+  print("[scrypt] => ${scrypt(pw, salt, N: 16, r: 8, p: 1, dklen: 32)}");
   print('');
 
   // Examples of Argon2 key derivation
@@ -242,10 +245,12 @@ Argon2 benchmarks on different security parameters:
 
 SCRYPT benchmarks on different security parameters:
 
+```
 --------- Hashlib/SCRYPT ----------
-hashlib/scrypt[n=1<<4,r=16,p=4]: 1.835 ms
-hashlib/scrypt[n=1<<8,r=16,p=4]: 13.703 ms
-hashlib/scrypt[n=1<<12,r=16,p=4]: 205.096 ms
-hashlib/scrypt[n=1<<15,r=16,p=4]: 1587.488 ms
+hashlib/scrypt[n=1<<4,r=16,p=4]: 1.896 ms
+hashlib/scrypt[n=1<<8,r=16,p=4]: 13.63 ms
+hashlib/scrypt[n=1<<12,r=16,p=4]: 201.858 ms
+hashlib/scrypt[n=1<<15,r=16,p=4]: 1585.825 ms
+```
 
 > These benchmarks were done in _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_ on Windows 10
