@@ -52,16 +52,6 @@ List<int> toBytes(String value, [cvt.Encoding? encoding]) {
 }
 
 /// The message digest as a string of hexadecimal digits.
-String toHexSingle(int byte, [bool uppercase = false]) {
-  int a, b;
-  a = (byte >>> 4) & 0xF;
-  b = byte & 0xF;
-  a += a < 10 ? _zero : ((uppercase ? _bigA : _smallA) - 10);
-  b += b < 10 ? _zero : ((uppercase ? _bigA : _smallA) - 10);
-  return String.fromCharCodes([a, b]);
-}
-
-/// The message digest as a string of hexadecimal digits.
 String toHex(List<int> bytes, [bool uppercase = false]) {
   int a, b, i, j;
   i = j = 0;

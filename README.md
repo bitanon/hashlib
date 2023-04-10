@@ -253,4 +253,4 @@ hashlib/scrypt[n=1<<12,r=16,p=4]: 201.858 ms
 hashlib/scrypt[n=1<<15,r=16,p=4]: 1585.825 ms
 ```
 
-> These benchmarks were done in _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_ on Windows 10
+> All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_

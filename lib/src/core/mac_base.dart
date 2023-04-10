@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
 
 abstract class MACSinkBase implements HashDigestSink {
   /// The length of generated key in bytes
@@ -18,4 +19,13 @@ abstract class MACHashBase extends HashBase {
 
   @override
   MACSinkBase createSink();
+
+  /// Signing the [message] using this MAC to generate a tag.
+  @pragma('vm:prefer-inline')
+  HashDigest sign(List<int> message) => convert(message);
+
+  /// Verify if the [tag] is derived from the [message] using this MAC.
+  @pragma('vm:prefer-inline')
+  bool verify(List<int> tag, List<int> message) =>
+      convert(message).isEqual(message);
 }

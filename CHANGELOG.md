@@ -1,3 +1,12 @@
+## next
+
+- Adds two new methods to `MACHashBase`:
+  - `sign`: generates a tag from a message
+  - `verify`: verifies if a message and tag matches
+- Adds `isEqual` to `HashDigest` to match it with other `HashDigest`, `String`, `TypedData`, `ByteBuffer` and `List<int>`
+- Use custom equality check for `HashDigest`
+- Removes `toHexSingle` from utils.
+
 ## 1.9.0
 
 - Adds SCRYPT:

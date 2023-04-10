@@ -5,14 +5,10 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/utils.dart' as utils;
 
-class HashDigest {
+class HashDigest extends Object {
   final Uint8List bytes;
 
   const HashDigest(this.bytes);
-
-  /// The message digest as a string of hexadecimal digits.
-  @override
-  String toString() => utils.toHex(bytes);
 
   /// Returns the byte buffer associated with this digest.
   ByteBuffer get buffer => bytes.buffer;
@@ -20,14 +16,17 @@ class HashDigest {
   /// The message digest as a string of hexadecimal digits.
   ///
   /// If [uppercase] is true, the output will have uppercase alphabets.
+  @pragma('vm:prefer-inline')
   String hex([bool uppercase = false]) => utils.toHex(bytes, uppercase);
 
   /// The message digest as a string of base64.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
+  @pragma('vm:prefer-inline')
   String base64([bool urlSafe = false]) => utils.toBase64(bytes, urlSafe);
 
   /// The message digest as a string of ASCII alphabets.
+  @pragma('vm:prefer-inline')
   String toAscii() => utils.toAscii(bytes);
 
   /// Returns the least significant bytes as a number.
@@ -47,5 +46,49 @@ class HashDigest {
       }
     }
     return result;
+  }
+
+  @override
+  int get hashCode => bytes.hashCode;
+
+  @override
+  bool operator ==(other) => isEqual(other);
+
+  /// The message digest as a string of hexadecimal digits.
+  @override
+  String toString() => utils.toHex(bytes);
+
+  /// Checks if the message digest equals to [other].
+  ///
+  /// Here, the [other] can be a one of the following:
+  /// - Another [HashDigest] object.
+  /// - A [List] containing an array of bytes
+  /// - Any [ByteBuffer] or [TypedData] that will be converted to [Uint8List]
+  /// - A [String], which will be treated as a hexadecimal encoded byte array
+  ///
+  /// This function will return True if all bytes in the [other] matches with
+  /// the [bytes] of this object. If the length does not match, or the type of
+  /// [other] is not supported, it returns False immediately.
+  bool isEqual(other) {
+    if (other is HashDigest) {
+      return isEqual(other.bytes);
+    } else if (other is String) {
+      return isEqual(utils.fromHex(other));
+    } else if (other is ByteBuffer) {
+      return isEqual(buffer.asUint8List());
+    } else if (other is TypedData) {
+      return isEqual(other.buffer.asUint8List());
+    } else if (other is List<int>) {
+      if (other.length != bytes.length) {
+        return false;
+      }
+      for (int i = 0; i < bytes.length; ++i) {
+        if (other[i] != bytes[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 }

@@ -39,12 +39,11 @@ HashDigest scrypt(
   int r = 8,
   int p = 1,
   int dklen = 64,
-}) {
-  return Scrypt(
-    salt: salt,
-    cost: N,
-    blockSize: r,
-    parallelism: p,
-    derivedKeyLength: dklen,
-  ).convert(password);
-}
+}) =>
+    Scrypt(
+      salt: salt,
+      cost: N,
+      blockSize: r,
+      parallelism: p,
+      derivedKeyLength: dklen,
+    ).convert(password);
