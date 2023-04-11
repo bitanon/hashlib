@@ -1,11 +1,18 @@
 ## next
 
+- Adds support for `Poly1305` MAC generation:
+  - New class: `Poly1305`
+  - New method: `poly1305`
 - Adds two new methods to `MACHashBase`:
   - `sign`: generates a tag from a message
   - `verify`: verifies if a message and tag matches
-- Adds `isEqual` to `HashDigest` to match it with other `HashDigest`, `String`, `TypedData`, `ByteBuffer` and `List<int>`
-- Use custom equality check for `HashDigest`
-- Removes `toHexSingle` from utils.
+- Updates the utils methods
+  - Removes `toHexSingle` from utils.
+  - Accepts `Iterables` instead of `List` in `toHex`
+  - Adds tests
+- Updates `HashDigest`
+  - Adds `isEqual` to match it with other `HashDigest`, `String`, `TypedData`, `ByteBuffer`, `List<int>`, `Iterable<int>`
+  - Use custom equality check
 
 ## 1.9.0
 

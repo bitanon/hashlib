@@ -17,9 +17,11 @@ abstract class BlockHashBase extends HashBase {
 }
 
 abstract class BlockHashSink implements HashDigestSink {
-  // The digest and closing flag
-  HashDigest? _digest;
+  /// The flag tracking if the [digest] is called once.
   bool _closed = false;
+
+  /// The message digest (available after the [digest] call)
+  HashDigest? _digest;
 
   /// The current position of data in the [buffer]
   int pos = 0;
@@ -30,19 +32,24 @@ abstract class BlockHashSink implements HashDigestSink {
   /// The internal block length of the algorithm in bytes
   final int blockLength;
 
-  /// The buffer as Uint8List
+  /// The main buffer
   late final Uint8List buffer;
 
-  /// The buffer as ByteData
-  late final ByteData bdata;
-
-  /// The buffer as Uint32List
+  /// The [buffer] as Uint32List
   late final Uint32List sbuffer;
 
+  /// The [buffer] as ByteData
+  late final ByteData bdata;
+
+  /// Initialize a new sink for the block hash
+  ///
+  /// Parameters:
+  /// - [blockLength] is the length of each block in each [$update] call.
+  /// - [bufferLength] is the buffer length where blocks are stored temporarily
   BlockHashSink(this.blockLength, {int? bufferLength}) : super() {
     buffer = Uint8List(bufferLength ?? blockLength);
-    bdata = buffer.buffer.asByteData();
     sbuffer = buffer.buffer.asUint32List();
+    bdata = buffer.buffer.asByteData();
   }
 
   @override

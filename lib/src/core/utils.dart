@@ -52,17 +52,16 @@ List<int> toBytes(String value, [cvt.Encoding? encoding]) {
 }
 
 /// The message digest as a string of hexadecimal digits.
-String toHex(List<int> bytes, [bool uppercase = false]) {
-  int a, b, i, j;
-  i = j = 0;
-  var hex = Uint8List(bytes.length << 1);
-  while (i < bytes.length) {
-    a = (bytes[i] >>> 4) & 0xF;
-    b = bytes[i++] & 0xF;
+String toHex(Iterable<int> bytes, [bool uppercase = false]) {
+  int a, b;
+  List<int> hex = <int>[];
+  for (int x in bytes) {
+    a = (x >>> 4) & 0xF;
+    b = x & 0xF;
     a += a < 10 ? _zero : ((uppercase ? _bigA : _smallA) - 10);
     b += b < 10 ? _zero : ((uppercase ? _bigA : _smallA) - 10);
-    hex[j++] = a;
-    hex[j++] = b;
+    hex.add(a);
+    hex.add(b);
   }
   return String.fromCharCodes(hex);
 }

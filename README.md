@@ -16,7 +16,7 @@ This library contains implementations of secure hash functions, checksum generat
 
 | Algorithm | Available methods                                                  | Source      |
 | --------- | ------------------------------------------------------------------ | ----------- |
-| SHA-2     | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RCC-6234    |
+| SHA-2     | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RFC-6234    |
 | SHA-3     | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
 | SHAKE     | `Shake128`, `Shake256`, `shake128`, `shake256`                     | FIPS-202    |
 | Keccak    | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 | Team Keccak |
@@ -49,7 +49,7 @@ This library contains implementations of secure hash functions, checksum generat
 | Algorithm | Available methods                          | Source   |
 | --------- | ------------------------------------------ | -------- |
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
-| PBKDF2    | `PBKDF2`, `pbkdf2`                         | RFC-8081 |
+| PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`             | RFC-8081 |
 | scrypt    | `scrypt`, `Scrypt`                         | RFC-7914 |
 
 <!--
@@ -59,11 +59,10 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Message Authentication Code (MAC) Generators
 
-| Algorithms | Available methods | Source   |
-| ---------- | ----------------- | -------- |
-| HMAC       | `HMAC`            | RFC-2104 |
-
-<!-- | `poly1305` |   ⌛    |        |  ⌛  |        | -->
+| Algorithms | Available methods      | Source   |
+| ---------- | ---------------------- | -------- |
+| HMAC       | `HMAC`, `#.hmac`       | RFC-2104 |
+| Poly1305   | `Poly1305`, `poly1305` | RFC-8439 |
 
 ## Getting Started
 
