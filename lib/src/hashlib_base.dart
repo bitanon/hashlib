@@ -33,3 +33,4 @@ export 'xxh128.dart';
 export 'xxh3.dart';
 export 'xxhash32.dart';
 export 'xxhash64.dart';
+export 'otpauth.dart';

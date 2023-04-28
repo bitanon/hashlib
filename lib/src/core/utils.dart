@@ -5,8 +5,11 @@ import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
 const int _zero = 48;
+const int _nine = 57;
 const int _smallA = 97;
+const int _smallZ = 122;
 const int _bigA = 65;
+const int _bigZ = 90;
 
 // The RFC 4648 base32 encoding alphabet.
 // "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
@@ -55,13 +58,21 @@ const _base64UrlReverse = [
   41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
 ];
 
+/// Remove all characters except letters and digits
+@pragma('vm:prefer-inline')
+String keepAlphaNumeric(String value) {
+  return String.fromCharCodes(
+    value.codeUnits.where((c) =>
+        (c >= _zero && c <= _nine) ||
+        (c >= _bigA && c <= _bigZ) ||
+        (c >= _smallA && c <= _smallZ)),
+  );
+}
+
 // Get bytes from an string
+@pragma('vm:prefer-inline')
 List<int> toBytes(String value, [cvt.Encoding? encoding]) {
-  if (encoding == null) {
-    return value.codeUnits;
-  } else {
-    return encoding.encode(value);
-  }
+  return encoding == null ? value.codeUnits : encoding.encode(value);
 }
 
 /// The message digest as a string of hexadecimal digits.
