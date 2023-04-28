@@ -1,4 +1,4 @@
-// Copyright (c) 2021, Sudipto Chandra
+// Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
 export 'alder32.dart';
