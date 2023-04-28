@@ -2,23 +2,23 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:hash/hash.dart' as hash;
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
-import 'package:pointycastle/digests/sha1.dart' as pc;
 
 import 'base.dart';
 
 Random random = Random();
+
+final key = List.generate(64, (i) => random.nextInt(256));
 
 class HashlibBenchmark extends Benchmark {
   HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
 
   @override
   void run() {
-    hashlib.sha1.convert(input).bytes;
+    hashlib.HMAC(hashlib.md5, key).convert(input).bytes;
   }
 }
 
@@ -27,7 +27,7 @@ class CryptoBenchmark extends Benchmark {
 
   @override
   void run() {
-    crypto.sha1.convert(input).bytes;
+    crypto.Hmac(crypto.md5, key).convert(input).bytes;
   }
 }
 
@@ -36,29 +36,12 @@ class HashBenchmark extends Benchmark {
 
   @override
   void run() {
-    hash.SHA1().update(input).digest();
-  }
-}
-
-class PointyCastleBenchmark extends Benchmark {
-  Uint8List _input = Uint8List(0);
-  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
-
-  @override
-  void setup() {
-    super.setup();
-    _input = Uint8List.fromList(input);
-  }
-
-  @override
-  void run() {
-    final d = pc.SHA1Digest();
-    d.process(_input);
+    hash.Hmac(hash.MD5(), key).update(input).digest();
   }
 }
 
 void main() {
-  print('--------- SHA-1 ----------');
+  print('------- HMAC(MD5) --------');
   final conditions = [
     [10, 100000],
     [1000, 5000],
@@ -70,7 +53,6 @@ void main() {
     HashlibBenchmark(size, iter).showDiff([
       CryptoBenchmark(size, iter),
       HashBenchmark(size, iter),
-      PointyCastleBenchmark(size, iter),
     ]);
     print('');
   }

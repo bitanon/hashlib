@@ -1,4 +1,4 @@
-// Copyright (c) 2021, Sudipto Chandra
+// Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/hashlib.dart' as hashlib;

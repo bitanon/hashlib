@@ -62,7 +62,7 @@ class HashDigest extends Object {
   ///
   /// Here, the [other] can be a one of the following:
   /// - Another [HashDigest] object.
-  /// - A [List] containing an array of bytes
+  /// - An [Iterable] containing an array of bytes
   /// - Any [ByteBuffer] or [TypedData] that will be converted to [Uint8List]
   /// - A [String], which will be treated as a hexadecimal encoded byte array
   ///
@@ -72,18 +72,21 @@ class HashDigest extends Object {
   bool isEqual(other) {
     if (other is HashDigest) {
       return isEqual(other.bytes);
-    } else if (other is String) {
-      return isEqual(utils.fromHex(other));
     } else if (other is ByteBuffer) {
       return isEqual(buffer.asUint8List());
-    } else if (other is TypedData) {
+    } else if (other is TypedData && other is! Uint8List) {
       return isEqual(other.buffer.asUint8List());
-    } else if (other is List<int>) {
-      if (other.length != bytes.length) {
-        return false;
+    } else if (other is String) {
+      return isEqual(utils.fromHex(other));
+    } else if (other is Iterable<int>) {
+      if (other is List<int>) {
+        if (other.length != bytes.length) {
+          return false;
+        }
       }
-      for (int i = 0; i < bytes.length; ++i) {
-        if (other[i] != bytes[i]) {
+      int i = 0;
+      for (int x in other) {
+        if (i >= bytes.length || x != bytes[i++]) {
           return false;
         }
       }

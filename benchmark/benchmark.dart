@@ -1,26 +1,27 @@
-// Copyright (c) 2021, Sudipto Chandra
+// Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 
+import 'argon2.dart' as argon2;
 import 'base.dart';
 import 'blake2b.dart' as blake2b;
 import 'blake2s.dart' as blake2s;
+import 'hmac_md5.dart' as md5_hmac;
+import 'hmac_sha256.dart' as sha256_hmac;
 import 'md5.dart' as md5;
-import 'md5_hmac.dart' as md5_hmac;
+import 'poly1305.dart' as poly1305;
 import 'sha1.dart' as sha1;
 import 'sha224.dart' as sha224;
 import 'sha256.dart' as sha256;
-import 'sha256_hmac.dart' as sha256_hmac;
 import 'sha384.dart' as sha384;
 import 'sha3_256.dart' as sha3_256;
 import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
 import 'sha512_224.dart' as sha512t224;
 import 'sha512_256.dart' as sha512t256;
-import 'argon2.dart' as argon2;
 import 'xxhash.dart' as xxhash;
 
 void main(List<String> args) {
@@ -38,9 +39,9 @@ void main(List<String> args) {
   // Hash function benchmarks
   // ---------------------------------------------------------------------
   final conditions = [
-    [10, 100000],
-    [1000, 5000],
     [500000, 10],
+    [1000, 5000],
+    [10, 100000],
   ];
   for (var condition in conditions) {
     var size = condition[0];
@@ -122,6 +123,9 @@ void main(List<String> args) {
       "HMAC(SHA-256)": [
         sha256_hmac.HashlibBenchmark(size, iter),
         sha256_hmac.CryptoBenchmark(size, iter),
+      ],
+      "Poly1305": [
+        poly1305.HashlibBenchmark(size, iter),
       ],
     };
 
