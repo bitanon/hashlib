@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/algorithms/blake2s.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
@@ -37,7 +38,7 @@ const Blake2s blake2s256 = Blake2s(256 >>> 3);
 /// This implementation is based on the [RFC-7693][rfc]
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
-class Blake2s extends HashBase {
+class Blake2s extends BlockHashBase {
   final int digestSize;
   final List<int>? key;
   final List<int>? salt;

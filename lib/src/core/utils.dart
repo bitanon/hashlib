@@ -8,6 +8,19 @@ const int _zero = 48;
 const int _smallA = 97;
 const int _bigA = 65;
 
+// The RFC 4648 base32 encoding alphabet.
+// "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+const _base32Alphabet = [
+  65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, //
+  84, 85, 86, 87, 88, 89, 90, 50, 51, 52, 53, 54, 55
+];
+const _base32Reverse = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  26, 27, 28, 29, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7,
+  8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25
+];
+
 // The RFC 4648 base64 encoding alphabet.
 // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 const _base64Alphabet = [
@@ -63,21 +76,35 @@ String toHex(Iterable<int> bytes, [bool uppercase = false]) {
     hex.add(a);
     hex.add(b);
   }
-  return String.fromCharCodes(hex);
+  for (a = 0; a + 1 < hex.length && hex[a] == _zero; ++a) {}
+  return String.fromCharCodes(hex.skip(a));
 }
 
 /// The message digest as a string of hexadecimal digits.
 List<int> fromHex(String hex) {
   assert((hex.length & 1) == 0);
   int a, b, i, j;
-  i = j = 0;
-  var norm = Uint8List(hex.length >>> 1);
-  while (i < hex.length) {
-    a = hex.codeUnits[i++];
-    b = hex.codeUnits[i++];
+  var norm = Uint8List((hex.length >>> 1) + (hex.length & 1));
+  // convert by block
+  j = -1;
+  for (i = hex.length - 1; i > 0; i -= 2) {
+    a = hex.codeUnits[i - 1];
+    b = hex.codeUnits[i];
     a -= a < _bigA ? _zero : ((a < _smallA ? _bigA : _smallA) - 10);
     b -= b < _bigA ? _zero : ((b < _smallA ? _bigA : _smallA) - 10);
-    norm[j++] = (a << 4) | b;
+    norm[++j] = (a << 4) | b;
+  }
+  // take the first one
+  if (i == 0) {
+    b = hex.codeUnits[i];
+    b -= b < _bigA ? _zero : ((b < _smallA ? _bigA : _smallA) - 10);
+    norm[++j] = b;
+  }
+  // reverse
+  for (i = 0; i < j; i++, j--) {
+    a = norm[i];
+    norm[i] = norm[j];
+    norm[j] = a;
   }
   return norm;
 }
@@ -121,6 +148,37 @@ Uint8List fromBase64(String data, [bool urlSafe = false]) {
   for (int x in data.codeUnits) {
     p = (p << 6) | map[x];
     for (n += 6; n >= 8; n -= 8, p &= (1 << n) - 1) {
+      result[i++] = p >>> (n - 8);
+    }
+  }
+  if (p > 0) {
+    result[i++] = p;
+  }
+  return result;
+}
+
+String toBase32(Iterable<int> bytes) {
+  int p = 0, n = 0;
+  var result = <int>[];
+  var alpha = _base32Alphabet;
+  for (int x in bytes) {
+    p = (p << 8) | x;
+    for (n += 8; n >= 5; n -= 5, p &= (1 << n) - 1) {
+      result.add(alpha[p >>> (n - 5)]);
+    }
+  }
+  if (n > 0) {
+    result.add(alpha[p << (5 - n)]);
+  }
+  return String.fromCharCodes(result);
+}
+
+Uint8List fromBase32(String data) {
+  int p = 0, n = 0, i = 0;
+  var result = Uint8List((data.length * 5) ~/ 8);
+  for (int x in data.codeUnits) {
+    p = (p << 5) | _base32Reverse[x];
+    for (n += 5; n >= 8; n -= 8, p &= (1 << n) - 1) {
       result[i++] = p >>> (n - 8);
     }
   }

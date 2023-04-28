@@ -24,6 +24,7 @@ extension HMAConBlockHashBase on BlockHashBase {
   ///
   /// HMAC is a hash-based message authentication code that can be used to
   /// simultaneously verify both the data integrity and authenticity of a message.
+  @pragma('vm:prefer-inline')
   HMAC hmac(List<int> key) {
     return HMAC(this, key);
   }
@@ -32,6 +33,7 @@ extension HMAConBlockHashBase on BlockHashBase {
   ///
   /// HMAC is a hash-based message authentication code that can be used to
   /// simultaneously verify both the data integrity and authenticity of a message.
+  @pragma('vm:prefer-inline')
   HMAC hmacBy(String key, [Encoding? encoding]) {
     if (encoding != null) {
       return HMAC(this, encoding.encode(key));
