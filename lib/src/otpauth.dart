@@ -5,9 +5,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:hashlib/src/_registry.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/utils.dart';
 import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/sha1.dart';
 
@@ -19,59 +17,6 @@ abstract class OTPAuth {
 
   /// Generates the next OTP
   int next();
-
-  /// Create an instance from otpauth key URI
-  factory OTPAuth.parse(String keyUri) {
-    var uri = Uri.parse(keyUri);
-    if (uri.scheme != 'otpauth') {
-      throw ArgumentError('Invalid scheme: ${uri.scheme}. Expected: otpauth');
-    }
-
-    var query = uri.queryParameters;
-    if (!query.containsKey('secret')) {
-      throw ArgumentError('The secret parameter is not present');
-    }
-    var secret = fromBase32(query['secret']!);
-
-    var algorithm = query['algorithm'] ?? 'SHA1';
-    BlockHashBase? algo = findAlgorithm(algorithm);
-    if (algo == null) {
-      throw ArgumentError('No such algorithm found: $algorithm');
-    }
-
-    int digits = int.parse(query['digits'] ?? '6');
-    if (digits < 6 || digits > 12) {
-      throw StateError('Number of digits should be between 6 to 12');
-    }
-
-    switch (uri.host.toLowerCase()) {
-      case 'totp':
-        int period = int.parse(query['period'] ?? '30');
-        return TOTP(
-          secret,
-          algo: algo,
-          digits: digits,
-          period: period,
-        );
-      case 'hotp':
-        if (!query.containsKey('counter')) {
-          throw ArgumentError('The counter parameter is not present');
-        }
-        var counter = Uint8List(8);
-        int c = int.parse(query['counter']!);
-        for (int i = 7; i >= 0; --i, c >>>= 8) {
-          counter[i] = c & 0xFF;
-        }
-        return HOTP(
-          secret,
-          digits: 6,
-          counter: counter,
-          algo: algo,
-        );
-      default:
-        throw ArgumentError('Unknown type: ${uri.host}');
-    }
-  }
 }
 
 class RandomOTP extends OTPAuth {
@@ -106,6 +51,8 @@ class RandomOTP extends OTPAuth {
 
 class HOTP extends OTPAuth {
   final HMAC mac;
+  final String? label;
+  final String? issuer;
   final List<int> counter;
   late final int _max;
 
@@ -114,6 +61,8 @@ class HOTP extends OTPAuth {
     int digits = 6,
     required this.counter,
     BlockHashBase algo = sha1,
+    this.label,
+    this.issuer,
   })  : mac = HMAC(algo, secret),
         super(digits) {
     if (digits < 6) {
@@ -134,7 +83,7 @@ class HOTP extends OTPAuth {
   @override
   int next() {
     var digest = mac.convert(counter).bytes;
-    int offset = digest[19] & 0xF;
+    int offset = digest.last & 0xF;
     int dbc = ((digest[offset] & 0x7f) << 24) |
         (digest[offset + 1] << 16) |
         (digest[offset + 2] << 8) |
@@ -156,11 +105,15 @@ class TOTP extends HOTP {
     this.period = 30,
     int? currentTime,
     this.startTime = 0,
+    String? label,
+    String? issuer,
     BlockHashBase algo = sha1,
   }) : super(
           secret,
           algo: algo,
           digits: digits,
+          label: label,
+          issuer: issuer,
           counter: Uint8List(8),
         ) {
     _setupController();

@@ -58,6 +58,23 @@ const _base64UrlReverse = [
   41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
 ];
 
+/// Remove all characters except digits
+@pragma('vm:prefer-inline')
+String keepNumeric(String value) {
+  return String.fromCharCodes(
+    value.codeUnits.where((c) => (c >= _zero && c <= _nine)),
+  );
+}
+
+/// Remove all characters except letters
+@pragma('vm:prefer-inline')
+String keepAlpha(String value) {
+  return String.fromCharCodes(
+    value.codeUnits.where(
+        (c) => (c >= _bigA && c <= _bigZ) || (c >= _smallA && c <= _smallZ)),
+  );
+}
+
 /// Remove all characters except letters and digits
 @pragma('vm:prefer-inline')
 String keepAlphaNumeric(String value) {

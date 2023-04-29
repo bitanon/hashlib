@@ -69,12 +69,15 @@ const Map<String, BlockHashBase> _blockHash = {
   'XXH64': xxh64,
 };
 
-/// Find a [BlockHashBase] algorithm given a string name
-BlockHashBase? findAlgorithm(String name) {
-  return _blockHash[keepAlphaNumeric(name).toUpperCase()];
-}
+/// A registry to find block hash algorithms by name
+class BlockHashRegistry {
+  /// Find a [BlockHashBase] algorithm given a string name
+  static BlockHashBase? findAlgorithm(String name) {
+    return _blockHash[keepAlphaNumeric(name).toUpperCase()];
+  }
 
-/// Register a new [BlockHashBase] algorithm on the fly given a string name
-void registerAlgorithm(String name, BlockHashBase algo) {
-  _blockHash[keepAlphaNumeric(name).toUpperCase()] = algo;
+  /// Register a new [BlockHashBase] algorithm on the fly given a string name
+  static void registerAlgorithm(String name, BlockHashBase algo) {
+    _blockHash[keepAlphaNumeric(name).toUpperCase()] = algo;
+  }
 }
