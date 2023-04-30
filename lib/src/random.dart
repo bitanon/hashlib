@@ -4,18 +4,20 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-final Random _secure = Random.secure();
+Random _generator() {
+  try {
+    return Random.secure();
+  } catch (err) {
+    return Random(DateTime.now().millisecondsSinceEpoch);
+  }
+}
 
 /// Generate a list of random 8-bit numbers of size [length]
 List<int> randomBytes(int length) {
-  return List<int>.generate(length, (index) => _secure.nextInt(256));
-}
-
-/// Generate a [Uint8List] of size [length] with random 8-bit numbers
-Uint8List randomBuffer(int length) {
+  var random = _generator();
   var data = Uint8List(length);
   for (int i = 0; i < data.length; i++) {
-    data[i] = _secure.nextInt(256);
+    data[i] = random.nextInt(256);
   }
   return data;
 }
@@ -26,8 +28,14 @@ void fillRandom(
   int offsetInBytes = 0,
   int? lengthInBytes,
 ]) {
-  var data = buffer.asUint8List(offsetInBytes, lengthInBytes);
-  for (int i = 0; i < data.length; i++) {
-    data[i] = _secure.nextInt(256);
+  if (lengthInBytes == null) {
+    lengthInBytes = buffer.lengthInBytes;
+  } else {
+    lengthInBytes = min(lengthInBytes + offsetInBytes, buffer.lengthInBytes);
+  }
+  var random = _generator();
+  var data = buffer.asUint8List();
+  for (int i = offsetInBytes; i < lengthInBytes; i++) {
+    data[i] = random.nextInt(256);
   }
 }

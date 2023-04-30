@@ -2,7 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';

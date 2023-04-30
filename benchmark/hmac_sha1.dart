@@ -31,7 +31,7 @@ class CryptoBenchmark extends Benchmark {
 }
 
 void main() {
-  print('------- HMAC(SHA-256) --------');
+  print('------- HMAC(SHA-1) --------');
   final conditions = [
     [10, 100000],
     [1000, 5000],

@@ -17,7 +17,7 @@ OTPAuth parse(String keyUri) {
   var secret = fromBase32(query['secret']!);
 
   var algorithm = query['algorithm'] ?? 'SHA1';
-  var algo = BlockHashRegistry.findAlgorithm(algorithm);
+  var algo = BlockHashRegistry.lookup(algorithm);
   if (algo == null) {
     throw ArgumentError('No such algorithm found: $algorithm');
   }

@@ -104,13 +104,13 @@ void _buildRegistry() {
 /// A registry to find a block hash algorithm by name
 class BlockHashRegistry {
   /// Find a [BlockHashBase] algorithm given a string name
-  static BlockHashBase? findAlgorithm(String name) {
+  static BlockHashBase? lookup(String name) {
     _buildRegistry();
     return _blockHash[_normalize(name)];
   }
 
   /// Register a new [BlockHashBase] algorithm on the fly given a string name
-  static void registerAlgorithm(BlockHashBase algo, [String? name]) {
+  static void register(BlockHashBase algo, [String? name]) {
     _buildRegistry();
     name = _normalize(name ?? algo.name);
     _blockHash[_normalize(name)] = algo;
@@ -120,13 +120,13 @@ class BlockHashRegistry {
 /// A registry to find a hash algorithm by name
 class HashRegistry {
   /// Find a [HashBase] algorithm given a string name
-  static HashBase? findAlgorithm(String name) {
+  static HashBase? lookup(String name) {
     _buildRegistry();
     return _hash[_normalize(name)];
   }
 
   /// Register a new [HashBase] algorithm on the fly given a string name
-  static void registerAlgorithm(HashBase algo, [String? name]) {
+  static void register(HashBase algo, [String? name]) {
     _buildRegistry();
     name = _normalize(name ?? algo.name);
     _hash[name] = algo;

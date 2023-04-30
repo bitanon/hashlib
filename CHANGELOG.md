@@ -1,18 +1,45 @@
 ## next
 
-- Adds support for `Poly1305` MAC generation:
+- Adds support for `Poly1305` MAC generation: [#5](https://github.com/dipu-bd/hashlib/issues/5)
   - New class: `Poly1305`
-  - New method: `poly1305`
+  - New methods: `poly1305`, `poly1305auth`
+- Adds support for OTP generation:
+  - `HOTP` - Hash-based OTP generation [#8](https://github.com/dipu-bd/hashlib/issues/8)
+  - `TOTP` - Time-based OTP generation [#9](https://github.com/dipu-bd/hashlib/issues/9)
+- Name all hash algorithms and a registry to loopup algorithms by name.
+  - `BlockHashRegistry` - for block hash algorithms
+  - `HashRegistry` - for all hash algorithms
+- Adds random byte generator:
+  - `randomBytes` method returns a `List<int>`
+  - `fillRandom` method fills a `ByteBuffer` with random values
+- New default instances for `Shake128`:
+  - `shake128_128`
+  - `shake128_160`
+  - `shake128_224`
+  - `shake128_256`
+  - `shake128_384`
+  - `shake128_512`
+- New default instances for `Shake256`:
+  - `shake256_128`
+  - `shake256_160`
+  - `shake256_224`
+  - `shake256_256`
+  - `shake256_384`
+  - `shake256_512`
 - Adds two new methods to `MACHashBase`:
   - `sign`: generates a tag from a message
   - `verify`: verifies if a message and tag matches
 - Updates the utils methods
   - Removes `toHexSingle` from utils.
   - Accepts `Iterables` instead of `List` in `toHex`
+  - Change parameter type of `toHex`
+  - Adds `fromBase32` and `toBase32`
   - Adds tests
 - Updates `HashDigest`
   - Adds `isEqual` to match it with other `HashDigest`, `String`, `TypedData`, `ByteBuffer`, `List<int>`, `Iterable<int>`
   - Use custom equality check
+- New example: `otpauth_parser.dart`. It can decode migration string from Google Authenticator and parse any valid otpauth string.
+- Updates benchmarks
 
 ## 1.9.0
 
