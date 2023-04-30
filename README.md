@@ -183,8 +183,6 @@ With string of length 500000 (10 iterations):
 | SHA-256       | **100.55MB/s** | 84.38MB/s <br> `19% slower`  | 19.83MB/s <br> `407% slower` | 21.79MB/s <br> `361% slower`  |
 | SHA-384       | **157.21MB/s** | 48.19MB/s <br> `226% slower` | 17.82MB/s <br> `782% slower` | 5.19MB/s <br> `2927% slower`  |
 | SHA-512       | **157.13MB/s** | 48.30MB/s <br> `225% slower` | 17.93MB/s <br> `776% slower` | 5.19MB/s <br> `2929% slower`  |
-| SHA-512/224   | **156.70MB/s** | 48.46MB/s <br> `223% slower` | ➖                           | 5.20MB/s <br> `2913% slower`  |
-| SHA-512/256   | **156.94MB/s** | 48.24MB/s <br> `225% slower` | ➖                           | 5.08MB/s <br> `2991% slower`  |
 | SHA3-256      | **99.89MB/s**  | ➖                           | ➖                           | 3.18MB/s <br> `3044% slower`  |
 | SHA3-512      | **157.45MB/s** | ➖                           | ➖                           | 1.71MB/s <br> `9127% slower`  |
 | BLAKE-2s      | **144.42MB/s** | ➖                           | ➖                           | ➖                            |
@@ -205,8 +203,6 @@ With string of length 1000 (5000 iterations):
 | SHA-256       | **96.18MB/s**  | 81.39MB/s <br> `18% slower`  | 20.67MB/s <br> `365% slower` | 21.26MB/s <br> `352% slower`  |
 | SHA-384       | **145.70MB/s** | 46.59MB/s <br> `213% slower` | 21.52MB/s <br> `577% slower` | 5.09MB/s <br> `2762% slower`  |
 | SHA-512       | **143.40MB/s** | 46.40MB/s <br> `209% slower` | 21.62MB/s <br> `563% slower` | 5.07MB/s <br> `2729% slower`  |
-| SHA-512/224   | **143.47MB/s** | 46.50MB/s <br> `209% slower` | ➖                           | 4.50MB/s <br> `3090% slower`  |
-| SHA-512/256   | **145.55MB/s** | 46.73MB/s <br> `211% slower` | ➖                           | 4.49MB/s <br> `3145% slower`  |
 | SHA3-256      | **96.15MB/s**  | ➖                           | ➖                           | 2.97MB/s <br> `3136% slower`  |
 | SHA3-512      | **143.89MB/s** | ➖                           | ➖                           | 1.70MB/s <br> `8346% slower`  |
 | BLAKE-2s      | **136.61MB/s** | ➖                           | ➖                           | ➖                            |
@@ -227,8 +223,6 @@ With string of length 10 (100000 iterations):
 | SHA-256       | **12.27MB/s** | 7.21MB/s <br> `70% slower`   | 2.62MB/s <br> `368% slower` | 3.13MB/s <br> `292% slower`    |
 | SHA-384       | **9.48MB/s**  | 2.90MB/s <br> `227% slower`  | 1.34MB/s <br> `610% slower` | 386.20KB/s <br> `2355% slower` |
 | SHA-512       | **9.49MB/s**  | 2.89MB/s <br> `228% slower`  | 1.35MB/s <br> `601% slower` | 384.32KB/s <br> `2370% slower` |
-| SHA-512/224   | **9.62MB/s**  | 2.95MB/s <br> `226% slower`  | ➖                          | 197.75KB/s <br> `4765% slower` |
-| SHA-512/256   | **9.67MB/s**  | 2.95MB/s <br> `227% slower`  | ➖                          | 197.90KB/s <br> `4784% slower` |
 | SHA3-256      | **12.35MB/s** | ➖                           | ➖                          | 228.76KB/s <br> `5301% slower` |
 | SHA3-512      | **9.50MB/s**  | ➖                           | ➖                          | 228.29KB/s <br> `4061% slower` |
 | BLAKE-2s      | **15.14MB/s** | ➖                           | ➖                          | ➖                             |

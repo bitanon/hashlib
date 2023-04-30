@@ -26,6 +26,9 @@ class _Keccak256 extends BlockHashBase {
   const _Keccak256();
 
   @override
+  final String name = 'Keccak-256';
+
+  @override
   Keccak256Hash createSink() => Keccak256Hash();
 }
 

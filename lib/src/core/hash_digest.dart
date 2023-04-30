@@ -13,13 +13,17 @@ class HashDigest extends Object {
   /// Returns the byte buffer associated with this digest.
   ByteBuffer get buffer => bytes.buffer;
 
-  /// The message digest as a string of hexadecimal digits.
+  /// The message digest as a hexadecimal string.
   ///
   /// If [uppercase] is true, the output will have uppercase alphabets.
   @pragma('vm:prefer-inline')
-  String hex([bool uppercase = false]) => utils.toHex(bytes, uppercase);
+  String hex([bool uppercase = false]) => utils.toHex(bytes, upper: uppercase);
 
-  /// The message digest as a string of base64.
+  /// The message digest as a Base-32 string.
+  @pragma('vm:prefer-inline')
+  String base32() => utils.toBase32(bytes);
+
+  /// The message digest as a Base-64 string.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
   @pragma('vm:prefer-inline')

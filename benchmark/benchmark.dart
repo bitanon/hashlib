@@ -10,6 +10,7 @@ import 'base.dart';
 import 'blake2b.dart' as blake2b;
 import 'blake2s.dart' as blake2s;
 import 'hmac_md5.dart' as md5_hmac;
+import 'hmac_sha1.dart' as sha1_hmac;
 import 'hmac_sha256.dart' as sha256_hmac;
 import 'md5.dart' as md5;
 import 'poly1305.dart' as poly1305;
@@ -20,8 +21,6 @@ import 'sha384.dart' as sha384;
 import 'sha3_256.dart' as sha3_256;
 import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
-import 'sha512_224.dart' as sha512t224;
-import 'sha512_256.dart' as sha512t256;
 import 'xxhash.dart' as xxhash;
 
 void main(List<String> args) {
@@ -90,16 +89,6 @@ void main(List<String> args) {
         sha512.HashBenchmark(size, iter),
         sha512.PointyCastleBenchmark(size, iter),
       ],
-      "SHA-512/224": [
-        sha512t224.HashlibBenchmark(size, iter),
-        sha512t224.CryptoBenchmark(size, iter),
-        sha512t224.PointyCastleBenchmark(size, iter),
-      ],
-      "SHA-512/256": [
-        sha512t256.HashlibBenchmark(size, iter),
-        sha512t256.CryptoBenchmark(size, iter),
-        sha512t256.PointyCastleBenchmark(size, iter),
-      ],
       "SHA3-256": [
         sha3_256.HashlibBenchmark(size, iter),
         sha3_256.PointyCastleBenchmark(size, iter),
@@ -119,6 +108,10 @@ void main(List<String> args) {
         md5_hmac.HashlibBenchmark(size, iter),
         md5_hmac.CryptoBenchmark(size, iter),
         md5_hmac.HashBenchmark(size, iter),
+      ],
+      "HMAC(SHA-1)": [
+        sha1_hmac.HashlibBenchmark(size, iter),
+        sha1_hmac.CryptoBenchmark(size, iter),
       ],
       "HMAC(SHA-256)": [
         sha256_hmac.HashlibBenchmark(size, iter),

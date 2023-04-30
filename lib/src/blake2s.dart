@@ -2,7 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/algorithms/blake2s.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
 /// For generating un-keyed message digest with BLAKE2s-128.
@@ -37,7 +37,7 @@ const Blake2s blake2s256 = Blake2s(256 >>> 3);
 /// This implementation is based on the [RFC-7693][rfc]
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
-class Blake2s extends HashBase {
+class Blake2s extends BlockHashBase {
   final int digestSize;
   final List<int>? key;
   final List<int>? salt;
@@ -57,6 +57,9 @@ class Blake2s extends HashBase {
     this.salt,
     this.personalization,
   });
+
+  @override
+  String get name => 'BLAKE2s-${digestSize << 3}';
 
   @override
   Blake2sHash createSink() => Blake2sHash(
@@ -84,6 +87,9 @@ class Blake2sMAC extends MACHashBase {
     this.salt,
     this.personalization,
   }) : super(key);
+
+  @override
+  String get name => 'BLAKE2s-${digestSize << 3}-MAC';
 
   @override
   MACSinkBase createSink() => Blake2sHash(

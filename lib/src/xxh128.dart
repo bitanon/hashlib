@@ -32,6 +32,9 @@ class XXH128 extends BlockHashBase {
 
   const XXH128({this.seed = 0, this.secret});
 
+  @override
+  final String name = 'XXH128';
+
   /// Get and instance of [xxh128] with an specific seed
   factory XXH128.withSeed(int seed) => XXH128(seed: seed);
 

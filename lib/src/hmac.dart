@@ -11,11 +11,21 @@ import 'package:hashlib/src/core/mac_base.dart';
 /// simultaneously verify both the data integrity and authenticity of a message.
 class HMAC extends MACHashBase {
   final BlockHashBase algo;
+  late final HMACSink _sink;
 
-  const HMAC(this.algo, List<int> key) : super(key);
+  HMAC(this.algo, List<int> key) : super(key) {
+    _sink = HMACSink(algo.createSink());
+    _sink.init(key);
+  }
 
   @override
-  HMACSink createSink() => HMACSink(algo.createSink())..init(key);
+  final String name = 'HMAC';
+
+  @override
+  HMACSink createSink() {
+    _sink.reset();
+    return _sink;
+  }
 }
 
 /// Extension on [BlockHashBase] to get an [HMAC] instance
@@ -24,6 +34,7 @@ extension HMAConBlockHashBase on BlockHashBase {
   ///
   /// HMAC is a hash-based message authentication code that can be used to
   /// simultaneously verify both the data integrity and authenticity of a message.
+  @pragma('vm:prefer-inline')
   HMAC hmac(List<int> key) {
     return HMAC(this, key);
   }
@@ -32,6 +43,7 @@ extension HMAConBlockHashBase on BlockHashBase {
   ///
   /// HMAC is a hash-based message authentication code that can be used to
   /// simultaneously verify both the data integrity and authenticity of a message.
+  @pragma('vm:prefer-inline')
   HMAC hmacBy(String key, [Encoding? encoding]) {
     if (encoding != null) {
       return HMAC(this, encoding.encode(key));

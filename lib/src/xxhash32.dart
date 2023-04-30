@@ -26,6 +26,9 @@ class XXHash32 extends BlockHashBase {
   const XXHash32([this.seed = 0]);
 
   @override
+  final String name = 'XXH32';
+
+  @override
   BlockHashSink createSink() => XXHash32Sink(seed);
 
   /// Get and instance of [XXHash32] with an specific seed
