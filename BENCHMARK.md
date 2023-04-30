@@ -70,10 +70,11 @@ With string of length 10 (100000 iterations):
 | HMAC(SHA-256) | **1.93MB/s**  | 1.60MB/s <br> `21% slower`   | ➖                          | ➖                             |
 | Poly1305      | **1.41MB/s**  | ➖                           | ➖                          | ➖                             |
 
-Argon2 benchmarks on different security parameters:
+Argon2 and scrypt benchmarks on different security parameters:
 
 | Algorithms | test     | little   | moderate  | good       | strong      |
 | ---------- | -------- | -------- | --------- | ---------- | ----------- |
-| argon2i    | 0.365 ms | 2.501 ms | 16.835 ms | 209.94 ms  | 2435.554 ms |
-| argon2d    | 0.303 ms | 2.412 ms | 16.17 ms  | 207.963 ms | 2505.426 ms |
-| argon2id   | 0.313 ms | 2.424 ms | 16.386 ms | 202.846 ms | 2471.51 ms  |
+| scrypt     | 1.77 ms  | 3.053 ms | 16.9 ms   | 132.935 ms | 1979.908 ms |
+| argon2i    | 0.374 ms | 2.811 ms | 15.478 ms | 192.085 ms | 2346.343 ms |
+| argon2d    | 0.385 ms | 2.66 ms  | 15.341 ms | 191.056 ms | 2328.332 ms |
+| argon2id   | 0.349 ms | 2.426 ms | 15.989 ms | 186.398 ms | 2369.287 ms |

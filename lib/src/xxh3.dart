@@ -42,7 +42,7 @@ class XXH3 extends BlockHashBase {
   factory XXH3.withSecret(List<int> secret) => XXH3(secret: secret);
 
   @override
-  BlockHashSink createSink() => secret == null
+  XXH3Sink64bit createSink() => secret == null
       ? XXH3Sink64bit.withSeed(seed)
       : XXH3Sink64bit.withSecret(secret);
 }

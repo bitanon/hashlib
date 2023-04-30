@@ -29,7 +29,7 @@ class XXHash32 extends BlockHashBase {
   final String name = 'XXH32';
 
   @override
-  BlockHashSink createSink() => XXHash32Sink(seed);
+  XXHash32Sink createSink() => XXHash32Sink(seed);
 
   /// Get and instance of [XXHash32] with an specific seed
   XXHash32 withSeed(int seed) => XXHash32(seed);

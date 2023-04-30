@@ -65,6 +65,13 @@ This library contains implementations of secure hash functions, checksum generat
 | HMAC       | `HMAC`, `#.hmac`                       | RFC-2104 |
 | Poly1305   | `Poly1305`, `poly1305`, `poly1305auth` | RFC-8439 |
 
+### OTP generation for 2FA
+
+| Algorithms | Available methods | Source   |
+| ---------- | ----------------- | -------- |
+| HOTP       | `HOTP`            | RFC-4226 |
+| TOTP       | `TOTP`            | RFC-6238 |
+
 ## Getting Started
 
 The following import will give you access to all of the algorithms in this package.
@@ -131,29 +138,37 @@ void main() {
 
   // Examples of MAC generations
   print('HMAC[MD5] => ${md5.hmac(pw).string(text)}');
-  print('HMAC[MD5] => ${md5.hmacBy(key, utf8).string(text)}');
-  print('HMAC[MD5] => ${md5.hmacBy(key).string(text)}');
-  print('HMAC[MD5] => ${HMAC(md5, pw).string(text)}');
-  print("[BLAKE-2b/*] => ${Blake2bMAC(32, pw).string(text)}");
+  print('HMAC[SHA1] => ${sha1.hmacBy(key, utf8).string(text)}');
+  print('HMAC[SHA256] => ${sha256.hmacBy(key).string(text)}');
+  print('HMAC[SHA3-256] => ${HMAC(sha3_256, pw).string(text)}');
+  print("[BLAKE-2b/224] => ${Blake2bMAC(28, pw).string(text)}");
   print("[BLAKE-2b/256] => ${blake2b256.mac(pw).string(text)}");
   print('');
 
   // Examples of PBKDF2 key derivation
-  print("PBKDF2[HMAC[SHA-256]] => ${pbkdf2(pw, salt, 100)}");
-  print("PBKDF2[HMAC[SHA-1]] => ${sha1.hmac(pw).pbkdf2(salt, 100)}");
-  print("PBKDF2[HMAC[BLAKE-2b]] => ${blake2b256.pbkdf2(pw, salt, 100)}");
-  print("PBKDF2[BLAKE-2b-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[HMAC[SHA256]] => ${pbkdf2(pw, salt, 100)}");
+  print("PBKDF2[HMAC[SHA1]] => ${sha1.hmac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[BLAKE2b-256-MAC] => ${blake2b256.mac(pw).pbkdf2(salt, 100)}");
+  print("PBKDF2[HMAC[BLAKE-2b-256]] => ${blake2b256.pbkdf2(pw, salt, 100)}");
   print('');
 
-  // Examples of scrypt key derivation
-  print("[scrypt] => ${scrypt(pw, salt, N: 16, r: 8, p: 1, dklen: 32)}");
+  // Examples of OTP generation
+  int nw = DateTime.now().millisecondsSinceEpoch ~/ 30000;
+  var counter = fromHex(nw.toRadixString(16).padLeft(16, '0'));
+  print('TOTP[time=$nw] => ${TOTP(salt).value()}');
+  print('HOTP[counter=$nw] => ${HOTP(salt, counter: counter).value()}');
   print('');
 
   // Examples of Argon2 key derivation
-  var security = Argon2Security.test;
-  print("[Argon2i] => ${argon2i(pw, salt, security: security)}");
-  print("[Argon2d] => ${argon2d(pw, salt, security: security)}");
-  print("[Argon2id] => ${argon2id(pw, salt, security: security)}");
+  var argon2Test = Argon2Security.test;
+  print("[Argon2i] => ${argon2i(pw, salt, security: argon2Test)}");
+  print("[Argon2d] => ${argon2d(pw, salt, security: argon2Test)}");
+  print("[Argon2id] => ${argon2id(pw, salt, security: argon2Test)}");
+
+  // Examples of scrypt key derivation
+  var scryptLittle = ScryptSecurity.little;
+  print("[scrypt] => ${scrypt(pw, salt, security: scryptLittle, dklen: 32)}");
+  print('');
 }
 ```
 
@@ -235,22 +250,13 @@ With string of length 10 (100000 iterations):
 | HMAC(SHA-256) | **1.93MB/s**  | 1.60MB/s <br> `21% slower`   | ➖                          | ➖                             |
 | Poly1305      | **1.41MB/s**  | ➖                           | ➖                          | ➖                             |
 
-Argon2 benchmarks on different security parameters:
+Argon2 and scrypt benchmarks on different security parameters:
 
 | Algorithms | test     | little   | moderate  | good       | strong      |
 | ---------- | -------- | -------- | --------- | ---------- | ----------- |
-| argon2i    | 0.365 ms | 2.501 ms | 16.835 ms | 209.94 ms  | 2435.554 ms |
-| argon2d    | 0.303 ms | 2.412 ms | 16.17 ms  | 207.963 ms | 2505.426 ms |
-| argon2id   | 0.313 ms | 2.424 ms | 16.386 ms | 202.846 ms | 2471.51 ms  |
-
-SCRYPT benchmarks on different security parameters:
-
-```
---------- Hashlib/SCRYPT ----------
-hashlib/scrypt[n=1<<4,r=16,p=4]: 1.896 ms
-hashlib/scrypt[n=1<<8,r=16,p=4]: 13.63 ms
-hashlib/scrypt[n=1<<12,r=16,p=4]: 201.858 ms
-hashlib/scrypt[n=1<<15,r=16,p=4]: 1585.825 ms
-```
+| scrypt     | 1.77 ms  | 3.053 ms | 16.9 ms   | 132.935 ms | 1979.908 ms |
+| argon2i    | 0.374 ms | 2.811 ms | 15.478 ms | 192.085 ms | 2346.343 ms |
+| argon2d    | 0.385 ms | 2.66 ms  | 15.341 ms | 191.056 ms | 2328.332 ms |
+| argon2id   | 0.349 ms | 2.426 ms | 15.989 ms | 186.398 ms | 2369.287 ms |
 
 > All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_

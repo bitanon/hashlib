@@ -42,7 +42,7 @@ class XXH128 extends BlockHashBase {
   factory XXH128.withSecret(List<int> secret) => XXH128(secret: secret);
 
   @override
-  BlockHashSink createSink() => secret == null
+  XXH3Sink128bit createSink() => secret == null
       ? XXH3Sink128bit.withSeed(seed)
       : XXH3Sink128bit.withSecret(secret);
 }

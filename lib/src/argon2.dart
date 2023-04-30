@@ -101,7 +101,7 @@ Argon2HashDigest argon2id(
 }
 
 /// This contains some recommended values of memory, iteration and parallelism
-/// values for Argon2 algorithm.
+/// values for [Argon2] algorithm.
 ///
 /// It is best to try out different combinations of these values to achieve the
 /// desired runtime on a target machine. You can use the [optimize] method for

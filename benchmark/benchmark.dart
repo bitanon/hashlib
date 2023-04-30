@@ -22,21 +22,12 @@ import 'sha3_256.dart' as sha3_256;
 import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
 import 'xxhash.dart' as xxhash;
+import 'scrypt.dart' as scrypt;
 
-void main(List<String> args) {
-  print("# Benchmarks");
-  print('');
-  print("Libraries:");
-  print('');
-  print("- **Hashlib** : https://pub.dev/packages/hashlib");
-  print("- **Crypto** : https://pub.dev/packages/crypto");
-  print("- **PointyCastle** : https://pub.dev/packages/pointycastle");
-  print("- **Hash** : https://pub.dev/packages/hash");
-  print('');
-
-  // ---------------------------------------------------------------------
-  // Hash function benchmarks
-  // ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+// Hash function benchmarks
+// ---------------------------------------------------------------------
+void measureHashFunctions() {
   final conditions = [
     [500000, 10],
     [1000, 5000],
@@ -172,12 +163,13 @@ void main(List<String> args) {
     }
     print('');
   }
+}
 
-  // ---------------------------------------------------------------------
-  // Argon2 Benchmarks
-  // ---------------------------------------------------------------------
-
-  print('Argon2 benchmarks on different security parameters:');
+// ---------------------------------------------------------------------
+// Key Derivation Algorithm Benchmarks
+// ---------------------------------------------------------------------
+void measureKeyDerivation() {
+  print('Argon2 and scrypt benchmarks on different security parameters:');
   print('');
   var argon2Levels = [
     Argon2Security.test,
@@ -186,7 +178,15 @@ void main(List<String> args) {
     Argon2Security.good,
     Argon2Security.strong,
   ];
+  var scryptLevels = [
+    ScryptSecurity.test,
+    ScryptSecurity.little,
+    ScryptSecurity.moderate,
+    ScryptSecurity.good,
+    ScryptSecurity.strong,
+  ];
   var algorithms = {
+    'scrypt': scryptLevels.map((e) => scrypt.HashlibBenchmark(e)),
     'argon2i': argon2Levels.map((e) => argon2.HashlibArgon2iBenchmark(e)),
     'argon2d': argon2Levels.map((e) => argon2.HashlibArgon2dBenchmark(e)),
     'argon2id': argon2Levels.map((e) => argon2.HashlibArgon2idBenchmark(e)),
@@ -207,4 +207,27 @@ void main(List<String> args) {
     print(message);
   }
   print('');
+}
+
+// ---------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------
+void main(List<String> args) {
+  print("# Benchmarks");
+  print('');
+  print("Libraries:");
+  print('');
+  print("- **Hashlib** : https://pub.dev/packages/hashlib");
+  print("- **Crypto** : https://pub.dev/packages/crypto");
+  print("- **PointyCastle** : https://pub.dev/packages/pointycastle");
+  print("- **Hash** : https://pub.dev/packages/hash");
+  print('');
+
+  measureHashFunctions();
+  measureKeyDerivation();
+
+  var ram = '3200MHz';
+  var processor = 'AMD Ryzen 7 5800X';
+  print('> All benchmarks are done on _${processor}_ processor '
+      'and _${ram}_ RAM using compiled _exe_');
 }

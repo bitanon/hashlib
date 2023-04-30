@@ -9,11 +9,9 @@ import 'package:hashlib/hashlib.dart';
 Random random = Random();
 
 class ScryptBenchmarkBase extends BenchmarkBase {
-  final int n;
-  final int r;
-  final int p;
+  final ScryptSecurity security;
 
-  ScryptBenchmarkBase(String name, this.n, this.r, this.p) : super(name);
+  ScryptBenchmarkBase(String name, this.security) : super(name);
 
   @override
   double measure() {
@@ -28,30 +26,31 @@ class ScryptBenchmarkBase extends BenchmarkBase {
 }
 
 class HashlibBenchmark extends ScryptBenchmarkBase {
-  HashlibBenchmark(int n, int r, int p) : super('hashlib', n, r, p);
+  HashlibBenchmark(ScryptSecurity security) : super('hashlib', security);
 
   @override
   void run() {
-    Scrypt(
-      salt: 'secret salt'.codeUnits,
-      cost: n,
-      blockSize: r,
-      parallelism: p,
-      derivedKeyLength: 64,
-    ).convert('long password'.codeUnits);
+    scrypt(
+      'long password'.codeUnits,
+      'secret salt'.codeUnits,
+      security: security,
+      dklen: 64,
+    );
   }
 }
 
 void main() {
   double runtime;
   print('--------- Hashlib/SCRYPT ----------');
-  runtime = HashlibBenchmark(1 << 4, 16, 4).measure();
-  print('hashlib/scrypt[n=1<<4,r=16,p=4]: ${runtime / 1000} ms');
-  runtime = HashlibBenchmark(1 << 8, 16, 4).measure();
-  print('hashlib/scrypt[n=1<<8,r=16,p=4]: ${runtime / 1000} ms');
-  runtime = HashlibBenchmark(1 << 12, 16, 4).measure();
-  print('hashlib/scrypt[n=1<<12,r=16,p=4]: ${runtime / 1000} ms');
-  runtime = HashlibBenchmark(1 << 15, 16, 4).measure();
-  print('hashlib/scrypt[n=1<<15,r=16,p=4]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.test).measure();
+  print('hashlib/scrypt[test]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.little).measure();
+  print('hashlib/scrypt[little]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.moderate).measure();
+  print('hashlib/scrypt[moderate]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.good).measure();
+  print('hashlib/scrypt[good]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.strong).measure();
+  print('hashlib/scrypt[strong]: ${runtime / 1000} ms');
   print('');
 }
