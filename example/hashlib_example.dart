@@ -1,4 +1,5 @@
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/codecs_base.dart';
 
 void main() {
   var text = "Happy Hashing!";
@@ -75,6 +76,6 @@ void main() {
 
   // Examples of scrypt key derivation
   var scryptLittle = ScryptSecurity.little;
-  print("[scrypt] => ${scrypt(pw, salt, security: scryptLittle, dklen: 32)}");
+  print("[scrypt] => ${scrypt(pw, salt, security: scryptLittle, dklen: 24)}");
   print('');
 }
