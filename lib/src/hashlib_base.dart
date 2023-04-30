@@ -17,6 +17,7 @@ export 'md5.dart';
 export 'otpauth.dart';
 export 'pbkdf2.dart';
 export 'poly1305.dart';
+export 'random.dart';
 export 'registry.dart';
 export 'scrypt.dart';
 export 'sha1.dart';
