@@ -21,6 +21,9 @@ class _SHA512 extends BlockHashBase {
   const _SHA512();
 
   @override
+  final String name = 'SHA-512';
+
+  @override
   SHA512Hash createSink() => SHA512Hash();
 }
 

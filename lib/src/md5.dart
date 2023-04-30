@@ -18,6 +18,9 @@ class _MD5 extends BlockHashBase {
   const _MD5();
 
   @override
+  final String name = 'MD5';
+
+  @override
   MD5Hash createSink() => MD5Hash();
 }
 

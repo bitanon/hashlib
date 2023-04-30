@@ -18,6 +18,9 @@ class _CRC64 extends HashBase {
   const _CRC64();
 
   @override
+  final String name = 'CRC-64';
+
+  @override
   CRC64Hash createSink() => CRC64Hash();
 }
 

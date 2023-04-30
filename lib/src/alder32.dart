@@ -25,6 +25,9 @@ class _Alder32 extends HashBase {
   const _Alder32();
 
   @override
+  final String name = 'ALDER-32';
+
+  @override
   Alder32Hash createSink() => Alder32Hash();
 }
 

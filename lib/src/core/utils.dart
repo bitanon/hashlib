@@ -59,31 +59,46 @@ const _base64UrlReverse = [
 ];
 
 /// Remove all characters except digits
-@pragma('vm:prefer-inline')
 String keepNumeric(String value) {
   return String.fromCharCodes(
-    value.codeUnits.where((c) => (c >= _zero && c <= _nine)),
+    value.codeUnits.where(
+      (c) => (c >= _zero && c <= _nine),
+    ),
   );
 }
 
 /// Remove all characters except letters
-@pragma('vm:prefer-inline')
 String keepAlpha(String value) {
   return String.fromCharCodes(
     value.codeUnits.where(
-        (c) => (c >= _bigA && c <= _bigZ) || (c >= _smallA && c <= _smallZ)),
+      (c) => (c >= _bigA && c <= _bigZ) || (c >= _smallA && c <= _smallZ),
+    ),
   );
 }
 
 /// Remove all characters except letters and digits
-@pragma('vm:prefer-inline')
 String keepAlphaNumeric(String value) {
   return String.fromCharCodes(
-    value.codeUnits.where((c) =>
-        (c >= _zero && c <= _nine) ||
-        (c >= _bigA && c <= _bigZ) ||
-        (c >= _smallA && c <= _smallZ)),
+    value.codeUnits.where(
+      (c) =>
+          (c >= _zero && c <= _nine) ||
+          (c >= _bigA && c <= _bigZ) ||
+          (c >= _smallA && c <= _smallZ),
+    ),
   );
+}
+
+/// Transform [value] to uppercase and keeps only letters and digits.
+String normalizeName(String value) {
+  return String.fromCharCodes(() sync* {
+    for (int c in value.codeUnits) {
+      if ((c >= _zero && c <= _nine) || (c >= _bigA && c <= _bigZ)) {
+        yield c;
+      } else if (c >= _smallA && c <= _smallZ) {
+        yield c - _smallA + _bigA;
+      }
+    }
+  }());
 }
 
 // Get bytes from an string
@@ -93,19 +108,29 @@ List<int> toBytes(String value, [cvt.Encoding? encoding]) {
 }
 
 /// The message digest as a string of hexadecimal digits.
-String toHex(Iterable<int> bytes, [bool uppercase = false]) {
+String toHex(
+  Iterable<int> bytes, {
+  bool upper = false,
+  bool trim = false,
+}) {
   int a, b;
   List<int> hex = <int>[];
   for (int x in bytes) {
     a = (x >>> 4) & 0xF;
     b = x & 0xF;
-    a += a < 10 ? _zero : ((uppercase ? _bigA : _smallA) - 10);
-    b += b < 10 ? _zero : ((uppercase ? _bigA : _smallA) - 10);
+    a += a < 10 ? _zero : ((upper ? _bigA : _smallA) - 10);
+    b += b < 10 ? _zero : ((upper ? _bigA : _smallA) - 10);
     hex.add(a);
     hex.add(b);
   }
-  for (a = 0; a + 1 < hex.length && hex[a] == _zero; ++a) {}
-  return String.fromCharCodes(hex.skip(a));
+  if (trim) {
+    a = 0;
+    while (a < hex.length && hex[a] == _zero) {
+      a++;
+    }
+    return String.fromCharCodes(hex.skip(a));
+  }
+  return String.fromCharCodes(hex);
 }
 
 /// The message digest as a string of hexadecimal digits.
@@ -169,18 +194,18 @@ String toBase64(Iterable<int> bytes, [bool urlSafe = false]) {
   return String.fromCharCodes(result);
 }
 
-Uint8List fromBase64(String data, [bool urlSafe = false]) {
-  int p = 0, n = 0, i = 0;
-  var map = urlSafe ? _base64UrlReverse : _base64Reverse;
-  var result = Uint8List((data.length * 6) ~/ 8);
+List<int> fromBase64(String data, [bool urlSafe = false]) {
+  int p = 0, n = 0;
+  var result = <int>[];
+  var _index = urlSafe ? _base64UrlReverse : _base64Reverse;
   for (int x in data.codeUnits) {
-    p = (p << 6) | map[x];
+    p = (p << 6) | _index[x];
     for (n += 6; n >= 8; n -= 8, p &= (1 << n) - 1) {
-      result[i++] = p >>> (n - 8);
+      result.add(p >>> (n - 8));
     }
   }
   if (p > 0) {
-    result[i++] = p;
+    result.add(p);
   }
   return result;
 }
@@ -188,30 +213,30 @@ Uint8List fromBase64(String data, [bool urlSafe = false]) {
 String toBase32(Iterable<int> bytes) {
   int p = 0, n = 0;
   var result = <int>[];
-  var alpha = _base32Alphabet;
+  var _alpha = _base32Alphabet;
   for (int x in bytes) {
     p = (p << 8) | x;
     for (n += 8; n >= 5; n -= 5, p &= (1 << n) - 1) {
-      result.add(alpha[p >>> (n - 5)]);
+      result.add(_alpha[p >>> (n - 5)]);
     }
   }
   if (n > 0) {
-    result.add(alpha[p << (5 - n)]);
+    result.add(_alpha[p << (5 - n)]);
   }
   return String.fromCharCodes(result);
 }
 
-Uint8List fromBase32(String data) {
-  int p = 0, n = 0, i = 0;
-  var result = Uint8List((data.length * 5) ~/ 8);
+List<int> fromBase32(String data) {
+  int p = 0, n = 0;
+  var result = <int>[];
   for (int x in data.codeUnits) {
     p = (p << 5) | _base32Reverse[x];
     for (n += 5; n >= 8; n -= 8, p &= (1 << n) - 1) {
-      result[i++] = p >>> (n - 8);
+      result.add(p >>> (n - 8));
     }
   }
   if (p > 0) {
-    result[i++] = p;
+    result.add(p);
   }
   return result;
 }

@@ -32,6 +32,9 @@ class XXH3 extends BlockHashBase {
 
   const XXH3({this.seed = 0, this.secret});
 
+  @override
+  final String name = 'XXH3';
+
   /// Get and instance of [xxh3] with an specific seed
   factory XXH3.withSeed(int seed) => XXH3(seed: seed);
 

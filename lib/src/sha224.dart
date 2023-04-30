@@ -21,6 +21,9 @@ class _SHA224 extends BlockHashBase {
   const _SHA224();
 
   @override
+  final String name = 'SHA-224';
+
+  @override
   SHA224Hash createSink() => SHA224Hash();
 }
 

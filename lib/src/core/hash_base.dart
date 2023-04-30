@@ -43,6 +43,9 @@ abstract class HashDigestSink implements Sink<List<int>> {
 abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   const HashBase();
 
+  /// The name of this algorithm
+  String get name;
+
   /// Create a [HashDigestSink] for generating message-digests
   @pragma('vm:prefer-inline')
   HashDigestSink createSink();

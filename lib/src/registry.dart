@@ -2,10 +2,15 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/utils.dart';
 
+import 'alder32.dart';
 import 'blake2b.dart';
 import 'blake2s.dart';
+import 'crc16.dart';
+import 'crc32.dart';
+import 'crc64.dart';
 import 'keccak224.dart';
 import 'keccak256.dart';
 import 'keccak384.dart';
@@ -21,63 +26,112 @@ import 'sha3_384.dart';
 import 'sha3_512.dart';
 import 'sha512.dart';
 import 'sha512t.dart';
+import 'shake128.dart';
+import 'shake256.dart';
 import 'xxh128.dart';
 import 'xxh3.dart';
 import 'xxhash32.dart';
 import 'xxhash64.dart';
 
-const Map<String, BlockHashBase> _blockHash = {
-  'BLAKE2': blake2b512,
-  'BLAKE2128': blake2s128,
-  'BLAKE2160': blake2b160,
-  'BLAKE2224': blake2s224,
-  'BLAKE2256': blake2b256,
-  'BLAKE2384': blake2b384,
-  'BLAKE2512': blake2b512,
-  'BLAKE2B': blake2b512,
-  'BLAKE2B160': blake2b160,
-  'BLAKE2B256': blake2b256,
-  'BLAKE2B384': blake2b384,
-  'BLAKE2B512': blake2b512,
-  'BLAKE2S': blake2s256,
-  'BLAKE2S128': blake2s128,
-  'BLAKE2S160': blake2s160,
-  'BLAKE2S224': blake2s224,
-  'BLAKE2S256': blake2s256,
-  'KECCAK224': keccak224,
-  'KECCAK256': keccak256,
-  'KECCAK384': keccak384,
-  'KECCAK512': keccak512,
-  'MD5': md5,
-  'SHA1': sha1,
-  'SHA224': sha224,
-  'SHA256': sha256,
-  'SHA3': sha3_512,
-  'SHA3224': sha3_224,
-  'SHA3256': sha3_256,
-  'SHA3384': sha3_384,
-  'SHA3512': sha3_512,
-  'SHA384': sha384,
-  'SHA512': sha512,
-  'SHA512224': sha512t224,
-  'SHA512256': sha512t256,
-  'XXH128': xxh128,
-  'XXH3': xxh3,
-  'XXH3128': xxh3_128,
-  'XXH32': xxh32,
-  'XXH364': xxh3_64,
-  'XXH64': xxh64,
-};
+final _hash = <String, HashBase>{};
+final _blockHash = <String, BlockHashBase>{};
 
-/// A registry to find block hash algorithms by name
+@pragma('vm:prefer-inline')
+String _normalize(String name) => normalizeName(name);
+
+void _buildRegistry() {
+  if (_hash.isNotEmpty) return;
+
+  _blockHash.addAll({
+    _normalize(blake2b160.name): blake2b160,
+    _normalize(blake2b256.name): blake2b256,
+    _normalize(blake2b384.name): blake2b384,
+    _normalize(blake2b512.name): blake2b512,
+    _normalize(blake2s128.name): blake2s128,
+    _normalize(blake2s160.name): blake2s160,
+    _normalize(blake2s224.name): blake2s224,
+    _normalize(blake2s256.name): blake2s256,
+    _normalize(keccak224.name): keccak224,
+    _normalize(keccak256.name): keccak256,
+    _normalize(keccak384.name): keccak384,
+    _normalize(keccak512.name): keccak512,
+    _normalize(md5.name): md5,
+    _normalize(sha1.name): sha1,
+    _normalize(sha224.name): sha224,
+    _normalize(sha256.name): sha256,
+    _normalize(sha3_224.name): sha3_224,
+    _normalize(sha3_256.name): sha3_256,
+    _normalize(sha3_384.name): sha3_384,
+    _normalize(sha3_512.name): sha3_512,
+    _normalize(sha384.name): sha384,
+    _normalize(sha512.name): sha512,
+    _normalize(sha512t224.name): sha512t224,
+    _normalize(sha512t256.name): sha512t256,
+    _normalize(xxh128.name): xxh128,
+    _normalize(xxh3.name): xxh3,
+    _normalize(xxh32.name): xxh32,
+    _normalize(xxh64.name): xxh64,
+    _normalize('BLAKE2'): blake2b512,
+    _normalize('BLAKE2b'): blake2b512,
+    _normalize('BLAKE2s'): blake2s256,
+    _normalize('SHA2'): sha256,
+    _normalize('SHA3'): sha3_512,
+    _normalize('XXH3-128'): xxh128,
+    _normalize('XXH3-64'): xxh3,
+  });
+
+  _hash.addAll(_blockHash);
+  _hash.addAll({
+    _normalize(alder32.name): alder32,
+    _normalize(crc16.name): crc16,
+    _normalize(crc32.name): crc32,
+    _normalize(crc64.name): crc64,
+    _normalize(shake128_128.name): shake128_128,
+    _normalize(shake128_160.name): shake128_160,
+    _normalize(shake128_224.name): shake128_224,
+    _normalize(shake128_256.name): shake128_256,
+    _normalize(shake128_384.name): shake128_384,
+    _normalize(shake128_512.name): shake128_512,
+    _normalize(shake256_128.name): shake256_128,
+    _normalize(shake256_160.name): shake256_160,
+    _normalize(shake256_224.name): shake256_224,
+    _normalize(shake256_256.name): shake256_256,
+    _normalize(shake256_384.name): shake256_384,
+    _normalize(shake256_512.name): shake256_512,
+  });
+}
+
+/// A registry to find a block hash algorithm by name
 class BlockHashRegistry {
   /// Find a [BlockHashBase] algorithm given a string name
   static BlockHashBase? findAlgorithm(String name) {
-    return _blockHash[keepAlphaNumeric(name).toUpperCase()];
+    _buildRegistry();
+    return _blockHash[_normalize(name)];
   }
 
   /// Register a new [BlockHashBase] algorithm on the fly given a string name
-  static void registerAlgorithm(String name, BlockHashBase algo) {
-    _blockHash[keepAlphaNumeric(name).toUpperCase()] = algo;
+  static void registerAlgorithm(BlockHashBase algo, [String? name]) {
+    _buildRegistry();
+    name = _normalize(name ?? algo.name);
+    _blockHash[_normalize(name)] = algo;
+  }
+}
+
+/// A registry to find a hash algorithm by name
+class HashRegistry {
+  /// Find a [HashBase] algorithm given a string name
+  static HashBase? findAlgorithm(String name) {
+    _buildRegistry();
+    return _hash[_normalize(name)];
+  }
+
+  /// Register a new [HashBase] algorithm on the fly given a string name
+  static void registerAlgorithm(HashBase algo, [String? name]) {
+    _buildRegistry();
+    name = _normalize(name ?? algo.name);
+    _hash[name] = algo;
+    if (algo is BlockHashBase) {
+      _blockHash[name] = algo;
+    }
   }
 }

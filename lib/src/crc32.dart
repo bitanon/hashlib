@@ -18,6 +18,9 @@ class _CRC32 extends HashBase {
   const _CRC32();
 
   @override
+  final String name = 'CRC-32';
+
+  @override
   CRC32Hash createSink() => CRC32Hash();
 }
 

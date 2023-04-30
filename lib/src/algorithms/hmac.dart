@@ -34,6 +34,12 @@ class HMACSink extends HashDigestSink with MACSinkBase {
         outerKey = Uint8List(sink.blockLength);
 
   @override
+  bool get closed => _closed;
+
+  @override
+  int get hashLength => sink.hashLength;
+
+  @override
   void init(List<int> key) {
     // Keys longer than blockLength are shortened by hashing them
     if (key.length > blockLength) {
@@ -57,12 +63,6 @@ class HMACSink extends HashDigestSink with MACSinkBase {
     sink.add(innerKey);
     _initialized = true;
   }
-
-  @override
-  bool get closed => _closed;
-
-  @override
-  int get hashLength => sink.hashLength;
 
   @override
   void reset() {

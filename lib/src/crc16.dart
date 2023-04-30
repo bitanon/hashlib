@@ -16,6 +16,9 @@ class _CRC16 extends HashBase {
   const _CRC16();
 
   @override
+  final String name = 'CRC-16';
+
+  @override
   CRC16Hash createSink() => CRC16Hash();
 }
 

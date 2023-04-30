@@ -3,7 +3,6 @@
 
 import 'package:hashlib/src/algorithms/blake2s.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
 /// For generating un-keyed message digest with BLAKE2s-128.
@@ -60,6 +59,9 @@ class Blake2s extends BlockHashBase {
   });
 
   @override
+  String get name => 'BLAKE2s-${digestSize << 3}';
+
+  @override
   Blake2sHash createSink() => Blake2sHash(
         digestSize,
         key: key,
@@ -85,6 +87,9 @@ class Blake2sMAC extends MACHashBase {
     this.salt,
     this.personalization,
   }) : super(key);
+
+  @override
+  String get name => 'BLAKE2s-${digestSize << 3}-MAC';
 
   @override
   MACSinkBase createSink() => Blake2sHash(

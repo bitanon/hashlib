@@ -20,6 +20,9 @@ class _SHA1 extends BlockHashBase {
   const _SHA1();
 
   @override
+  final String name = 'SHA1';
+
+  @override
   SHA1Hash createSink() => SHA1Hash();
 }
 

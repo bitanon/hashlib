@@ -20,6 +20,9 @@ class _SHA384 extends BlockHashBase {
   const _SHA384();
 
   @override
+  final String name = 'SHA-384';
+
+  @override
   SHA384Hash createSink() => SHA384Hash();
 }
 

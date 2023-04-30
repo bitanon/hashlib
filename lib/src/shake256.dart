@@ -20,6 +20,24 @@ import 'package:hashlib/src/core/hash_digest.dart';
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
 const shake256 = _Shake256Builder();
 
+/// [Shake256] instance to generate a 128-bit message digest.
+const shake256_128 = Shake256(128 >>> 3);
+
+/// [Shake256] instance to generate a 160-bit message digest.
+const shake256_160 = Shake256(160 >>> 3);
+
+/// [Shake256] instance to generate a 224-bit message digest.
+const shake256_224 = Shake256(224 >>> 3);
+
+/// [Shake256] instance to generate a 256-bit message digest.
+const shake256_256 = Shake256(256 >>> 3);
+
+/// [Shake256] instance to generate a 384-bit message digest.
+const shake256_384 = Shake256(384 >>> 3);
+
+/// [Shake256] instance to generate a 512-bit message digest.
+const shake256_512 = Shake256(512 >>> 3);
+
 class _Shake256Builder {
   const _Shake256Builder();
 
@@ -49,6 +67,9 @@ class Shake256 extends HashBase {
   /// Parameters:
   /// - [outputSizeInBytes] is the length of the output digest in bytes.
   const Shake256(this.outputSizeInBytes);
+
+  @override
+  String get name => 'SHAKE-256/${outputSizeInBytes << 3}';
 
   @override
   Shake256Hash createSink() => Shake256Hash(outputSizeInBytes);

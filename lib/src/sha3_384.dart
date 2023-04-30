@@ -24,6 +24,9 @@ class _SHA3d384 extends BlockHashBase {
   const _SHA3d384();
 
   @override
+  final String name = 'SHA3-384';
+
+  @override
   SHA3d384Hash createSink() => SHA3d384Hash();
 }
 

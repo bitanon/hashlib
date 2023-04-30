@@ -58,6 +58,9 @@ class Blake2b extends BlockHashBase {
   });
 
   @override
+  String get name => 'BLAKE2b-${digestSize << 3}';
+
+  @override
   Blake2bHash createSink() => Blake2bHash(
         digestSize,
         key: key,
@@ -83,6 +86,9 @@ class Blake2bMAC extends MACHashBase {
     this.salt,
     this.personalization,
   }) : super(key);
+
+  @override
+  String get name => 'BLAKE2b-${digestSize << 3}-MAC';
 
   @override
   MACSinkBase createSink() => Blake2bHash(

@@ -21,6 +21,9 @@ class _SHA256 extends BlockHashBase {
   const _SHA256();
 
   @override
+  final String name = 'SHA-256';
+
+  @override
   SHA256Hash createSink() => SHA256Hash();
 }
 

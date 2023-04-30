@@ -14,6 +14,9 @@ class _SHA512t256 extends BlockHashBase {
   const _SHA512t256();
 
   @override
+  final String name = 'SHA-512/256';
+
+  @override
   SHA512t256Hash createSink() => SHA512t256Hash();
 }
 
@@ -23,6 +26,9 @@ const BlockHashBase sha512t224 = _SHA512t224();
 
 class _SHA512t224 extends BlockHashBase {
   const _SHA512t224();
+
+  @override
+  final String name = 'SHA-512/224';
 
   @override
   SHA512t224Hash createSink() => SHA512t224Hash();

@@ -26,6 +26,9 @@ class XXHash64 extends BlockHashBase {
   const XXHash64([this.seed = 0]);
 
   @override
+  final String name = 'XXH64';
+
+  @override
   BlockHashSink createSink() => XXHash64Sink(seed);
 
   /// Get and instance of [XXHash64] with an specific seed
