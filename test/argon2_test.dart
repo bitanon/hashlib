@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/src/algorithms/argon2.dart';
-import 'package:hashlib/src/core/utils.dart';
+import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -115,7 +115,7 @@ void main() {
     test("argon2verify with encoded", () {
       final encoded =
           r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0$24VHMpaU5EkkdH5rpdnb5zeOf3Y";
-      expect(argon2verify(encoded, "password".codeUnits), true);
+      expect(argon2verify(encoded, "password".codeUnits), isTrue);
     });
 
     test("argon2verify with password", () {
@@ -127,7 +127,10 @@ void main() {
         iterations: 1,
         parallelism: 4,
         memorySizeKB: 128,
-      ).verify(fromHex(matcher), "password".codeUnits);
+      ).verify(
+        fromHex(matcher),
+        "password".codeUnits,
+      );
       expect(result, true);
     });
 

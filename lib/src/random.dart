@@ -13,7 +13,7 @@ Random _generator() {
 }
 
 /// Generate a list of random 8-bit numbers of size [length]
-List<int> randomBytes(int length) {
+Uint8List randomBytes(int length) {
   var random = _generator();
   var data = Uint8List(length);
   for (int i = 0; i < data.length; i++) {

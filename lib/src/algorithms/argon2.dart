@@ -4,9 +4,9 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/argon2.dart';
+import 'package:hashlib/src/codecs/base64.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
-import 'package:hashlib/src/core/utils.dart';
 
 import 'argon2_64bit.dart' if (dart.library.js) 'argon2_32bit.dart';
 
@@ -289,17 +289,6 @@ abstract class Argon2 extends KeyDerivatorBase {
 
   /// Generate an Argon2 encoded string from a [password]
   String encode(List<int> password) => convert(password).encoded();
-}
-
-/// Verifies if the original [password] was derived from the [encoded]
-/// Argon2 hash.
-///
-/// The encoded hash may look like this:
-/// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
-bool argon2verify(String encoded, List<int> password) {
-  var instance = Argon2.fromEncoded(encoded);
-  var key = fromBase64(encoded.split('\$').last);
-  return instance.verify(key, password);
 }
 
 extension Argon2VersionValue on Argon2Version {

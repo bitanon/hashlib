@@ -3,9 +3,9 @@
 
 import 'dart:typed_data';
 
+import 'package:hashlib/src/codecs/base16.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/mac_base.dart';
-import 'package:hashlib/src/core/utils.dart';
 
 /// This implementation is derived from the [The Poly1305 Algorithms] described
 /// in the [ChaCha20 and Poly1305 for IETF Protocols][rfc8439] document.

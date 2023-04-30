@@ -29,15 +29,35 @@
 - Adds two new methods to `MACHashBase`:
   - `sign`: generates a tag from a message
   - `verify`: verifies if a message and tag matches
-- Updates the utils methods
-  - Removes `toHexSingle` from utils.
-  - Accepts `Iterables` instead of `List` in `toHex`
-  - Change parameter type of `toHex`
-  - Adds `fromBase32` and `toBase32`
-  - Adds tests
 - Updates `HashDigest`
   - Adds `isEqual` to match it with other `HashDigest`, `String`, `TypedData`, `ByteBuffer`, `List<int>`, `Iterable<int>`
   - Use custom equality check
+- Extracts few methods from utils and create codecs:
+  - Available:
+    - `ASCIICodec`
+    - `B16Codec`
+    - `B32Codec`
+    - `B64Codec`
+    - `B64URLCodec`
+  - New or transferred methods:
+    - `toAscii`
+    - `fromAscii`
+    - `toHex`
+    - `fromHex`
+    - `toBase32`
+    - `fromBase32`
+    - `toBase64`
+    - `fromBase64`
+    - `toBase64Url`
+    - `fromBase64Url`
+  - New constants:
+    - `ascii`
+    - `base16`
+    - `base16lower`
+    - `base32`
+    - `base32lower`
+    - `base64`
+    - `base64url`
 - New example: `otpauth_parser.dart`. It can decode migration string from Google Authenticator and parse any valid otpauth string.
 - Updates benchmarks
 

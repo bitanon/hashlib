@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/utils.dart' as utils;
+import 'package:hashlib/src/codecs_base.dart' as codec;
 
 class HashDigest extends Object {
   final Uint8List bytes;
@@ -13,25 +13,26 @@ class HashDigest extends Object {
   /// Returns the byte buffer associated with this digest.
   ByteBuffer get buffer => bytes.buffer;
 
+  /// The message digest as a string of hexadecimal digits.
+  @override
+  String toString() => codec.base16lower.encodeToString(bytes);
+
   /// The message digest as a hexadecimal string.
   ///
   /// If [uppercase] is true, the output will have uppercase alphabets.
-  @pragma('vm:prefer-inline')
-  String hex([bool uppercase = false]) => utils.toHex(bytes, upper: uppercase);
+  String hex([bool uppercase = false]) => codec.toHex(bytes, uppercase);
 
   /// The message digest as a Base-32 string.
-  @pragma('vm:prefer-inline')
-  String base32() => utils.toBase32(bytes);
+  String base32() => codec.toBase32(bytes);
 
   /// The message digest as a Base-64 string.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
-  @pragma('vm:prefer-inline')
-  String base64([bool urlSafe = false]) => utils.toBase64(bytes, urlSafe);
+  String base64([bool urlSafe = false]) =>
+      urlSafe ? codec.toBase64(bytes) : codec.toBase64Url(bytes);
 
   /// The message digest as a string of ASCII alphabets.
-  @pragma('vm:prefer-inline')
-  String toAscii() => utils.toAscii(bytes);
+  String toAscii() => codec.toAscii(bytes);
 
   /// Returns the least significant bytes as a number.
   ///
@@ -58,10 +59,6 @@ class HashDigest extends Object {
   @override
   bool operator ==(other) => isEqual(other);
 
-  /// The message digest as a string of hexadecimal digits.
-  @override
-  String toString() => utils.toHex(bytes);
-
   /// Checks if the message digest equals to [other].
   ///
   /// Here, the [other] can be a one of the following:
@@ -81,7 +78,7 @@ class HashDigest extends Object {
     } else if (other is TypedData && other is! Uint8List) {
       return isEqual(other.buffer.asUint8List());
     } else if (other is String) {
-      return isEqual(utils.fromHex(other));
+      return isEqual(codec.base16.decodeFromString(other));
     } else if (other is Iterable<int>) {
       if (other is List<int>) {
         if (other.length != bytes.length) {

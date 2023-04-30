@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/core/utils.dart';
 
 void main() {
   var text = "Happy Hashing!";
@@ -49,7 +46,7 @@ void main() {
 
   // Examples of MAC generations
   print('HMAC[MD5] => ${md5.hmac(pw).string(text)}');
-  print('HMAC[SHA1] => ${sha1.hmacBy(key, utf8).string(text)}');
+  print('HMAC[SHA1] => ${sha1.hmacBy(key).string(text)}');
   print('HMAC[SHA256] => ${sha256.hmacBy(key).string(text)}');
   print('HMAC[SHA3-256] => ${HMAC(sha3_256, pw).string(text)}');
   print("[BLAKE-2b/224] => ${Blake2bMAC(28, pw).string(text)}");

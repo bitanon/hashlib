@@ -4,12 +4,24 @@
 import 'dart:math';
 
 import 'package:hashlib/src/algorithms/argon2.dart';
+import 'package:hashlib/src/codecs/base64.dart';
 
 export 'package:hashlib/src/algorithms/argon2.dart'
-    show Argon2, Argon2Type, Argon2Version, argon2verify;
+    show Argon2, Argon2Type, Argon2Version;
 
 const _defaultHashLength = 24;
 const _defaultSecurity = Argon2Security.moderate;
+
+/// Verifies if the original [password] was derived from the [encoded]
+/// Argon2 hash.
+///
+/// The encoded hash may look like this:
+/// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
+bool argon2verify(String encoded, List<int> password) {
+  var instance = Argon2.fromEncoded(encoded);
+  var key = fromBase64(encoded.split('\$').last);
+  return instance.verify(key, password);
+}
 
 /// Encode a password using default Argon2d algorithm
 ///

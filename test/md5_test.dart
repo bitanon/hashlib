@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
 final tests = {
@@ -71,7 +70,7 @@ void main() {
         final stream = Stream.fromIterable(
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
-            .map(toBytes);
+            .map((s) => s.codeUnits);
         final result = await md5.consume(stream);
         expect(result.hex(), entry.value);
       }

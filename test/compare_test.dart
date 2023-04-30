@@ -6,7 +6,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/core/utils.dart';
+import 'package:hashlib/src/codecs_base.dart';
 import 'package:pointycastle/digests/blake2b.dart' as pc_blake2b;
 import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
 import 'package:pointycastle/digests/sha3.dart' as pc_sha3;
@@ -81,10 +81,10 @@ void main() {
       var msg = "The quick brown fox jumps over the lazy dog";
       var expected = "80070713463e7749b90c2dc24911e275";
       var actual = toHex(
-        md5.hmacBy(key).convert(toBytes(msg)).bytes,
+        md5.hmacBy(key).convert(msg.codeUnits).bytes,
       );
       var actual2 = toHex(
-        crypto.Hmac(crypto.md5, toBytes(key)).convert(toBytes(msg)).bytes,
+        crypto.Hmac(crypto.md5, key.codeUnits).convert(msg.codeUnits).bytes,
       );
       expect(actual2, expected, reason: "Key: $key | Message: $msg");
       expect(actual, expected, reason: "Key: $key | Message: $msg");

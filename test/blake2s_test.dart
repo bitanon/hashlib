@@ -2,7 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/core/utils.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -45,11 +44,11 @@ void main() {
     });
 
     test('with a secret', () {
-      expect(blake2s256.mac(toBytes('secret')).string("a").hex(),
+      expect(blake2s256.mac('secret'.codeUnits).string("a").hex(),
           "6252d094f32c706b6fa11529126bdf2910c4dd7638bf866348808df63f62531d");
     });
     test('with empty string and a secret', () {
-      expect(blake2s256.mac(toBytes('secret')).string('').hex(),
+      expect(blake2s256.mac('secret'.codeUnits).string('').hex(),
           "864f60ce88fc1c80c7b3b4f0bb920255fb464484a9dc7346f1d0e4e190d358cd");
     });
   });
@@ -63,11 +62,11 @@ void main() {
           blake2s128.string('abc').hex(), "aa4938119b1dc7b87cbad0ffd200d0ae");
     });
     test('with empty string and a secret', () {
-      expect(blake2s128.mac(toBytes('secret')).string('').hex(),
+      expect(blake2s128.mac('secret'.codeUnits).string('').hex(),
           "5697f332469e36135bad2a52a79803be");
     });
     test('with abc and a secret', () {
-      expect(blake2s128.mac(toBytes('secret')).string('abc').hex(),
+      expect(blake2s128.mac('secret'.codeUnits).string('abc').hex(),
           "9af4e6ccbbfafb7c9dbc6088ca27f3da");
     });
   });
@@ -82,11 +81,11 @@ void main() {
           "5ae3b99be29b01834c3b508521ede60438f8de17");
     });
     test('with empty string and a secret', () {
-      expect(blake2s160.mac(toBytes('secret')).string('').hex(),
+      expect(blake2s160.mac('secret'.codeUnits).string('').hex(),
           "3bdb8b311ae9f0547671fef3933653996ee65f45");
     });
     test('with abc and a secret', () {
-      expect(blake2s160.mac(toBytes('secret')).string('abc').hex(),
+      expect(blake2s160.mac('secret'.codeUnits).string('abc').hex(),
           "1fda19951bd14742e8b3587b1f195f09975ff628");
     });
   });
@@ -101,11 +100,11 @@ void main() {
           "0b033fc226df7abde29f67a05d3dc62cf271ef3dfea4d387407fbd55");
     });
     test('with empty string and a secret', () {
-      expect(blake2s224.mac(toBytes('secret')).string('').hex(),
+      expect(blake2s224.mac('secret'.codeUnits).string('').hex(),
           "7a37923d75c9d7be6b8fb2946a23d2d7f46067637380f0e91ef8ad0c");
     });
     test('with abc and a secret', () {
-      expect(blake2s224.mac(toBytes('secret')).string('abc').hex(),
+      expect(blake2s224.mac('secret'.codeUnits).string('abc').hex(),
           "d19a652b914f52e1437a5273d74aee9aba8921bbde5656ebddc8ffa8");
     });
   });
