@@ -18,15 +18,17 @@ This library contains implementations of secure hash functions, checksum generat
 | ----------- | ------------------------------------------------------------------ | ----------- |
 | MD5         | `md5`                                                              | RFC-1321    |
 | SHA-1       | `sha1`                                                             | RFC-3174    |
+| SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RFC-6234    |
+| SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
+| SHAKE-128   | `Shake128`, `shake128`, `shake128_128`, `shake128_256`             | FIPS-202    |
+| SHAKE-256   | `Shake256`, `shake256`, `shake256_256`, `shake256_512`             | FIPS-202    |
+| Keccak      | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 | Team Keccak |
+| Blake2b     | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             | RFC-7693    |
+| Blake2s     | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             | RFC-7693    |
 | xxHash-32   | `XXHash32`,`xxh32`,`xxh32code`                                     | Cyan4973    |
 | xxHash-64   | `XXHash64`,`xxh64`,`xxh64code`                                     | Cyan4973    |
 | xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         | Cyan4973    |
 | xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   | Cyan4973    |
-| SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RFC-6234    |
-| SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
-| Keccak      | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 | Team Keccak |
-| Blake2b     | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             | RFC-7693    |
-| Blake2s     | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             | RFC-7693    |
 
 <!--
 | `blake3`     |   ⌛    |        |
@@ -36,14 +38,12 @@ This library contains implementations of secure hash functions, checksum generat
 | `whirlpool` |    ⌛     |       |
 -->
 
-### Non-Block Hash Algorithms
+### Other Hash Algorithms
 
-| Algorithms | Available methods                                      | Source    |
-| ---------- | ------------------------------------------------------ | --------- |
-| CRC        | `crc16`, `crc32`, `crc64`                              | Wikipedia |
-| Alder32    | `alder32`                                              | Wikipedia |
-| SHAKE-128  | `Shake128`, `shake128`, `shake128_128`, `shake128_256` | FIPS-202  |
-| SHAKE-256  | `Shake256`, `shake256`, `shake256_256`, `shake256_512` | FIPS-202  |
+| Algorithms | Available methods         | Source    |
+| ---------- | ------------------------- | --------- |
+| CRC        | `crc16`, `crc32`, `crc64` | Wikipedia |
+| Alder32    | `alder32`                 | Wikipedia |
 
 ### Password / Key Derivation Algorithms
 

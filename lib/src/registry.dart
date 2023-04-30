@@ -43,6 +43,15 @@ void _buildRegistry() {
   if (_hash.isNotEmpty) return;
 
   _blockHash.addAll({
+    _normalize('BLAKE2'): blake2b512,
+    _normalize('BLAKE2b'): blake2b512,
+    _normalize('BLAKE2s'): blake2s256,
+    _normalize('SHA2'): sha256,
+    _normalize('SHA3'): sha3_512,
+    _normalize('SHAKE-128'): shake128_256,
+    _normalize('SHAKE-512'): shake256_512,
+    _normalize('XXH3-128'): xxh128,
+    _normalize('XXH3-64'): xxh3,
     _normalize(blake2b160.name): blake2b160,
     _normalize(blake2b256.name): blake2b256,
     _normalize(blake2b384.name): blake2b384,
@@ -67,25 +76,6 @@ void _buildRegistry() {
     _normalize(sha512.name): sha512,
     _normalize(sha512t224.name): sha512t224,
     _normalize(sha512t256.name): sha512t256,
-    _normalize(xxh128.name): xxh128,
-    _normalize(xxh3.name): xxh3,
-    _normalize(xxh32.name): xxh32,
-    _normalize(xxh64.name): xxh64,
-    _normalize('BLAKE2'): blake2b512,
-    _normalize('BLAKE2b'): blake2b512,
-    _normalize('BLAKE2s'): blake2s256,
-    _normalize('SHA2'): sha256,
-    _normalize('SHA3'): sha3_512,
-    _normalize('XXH3-128'): xxh128,
-    _normalize('XXH3-64'): xxh3,
-  });
-
-  _hash.addAll(_blockHash);
-  _hash.addAll({
-    _normalize(alder32.name): alder32,
-    _normalize(crc16.name): crc16,
-    _normalize(crc32.name): crc32,
-    _normalize(crc64.name): crc64,
     _normalize(shake128_128.name): shake128_128,
     _normalize(shake128_160.name): shake128_160,
     _normalize(shake128_224.name): shake128_224,
@@ -98,6 +88,18 @@ void _buildRegistry() {
     _normalize(shake256_256.name): shake256_256,
     _normalize(shake256_384.name): shake256_384,
     _normalize(shake256_512.name): shake256_512,
+    _normalize(xxh128.name): xxh128,
+    _normalize(xxh3.name): xxh3,
+    _normalize(xxh32.name): xxh32,
+    _normalize(xxh64.name): xxh64,
+  });
+
+  _hash.addAll(_blockHash);
+  _hash.addAll({
+    _normalize(alder32.name): alder32,
+    _normalize(crc16.name): crc16,
+    _normalize(crc32.name): crc32,
+    _normalize(crc64.name): crc64,
   });
 }
 

@@ -4,7 +4,7 @@
 import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/shake.dart';
-import 'package:hashlib/src/core/hash_base.dart';
+import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHAKE-256 is a member of SHA-3 family which uses 256-bit blocks to
@@ -59,7 +59,7 @@ class _Shake256Builder {
 ///
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
-class Shake256 extends HashBase {
+class Shake256 extends BlockHashBase {
   final int outputSizeInBytes;
 
   /// Creates an instance to generate arbitrary size hash using SHAKE-256
