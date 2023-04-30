@@ -6,10 +6,6 @@ import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
 /// A class for performing message authentication with the Poly1305 algorithm.
-/// This implementation is derived from the [The Poly1305 Algorithms] described
-/// in the [ChaCha20 and Poly1305 for IETF Protocols][rfc8439] document.
-///
-/// [rfc8439]: https://www.ietf.org/rfc/rfc8439.html
 ///
 /// The class extends [MACHashBase] and provides an implementation of the
 /// [createSink] method that returns an instance of [Poly1305Sink].

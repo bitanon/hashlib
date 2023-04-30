@@ -77,7 +77,14 @@ List<String> deocdeMigations(String migrationUri) {
   if (!query.containsKey('data')) {
     throw ArgumentError('The data parameter is not present');
   }
-  var data = fromBase64(query['data']!);
+  var data = fromBase64(
+    migrationUri
+        .split('?')
+        .last
+        .split('&')
+        .firstWhere((d) => d.startsWith('data='))
+        .substring('data='.length),
+  );
 
   var result = <String>[];
   for (int i = 2, len; i < data.length; ++i) {
@@ -93,7 +100,7 @@ List<String> deocdeMigations(String migrationUri) {
     i++;
     len = data[i];
     i++;
-    secret = toBase32(List<int>.generate(len, (j) => data[i + j]));
+    secret = toBase32(data.skip(i).take(len));
     i += len;
 
     bool release = false;
@@ -119,8 +126,6 @@ List<String> deocdeMigations(String migrationUri) {
             algorithm = 'SHA256';
           } else if (data[i] == 3) {
             algorithm = 'SHA512';
-          } else if (data[i] == 4) {
-            algorithm = 'MD5';
           } else {
             algorithm = 'SHA1';
           }
@@ -154,7 +159,7 @@ List<String> deocdeMigations(String migrationUri) {
       label = issuer;
     }
     var params = [];
-    if (!issuer.isNotEmpty) {
+    if (issuer.isNotEmpty) {
       params.add('issuer=$issuer');
     }
     params.add('secret=$secret');
@@ -164,12 +169,7 @@ List<String> deocdeMigations(String migrationUri) {
       scheme: 'otpauth',
       host: type,
       path: '/$label',
-      queryParameters: {
-        'issuer': issuer,
-        'secret': secret,
-        'algorithm': algorithm,
-        'digits': digits,
-      },
+      query: params.join('&'),
     );
     result.add(url.toString());
   }
@@ -177,18 +177,20 @@ List<String> deocdeMigations(String migrationUri) {
 }
 
 void main(List<String> args) {
-  var uri =
-      'otpauth://totp/Example:Name?issuer=Example&secret=94NXQOVMOYCG64EKI7L4XBEK4NP0RQAB&algorithm=SHA1&digits=6&period=30';
-  var totp = parse(uri) as TOTP;
-  print(totp.current);
-
   var migration =
-      'otpauth-migration://offline?data=CkkKFCQzVndkJUBzKC1CSzo1MSVOeiZTEiBFeGFtcGxlOiBlbWFtcGxlLmVtYWlsQGdtYWlsLmNvbRoJSUV4YW1wbGVTIAEoATACChoKCi0qa15qYUYsI8wSBlNhbXBsZSABKAEwAgo8ChRtA2tzEUZBJV4qMColcwpHNf9wTRIWQW5vdGhlciA6IFNhbXBsZSBMYWJlbBoGU2FtcGxlIAEoATACEAEYAiABKIaS4JIH';
-  for (final uri in deocdeMigations(migration)) {
-    var totp = parse(uri) as TOTP;
+      "otpauth-migration://offline?data=CisKCi0qa15qYUYsI8wSDkV4YW1wbGU6U0hBNTEyGgdFeGFtcGxlIAMoAjACCisKCi0qa15qYUYsI8wSDkV4YW1wbGU6U0hBMjU2GgdFeGFtcGxlIAIoAjACCikKCi0qa15qYUYsI8wSDEV4YW1wbGU6U0hBMRoHRXhhbXBsZSABKAEwAgo2ChTOVmhVzwG2tOcUvJIqCZ+EnbS2qxIPRXhhbXBsZTpObyBBbGdvGgdFeGFtcGxlIAEoATACCjgKFM5WaFXPAba05xS8kioJn4SdtLarEhFFeGFtcGxlOk5vIFBlcmlvZBoHRXhhbXBsZSABKAEwAgo4ChTOVmhVzwG2tOcUvJIqCZ+EnbS2qxIRRXhhbXBsZTpObyBEaWdpdHMaB0V4YW1wbGUgASgBMAIKLwoUzlZoVc8BtrTnFLySKgmfhJ20tqsSEUV4YW1wbGU6Tm8gSXNzdWVyIAEoATACEAEYASAAKJjgucEE";
+  var uris = deocdeMigations(migration);
+  for (int i = 0; i < uris.length; ++i) {
+    print(uris[i]);
+    var totp = parse(uris[i]) as TOTP;
     totp.stream.listen((e) {
+      if (i == 0) print('\nTime: ${DateTime.now()}\n' + ('-' * 40));
       var otp = e.toString().padLeft(totp.digits, '0');
-      print('${totp.label} => $otp');
+      var left = otp.substring(0, totp.digits ~/ 2);
+      var right = otp.substring(totp.digits ~/ 2);
+      var joined = '$left $right';
+      if (totp.digits == 6) joined = ' $joined ';
+      print('$joined <= ${totp.label}');
     });
   }
 }

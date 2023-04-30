@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/argon2.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
 import 'package:hashlib/src/core/utils.dart';
