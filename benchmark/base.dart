@@ -24,16 +24,23 @@ abstract class Benchmark extends BenchmarkBase {
   }
 
   void showDiff([List<BenchmarkBase> others = const []]) {
-    var data = measureDiff({this, ...others});
+    var data = <String, int>{};
+    var rate = <String, String>{};
+    for (var benchmark in {this, ...others}) {
+      var runtime = benchmark.measure();
+      var hashRate = 1e6 * iter * size / runtime;
+      data[benchmark.name] = runtime.round();
+      rate[benchmark.name] = formatSize(hashRate) + '/s';
+    }
     var mine = data[name]!;
     var best = data.values.fold(mine, min);
     for (var entry in data.entries) {
-      var message = "${entry.key} Runtime: ${entry.value / 1000} ms";
+      var message = "${entry.key} : ${rate[entry.key]}";
       if (entry.value == best) {
         message += " [best]";
       }
       if (entry.key != name) {
-        message += " ~ ${((entry.value - mine) / 1000)} ms";
+        message += " ~ ${rate[entry.key]}";
       }
       print(message);
     }

@@ -12,16 +12,21 @@ This library contains implementations of secure hash functions, checksum generat
 
 ## Features
 
-### Secure Hash Algorithms
+### Block Hash Algorithms
 
-| Algorithm | Available methods                                                  | Source      |
-| --------- | ------------------------------------------------------------------ | ----------- |
-| SHA-2     | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RFC-6234    |
-| SHA-3     | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
-| SHAKE     | `Shake128`, `Shake256`, `shake128`, `shake256`                     | FIPS-202    |
-| Keccak    | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 | Team Keccak |
-| Blake2b   | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             | RFC-7693    |
-| Blake2s   | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             | RFC-7693    |
+| Algorithm   | Available methods                                                  | Source      |
+| ----------- | ------------------------------------------------------------------ | ----------- |
+| MD5         | `md5`                                                              | RFC-1321    |
+| SHA-1       | `sha1`                                                             | RFC-3174    |
+| xxHash-32   | `XXHash32`,`xxh32`,`xxh32code`                                     | Cyan4973    |
+| xxHash-64   | `XXHash64`,`xxh64`,`xxh64code`                                     | Cyan4973    |
+| xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         | Cyan4973    |
+| xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   | Cyan4973    |
+| SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` | RFC-6234    |
+| SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     | FIPS-202    |
+| Keccak      | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 | Team Keccak |
+| Blake2b     | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             | RFC-7693    |
+| Blake2s     | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             | RFC-7693    |
 
 <!--
 | `blake3`     |   ⌛    |        |
@@ -31,18 +36,14 @@ This library contains implementations of secure hash functions, checksum generat
 | `whirlpool` |    ⌛     |       |
 -->
 
-### Non-Cryptographic Hash Algorithms
+### Non-Block Hash Algorithms
 
-| Algorithms  | Available methods              | Source    |
-| ----------- | ------------------------------ | --------- |
-| MD5         | `md5`                          | RFC-1321  |
-| SHA-1       | `sha1`                         | RFC-3174  |
-| xxHash-32   | `XXHash32`,`xxh32`,`xxh32code` | Cyan4973  |
-| xxHash-64   | `XXHash64`,`xxh64`,`xxh64code` | Cyan4973  |
-| xxHash3-64  | `XXH3`,`xxh3`,`xxh3code`       | Cyan4973  |
-| xxHash3-128 | `XXH128`,`xxh128`,`xxh128code` | Cyan4973  |
-| CRC         | `crc16`,`crc32`,`crc64`        | Wikipedia |
-| Alder32     | `alder32`                      | Wikipedia |
+| Algorithms | Available methods                                      | Source    |
+| ---------- | ------------------------------------------------------ | --------- |
+| CRC        | `crc16`, `crc32`, `crc64`                              | Wikipedia |
+| Alder32    | `alder32`                                              | Wikipedia |
+| SHAKE-128  | `Shake128`, `shake128`, `shake128_128`, `shake128_256` | FIPS-202  |
+| SHAKE-256  | `Shake256`, `shake256`, `shake256_256`, `shake256_512` | FIPS-202  |
 
 ### Password / Key Derivation Algorithms
 
@@ -59,10 +60,10 @@ This library contains implementations of secure hash functions, checksum generat
 
 ### Message Authentication Code (MAC) Generators
 
-| Algorithms | Available methods      | Source   |
-| ---------- | ---------------------- | -------- |
-| HMAC       | `HMAC`, `#.hmac`       | RFC-2104 |
-| Poly1305   | `Poly1305`, `poly1305` | RFC-8439 |
+| Algorithms | Available methods                      | Source   |
+| ---------- | -------------------------------------- | -------- |
+| HMAC       | `HMAC`, `#.hmac`                       | RFC-2104 |
+| Poly1305   | `Poly1305`, `poly1305`, `poly1305auth` | RFC-8439 |
 
 ## Getting Started
 
@@ -188,6 +189,7 @@ With string of length 500000 (10 iterations):
 | BLAKE-2s      | **144.42MB/s** | ➖                           | ➖                           | ➖                            |
 | BLAKE-2b      | **164.61MB/s** | ➖                           | ➖                           | 12.62MB/s <br> `1204% slower` |
 | HMAC(MD5)     | **161.72MB/s** | 120.11MB/s <br> `35% slower` | 70.40MB/s <br> `130% slower` | ➖                            |
+| HMAC(SHA-1)   | **147.08MB/s** | 95.05MB/s <br> `55% slower`  | ➖                           |                               |
 | HMAC(SHA-256) | **100.12MB/s** | 83.03MB/s <br> `21% slower`  | ➖                           | ➖                            |
 | Poly1305      | **10.73MB/s**  | ➖                           | ➖                           | ➖                            |
 
@@ -208,6 +210,7 @@ With string of length 1000 (5000 iterations):
 | BLAKE-2s      | **136.61MB/s** | ➖                           | ➖                           | ➖                            |
 | BLAKE-2b      | **154.86MB/s** | ➖                           | ➖                           | 12.28MB/s <br> `1161% slower` |
 | HMAC(MD5)     | **123.84MB/s** | 94.08MB/s <br> `32% slower`  | 68.14MB/s <br> `82% slower`  | ➖                            |
+| HMAC(SHA-1)   | **92.13MB/s**  | 64.98MB/s <br> `42% slower`  | ➖                           | ➖                            |
 | HMAC(SHA-256) | **67.95MB/s**  | 56.12MB/s <br> `21% slower`  | ➖                           | ➖                            |
 | Poly1305      | **10.06MB/s**  | ➖                           | ➖                           | ➖                            |
 
@@ -228,6 +231,7 @@ With string of length 10 (100000 iterations):
 | BLAKE-2s      | **15.14MB/s** | ➖                           | ➖                          | ➖                             |
 | BLAKE-2b      | **13.05MB/s** | ➖                           | ➖                          | 884.35KB/s <br> `1376% slower` |
 | HMAC(MD5)     | **4.77MB/s**  | 3.75MB/s <br> `27% slower`   | 1.95MB/s <br> `144% slower` | ➖                             |
+| HMAC(SHA-1)   | **2.46MB/s**  | 1.85MB/s <br> `33% slower`   | ➖                          | ➖                             |
 | HMAC(SHA-256) | **1.93MB/s**  | 1.60MB/s <br> `21% slower`   | ➖                          | ➖                             |
 | Poly1305      | **1.41MB/s**  | ➖                           | ➖                          | ➖                             |
 

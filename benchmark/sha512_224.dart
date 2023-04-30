@@ -57,6 +57,7 @@ void main() {
   for (var condition in conditions) {
     int size = condition[0];
     int iter = condition[1];
+    print('---- size=$size | iterations: $iter ----');
     HashlibBenchmark(size, iter).showDiff([
       CryptoBenchmark(size, iter),
       PointyCastleBenchmark(size, iter),

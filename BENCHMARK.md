@@ -24,6 +24,7 @@ With string of length 500000 (10 iterations):
 | BLAKE-2s      | **144.42MB/s** | ➖                           | ➖                           | ➖                            |
 | BLAKE-2b      | **164.61MB/s** | ➖                           | ➖                           | 12.62MB/s <br> `1204% slower` |
 | HMAC(MD5)     | **161.72MB/s** | 120.11MB/s <br> `35% slower` | 70.40MB/s <br> `130% slower` | ➖                            |
+| HMAC(SHA-1)   | **147.08MB/s** | 95.05MB/s <br> `55% slower`  | ➖                           |                               |
 | HMAC(SHA-256) | **100.12MB/s** | 83.03MB/s <br> `21% slower`  | ➖                           | ➖                            |
 | Poly1305      | **10.73MB/s**  | ➖                           | ➖                           | ➖                            |
 
@@ -44,6 +45,7 @@ With string of length 1000 (5000 iterations):
 | BLAKE-2s      | **136.61MB/s** | ➖                           | ➖                           | ➖                            |
 | BLAKE-2b      | **154.86MB/s** | ➖                           | ➖                           | 12.28MB/s <br> `1161% slower` |
 | HMAC(MD5)     | **123.84MB/s** | 94.08MB/s <br> `32% slower`  | 68.14MB/s <br> `82% slower`  | ➖                            |
+| HMAC(SHA-1)   | **92.13MB/s**  | 64.98MB/s <br> `42% slower`  | ➖                           | ➖                            |
 | HMAC(SHA-256) | **67.95MB/s**  | 56.12MB/s <br> `21% slower`  | ➖                           | ➖                            |
 | Poly1305      | **10.06MB/s**  | ➖                           | ➖                           | ➖                            |
 
@@ -64,6 +66,7 @@ With string of length 10 (100000 iterations):
 | BLAKE-2s      | **15.14MB/s** | ➖                           | ➖                          | ➖                             |
 | BLAKE-2b      | **13.05MB/s** | ➖                           | ➖                          | 884.35KB/s <br> `1376% slower` |
 | HMAC(MD5)     | **4.77MB/s**  | 3.75MB/s <br> `27% slower`   | 1.95MB/s <br> `144% slower` | ➖                             |
+| HMAC(SHA-1)   | **2.46MB/s**  | 1.85MB/s <br> `33% slower`   | ➖                          | ➖                             |
 | HMAC(SHA-256) | **1.93MB/s**  | 1.60MB/s <br> `21% slower`   | ➖                          | ➖                             |
 | Poly1305      | **1.41MB/s**  | ➖                           | ➖                          | ➖                             |
 
