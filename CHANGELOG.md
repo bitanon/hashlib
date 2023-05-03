@@ -1,3 +1,7 @@
+# next
+
+- Optimizes Poly1305 implementation (runtime improved by 30x)
+
 ## 1.10.0
 
 - Adds support for `Poly1305` MAC generation: [#5](https://github.com/dipu-bd/hashlib/issues/5)
