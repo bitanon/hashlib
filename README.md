@@ -204,7 +204,7 @@ With string of length 500000 (10 iterations):
 | HMAC(MD5)     | **161.72MB/s** | 120.11MB/s <br> `35% slower` | 70.40MB/s <br> `130% slower` | ➖                            |
 | HMAC(SHA-1)   | **147.08MB/s** | 95.05MB/s <br> `55% slower`  | ➖                           |                               |
 | HMAC(SHA-256) | **100.12MB/s** | 83.03MB/s <br> `21% slower`  | ➖                           | ➖                            |
-| Poly1305      | **10.73MB/s**  | ➖                           | ➖                           | ➖                            |
+| Poly1305      | **441.58MB/s** | ➖                           | ➖                           | ➖                            |
 
 With string of length 1000 (5000 iterations):
 
@@ -225,7 +225,7 @@ With string of length 1000 (5000 iterations):
 | HMAC(MD5)     | **123.84MB/s** | 94.08MB/s <br> `32% slower`  | 68.14MB/s <br> `82% slower`  | ➖                            |
 | HMAC(SHA-1)   | **92.13MB/s**  | 64.98MB/s <br> `42% slower`  | ➖                           | ➖                            |
 | HMAC(SHA-256) | **67.95MB/s**  | 56.12MB/s <br> `21% slower`  | ➖                           | ➖                            |
-| Poly1305      | **10.06MB/s**  | ➖                           | ➖                           | ➖                            |
+| Poly1305      | **403.08MB/s** | ➖                           | ➖                           | ➖                            |
 
 With string of length 10 (100000 iterations):
 
@@ -246,7 +246,7 @@ With string of length 10 (100000 iterations):
 | HMAC(MD5)     | **4.77MB/s**  | 3.75MB/s <br> `27% slower`   | 1.95MB/s <br> `144% slower` | ➖                             |
 | HMAC(SHA-1)   | **2.46MB/s**  | 1.85MB/s <br> `33% slower`   | ➖                          | ➖                             |
 | HMAC(SHA-256) | **1.93MB/s**  | 1.60MB/s <br> `21% slower`   | ➖                          | ➖                             |
-| Poly1305      | **1.41MB/s**  | ➖                           | ➖                          | ➖                             |
+| Poly1305      | **43.04MB/s** | ➖                           | ➖                          | ➖                             |
 
 Argon2 and scrypt benchmarks on different security parameters:
 

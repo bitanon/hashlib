@@ -1,5 +1,12 @@
 @echo off
-call dart test -p vm || exit 1
-if not exist "build" mkdir build
-call dart compile exe .\benchmark\benchmark.dart -o .\build\benchmark.exe
-call .\build\benchmark.exe > BENCHMARK.md
+
+call dart test -p vm || goto :error
+if not exist "build" mkdir build || goto :error
+call dart compile exe .\benchmark\benchmark.dart -o .\build\benchmark.exe || goto :error
+call .\build\benchmark.exe > BENCHMARK.md || goto :error
+
+goto :EOF
+
+:error
+echo Failed with error #%errorlevel%.
+exit /b %errorlevel%
