@@ -30,11 +30,11 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   int _s2 = 0;
   int _s3 = 0;
   // accumulator: a
-  int _a0 = 0;
-  int _a1 = 0;
-  int _a2 = 0;
-  int _a3 = 0;
-  int _a4 = 0;
+  int _h0 = 0;
+  int _h1 = 0;
+  int _h2 = 0;
+  int _h3 = 0;
+  int _h4 = 0;
   // g = 5 * r
   int _g1 = 0;
   int _g2 = 0;
@@ -49,12 +49,15 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
 
   @override
   void reset() {
+    if (!_initialized) {
+      throw StateError('The instance is not initialized');
+    }
     super.reset();
-    _a0 = 0;
-    _a1 = 0;
-    _a2 = 0;
-    _a3 = 0;
-    _a4 = 0;
+    _h0 = 0;
+    _h1 = 0;
+    _h2 = 0;
+    _h3 = 0;
+    _h4 = 0;
   }
 
   /// Initialize the Poly1305 with the secret and the authentication
@@ -71,14 +74,28 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
       throw StateError('The secret length must be 16 bytes');
     }
 
+    _initialized = true;
+
     // r = key[15..0]
-    var key8 = key is Uint8List ? key : Uint8List.fromList(key);
-    var kdata = key8.buffer.asByteData();
-    _r0 = kdata.getUint32(0, Endian.little);
-    _r1 = kdata.getUint32(3, Endian.little) >>> 2;
-    _r2 = kdata.getUint32(6, Endian.little) >>> 4;
-    _r3 = kdata.getUint32(9, Endian.little) >>> 6;
-    _r4 = kdata.getUint32(12, Endian.little) >>> 8;
+    _r0 = ((key[0] & 0xFF)) |
+        ((key[1] & 0xFF) << 8) |
+        ((key[2] & 0xFF) << 16) |
+        ((key[3] & 0xFF) << 24);
+    _r1 = ((key[3] & 0xFF) >>> 2) |
+        ((key[4] & 0xFF) << 6) |
+        ((key[5] & 0xFF) << 14) |
+        ((key[6] & 0xFF) << 22);
+    _r2 = ((key[6] & 0xFF) >>> 4) |
+        ((key[7] & 0xFF) << 4) |
+        ((key[8] & 0xFF) << 12) |
+        ((key[9] & 0xFF) << 20);
+    _r3 = ((key[9] & 0xFF) >>> 6) |
+        ((key[10] & 0xFF) << 2) |
+        ((key[11] & 0xFF) << 10) |
+        ((key[12] & 0xFF) << 18);
+    _r4 = (key[13] & 0xFF) | //
+        ((key[14] & 0xFF) << 8) |
+        ((key[15] & 0xFF) << 16);
 
     // clamp(r): r &= 0x0ffffffc0ffffffc0ffffffc0fffffff
     _r0 &= 0x03ffffff;
@@ -94,16 +111,23 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
 
     if (secret != null) {
       // s = secret[15..0]
-      var secret8 = secret is Uint8List ? secret : Uint8List.fromList(secret);
-      var secret32 = secret8.buffer.asUint32List();
-      _s0 = secret32[0];
-      _s1 = secret32[1];
-      _s2 = secret32[2];
-      _s3 = secret32[3];
+      _s0 = ((secret[0] & 0xFF)) |
+          ((secret[1] & 0xFF) << 8) |
+          ((secret[2] & 0xFF) << 16) |
+          ((secret[3] & 0xFF) << 24);
+      _s1 = ((secret[4] & 0xFF)) |
+          ((secret[5] & 0xFF) << 8) |
+          ((secret[6] & 0xFF) << 16) |
+          ((secret[7] & 0xFF) << 24);
+      _s2 = ((secret[8] & 0xFF)) |
+          ((secret[9] & 0xFF) << 8) |
+          ((secret[10] & 0xFF) << 16) |
+          ((secret[11] & 0xFF) << 24);
+      _s3 = ((secret[12] & 0xFF)) |
+          ((secret[13] & 0xFF) << 8) |
+          ((secret[14] & 0xFF) << 16) |
+          ((secret[15] & 0xFF) << 24);
     }
-
-    reset();
-    _initialized = true;
   }
 
   @override
@@ -130,33 +154,47 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
     int d0, d1, d2, d3, d4;
 
     // a += n
-    _a0 += bdata.getUint32(0, Endian.little) & _mask26;
-    _a1 += (bdata.getUint32(3, Endian.little) >>> 2) & _mask26;
-    _a2 += (bdata.getUint32(6, Endian.little) >>> 4) & _mask26;
-    _a3 += (bdata.getUint32(9, Endian.little) >>> 6) & _mask26;
-    _a4 += (bdata.getUint32(12, Endian.little) >>> 8) & _mask26;
-    _a4 += buffer[16] << 24;
+    _h0 += ((buffer[0] & 0xFF)) |
+        ((buffer[1] & 0xFF) << 8) |
+        ((buffer[2] & 0xFF) << 16) |
+        ((buffer[3] & 0x03) << 24);
+    _h1 += ((buffer[3] & 0xFF) >>> 2) |
+        ((buffer[4] & 0xFF) << 6) |
+        ((buffer[5] & 0xFF) << 14) |
+        ((buffer[6] & 0xF) << 22);
+    _h2 += ((buffer[6] & 0xFF) >>> 4) |
+        ((buffer[7] & 0xFF) << 4) |
+        ((buffer[8] & 0xFF) << 12) |
+        ((buffer[9] & 0x3F) << 20);
+    _h3 += ((buffer[9] & 0xFF) >>> 6) |
+        ((buffer[10] & 0xFF) << 2) |
+        ((buffer[11] & 0xFF) << 10) |
+        ((buffer[12] & 0xFF) << 18);
+    _h4 += (buffer[13] & 0xFF) | //
+        ((buffer[14] & 0xFF) << 8) |
+        ((buffer[15] & 0xFF) << 16) |
+        ((buffer[16] & 0x03) << 24);
 
     // a *= r
-    d0 = _a0 * _r0 + _a1 * _g4 + _a2 * _g3 + _a3 * _g2 + _a4 * _g1;
-    d1 = _a0 * _r1 + _a1 * _r0 + _a2 * _g4 + _a3 * _g3 + _a4 * _g2;
-    d2 = _a0 * _r2 + _a1 * _r1 + _a2 * _r0 + _a3 * _g4 + _a4 * _g3;
-    d3 = _a0 * _r3 + _a1 * _r2 + _a2 * _r1 + _a3 * _r0 + _a4 * _g4;
-    d4 = _a0 * _r4 + _a1 * _r3 + _a2 * _r2 + _a3 * _r1 + _a4 * _r0;
+    d0 = _h0 * _r0 + _h1 * _g4 + _h2 * _g3 + _h3 * _g2 + _h4 * _g1;
+    d1 = _h0 * _r1 + _h1 * _r0 + _h2 * _g4 + _h3 * _g3 + _h4 * _g2;
+    d2 = _h0 * _r2 + _h1 * _r1 + _h2 * _r0 + _h3 * _g4 + _h4 * _g3;
+    d3 = _h0 * _r3 + _h1 * _r2 + _h2 * _r1 + _h3 * _r0 + _h4 * _g4;
+    d4 = _h0 * _r4 + _h1 * _r3 + _h2 * _r2 + _h3 * _r1 + _h4 * _r0;
 
     // a %= 2^130 - 5;
     d1 += d0 >>> 26;
     d2 += d1 >>> 26;
     d3 += d2 >>> 26;
     d4 += d3 >>> 26;
-    _a0 = d0 & _mask26;
-    _a1 = d1 & _mask26;
-    _a2 = d2 & _mask26;
-    _a3 = d3 & _mask26;
-    _a4 = d4 & _mask26;
-    _a0 += 5 * (d4 >>> 26);
-    _a1 += _a0 >>> 26;
-    _a0 &= _mask26;
+    _h0 = d0 & _mask26;
+    _h1 = d1 & _mask26;
+    _h2 = d2 & _mask26;
+    _h3 = d3 & _mask26;
+    _h4 = d4 & _mask26;
+    _h0 += 5 * (d4 >>> 26);
+    _h1 += _h0 >>> 26;
+    _h0 &= _mask26;
   }
 
   @override
@@ -176,49 +214,49 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
     int d0, d1, d2, d3, d4;
 
     // fully carry
-    _a1 += _a0 >>> 26;
-    _a2 += _a1 >>> 26;
-    _a3 += _a2 >>> 26;
-    _a4 += _a3 >>> 26;
-    _a0 &= _mask26;
-    _a1 &= _mask26;
-    _a2 &= _mask26;
-    _a3 &= _mask26;
+    _h1 += _h0 >>> 26;
+    _h2 += _h1 >>> 26;
+    _h3 += _h2 >>> 26;
+    _h4 += _h3 >>> 26;
+    _h0 &= _mask26;
+    _h1 &= _mask26;
+    _h2 &= _mask26;
+    _h3 &= _mask26;
 
-    // compute d = a - p
-    d0 = _a0 + 5;
-    d1 = _a1 + (d0 >>> 26);
-    d2 = _a2 + (d1 >>> 26);
-    d3 = _a3 + (d2 >>> 26);
-    d4 = _a4 + (d3 >>> 26) - (1 << 26);
+    // compute d = h - p
+    d0 = _h0 + 5;
+    d1 = _h1 + (d0 >>> 26);
+    d2 = _h2 + (d1 >>> 26);
+    d3 = _h3 + (d2 >>> 26);
+    d4 = _h4 + (d3 >>> 26) - (1 << 26);
     d4 &= _mask32;
 
-    // if a < p, take a; else, take d
+    // if h < p, take h; else, take d
     if ((d4 >>> 31) != 1) {
-      _a0 = d0 & _mask26;
-      _a1 = d1 & _mask26;
-      _a2 = d2 & _mask26;
-      _a3 = d3 & _mask26;
-      _a4 = d4 & _mask26;
+      _h0 = d0 & _mask26;
+      _h1 = d1 & _mask26;
+      _h2 = d2 & _mask26;
+      _h3 = d3 & _mask26;
+      _h4 = d4 & _mask26;
     }
 
     // modulus 2^128
-    _a0 = ((_a0) | (_a1 << 26)) & _mask32;
-    _a1 = ((_a1 >>> 6) | (_a2 << 20)) & _mask32;
-    _a2 = ((_a2 >>> 12) | (_a3 << 14)) & _mask32;
-    _a3 = ((_a3 >>> 18) | (_a4 << 8)) & _mask32;
+    _h0 = ((_h0) | (_h1 << 26)) & _mask32;
+    _h1 = ((_h1 >>> 6) | (_h2 << 20)) & _mask32;
+    _h2 = ((_h2 >>> 12) | (_h3 << 14)) & _mask32;
+    _h3 = ((_h3 >>> 18) | (_h4 << 8)) & _mask32;
 
-    // a += s
-    _a0 += _s0;
-    _a1 += _s1 + (_a0 >>> 32);
-    _a2 += _s2 + (_a1 >>> 32);
-    _a3 += _s3 + (_a2 >>> 32);
+    // h += s
+    _h0 += _s0;
+    _h1 += _s1 + (_h0 >>> 32);
+    _h2 += _s2 + (_h1 >>> 32);
+    _h3 += _s3 + (_h2 >>> 32);
 
     return Uint32List.fromList([
-      _a0,
-      _a1,
-      _a2,
-      _a3,
+      _h0,
+      _h1,
+      _h2,
+      _h3,
     ]).buffer.asUint8List();
   }
 }

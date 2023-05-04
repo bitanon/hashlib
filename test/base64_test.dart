@@ -20,7 +20,7 @@ void main() {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
         var base64 = base64Encode(b).replaceAll('=', '');
-        expect(fromBase64(base64), orderedEquals(b));
+        expect(fromBase64(base64), equals(b));
       }
     });
   });

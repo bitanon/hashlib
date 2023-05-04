@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/algorithms/poly1305.dart';
 import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
@@ -46,7 +47,7 @@ void main() {
         0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9
       ];
       var res = poly1305auth(msg, key);
-      expect(res.bytes, mac);
+      expect(res.bytes, equals(mac));
     });
 
     test("NACL example with wrap key", () {
@@ -65,7 +66,7 @@ void main() {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       ];
       var res = poly1305auth(msg, key);
-      expect(res.bytes, mac);
+      expect(res.bytes, equals(mac));
     });
 
     test("example from poly1305-donna", () {
@@ -77,6 +78,57 @@ void main() {
       ];
       var res = poly1305auth(msg, key);
       expect(res.bytes, mac);
+    });
+
+    test('key = strings of zeros', () {
+      var m = "Cryptographic Forum Research Group".codeUnits;
+      var key = List.filled(32, 0);
+      var actual = List.filled(16, 0);
+      expect(poly1305auth(m, key).bytes, equals(actual));
+    });
+
+    test('random key, empty message', () {
+      var m = <int>[];
+      var key = fromHex(
+        'c90e3dd155bcd5dfc5ac9a73eed584e6652bd6b403cdafd31bed3427442d29a9',
+      );
+      var actual = "652bd6b403cdafd31bed3427442d29a9";
+      expect(poly1305auth(m, key).hex(), actual);
+    });
+
+    test('random key, single message', () {
+      var m = "0".codeUnits;
+      var key = fromHex(
+        'b90e3dd1e5bc6cdfc5ac9a73eed584e6652bd3b409acdafd31bed3427442dae1',
+      );
+      var actual = "1aa7542dcbfafa4e04e7808ab84a989f";
+      expect(poly1305auth(m, key).hex(), actual);
+    });
+
+    test("buffered update", () {
+      var sink = Poly1305Sink();
+      var key = [
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, //
+        0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0x00, 0x00, 0x00, 0x00
+      ];
+      var mac = [
+        0xc6, 0x9d, 0xc3, 0xb9, 0x75, 0xee, 0x5f, 0x6b, //
+        0x28, 0x99, 0x57, 0x94, 0x41, 0x27, 0xd7, 0x5e,
+      ];
+
+      sink.init(key.sublist(0, 16), key.sublist(16, 32));
+      for (int i = 0; i < 256; i++) {
+        var mac = poly1305(
+          List.generate(i, (j) => i),
+          List.generate(16, (j) => i),
+          List.generate(16, (j) => 0xFF),
+        );
+        sink.add(mac.bytes);
+      }
+      expect(sink.digest().bytes, equals(mac));
     });
   });
 }

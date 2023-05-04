@@ -67,14 +67,14 @@ void main() {
         ];
         var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
         var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
-        expect(fromHex(lowerHex), orderedEquals(buf));
-        expect(fromHex(upperHex), orderedEquals(buf));
+        expect(fromHex(lowerHex), equals(buf));
+        expect(fromHex(upperHex), equals(buf));
       });
       test('random', () {
         for (int i = 0; i < 100; ++i) {
           var b = randomBytes(i);
           var hex = b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
-          expect(fromHex(hex), orderedEquals(b));
+          expect(fromHex(hex), equals(b));
         }
       });
     });
