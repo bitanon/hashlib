@@ -19,6 +19,7 @@ export 'pbkdf2.dart';
 export 'poly1305.dart';
 export 'random.dart';
 export 'registry.dart';
+export 'ripemd160.dart';
 export 'scrypt.dart';
 export 'sha1.dart';
 export 'sha224.dart';

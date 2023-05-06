@@ -1,6 +1,8 @@
 # next
 
-- Optimizes Poly1305 implementation (runtime improved by 30x)
+- Optimize Poly1305 implementation (30x improvement in hashrate)
+- Implements RIPEMD algorithm series. New hash functions:
+  - `ripemd160`, `ripemd160sum`
 
 ## 1.10.0
 
