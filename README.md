@@ -31,13 +31,6 @@ This library contains implementations of secure hash functions, checksum generat
 | xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   |        Cyan4973         |
 | RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | ISO/IEC 10118-3:2018(E) |
 
-<!--
-`blake3`
-`whirlpool`
-`sm3`
-`streebog`
--->
-
 ### Other Hash Algorithms
 
 | Algorithms | Available methods         | Source    |
@@ -52,11 +45,6 @@ This library contains implementations of secure hash functions, checksum generat
 | Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id` | RFC-9106 |
 | PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`             | RFC-8081 |
 | scrypt    | `scrypt`, `Scrypt`                         | RFC-7914 |
-
-<!--
-| `bcrypt`      |    ⌛     |       |
-| `balloon`     |    ⌛     |       |
--->
 
 ### Message Authentication Code (MAC) Generators
 

@@ -4,9 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    paths: ['**.dart']
+    paths: ['**.dart','**.yaml']
   pull_request:
     branches: [master]
+    paths: ['**.dart','**.yaml']
   schedule:
      - cron: "0 0 * * 5" # m h d M w
 
