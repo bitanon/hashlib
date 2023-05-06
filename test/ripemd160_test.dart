@@ -5,7 +5,7 @@ import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('MD5 test', () {
+  group('RIPEMD-160 test', () {
     test('with empty string', () {
       var m = "";
       var r = "9c1185a5c5e9fc54612808977ee8f548b2258d31";

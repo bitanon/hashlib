@@ -29,7 +29,7 @@ This library contains implementations of secure hash functions, checksum generat
 | xxHash-64   | `XXHash64`,`xxh64`,`xxh64code`                                     |        Cyan4973         |
 | xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         |        Cyan4973         |
 | xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   |        Cyan4973         |
-| RIPEMD      | `ripemd128`, `ripemd160`, `ripemd320`                              | ISO/IEC 10118-3:2018(E) |
+| RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | ISO/IEC 10118-3:2018(E) |
 
 <!--
 `blake3`
