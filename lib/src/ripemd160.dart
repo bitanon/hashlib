@@ -29,13 +29,6 @@ class _RIPEMD160 extends BlockHashBase {
 /// - [input] is the message string
 /// - [encoding] specifies the character encoding. Default is [utf8].
 /// - [uppercase] flag indicates whether the output should be in uppercase.
-///
-/// Example:
-/// ```dart
-/// final input = 'Hello, world!';
-/// final hash = ripemd160sum(input);
-/// print(hash); // 58262d1fbdbe4530d8865d3518c6d6e41002610f
-/// ```
 String ripemd160sum(
   String input, [
   Encoding? encoding,

@@ -9,7 +9,9 @@ import 'package:hashlib/src/core/block_hash.dart';
 /// RIPEMD-320 (RACE Integrity Primitives Evaluation Message Digest) is a
 /// cryptographic hash function that produces a fixed-size, 320-bit hash value.
 ///
-/// It provides the same level of security as RIPEMD-160, but with more bits.
+/// It shares some design principles with RIPEMD-160, but provides a higher
+/// level of security having a larger output size and a more complex message
+/// expansion function.
 const BlockHashBase ripemd320 = _RIPEMD320();
 
 class _RIPEMD320 extends BlockHashBase {
@@ -28,13 +30,6 @@ class _RIPEMD320 extends BlockHashBase {
 /// - [input] is the message string
 /// - [encoding] specifies the character encoding. Default is [utf8].
 /// - [uppercase] flag indicates whether the output should be in uppercase.
-///
-/// Example:
-/// ```dart
-/// final input = 'Hello, world!';
-/// final hash = ripemd320sum(input);
-/// print(hash);
-/// ```
 String ripemd320sum(
   String input, [
   Encoding? encoding,
