@@ -6,6 +6,84 @@ import 'package:hashlib/src/algorithms/poly1305.dart';
 import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
+const cases = [
+  // Raw Poly1305
+  // onetimeauth.c from nacl-20110221
+  [
+    "eea6a7251c1e72916d11c2cb214d3c25" "2539121d8e234e652d651fa4c8cff880",
+    "8e993b9f48681273c29650ba32fc76ce48332ea7164d96a4476fb8c531a1186a"
+        "c0dfc17c98dce87b4da7f011ec48c97271d2c20f9b928fe2270d6fb863d51738"
+        "b48eeee314a7cc8ab932164548e526ae90224368517acfeabd6bb3732bc0e9da"
+        "99832b61ca01b6de56244a9e88d5f9b37973f622a43d14a6599b1f654cb45a74e355a5",
+    "f3ffc7703f9400e52a7dfb4b3d3305d9"
+  ],
+  // Specific test cases generated from test-poly1305aes from poly1305aes-20050218 that
+  // expose Java unsigned integer problems
+  [
+    "01bcb20bfc8b6e03609ddd09f44b060f" "95cc0e44d0b79a8856afcae1bec4fe3c",
+    "66f75c0e0c7a40658629e3392f7f8e3349a02191ffd49f39879a8d9d1d0e23ea3caa4d240bd2ab8a8c4a6bb8d3288d9de4b793f05e97646dd4d98055de"
+        "fc3e0677d956b4c62664bac15962ab15d93ccbbc03aafdbde779162ed93b55361f0f8acaa41d50ef5175927fe79ea316186516eef15001cd04d3524a55"
+        "e4fa3c5ca479d3aaa8a897c21807f721b6270ffc68b6889d81a116799f6aaa35d8e04c7a7dd5e6da2519e8759f54e906696f5772fee093283bcef7b930"
+        "aed50323bcbc8c820c67422c1e16bdc022a9c0277c9d95fef0ea4ee11e2b27276da811523c5acb80154989f8a67ee9e3fa30b73b0c1c34bf46e3464d97"
+        "7cd7fcd0ac3b82721080bb0d9b982ee2c77feee983d7ba35da88ce86955002940652ab63bc56fb16f994da2b01d74356509d7d1b6d7956b0e5a557757b"
+        "d1ced2eef8650bc5b6d426108c1518abcbd0befb6a0d5fd57a3e2dbf31458eab63df66613653d4beae73f5c40eb438fbcfdcf4a4ba46320184b9ca0da4"
+        "dfae77de7ccc910356caea3243f33a3c81b064b3b7cedc7435c223f664227215715980e6e0bb570d459ba80d7512dbe458c8f0f3f52d659b6e8eef19ee"
+        "71aea2ced85c7a42ffca6522a62db49a2a46eff72bd7f7e0883acd087183f0627f3537a4d558754ed63358e8182bee196735b361dc9bd64d5e34e1074a"
+        "855655d2974cc6fa1653754cf40f561d8c7dc526aab2908ec2d2b977cde1a1fb1071e32f40e049ea20f30368ba1592b4fe57fb51595d23acbdace324cd"
+        "d78060a17187c662368854e915402d9b52fb21e984663e41c26a109437e162cfaf071b53f77e50000a5388ff183b82ce7a1af476c416d7d204157b3633"
+        "b2f4ec077b699b032816997e37bceded8d4a04976fd7d0c0b029f290794c3be504c5242287ea2f831f11ed5690d92775cd6e863d7731fd4da687ebfb13"
+        "df4c41dc0fb8",
+    "ae345d555eb04d6947bb95c0965237e2"
+  ],
+  [
+    "cd07fd0ef8c0be0afcbdb30af4af0009" "76fb3635a2dc92a1f768163ab12f2187",
+    "f05204a74f0f88a7fa1a95b84ec3d8ffb36fcdc7723ea65dfe7cd464e86e0abf6b9d51"
+        "db3220cfd8496ad6e6d36ebee8d990f9ce0d3bb7f72b7ab5b3ab0a73240d11efe77"
+        "2c857021ae859db4933cdde4387b471d2ce700fef4b81087f8f47c307881fd83017a"
+        "fcd15b8d21edf9b704677f46df97b07e5b83f87c8abd90af9b1d0f9e2710e8ebd0d4"
+        "d1c6a055abea861f42368bed94d9373e909c1d3715b221c16bc524c55c31ec3eab20"
+        "4850bb2474a84f9917038eff9d921130951391b5c54f09b5e1de833ea2cd7d3b3067"
+        "40abb7096d1e173da83427da2adddd3631eda30b54dbf487f2b082e8646f07d6e0a8"
+        "7e97522ca38d4ace4954bf3db6dd3a93b06fa18eb56856627ed6cffcd7ae26374554"
+        "ca18ab8905f26331d323fe10e6e70624c7bc07a70f06ecd804b48f8f7e75e910165e"
+        "1beb554f1f0ec7949c9c8d429a206b4d5c0653102249b6098e6b45fac2a07ff0220b"
+        "0b8ae8f4c6bcc0c813a7cd141fa8b398b42575fc395747c5a0257ac41d6c1f434cfb"
+        "f5dfe8349f5347ef6b60e611f5d6c3cbc20ca2555274d1934325824cef4809da293e"
+        "a13f181929e2af025bbd1c9abdc3af93afd4c50a2854ade3887f4d2c8c225168052c"
+        "16e74d76d2dd3e9467a2c5b8e15c06ffbffa42b8536384139f07e195a8c9f70f514f3"
+        "1dca4eb2cf262c0dcbde53654b6250a29efe21d54e83c80e005a1cad36d5934ff01c3"
+        "2e4bc5fe06d03064ff4a268517df4a94c759289f323734318cfa5d859d4ce9c16e63"
+        "d02dff0896976f521607638535d2ee8dd3312e1ddc80a55d34fe829ab954c1ebd54d"
+        "929954770f1be9d32b4c05003c5c9e97943b6431e2afe820b1e967b19843e5985a13"
+        "1b1100517cdc363799104af91e2cf3f53cb8fd003653a6dd8a31a3f9d566a7124b0f"
+        "fe9695bcb87c482eb60106f88198f766a40bc0f4873c23653c5f9e7a8e446f770beb"
+        "8034cf01d21028ba15ccee21a8db918c4829d61c88bfa927bc5def831501796c5b40"
+        "1a60a6b1b433c9fb905c8cd40412fffee81ab",
+    "045be28cc52009f506bdbfabedacf0b4"
+  ],
+  // Test case from JIRA issue BJA-620
+  [
+    "ffffffffffffffffffffffffffffffff" "ffffffffffffffffffffffffffffffff",
+    "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffffff"
+        "ffffffffffffffffffffffffffffff",
+    "c80cb43844f387946e5aa6085bdf67da"
+  ],
+];
+
 void main() {
   group('Poly1305 test', () {
     test('the RFC sample', () {
@@ -129,6 +207,16 @@ void main() {
         sink.add(mac.bytes);
       }
       expect(sink.digest().bytes, equals(mac));
+    });
+
+    test("from bc-java test cases", () {
+      for (final x in cases) {
+        var mac = poly1305auth(
+          fromHex(x[1]),
+          fromHex(x[0]),
+        );
+        expect(mac.hex(), x[2]);
+      }
     });
   });
 }

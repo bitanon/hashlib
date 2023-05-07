@@ -23,6 +23,10 @@ import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
 import 'xxhash.dart' as xxhash;
 import 'scrypt.dart' as scrypt;
+import 'ripemd128.dart' as ripemd128;
+import 'ripemd160.dart' as ripemd160;
+import 'ripemd256.dart' as ripemd256;
+import 'ripemd320.dart' as ripemd320;
 
 // ---------------------------------------------------------------------
 // Hash function benchmarks
@@ -87,6 +91,23 @@ void measureHashFunctions() {
       "SHA3-512": [
         sha3_512.HashlibBenchmark(size, iter),
         sha3_512.PointyCastleBenchmark(size, iter),
+      ],
+      "RIPEMD-128": [
+        ripemd128.HashlibBenchmark(size, iter),
+        ripemd128.PointyCastleBenchmark(size, iter),
+      ],
+      "RIPEMD-160": [
+        ripemd160.HashlibBenchmark(size, iter),
+        ripemd160.HashBenchmark(size, iter),
+        ripemd160.PointyCastleBenchmark(size, iter),
+      ],
+      "RIPEMD-256": [
+        ripemd256.HashlibBenchmark(size, iter),
+        ripemd256.PointyCastleBenchmark(size, iter),
+      ],
+      "RIPEMD-320": [
+        ripemd320.HashlibBenchmark(size, iter),
+        ripemd320.PointyCastleBenchmark(size, iter),
       ],
       "BLAKE-2s": [
         blake2s.HashlibBenchmark(size, iter),
