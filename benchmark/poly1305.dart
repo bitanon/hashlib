@@ -2,8 +2,11 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:pointycastle/api.dart';
+import 'package:pointycastle/macs/poly1305.dart' as pc;
 
 import 'base.dart';
 
@@ -21,6 +24,26 @@ class HashlibBenchmark extends Benchmark {
   }
 }
 
+class PointyCastleBenchmark extends Benchmark {
+  Uint8List _key = Uint8List(32);
+  Uint8List _input = Uint8List(0);
+  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
+
+  @override
+  void setup() {
+    super.setup();
+    _input = Uint8List.fromList(input);
+    _key = Uint8List.fromList([...key, ...secret]);
+  }
+
+  @override
+  void run() {
+    final d = pc.Poly1305();
+    d.init(KeyParameter(_key));
+    d.process(_input);
+  }
+}
+
 void main() {
   print('------- Poly1305 --------');
   final conditions = [
@@ -32,7 +55,9 @@ void main() {
     int size = condition[0];
     int iter = condition[1];
     print('---- size=$size | iterations: $iter ----');
-    HashlibBenchmark(size, iter).showDiff();
+    HashlibBenchmark(size, iter).showDiff([
+      PointyCastleBenchmark(size, iter),
+    ]);
     print('');
   }
 }

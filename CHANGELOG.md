@@ -1,8 +1,11 @@
 # next
 
 - Optimize Poly1305 implementation (30x improvement in hashrate)
-- Implements RIPEMD algorithm series. New hash functions:
+- Optimize scrypt implementation (10x improvement in runtime)
+- RIPEMD algorithm series. New hash functions:
+  - `ripemd128`, `ripemd128sum`
   - `ripemd160`, `ripemd160sum`
+  - `ripemd256`, `ripemd256sum`
   - `ripemd320`, `ripemd320sum`
 
 ## 1.10.0

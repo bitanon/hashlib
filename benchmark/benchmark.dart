@@ -131,6 +131,7 @@ void measureHashFunctions() {
       ],
       "Poly1305": [
         poly1305.HashlibBenchmark(size, iter),
+        poly1305.PointyCastleBenchmark(size, iter),
       ],
     };
 

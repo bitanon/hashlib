@@ -93,69 +93,85 @@ class Scrypt extends KeyDerivatorBase {
   /// Generate a derived key using the scrypt algorithm.
   @override
   HashDigest convert(List<int> password) {
+    int N = cost;
     int midRO = (blockSize << 4);
     int roLength = (blockSize << 7);
     int roLength32 = (roLength >>> 2);
     int innerKeyLength = parallelism * roLength;
-    List<Uint32List> acc = List.filled(cost, Uint32List(0));
-
-    /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
-    void _scryptBlockMix(Uint32List b) {
-      Uint32List t, x, y;
-      int i, j, p, q;
-      p = 0;
-      q = midRO;
-      t = b.sublist(0);
-      x = t.buffer.asUint32List(roLength - 64, 16);
-      for (i = p = 0; i < roLength; i += 128) {
-        // even
-        y = t.buffer.asUint32List(i, 16);
-        for (j = 0; j < 16; j++) {
-          y[j] ^= x[j];
-        }
-        _salsa20(y);
-        for (j = 0; j < 16; j++, p++) {
-          b[p] = y[j];
-        }
-        x = y;
-
-        // odd
-        y = t.buffer.asUint32List(i + 64, 16);
-        for (j = 0; j < 16; j++) {
-          y[j] ^= x[j];
-        }
-        _salsa20(y);
-        for (j = 0; j < 16; j++, q++) {
-          b[q] = y[j];
-        }
-        x = y;
-      }
-    }
-
-    /// Number of iterations, [N] is a power of 2
-    /// length of [x] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
-    void _scryptROMix(int N, Uint32List x) {
-      int i, j;
-      for (i = 0; i < N; ++i) {
-        acc[i] = x.sublist(0);
-        _scryptBlockMix(x);
-      }
-      for (i = 0; i < N; ++i) {
-        var v = acc[x[roLength32 - 16] & (N - 1)];
-        for (j = 0; j < roLength32; ++j) {
-          x[j] ^= v[j];
-        }
-        _scryptBlockMix(x);
-      }
-    }
+    int innerKeyLength32 = parallelism * roLength32;
+    List<Uint32List> acc = List.generate(N, (_) => Uint32List(roLength32));
+    Uint32List inp = Uint32List(roLength32);
+    Uint32List out = Uint32List(roLength32);
+    Uint32List t = Uint32List(16);
+    Uint32List v;
 
     // Derive the inner blocks
     var sink = HMACSink(sha256.createSink());
     var inner = PBKDF2(sink, salt, 1, innerKeyLength).convert(password);
+    Uint32List inner32 = inner.buffer.asUint32List();
+
+    /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
+    @pragma('vm:prefer-inline')
+    void _blockMix() {
+      int i, j, p, q;
+      p = 0;
+      q = midRO;
+      for (j = 0; j < 16; j++) {
+        t[j] = inp[roLength32 - 16 + j];
+      }
+      for (i = 0; i < roLength32; i += 32) {
+        // even
+        for (j = 0; j < 16; j++) {
+          t[j] ^= inp[i + j];
+        }
+        _salsa20(t);
+        for (j = 0; j < 16; j++, p++) {
+          out[p] = t[j];
+        }
+
+        // odd
+        for (j = 0; j < 16; j++) {
+          t[j] ^= inp[i + j + 16];
+        }
+        _salsa20(t);
+        for (j = 0; j < 16; j++, q++) {
+          out[q] = t[j];
+        }
+      }
+    }
 
     // Mix the inner blocks to derive the outer salt
-    for (int i = 0; i < innerKeyLength; i += roLength) {
-      _scryptROMix(cost, inner.buffer.asUint32List(i, roLength32));
+    for (int i, j, k = 0; k < innerKeyLength32; k += roLength32) {
+      /// Number of iterations, [N] is a power of 2
+      /// length of [x] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
+      for (j = 0; j < roLength32; ++j) {
+        inp[j] = inner32[j + k];
+      }
+      for (i = 0; i < N; ++i) {
+        v = acc[i];
+        for (j = 0; j < roLength32; ++j) {
+          v[j] = inp[j];
+        }
+        _blockMix();
+        // swap inp <-> out
+        v = inp;
+        inp = out;
+        out = v;
+      }
+      for (i = 0; i < N; ++i) {
+        v = acc[inp[roLength32 - 16] & (N - 1)];
+        for (j = 0; j < roLength32; ++j) {
+          inp[j] ^= v[j];
+        }
+        _blockMix();
+        // swap inp <-> out
+        v = inp;
+        inp = out;
+        out = v;
+      }
+      for (j = 0; j < roLength32; ++j) {
+        inner32[j + k] = inp[j];
+      }
     }
 
     // Derive final blocks with the outer salt
