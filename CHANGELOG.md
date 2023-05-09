@@ -7,6 +7,7 @@
   - `ripemd160`, `ripemd160sum`
   - `ripemd256`, `ripemd256sum`
   - `ripemd320`, `ripemd320sum`
+- Codecs are now able to handle padding characters
 
 ## 1.10.0
 

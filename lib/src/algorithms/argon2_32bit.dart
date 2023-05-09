@@ -6,14 +6,12 @@ import 'dart:typed_data';
 import 'argon2.dart';
 import 'blake2b.dart';
 
+const int _mask16 = 0xFFFF;
 const int _mask32 = 0xFFFFFFFF;
 
-const int _blockSize = 1024;
-const int _blockSize32 = 256;
-
 const int _zero = 0;
-const int _input = _zero + _blockSize32;
-const int _address = _input + _blockSize32;
+const int _input = _zero + 256;
+const int _address = _input + 256;
 
 //     slice 0      slice 1      slice 2      slice 3
 //   ____/\____   ____/\____   ____/\____   ____/\____
@@ -31,9 +29,9 @@ const int _address = _input + _blockSize32;
 // +------------+------------+------------+------------+
 
 class Argon2Internal extends Argon2 {
-  final _blockR = Uint32List(_blockSize32);
-  final _blockT = Uint32List(_blockSize32);
-  final _temp = Uint32List(_address + _blockSize32);
+  final _blockR = Uint32List(256);
+  final _blockT = Uint32List(256);
+  final _temp = Uint32List(_address + 256);
 
   Argon2Internal({
     required List<int> salt,
@@ -71,7 +69,7 @@ class Argon2Internal extends Argon2 {
     int pass, slice, lane;
     var hash0 = Uint8List(64 + 8);
     var hash0as32 = hash0.buffer.asUint32List();
-    var buffer32 = Uint32List(blocks * _blockSize32);
+    var buffer32 = Uint32List(blocks << 8);
     var buffer = buffer32.buffer.asUint8List();
     var result = Uint8List(hashLength);
 
@@ -85,7 +83,7 @@ class Argon2Internal extends Argon2 {
     for (i = 0; i < lanes; i++, k += columns) {
       // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
       hash0as32[17] = i;
-      _expandHash(_blockSize, hash0, buffer, k << 10);
+      _expandHash(1024, hash0, buffer, k << 10);
     }
 
     // Second Lane Blocks
@@ -94,7 +92,7 @@ class Argon2Internal extends Argon2 {
     for (i = 0; i < lanes; i++, k += columns) {
       // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
       hash0as32[17] = i;
-      _expandHash(_blockSize, hash0, buffer, k << 10);
+      _expandHash(1024, hash0, buffer, k << 10);
     }
 
     // Further block generation
@@ -109,11 +107,11 @@ class Argon2Internal extends Argon2 {
     // Finalization
     /* XOR the blocks */
     j = columns - 1;
-    var block = buffer.buffer.asUint8List(j << 10, _blockSize);
+    var block = buffer.buffer.asUint8List(j << 10, 1024);
     for (k = 1; k < lanes; ++k) {
       j += columns;
       p = j << 10;
-      for (i = 0; i < _blockSize; ++i, ++p) {
+      for (i = 0; i < 1024; ++i, ++p) {
         block[i] ^= buffer[p];
       }
     }
@@ -318,13 +316,13 @@ class Argon2Internal extends Argon2 {
     int i, j;
 
     // T = R = ref ^ prev
-    for (i = 0; i < _blockSize32; ++i) {
+    for (i = 0; i < 256; ++i) {
       _blockT[i] = _blockR[i] = buffer[ref + i] ^ buffer[prev + i];
     }
 
     if (xor) {
       // T = ref ^ prev ^ next
-      for (i = 0; i < _blockSize32; ++i) {
+      for (i = 0; i < 256; ++i) {
         _blockT[i] ^= buffer[next + i];
       }
     }
@@ -378,7 +376,7 @@ class Argon2Internal extends Argon2 {
     }
 
     // next = T ^ R
-    for (i = 0; i < _blockSize32; ++i) {
+    for (i = 0; i < 256; ++i) {
       buffer[next + i] = _blockT[i] ^ _blockR[i];
     }
   }
@@ -440,14 +438,22 @@ class Argon2Internal extends Argon2 {
 
   /// `((x * y) mod 2^64) >> 32`
   static int _multiplyAndGetMSB(int x, int y) {
-    return ((BigInt.from(x) * BigInt.from(y)) >> 32).toUnsigned(32).toInt();
+    int lx, hx, ly, hy;
+
+    hx = (x >>> 16) & _mask16;
+    lx = x & _mask16;
+    hy = (y >>> 16) & _mask16;
+    ly = y & _mask16;
+
+    return ((hy * hx) + ((lx * hy + hx * ly) >>> 16)) & _mask32;
   }
 
-  /// `v[x] += v[y] + ((v[x] & _mask32) * (v[y] & _mask32) << 1)`
+  /// `v[x] += v[y] + 2 * ((v[x] & _mask32) * (v[y] & _mask32))`
   static void _fBlaMka(Uint32List v, int x, int y) {
-    var t = BigInt.two * BigInt.from(v[x]) * BigInt.from(v[y]);
+    var t = (BigInt.from(v[x]) * BigInt.from(v[y])) << 1;
     t += (BigInt.from(v[x + 1]) << 32) + BigInt.from(v[x]);
     t += (BigInt.from(v[y + 1]) << 32) + BigInt.from(v[y]);
+
     v[x] = t.toUnsigned(32).toInt();
     v[x + 1] = (t >> 32).toUnsigned(32).toInt();
   }
@@ -469,6 +475,7 @@ class Argon2Internal extends Argon2 {
   }
 
   /// `v[k] = v[i] ^ v[j]`
+  @pragma('dart2js:tryInline')
   static void _xor(List<int> v, int i, int j, int k) {
     v[k] = v[i] ^ v[j];
     v[k + 1] = v[i + 1] ^ v[j + 1];

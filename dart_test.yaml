@@ -2,7 +2,7 @@
 # https://github.com/dart-lang/test/blob/master/pkgs/test/doc/configuration.md
 
 timeout: 1m
-concurrency: 5
+concurrency: 8
 platforms: [vm, node]
 
 tags:

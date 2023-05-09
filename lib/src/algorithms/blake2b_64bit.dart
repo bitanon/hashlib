@@ -158,7 +158,7 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
   }
 
   /// Rotates x right by n bits.
-  @pragma('vm:always-consider-inlining')
+  @pragma('vm:prefer-inline')
   static int _rotr(int x, int n) => (x >>> n) ^ (x << (64 - n));
 
   // static void _G(Uint64List v, int a, int b, int c, int d, int x, int y) {

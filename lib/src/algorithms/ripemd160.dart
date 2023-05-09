@@ -53,22 +53,28 @@ class RIPEMD160Hash extends BlockHashSink {
   }
 
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   static int _rotl32(int x, int n) =>
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   static int _f1(int x, int y, int z) => x ^ y ^ z;
 
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   static int _f2(int x, int y, int z) => (x & y) | (((~x) & _mask32) & z);
 
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   static int _f3(int x, int y, int z) => (x | ((~y) & _mask32)) ^ z;
 
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   static int _f4(int x, int y, int z) => (x & z) | (y & ((~z) & _mask32));
 
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   static int _f5(int x, int y, int z) => x ^ (y | ((~z) & _mask32));
 
   @override

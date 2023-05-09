@@ -1,6 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:convert' show Encoding;
 import 'dart:typed_data';
 
 import 'package:hashlib/src/codecs_base.dart' as codec;
@@ -15,24 +16,51 @@ class HashDigest extends Object {
 
   /// The message digest as a string of hexadecimal digits.
   @override
-  String toString() => codec.base16lower.encodeToString(bytes);
+  String toString() => codec.toHex(bytes);
 
-  /// The message digest as a hexadecimal string.
+  /// The message digest as a hexadecimal string with zero padding.
   ///
-  /// If [uppercase] is true, the output will have uppercase alphabets.
-  String hex([bool uppercase = false]) => codec.toHex(bytes, uppercase);
+  /// If [upper] is true, the output will have uppercase alphabets.
+  String hex([bool upper = false]) => codec.toHex(bytes, upper: upper);
 
-  /// The message digest as a Base-32 string.
-  String base32() => codec.toBase32(bytes);
+  /// The message digest as a Base-32 string with no padding.
+  ///
+  /// If [upper] is true, the output will have uppercase alphabets.
+  /// If [padding] is true, the output will have `=` padding at the end.
+  String base32({
+    bool upper = true,
+    bool padding = false,
+  }) =>
+      codec.toBase32(
+        bytes,
+        upper: upper,
+        padding: padding,
+      );
 
-  /// The message digest as a Base-64 string.
+  /// The message digest as a Base-64 string with no padding.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
-  String base64([bool urlSafe = false]) =>
-      urlSafe ? codec.toBase64(bytes) : codec.toBase64Url(bytes);
+  /// If [padding] is true, the output will have `=` padding at the end.
+  String base64({
+    bool urlSafe = false,
+    bool padding = false,
+  }) =>
+      urlSafe
+          ? codec.toBase64(bytes, padding: padding)
+          : codec.toBase64Url(bytes, padding: padding);
 
   /// The message digest as a string of ASCII alphabets.
+  @Deprecated('Use the ascii() method')
   String toAscii() => codec.toAscii(bytes);
+
+  /// The message digest as a string of ASCII alphabets.
+  String ascii() => codec.toAscii(bytes);
+
+  /// The message digest as a string of UTF-8 alphabets.
+  String utf8() => String.fromCharCodes(bytes);
+
+  /// Returns the digest in the given [encoding]
+  String to(Encoding encoding) => encoding.decode(bytes);
 
   /// Returns the least significant bytes as a number.
   ///

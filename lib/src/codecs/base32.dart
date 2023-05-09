@@ -5,8 +5,8 @@ import 'codec.dart';
 import 'converter.dart';
 
 const _base32Encoding = [
-  65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, //
-  83, 84, 85, 86, 87, 88, 89, 90, 50, 51, 52, 53, 54, 55
+  65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, //
+  84, 85, 86, 87, 88, 89, 90, 50, 51, 52, 53, 54, 55
 ];
 
 const _base32lowerEncoding = [
@@ -15,12 +15,13 @@ const _base32lowerEncoding = [
 ];
 
 const _base32Decoding = [
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  26, 27, 28, 29, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7,
-  8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 0, 0,
-  0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-  19, 20, 21, 22, 23, 24, 25, 0, 0, 0, 0, 0
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, //
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, -1,
+  -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+  14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 0, 1,
+  2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+  23, 24, 25
 ];
 
 class B32Codec extends Uint8Codec {
@@ -36,6 +37,20 @@ class B32Codec extends Uint8Codec {
   const B32Codec.lower()
       : encoder = const Uint8Encoder(
           bits: 5,
+          alphabet: _base32lowerEncoding,
+        );
+
+  const B32Codec.padded()
+      : encoder = const Uint8Encoder(
+          bits: 5,
+          padding: 61,
+          alphabet: _base32Encoding,
+        );
+
+  const B32Codec.paddedLower()
+      : encoder = const Uint8Encoder(
+          bits: 5,
+          padding: 61,
           alphabet: _base32lowerEncoding,
         );
 
@@ -64,13 +79,26 @@ const base32 = B32Codec();
 /// [rfc]: https://www.ietf.org/rfc/rfc4648.html
 const base32lower = B32Codec.lower();
 
+/// Same as [base32] but appends the padding character `=` in the output.
+const base32WithPadding = B32Codec.padded();
+
+/// Same as [base32lower] but appends the padding character `=` in the output.
+const base32lowerWithPadding = B32Codec.paddedLower();
+
 /// Encode an array of 8-bit integers to Base32 string
-String toBase32(Iterable<int> input, [bool uppercase = true]) {
-  if (uppercase) {
-    return String.fromCharCodes(base32.encoder.convert(input));
-  } else {
-    return String.fromCharCodes(base32lower.encoder.convert(input));
-  }
+String toBase32(
+  Iterable<int> input, {
+  bool upper = true,
+  bool padding = false,
+}) {
+  var codec = upper
+      ? padding
+          ? base32WithPadding
+          : base32
+      : padding
+          ? base32lowerWithPadding
+          : base32lower;
+  return String.fromCharCodes(codec.encoder.convert(input));
 }
 
 /// Decode an array of 8-bit integers from Base32 string

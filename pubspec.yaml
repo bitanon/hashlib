@@ -11,6 +11,6 @@ dev_dependencies:
   test: ^1.21.4
   crypto: ^3.0.2
   hash: ^1.0.4
-  pointycastle: ^3.6.2
-  benchmark_harness: ^2.2.0
+  pointycastle: ^3.7.3
+  benchmark_harness: ^2.2.1
   argon2: ^1.0.1

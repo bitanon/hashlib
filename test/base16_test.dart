@@ -20,7 +20,7 @@ void main() {
       test('[16] => "10"', () {
         expect(toHex([16]), "10");
       });
-      test('buffer', () {
+      test('buffer,lower,upper', () {
         var buf = [
           244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
           55, 115, 178, 138, 230, 251
@@ -28,7 +28,7 @@ void main() {
         var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
         var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
         expect(toHex(buf), lowerHex);
-        expect(toHex(buf, true), upperHex);
+        expect(toHex(buf, upper: true), upperHex);
       });
       test('random', () {
         for (int i = 0; i < 100; ++i) {
@@ -60,7 +60,7 @@ void main() {
       test('"0000c" => [0, 0, 12]', () {
         expect(fromHex("0000c"), [0, 0, 12]);
       });
-      test('buffer', () {
+      test('buffer,lower,upper', () {
         var buf = [
           244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
           55, 115, 178, 138, 230, 251

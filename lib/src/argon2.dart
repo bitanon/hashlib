@@ -204,7 +204,7 @@ class Argon2Security {
 
     var watch = Stopwatch()..start();
     var salt = List.filled(saltLength, 1);
-    var password = List.filled(4 * saltLength, 2);
+    var password = List.filled(saltLength << 2, 2);
     int target = desiredRuntime.inMicroseconds;
 
     // maximize memory

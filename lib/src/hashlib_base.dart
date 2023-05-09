@@ -38,5 +38,5 @@ export 'shake128.dart';
 export 'shake256.dart';
 export 'xxh128.dart';
 export 'xxh3.dart';
-export 'xxhash32.dart';
-export 'xxhash64.dart';
+export 'xxh32.dart';
+export 'xxh64.dart';

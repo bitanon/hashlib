@@ -30,8 +30,8 @@ import 'shake128.dart';
 import 'shake256.dart';
 import 'xxh128.dart';
 import 'xxh3.dart';
-import 'xxhash32.dart';
-import 'xxhash64.dart';
+import 'xxh32.dart';
+import 'xxh64.dart';
 
 final _hash = <String, HashBase>{};
 final _blockHash = <String, BlockHashBase>{};

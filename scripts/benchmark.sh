@@ -4,4 +4,4 @@ dart test -p vm
 mkdir -p build
 dart compile exe ./benchmark/benchmark.dart -o ./build/benchmark
 chmod +x ./build/benchmark
-./build/benchmark > BENCHMARK.md
+./build/benchmark BENCHMARK.md

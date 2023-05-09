@@ -5,34 +5,8 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 
-// Rotation constants
-const int _rot01 = 36;
-const int _rot02 = 3;
-const int _rot03 = 41;
-const int _rot04 = 18;
-const int _rot05 = 1;
-const int _rot06 = 44;
-const int _rot07 = 10;
-const int _rot08 = 45;
-const int _rot09 = 2;
-const int _rot10 = 62;
-const int _rot11 = 6;
-const int _rot12 = 43;
-const int _rot13 = 15;
-const int _rot14 = 61;
-const int _rot15 = 28;
-const int _rot16 = 55;
-const int _rot17 = 25;
-const int _rot18 = 21;
-const int _rot19 = 56;
-const int _rot20 = 27;
-const int _rot21 = 20;
-const int _rot22 = 39;
-const int _rot23 = 8;
-const int _rot24 = 14;
-
 // 200-bit round constants iota mapping
-const _rc = <int>[
+const List<int> _rc = <int>[
   0x0000000000000001, //
   0x0000000000008082,
   0x800000000000808a,
@@ -101,7 +75,7 @@ class KeccakHash extends BlockHashSink {
   }
 
   /// Rotates 64-bit number x by n bits
-  @pragma('vm:always-consider-inlining')
+  @pragma('vm:prefer-inline')
   static int _rotl(int x, int n) => (x << n) | (x >>> (64 - n));
 
   @override
@@ -131,7 +105,7 @@ class KeccakHash extends BlockHashSink {
     int b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12;
     int b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23, b24;
 
-    int c0, c1, c2, c3, c4, d;
+    int c0, c1, c2, c3, c4, d, r;
 
     // Prepare the state (little-endian)
     a0 = st[0];
@@ -160,7 +134,7 @@ class KeccakHash extends BlockHashSink {
     a23 = st[23];
     a24 = st[24];
 
-    for (int r in _rc) {
+    for (r in _rc) {
       // ---- Theta parity ----
       c0 = a0 ^ a5 ^ a10 ^ a15 ^ a20;
       c1 = a1 ^ a6 ^ a11 ^ a16 ^ a21;
@@ -171,38 +145,38 @@ class KeccakHash extends BlockHashSink {
       // ---- Theta + Rho + Pi ----
       d = c4 ^ _rotl(c1, 1);
       b0 = d ^ a0;
-      b16 = _rotl(d ^ a5, _rot01);
-      b7 = _rotl(d ^ a10, _rot02);
-      b23 = _rotl(d ^ a15, _rot03);
-      b14 = _rotl(d ^ a20, _rot04);
+      b16 = _rotl(d ^ a5, 36);
+      b7 = _rotl(d ^ a10, 3);
+      b23 = _rotl(d ^ a15, 41);
+      b14 = _rotl(d ^ a20, 18);
 
       d = c0 ^ _rotl(c2, 1);
-      b10 = _rotl(d ^ a1, _rot05);
-      b1 = _rotl(d ^ a6, _rot06);
-      b17 = _rotl(d ^ a11, _rot07);
-      b8 = _rotl(d ^ a16, _rot08);
-      b24 = _rotl(d ^ a21, _rot09);
+      b10 = _rotl(d ^ a1, 1);
+      b1 = _rotl(d ^ a6, 44);
+      b17 = _rotl(d ^ a11, 10);
+      b8 = _rotl(d ^ a16, 45);
+      b24 = _rotl(d ^ a21, 2);
 
       d = c1 ^ _rotl(c3, 1);
-      b20 = _rotl(d ^ a2, _rot10);
-      b11 = _rotl(d ^ a7, _rot11);
-      b2 = _rotl(d ^ a12, _rot12);
-      b18 = _rotl(d ^ a17, _rot13);
-      b9 = _rotl(d ^ a22, _rot14);
+      b20 = _rotl(d ^ a2, 62);
+      b11 = _rotl(d ^ a7, 6);
+      b2 = _rotl(d ^ a12, 43);
+      b18 = _rotl(d ^ a17, 15);
+      b9 = _rotl(d ^ a22, 61);
 
       d = c2 ^ _rotl(c4, 1);
-      b5 = _rotl(d ^ a3, _rot15);
-      b21 = _rotl(d ^ a8, _rot16);
-      b12 = _rotl(d ^ a13, _rot17);
-      b3 = _rotl(d ^ a18, _rot18);
-      b19 = _rotl(d ^ a23, _rot19);
+      b5 = _rotl(d ^ a3, 28);
+      b21 = _rotl(d ^ a8, 55);
+      b12 = _rotl(d ^ a13, 25);
+      b3 = _rotl(d ^ a18, 21);
+      b19 = _rotl(d ^ a23, 56);
 
       d = c3 ^ _rotl(c0, 1);
-      b15 = _rotl(d ^ a4, _rot20);
-      b6 = _rotl(d ^ a9, _rot21);
-      b22 = _rotl(d ^ a14, _rot22);
-      b13 = _rotl(d ^ a19, _rot23);
-      b4 = _rotl(d ^ a24, _rot24);
+      b15 = _rotl(d ^ a4, 27);
+      b6 = _rotl(d ^ a9, 20);
+      b22 = _rotl(d ^ a14, 39);
+      b13 = _rotl(d ^ a19, 8);
+      b4 = _rotl(d ^ a24, 14);
 
       // ---- Chi + Iota ----
       a0 = b0 ^ (~b1 & b2) ^ r;

@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
+import "dart:io";
 
 import 'package:hashlib/hashlib.dart';
 
@@ -28,6 +29,14 @@ import 'ripemd160.dart' as ripemd160;
 import 'ripemd256.dart' as ripemd256;
 import 'ripemd320.dart' as ripemd320;
 
+IOSink sink = stdout;
+RandomAccessFile? raf;
+
+void dump(message) {
+  raf?.writeStringSync(message + '\n');
+  stdout.writeln(message);
+}
+
 // ---------------------------------------------------------------------
 // Hash function benchmarks
 // ---------------------------------------------------------------------
@@ -42,23 +51,26 @@ void measureHashFunctions() {
     var iter = condition[1];
 
     var algorithms = {
-      "XXH64": [
-        xxhash.XXH64Benchmark(size, iter, "hashlib"),
-      ],
-      "XXH3": [
-        xxhash.XXH3Benchmark(size, iter, "hashlib"),
-      ],
       "MD5": [
         md5.HashlibBenchmark(size, iter),
         md5.CryptoBenchmark(size, iter),
         md5.HashBenchmark(size, iter),
         md5.PointyCastleBenchmark(size, iter),
       ],
+      "HMAC(MD5)": [
+        md5_hmac.HashlibBenchmark(size, iter),
+        md5_hmac.CryptoBenchmark(size, iter),
+        md5_hmac.HashBenchmark(size, iter),
+      ],
       "SHA-1": [
         sha1.HashlibBenchmark(size, iter),
         sha1.CryptoBenchmark(size, iter),
         sha1.PointyCastleBenchmark(size, iter),
         sha1.HashBenchmark(size, iter),
+      ],
+      "HMAC(SHA-1)": [
+        sha1_hmac.HashlibBenchmark(size, iter),
+        sha1_hmac.CryptoBenchmark(size, iter),
       ],
       "SHA-224": [
         sha224.HashlibBenchmark(size, iter),
@@ -71,6 +83,10 @@ void measureHashFunctions() {
         sha256.CryptoBenchmark(size, iter),
         sha256.HashBenchmark(size, iter),
         sha256.PointyCastleBenchmark(size, iter),
+      ],
+      "HMAC(SHA-256)": [
+        sha256_hmac.HashlibBenchmark(size, iter),
+        sha256_hmac.CryptoBenchmark(size, iter),
       ],
       "SHA-384": [
         sha384.HashlibBenchmark(size, iter),
@@ -116,22 +132,21 @@ void measureHashFunctions() {
         blake2b.HashlibBenchmark(size, iter),
         blake2b.PointyCastleBenchmark(size, iter),
       ],
-      "HMAC(MD5)": [
-        md5_hmac.HashlibBenchmark(size, iter),
-        md5_hmac.CryptoBenchmark(size, iter),
-        md5_hmac.HashBenchmark(size, iter),
-      ],
-      "HMAC(SHA-1)": [
-        sha1_hmac.HashlibBenchmark(size, iter),
-        sha1_hmac.CryptoBenchmark(size, iter),
-      ],
-      "HMAC(SHA-256)": [
-        sha256_hmac.HashlibBenchmark(size, iter),
-        sha256_hmac.CryptoBenchmark(size, iter),
-      ],
       "Poly1305": [
         poly1305.HashlibBenchmark(size, iter),
         poly1305.PointyCastleBenchmark(size, iter),
+      ],
+      "XXH32": [
+        xxhash.XXH32Benchmark(size, iter, "hashlib"),
+      ],
+      "XXH64": [
+        xxhash.XXH64Benchmark(size, iter, "hashlib"),
+      ],
+      "XXH3": [
+        xxhash.XXH3Benchmark(size, iter, "hashlib"),
+      ],
+      "XXH128": [
+        xxhash.XXH128Benchmark(size, iter, "hashlib"),
       ],
     };
 
@@ -141,18 +156,18 @@ void measureHashFunctions() {
     );
     var separator = names.map((e) => ('-' * (e.length + 4)));
 
-    print("With string of length $size ($iter iterations):");
-    print('');
-    print('| Algorithms | `${names.join('` | `')}` |');
-    print('|------------|${separator.join('|')}|');
+    dump("With string of length $size ($iter iterations):");
+    dump('');
+    dump('| Algorithms | `${names.join('` | `')}` |');
+    dump('|------------|${separator.join('|')}|');
 
     for (var entry in algorithms.entries) {
-      var diff = <String, int>{};
+      var diff = <String, double>{};
       var rate = <String, String>{};
       for (var benchmark in entry.value.reversed) {
         var runtime = benchmark.measure();
         var hashRate = 1e6 * iter * size / runtime;
-        diff[benchmark.name] = runtime.round();
+        diff[benchmark.name] = runtime;
         rate[benchmark.name] = formatSize(hashRate) + '/s';
       }
       var me = entry.value.first;
@@ -181,9 +196,9 @@ void measureHashFunctions() {
         }
       }
       message += " |";
-      print(message);
+      dump(message);
     }
-    print('');
+    dump('');
   }
 }
 
@@ -191,8 +206,8 @@ void measureHashFunctions() {
 // Key Derivation Algorithm Benchmarks
 // ---------------------------------------------------------------------
 void measureKeyDerivation() {
-  print('Argon2 and scrypt benchmarks on different security parameters:');
-  print('');
+  dump('Argon2 and scrypt benchmarks on different security parameters:');
+  dump('');
   var argon2Levels = [
     Argon2Security.test,
     Argon2Security.little,
@@ -216,8 +231,8 @@ void measureKeyDerivation() {
 
   var names = argon2Levels.map((e) => e.name);
   var separator = names.map((e) => ('-' * (e.length + 2)));
-  print('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
-  print('|------------|${separator.join('|')}|');
+  dump('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
+  dump('|------------|${separator.join('|')}|');
   for (var entry in algorithms.entries) {
     var algorithm = entry.key;
     var items = entry.value;
@@ -226,30 +241,43 @@ void measureKeyDerivation() {
       var runtime = item.measure();
       message += ' ${runtime / 1000} ms |';
     }
-    print(message);
+    dump(message);
   }
-  print('');
+  dump('');
 }
 
 // ---------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------
-void main(List<String> args) {
-  print("# Benchmarks");
-  print('');
-  print("Libraries:");
-  print('');
-  print("- **Hashlib** : https://pub.dev/packages/hashlib");
-  print("- **Crypto** : https://pub.dev/packages/crypto");
-  print("- **PointyCastle** : https://pub.dev/packages/pointycastle");
-  print("- **Hash** : https://pub.dev/packages/hash");
-  print('');
+void main(List<String> args) async {
+  if (args.isNotEmpty) {
+    try {
+      stdout.writeln('Opening output file: ${args[0]}');
+      raf = File(args[0]).openSync(mode: FileMode.writeOnly);
+    } catch (err) {
+      stderr.writeln(err);
+    }
+    stdout.writeln('----------------------------------------');
+  }
+
+  dump("# Benchmarks");
+  dump('');
+  dump("Libraries:");
+  dump('');
+  dump("- **Hashlib** : https://pub.dev/packages/hashlib");
+  dump("- **Crypto** : https://pub.dev/packages/crypto");
+  dump("- **PointyCastle** : https://pub.dev/packages/pointycastle");
+  dump("- **Hash** : https://pub.dev/packages/hash");
+  dump('');
 
   measureHashFunctions();
   measureKeyDerivation();
 
   var ram = '3200MHz';
   var processor = 'AMD Ryzen 7 5800X';
-  print('> All benchmarks are done on _${processor}_ processor '
+  dump('> All benchmarks are done on _${processor}_ processor '
       'and _${ram}_ RAM using compiled _exe_');
+
+  raf?.flushSync();
+  raf?.closeSync();
 }

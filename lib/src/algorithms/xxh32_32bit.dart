@@ -66,6 +66,7 @@ class XXHash32Sink extends BlockHashSink {
   }
 
   /// Rotates 32-bit number [x] by [n] bits
+  @pragma('dart2js:tryInline')
   static int rotl32(int x, int n) =>
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 

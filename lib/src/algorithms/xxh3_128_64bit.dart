@@ -259,7 +259,6 @@ class XXH3Sink128bit extends BlockHashSink {
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   // Multiply two 64-bit numbers to get 128-bit number
-  @pragma('vm:prefer-inline')
   static void _mul128(int a, int b, Uint64List result) {
     int al, ah, bl, bh, ll, hl, lh, hh, cross;
 
@@ -280,7 +279,6 @@ class XXH3Sink128bit extends BlockHashSink {
 
   // Multiply two 64-bit numbers to get 128-bit number and
   // xor the low bits of the product with the high bits
-  @pragma('vm:prefer-inline')
   static int _mul128fold64(int a, int b) {
     int al, ah, bl, bh, ll, hl, lh, hh, cross, upper, lower;
 
@@ -301,7 +299,6 @@ class XXH3Sink128bit extends BlockHashSink {
     return upper ^ lower;
   }
 
-  @pragma('vm:prefer-inline')
   static int _mix16B(ByteData input, int i, ByteData key, int j, int seed) {
     int lhs, rhs;
     lhs = key.getUint64(j, Endian.little) + seed;
@@ -311,7 +308,6 @@ class XXH3Sink128bit extends BlockHashSink {
     return _mul128fold64(lhs, rhs);
   }
 
-  @pragma('vm:prefer-inline')
   static void _mix32B(
     Uint64List acc,
     ByteData input,

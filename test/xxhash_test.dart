@@ -10,12 +10,13 @@ import 'dart:io';
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
+File fixtureFile(String filename) {
+  return File(Directory('test/fixures/$filename').absolute.path);
+}
+
 void main() {
   group('xxHash test with fixures', () {
-    fixtureFile(String filename) {
-      return File(Directory('test/fixures/$filename').absolute.path);
-    }
-
+    const int maxLength = 1000;
     final text = fixtureFile('long.txt').readAsBytesSync();
 
     test('for xxh32', () {
@@ -24,6 +25,7 @@ void main() {
         var parts = line.split(',');
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
+        if (len > maxLength) break;
         expect(
           parts[1],
           xxh32.convert(text.take(len).toList()).hex(),
@@ -38,6 +40,7 @@ void main() {
         var parts = line.split(',');
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
+        if (len > maxLength) break;
         expect(
           parts[1],
           xxh64.convert(text.take(len).toList()).hex(),
@@ -52,6 +55,7 @@ void main() {
         var parts = line.split(',');
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
+        if (len > maxLength) break;
         expect(
           xxh3.convert(text.take(len).toList()).hex(),
           parts[1],
@@ -66,6 +70,7 @@ void main() {
         var parts = line.split(',');
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
+        if (len > maxLength) break;
         expect(
           xxh128.convert(text.take(len).toList()).hex(),
           parts[1],

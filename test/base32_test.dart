@@ -46,11 +46,11 @@ void main() {
       });
       test('foobar --lower--> mzxw6ytboi', () {
         var s = 'foobar';
-        expect(toBase32(s.codeUnits, false), equals('mzxw6ytboi'));
+        expect(toBase32(s.codeUnits, upper: false), equals('mzxw6ytboi'));
       });
       test('48656c6c6f21deadbeef --lower--> jbswy3dpehpk3pxp', () {
         var encoded = fromHex('48656c6c6f21deadbeef');
-        expect(toBase32(encoded, false), equals('jbswy3dpehpk3pxp'));
+        expect(toBase32(encoded, upper: false), equals('jbswy3dpehpk3pxp'));
       });
     });
 
@@ -102,6 +102,72 @@ void main() {
       test('jbswy3dpehpk3pq -> 48656c6c6f21deadbe', () {
         var decoded = fromBase32('jbswy3dpehpk3pq');
         expect(toHex(decoded), equals('48656c6c6f21deadbe'));
+      });
+    });
+
+    group('encoding with padding', () {
+      test('f -> MY======', () {
+        var s = 'f';
+        var r = 'MY======';
+        expect(toBase32(s.codeUnits, padding: true), equals(r));
+      });
+      test('fo -> MZXQ====', () {
+        var s = 'fo';
+        var r = 'MZXQ====';
+        expect(toBase32(s.codeUnits, padding: true), equals(r));
+      });
+      test('foo -> MZXW6===', () {
+        var s = 'foo';
+        var r = 'MZXW6===';
+        expect(toBase32(s.codeUnits, padding: true), equals(r));
+      });
+      test('foob -> MZXW6YQ=', () {
+        var s = 'foob';
+        var r = 'MZXW6YQ=';
+        expect(toBase32(s.codeUnits, padding: true), equals(r));
+      });
+      test('foobar -> MZXW6YTBOI======', () {
+        var s = 'foobar';
+        var r = 'MZXW6YTBOI======';
+        expect(toBase32(s.codeUnits, padding: true), equals(r));
+      });
+      test('48656c6c6f21deadbe -> JBSWY3DPEHPK3PQ=', () {
+        var s = String.fromCharCodes(fromHex('48656c6c6f21deadbe'));
+        var r = 'JBSWY3DPEHPK3PQ=';
+        expect(toBase32(s.codeUnits, padding: true), equals(r));
+      });
+    });
+
+    group('decoding with padding', () {
+      test('MY====== -> f', () {
+        var s = 'MY======';
+        var r = 'f';
+        expect(fromBase32(s), equals(r.codeUnits));
+      });
+      test('MZXQ==== -> fo', () {
+        var s = 'MZXQ====';
+        var r = 'fo';
+        expect(fromBase32(s), equals(r.codeUnits));
+      });
+      test('MZXW6=== -> foo', () {
+        var s = 'MZXW6===';
+        var r = 'foo';
+        expect(fromBase32(s), equals(r.codeUnits));
+      });
+      test('MZXW6YQ= -> foob', () {
+        var s = 'MZXW6YQ=';
+        var r = 'foob';
+        expect(fromBase32(s), equals(r.codeUnits));
+      });
+      test('MZXW6YTBOI====== -> foobar', () {
+        var s = 'MZXW6YTBOI======';
+        var r = 'foobar';
+        expect(fromBase32(s), equals(r.codeUnits));
+      });
+      test('JBSWY3DPEHPK3PQ= -> 48656c6c6f21deadbe', () {
+        var s = 'JBSWY3DPEHPK3PQ=';
+        var r = String.fromCharCodes(fromHex('48656c6c6f21deadbe'));
+        expect(fromBase32(s), equals(r.codeUnits));
       });
     });
   });

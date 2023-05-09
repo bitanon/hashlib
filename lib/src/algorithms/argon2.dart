@@ -140,7 +140,7 @@ abstract class Argon2 extends KeyDerivatorBase {
     if (passes > _maxIterations) {
       throw ArgumentError('The iterations must be at most $_maxIterations');
     }
-    if (memorySizeKB < 8 * lanes) {
+    if (memorySizeKB < (lanes << 3)) {
       throw ArgumentError('The memory size must be at least 8 * parallelism');
     }
     if (memorySizeKB > _maxMemory) {
@@ -277,7 +277,7 @@ abstract class Argon2 extends KeyDerivatorBase {
       parallelism: p,
       memorySizeKB: m,
       salt: fromBase64(data[4]),
-      hashLength: (data[5].length * 6) ~/ 8,
+      hashLength: (data[5].length * 6) >>> 3,
       key: key,
       personalization: personalization,
     );

@@ -206,12 +206,14 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
   }
 
   /// `v[k] = v[i] ^ v[j]`
+  @pragma('dart2js:tryInline')
   static void _xor(List<int> v, int i, int j, int k) {
     v[k] = v[i] ^ v[j];
     v[k + 1] = v[i + 1] ^ v[j + 1];
   }
 
   /// `v[k] = v[i] + v[j]`
+  @pragma('dart2js:tryInline')
   static void _add2(List<int> v, int i, int j, int k) {
     var t = v[i] + v[j];
     v[k] = t;
@@ -219,6 +221,7 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
   }
 
   /// `v[k] = v[i] + v[j] + n[x]`
+  @pragma('dart2js:tryInline')
   static void _add3(List<int> v, int i, int j, List<int> n, int x, int k) {
     var t = v[i] + v[j];
     v[k] = t;

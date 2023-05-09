@@ -103,7 +103,7 @@ class MD5Hash extends BlockHashSink {
 
     for (int i = 16; i < 32; i++) {
       e = (d & b) | ((~d & _mask32) & c);
-      f = ((5 * i) + 1) & 15;
+      f = ((i << 2) + i + 1) & 15;
       t = d;
       d = c;
       c = b;
@@ -115,7 +115,7 @@ class MD5Hash extends BlockHashSink {
 
     for (int i = 32; i < 48; i++) {
       e = b ^ c ^ d;
-      f = ((3 * i) + 5) & 15;
+      f = ((i << 1) + i + 5) & 15;
       t = d;
       d = c;
       c = b;
@@ -127,7 +127,7 @@ class MD5Hash extends BlockHashSink {
 
     for (int i = 48; i < 64; i++) {
       e = c ^ (b | (~d & _mask32));
-      f = (7 * i) & 15;
+      f = ((i << 3) - i) & 15;
       t = d;
       d = c;
       c = b;

@@ -28,6 +28,7 @@ abstract class HashDigestSink implements Sink<List<int>> {
   /// Finalizes the message-digest. It calls [digest] method internally.
   @override
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   void close() => digest();
 
   /// Finalizes the message-digest and returns a [HashDigest]
@@ -48,6 +49,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
 
   /// Create a [HashDigestSink] for generating message-digests
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   HashDigestSink createSink();
 
   /// Transforms the byte array input stream to generate a new stream
@@ -130,6 +132,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
 
   /// Process the byte array [input] and returns a [HashDigest].
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   HashDigest convert(List<int> input) {
     var sink = createSink();
     sink.add(input);
@@ -152,6 +155,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
 
   /// Consumes the entire [stream] of byte array and generates a [HashDigest].
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   Future<HashDigest> consume(Stream<List<int>> stream) {
     return bind(stream).first;
   }
@@ -160,6 +164,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   ///
   /// Default [encoding] scheme to get the input bytes is [latin1].
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   Future<HashDigest> consumeAs(
     Stream<String> stream, [
     Encoding encoding = latin1,
@@ -175,6 +180,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   /// If [end] is present, only bytes up to byte-index [end] will be read.
   /// Otherwise, until end of file.
   @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline')
   Future<HashDigest> file(File input, [int start = 0, int? end]) {
     return bind(input.openRead(start, end)).first;
   }

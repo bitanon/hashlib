@@ -8,9 +8,6 @@ import 'blake2b.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
-const int _blockSize = 1024;
-const int _blockSize64 = 128;
-
 //     slice 0      slice 1      slice 2      slice 3
 //   ____/\____   ____/\____   ____/\____   ____/\____
 //  /          \ /          \ /          \ /          \
@@ -28,10 +25,10 @@ const int _blockSize64 = 128;
 
 class Argon2Internal extends Argon2 {
   final _hash0 = Uint8List(64 + 8);
-  final _blockR = Uint64List(_blockSize64);
-  final _blockT = Uint64List(_blockSize64);
-  final _input = Uint64List(_blockSize64);
-  final _address = Uint64List(_blockSize64);
+  final _blockR = Uint64List(128);
+  final _blockT = Uint64List(128);
+  final _input = Uint64List(128);
+  final _address = Uint64List(128);
 
   late final _digest = Uint8List(hashLength);
   late final _memory = Uint64List(blocks << 7);
@@ -83,16 +80,16 @@ class Argon2Internal extends Argon2 {
     for (i = 0; i < lanes; i++, k += cols) {
       // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
       hash0_32[17] = i;
-      _expandHash(_blockSize, _hash0, memoryBytes, k);
+      _expandHash(1024, _hash0, memoryBytes, k);
     }
 
     // Initial block generation: Second Lane Blocks
-    k = _blockSize;
+    k = 1024;
     hash0_32[16] = 1;
     for (i = 0; i < lanes; i++, k += cols) {
       // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
       hash0_32[17] = i;
-      _expandHash(_blockSize, _hash0, memoryBytes, k);
+      _expandHash(1024, _hash0, memoryBytes, k);
     }
 
     // Further block generation
@@ -105,11 +102,11 @@ class Argon2Internal extends Argon2 {
     }
 
     // Finalization : XOR the last column blocks
-    j = cols - _blockSize;
-    var block = memoryBytes.buffer.asUint8List(j, _blockSize);
+    j = cols - 1024;
+    var block = memoryBytes.buffer.asUint8List(j, 1024);
     for (k = 1; k < lanes; ++k) {
       j += cols;
-      for (i = 0; i < _blockSize; ++i) {
+      for (i = 0; i < 1024; ++i) {
         block[i] ^= memoryBytes[j + i];
       }
     }
@@ -336,7 +333,7 @@ class Argon2Internal extends Argon2 {
 
   /// Fills a memory block and optionally XORs the old block over it.
   void _nextAddress(Uint64List input, Uint64List address) {
-    for (int i = 0; i < _blockSize64; ++i) {
+    for (int i = 0; i < 128; ++i) {
       _blockR[i] = address[i] = input[i];
     }
 
@@ -389,7 +386,7 @@ class Argon2Internal extends Argon2 {
         );
       }
 
-      for (int i = 0; i < _blockSize64; ++i) {
+      for (int i = 0; i < 128; ++i) {
         address[i] = _blockR[i] ^= address[i];
       }
     }
@@ -404,13 +401,13 @@ class Argon2Internal extends Argon2 {
     bool xor = false,
   }) {
     // R = ref ^ prev
-    for (int i = 0; i < _blockSize64; ++i) {
+    for (int i = 0; i < 128; ++i) {
       _blockT[i] = _blockR[i] = memory[ref + i] ^ memory[prev + i];
     }
 
     if (xor) {
       // T ^= next
-      for (int i = 0; i < _blockSize64; ++i) {
+      for (int i = 0; i < 128; ++i) {
         _blockT[i] ^= memory[next + i];
       }
     }
@@ -464,7 +461,7 @@ class Argon2Internal extends Argon2 {
     }
 
     // next = T ^ R
-    for (int i = 0; i < _blockSize64; ++i) {
+    for (int i = 0; i < 128; ++i) {
       memory[next + i] = _blockR[i] ^ _blockT[i];
     }
   }

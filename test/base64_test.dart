@@ -12,15 +12,29 @@ void main() {
     test('encoding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var base64 = base64Encode(b).replaceAll('=', '');
-        expect(toBase64(b), base64);
+        var r = base64Encode(b).replaceAll('=', '');
+        expect(toBase64(b), r);
       }
     });
     test('decoding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var base64 = base64Encode(b).replaceAll('=', '');
-        expect(fromBase64(base64), equals(b));
+        var r = base64Encode(b).replaceAll('=', '');
+        expect(fromBase64(r), equals(b));
+      }
+    });
+    test('encoding with padding', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = base64Encode(b);
+        expect(toBase64(b, padding: true), r);
+      }
+    });
+    test('decoding with padding', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = base64Encode(b);
+        expect(fromBase64(r), equals(b));
       }
     });
   });
