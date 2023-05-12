@@ -195,14 +195,12 @@ class KeccakHash extends BlockHashSink {
   }
 
   // z = x ^ y
-  @pragma('dart2js:tryInline')
   static void _xor(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
     z[k] = x[i] ^ y[j];
     z[k + 1] = x[i + 1] ^ y[j + 1];
   }
 
   // z = x[i1] ^ x[i2] ^ x[i3] ^ x[i4] ^ x[i5]
-  @pragma('dart2js:tryInline')
   static void _xor5(
       List<int> x, int i1, int i2, int i3, int i4, int i5, List<int> z, int k) {
     z[k] = x[i1] ^ x[i2] ^ x[i3] ^ x[i4] ^ x[i5];
@@ -210,7 +208,6 @@ class KeccakHash extends BlockHashSink {
   }
 
   // z = x[i1] ^ (~x[i2] & x[i3]);
-  @pragma('dart2js:tryInline')
   static void _chi(List<int> x, int i1, int i2, int i3, List<int> z, int k) {
     z[k] = x[i1] ^ (~x[i2] & x[i3]);
     z[k + 1] = x[i1 + 1] ^ (~x[i2 + 1] & x[i3 + 1]);

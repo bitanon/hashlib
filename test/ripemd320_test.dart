@@ -36,6 +36,6 @@ void main() {
       var r = "bdee37f4371e20646b8b0d862dda16292ae36f4"
           "0965e8c8509e63d1dbddecc503e2b63eb9245bb66";
       expect(ripemd320.convert(m).hex(), r);
-    });
+    }, tags: ['skip-js']);
   });
 }

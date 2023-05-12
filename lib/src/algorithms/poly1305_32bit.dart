@@ -91,7 +91,6 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   }
 
   @override
-  @pragma('dart2js:tryInline')
   void $update([List<int>? block, int offset = 0, bool last = false]) {
     _h = ((_h + _n) * _r) % _p;
   }

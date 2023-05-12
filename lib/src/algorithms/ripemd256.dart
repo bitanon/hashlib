@@ -56,63 +56,50 @@ class RIPEMD256Hash extends BlockHashSink {
   }
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _rotl32(int x, int n) =>
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _f1(int x, int y, int z) => x ^ y ^ z;
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _f2(int x, int y, int z) => (x & y) | (((~x) & _mask32) & z);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _f3(int x, int y, int z) => (x | ((~y) & _mask32)) ^ z;
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _f4(int x, int y, int z) => (x & z) | (y & ((~z) & _mask32));
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _lr1(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f1(b, c, d) + x, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _lr2(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f2(b, c, d) + x + 0x5a827999, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _lr3(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f3(b, c, d) + x + 0x6ed9eba1, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _lr4(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f4(b, c, d) + x + 0x8f1bbcdc, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _rr1(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f1(b, c, d) + x, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _rr2(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f2(b, c, d) + x + 0x6d703ef3, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _rr3(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f3(b, c, d) + x + 0x5c4dd124, s);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _rr4(int a, int b, int c, int d, int x, int s) =>
       _rotl32(a + _f4(b, c, d) + x + 0x50a28be6, s);
 

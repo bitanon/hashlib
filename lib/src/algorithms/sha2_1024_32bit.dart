@@ -87,21 +87,18 @@ class SHA2of1024 extends BlockHashSink {
   }
 
   /// z = x ^ y
-  @pragma('dart2js:tryInline')
   static void _xor(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
     z[k] = x[i] ^ y[j];
     z[k + 1] = x[i + 1] ^ y[j + 1];
   }
 
   /// z = x + y
-  @pragma('dart2js:tryInline')
   static void _add(List<int> x, int i, List<int> y, int j, List<int> z, int k) {
     z[k + 1] = x[i + 1] + y[j + 1];
     z[k] = x[i] + y[j] + (z[k + 1] < x[i + 1] ? 1 : 0);
   }
 
   /// x += z
-  @pragma('dart2js:tryInline')
   static void _addAndSet(List<int> x, int i, List<int> z, int j) {
     var t = x[i + 1];
     x[i + 1] += z[j + 1];
@@ -177,7 +174,6 @@ class SHA2of1024 extends BlockHashSink {
   }
 
   // z = (e & f) ^ ((~e) & g)
-  @pragma('dart2js:tryInline')
   static void _ch(List<int> e, int i, List<int> f, int j, List<int> g, int k,
       List<int> z, int l) {
     z[l] = (e[i] & (f[j] ^ g[k])) ^ g[k];
@@ -185,7 +181,6 @@ class SHA2of1024 extends BlockHashSink {
   }
 
   // z = (a & b) ^ (a & c) ^ (b & c)
-  @pragma('dart2js:tryInline')
   static void _maj(List<int> a, int i, List<int> b, int j, List<int> c, int k,
       List<int> z, int l) {
     z[l] = (a[i] & (b[j] | c[k])) | (b[j] & c[k]);

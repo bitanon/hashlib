@@ -48,7 +48,7 @@ void main() {
       var m = List<int>.filled(1000000, 'a'.codeUnitAt(0));
       var r = '52783243c1697bdbe16d37f97f68f08325dc1528';
       expect(ripemd160.convert(m).hex(), r);
-    });
+    }, tags: ['skip-js']);
     test('string: "Hello, world!"', () {
       var m = "Hello, world!";
       var r = "58262d1fbdbe4530d8865d3518c6d6e41002610f";

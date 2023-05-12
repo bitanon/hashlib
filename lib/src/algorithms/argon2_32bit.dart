@@ -475,7 +475,6 @@ class Argon2Internal extends Argon2 {
   }
 
   /// `v[k] = v[i] ^ v[j]`
-  @pragma('dart2js:tryInline')
   static void _xor(List<int> v, int i, int j, int k) {
     v[k] = v[i] ^ v[j];
     v[k + 1] = v[i + 1] ^ v[j + 1];

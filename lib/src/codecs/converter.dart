@@ -18,21 +18,18 @@ abstract class Uint8Converter extends Converter<Iterable<int>, Iterable<int>> {
 
   /// Converts an input string using this converter and returns a string
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   String string(String input) {
     return String.fromCharCodes(convert(input.codeUnits));
   }
 
   /// Converts an array of bytes using this converter and returns a string
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   String asString(Iterable<int> input) {
     return String.fromCharCodes(convert(input));
   }
 
   /// Converts a string using this converter and returns an array of bytes
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   Iterable<int> fromString(String input) {
     return convert(input.codeUnits);
   }

@@ -56,28 +56,24 @@ class SHA2of512 extends BlockHashSink {
 
   /// Rotates x right by n bits.
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _bsig0(int x) =>
       (((x & _mask32) >>> 2) | ((x << 30) & _mask32)) ^
       (((x & _mask32) >>> 13) | ((x << 19) & _mask32)) ^
       (((x & _mask32) >>> 22) | ((x << 10) & _mask32));
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _bsig1(int x) =>
       (((x & _mask32) >>> 6) | ((x << 26) & _mask32)) ^
       (((x & _mask32) >>> 11) | ((x << 21) & _mask32)) ^
       (((x & _mask32) >>> 25) | ((x << 7) & _mask32));
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _ssig0(int x) =>
       (((x & _mask32) >>> 7) | ((x << 25) & _mask32)) ^
       (((x & _mask32) >>> 18) | ((x << 14) & _mask32)) ^
       (x >>> 3);
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _ssig1(int x) =>
       (((x & _mask32) >>> 17) | ((x << 15) & _mask32)) ^
       (((x & _mask32) >>> 19) | ((x << 13) & _mask32)) ^

@@ -112,7 +112,6 @@ class Scrypt extends KeyDerivatorBase {
 
     /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
     @pragma('vm:prefer-inline')
-    @pragma('dart2js:tryInline')
     void _blockMix() {
       int i, j, p, q;
       p = 0;
@@ -180,7 +179,6 @@ class Scrypt extends KeyDerivatorBase {
   }
 
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   static int _rotl32(int x, int n) =>
       ((x << n) & _mask32) | ((x & _mask32) >>> (32 - n));
 

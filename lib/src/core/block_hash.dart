@@ -117,7 +117,6 @@ abstract class BlockHashSink implements HashDigestSink {
 
   @override
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   void close() => digest();
 
   @override

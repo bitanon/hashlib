@@ -22,12 +22,10 @@ abstract class MACHashBase extends HashBase {
 
   /// Signing the [message] using this MAC to generate a tag.
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   HashDigest sign(List<int> message) => convert(message);
 
   /// Verify if the [tag] is derived from the [message] using this MAC.
   @pragma('vm:prefer-inline')
-  @pragma('dart2js:tryInline')
   bool verify(List<int> tag, List<int> message) =>
       convert(message).isEqual(message);
 }
