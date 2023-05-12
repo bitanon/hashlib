@@ -1,4 +1,4 @@
-# next
+# 1.11.0
 
 - Optimize Poly1305 implementation (30x improvement in hashrate)
 - Optimize scrypt implementation (10x improvement in runtime)

@@ -23,29 +23,6 @@ abstract class Benchmark extends BenchmarkBase {
     }
   }
 
-  void showDiff([List<BenchmarkBase> others = const []]) {
-    var data = <String, int>{};
-    var rate = <String, String>{};
-    for (var benchmark in {this, ...others}) {
-      var runtime = benchmark.measure();
-      var hashRate = 1e6 * iter * size / runtime;
-      data[benchmark.name] = runtime.round();
-      rate[benchmark.name] = formatSize(hashRate) + '/s';
-    }
-    var mine = data[name]!;
-    var best = data.values.fold(mine, min);
-    for (var entry in data.entries) {
-      var message = "${entry.key} : ${rate[entry.key]}";
-      if (entry.value == best) {
-        message += " [best]";
-      }
-      if (entry.key != name) {
-        message += " ~ ${rate[entry.key]}";
-      }
-      print(message);
-    }
-  }
-
   void measureRate() {
     var runtime = measure();
     var nbhps = 1e6 * iter / runtime;
@@ -53,6 +30,34 @@ abstract class Benchmark extends BenchmarkBase {
     var rtms = runtime.round() / 1000;
     var speed = formatSize(rate) + '/s';
     print('$name ($size x $iter): $rtms ms => nb# ${nbhps.round()} @ $speed');
+  }
+
+  void showDiff([List<BenchmarkBase> others = const []]) {
+    var diff = <String, double>{};
+    var rate = <String, String>{};
+    for (var benchmark in {this, ...others}) {
+      var runtime = benchmark.measure();
+      var hashRate = 1e6 * iter * size / runtime;
+      diff[benchmark.name] = runtime;
+      rate[benchmark.name] = formatSize(hashRate) + '/s';
+    }
+    var mine = diff[name]!;
+    var best = diff.values.fold(mine, min);
+    for (var entry in diff.entries) {
+      var message = "${entry.key} : ${rate[entry.key]}";
+      var value = diff[entry.key]!;
+      if (value == best) {
+        message += ' [best]';
+      }
+      if (value > mine) {
+        var p = (100 * (value - mine) / mine).round();
+        message += ' ~ $p% slower';
+      } else if (value < mine) {
+        var p = (100 * (mine - value) / mine).round();
+        message += ' ~ $p% faster';
+      }
+      print(message);
+    }
   }
 }
 

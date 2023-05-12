@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    paths: ['**.dart','**.yaml']
+    paths: ["**.dart", "**.yaml"]
   pull_request:
     branches: [master]
-    paths: ['**.dart','**.yaml']
+    paths: ["**.dart", "**.yaml"]
   schedule:
-     - cron: "0 0 * * 5" # m h d M w
+    - cron: "0 0 * * 5" # m h d M w
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest] # macos-latest, windows-latest
-        sdk: ["2.14.0", "stable", "dev" ]
+        sdk: ["2.14.0", "2.19.6", "stable", "dev"]
 
     steps:
       - uses: actions/checkout@v3
@@ -34,7 +34,7 @@ jobs:
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
- 
+
       - name: Analyze project source
         run: dart analyze --fatal-infos
 
