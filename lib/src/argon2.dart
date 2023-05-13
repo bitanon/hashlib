@@ -7,7 +7,7 @@ import 'package:hashlib/src/algorithms/argon2.dart';
 import 'package:hashlib/src/codecs/base64.dart';
 
 export 'package:hashlib/src/algorithms/argon2.dart'
-    show Argon2, Argon2Type, Argon2Version;
+    show Argon2, Argon2Type, Argon2Version, Argon2HashDigest;
 
 const _defaultHashLength = 24;
 const _defaultSecurity = Argon2Security.moderate;

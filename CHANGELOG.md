@@ -1,3 +1,16 @@
+# 1.11.1
+
+- Export a few additional clases
+  - `BlockHashBase`
+  - `BlockHashSink`
+  - `HashBase`
+  - `HashDigestSink`
+  - `HashDigest`
+  - `Argon2HashDigest`
+  - `BlockHashRegistry`
+  - `HashRegistry`
+  - `Uint8Codec`
+
 # 1.11.0
 
 - Optimize Poly1305 implementation (30x improvement in hashrate)
