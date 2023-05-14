@@ -77,7 +77,6 @@ Examples can be found inside the `example` folder.
 
 ```dart
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/codecs_base.dart';
 
 void main() {
   var text = "Happy Hashing!";

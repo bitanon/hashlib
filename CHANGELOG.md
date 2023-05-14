@@ -1,3 +1,9 @@
+# 1.11.2
+
+- Export codecs
+- Update documentation
+- Truncate seed to 32-bit integer for xxh32
+
 # 1.11.1
 
 - Export a few additional clases

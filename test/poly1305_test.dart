@@ -3,7 +3,6 @@
 
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/algorithms/poly1305.dart';
-import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
 const cases = [

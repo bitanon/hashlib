@@ -32,10 +32,10 @@ class XXHash32Sink extends BlockHashSink {
   @override
   void reset() {
     super.reset();
-    _acc1 = seed + prime32_1 + prime32_2;
-    _acc2 = seed + prime32_2;
-    _acc3 = seed + 0;
-    _acc4 = seed - prime32_1;
+    _acc1 = (seed & _mask32) + prime32_1 + prime32_2;
+    _acc2 = (seed & _mask32) + prime32_2;
+    _acc3 = (seed & _mask32) + 0;
+    _acc4 = (seed & _mask32) - prime32_1;
   }
 
   @override
@@ -94,7 +94,7 @@ class XXHash32Sink extends BlockHashSink {
     int _hash;
 
     if (messageLength < 16) {
-      _hash = seed + prime32_5;
+      _hash = (seed & _mask32) + prime32_5;
     } else {
       _hash = rotl32(_acc1, 1);
       _hash += rotl32(_acc2, 7);

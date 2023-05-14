@@ -8,7 +8,7 @@ import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 /// MD5 can be used as a checksum to verify data integrity against unintentional
-/// corruption. Although it was widely used as a cryptographic has function
+/// corruption. Although it was widely used as a cryptographic hash function
 /// once, it has been found to suffer from extensive vulnerabilities.
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**

@@ -4,7 +4,6 @@
 import 'dart:convert';
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
 void main() {

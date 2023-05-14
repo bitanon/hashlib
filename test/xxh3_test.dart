@@ -6,7 +6,6 @@
 })
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
 const seed = 0x9e3779b185ebca8d;

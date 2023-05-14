@@ -1,8 +1,10 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-export 'codecs/ascii.dart';
-export 'codecs/base16.dart';
-export 'codecs/base32.dart';
-export 'codecs/base64.dart';
-export 'codecs/base64url.dart';
+export 'codecs/ascii.dart' hide ASCIICodec;
+export 'codecs/base16.dart' hide B16Codec;
+export 'codecs/base32.dart' hide B32Codec;
+export 'codecs/base64.dart' hide B64Codec;
+export 'codecs/base64url.dart' hide B64URLCodec;
+export 'codecs/codec.dart';
+export 'codecs/converter.dart';

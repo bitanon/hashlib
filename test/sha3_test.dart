@@ -2,7 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/codecs_base.dart';
 import 'package:test/test.dart';
 
 void main() {

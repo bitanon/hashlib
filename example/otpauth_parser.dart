@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/codecs_base.dart';
 
 /// Parse any otpauth URI
 OTPAuth parse(String keyUri) {
