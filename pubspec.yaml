@@ -1,7 +1,7 @@
 name: hashlib
 description: Secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 homepage: https://github.com/dipu-bd/hashlib
-version: 1.11.2
+version: 1.11.3
 
 environment:
   sdk: ">=2.14.0 <4.0.0"

@@ -15,11 +15,11 @@ const _base32lowerEncoding = [
 ];
 
 const _base32Decoding = [
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, //
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, -1,
-  -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-  14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 0, 1,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, //
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 26, 27, 28, 29, 30, 31, -2,
+  -2, -2, -2, -2, -1, -2, -2, -2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+  14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -2, -2, -2, -2, -2, -2, 0, 1,
   2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
   23, 24, 25
 ];
@@ -27,6 +27,12 @@ const _base32Decoding = [
 class B32Codec extends Uint8Codec {
   @override
   final Uint8Encoder encoder;
+
+  @override
+  final decoder = const Uint8Decoder(
+    bits: 5,
+    alphabet: _base32Decoding,
+  );
 
   const B32Codec()
       : encoder = const Uint8Encoder(
@@ -53,12 +59,6 @@ class B32Codec extends Uint8Codec {
           padding: 61,
           alphabet: _base32lowerEncoding,
         );
-
-  @override
-  final decoder = const Uint8Decoder(
-    bits: 5,
-    alphabet: _base32Decoding,
-  );
 }
 
 /// Codec to encode and decode an iterable of 8-bit integers to 5-bit Base32

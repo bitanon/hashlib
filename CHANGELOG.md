@@ -1,3 +1,10 @@
+# 1.11.3
+
+- Throws `FormatException` for invalid characters in codecs
+- Adds `base2` codes. New methods:
+  - `fromBinary`
+  - `toBinary`
+
 # 1.11.2
 
 - Export codecs

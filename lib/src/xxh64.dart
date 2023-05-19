@@ -25,7 +25,7 @@ class XXHash64 extends BlockHashBase {
 
   /// Creates a new instance of [XXHash64].
   ///
-  /// Paramters:
+  /// Parameters:
   /// - [seed] is an optional 64-bit integer. Default: 0
   const XXHash64([this.seed = 0]);
 

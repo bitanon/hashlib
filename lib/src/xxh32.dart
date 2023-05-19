@@ -25,7 +25,7 @@ class XXHash32 extends BlockHashBase {
 
   /// Creates a new instance of [XXHash32].
   ///
-  /// Paramters:
+  /// Parameters:
   /// - [seed] is an optional 32-bit integer. Default: 0
   const XXHash32([this.seed = 0]);
 

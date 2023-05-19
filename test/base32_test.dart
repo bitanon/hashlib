@@ -1,7 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/hashlib.dart'
+    show fromHex, toHex, fromBase32, toBase32, randomBytes;
 import 'package:test/test.dart';
 
 void main() {
@@ -53,7 +54,6 @@ void main() {
         expect(toBase32(encoded, upper: false), equals('jbswy3dpehpk3pxp'));
       });
     });
-
     group('decoding', () {
       test('"" -> ""', () {
         var s = '';
@@ -104,7 +104,6 @@ void main() {
         expect(toHex(decoded), equals('48656c6c6f21deadbe'));
       });
     });
-
     group('encoding with padding', () {
       test('f -> MY======', () {
         var s = 'f';
@@ -137,7 +136,6 @@ void main() {
         expect(toBase32(s.codeUnits, padding: true), equals(r));
       });
     });
-
     group('decoding with padding', () {
       test('MY====== -> f', () {
         var s = 'MY======';
@@ -170,5 +168,83 @@ void main() {
         expect(fromBase32(s), equals(r.codeUnits));
       });
     });
+
+    test('encoding <-> decoding', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = toBase32(b);
+        expect(fromBase32(r), equals(b), reason: 'length $i');
+      }
+    });
+    test('encoding <-> decoding uppercase', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = toBase32(b, upper: true);
+        expect(fromBase32(r), equals(b), reason: 'length $i');
+      }
+    });
+    test('encoding <-> decoding with padding', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = toBase32(b, padding: true);
+        expect(fromBase32(r), equals(b), reason: 'length $i');
+      }
+    });
+
+    group('decoding with invalid chars', () {
+      test('"Error!"', () {
+        expect(() => fromBase32("Error!"), throwsFormatException);
+      });
+      test('"-10"', () {
+        expect(() => fromBase32("-10"), throwsFormatException);
+      });
+      test('"s*mething"', () {
+        expect(() => fromBase32("s*mething"), throwsFormatException);
+      });
+    });
+    // group('decoding with invalid length', () {
+    //   test('"1"', () {
+    //     expect(() => fromBase32("1"), throwsFormatException);
+    //   });
+    //   test('"12"', () {
+    //     expect(() => fromBase32("12"), throwsFormatException);
+    //   });
+    //   test('"123"', () {
+    //     expect(() => fromBase32("123"), throwsFormatException);
+    //   });
+    //   test('"1234"', () {
+    //     expect(() => fromBase32("1234"), throwsFormatException);
+    //   });
+    //   test('"12345"', () {
+    //     expect(() => fromBase32("12345"), throwsFormatException);
+    //   });
+    //   test('"123456"', () {
+    //     expect(() => fromBase32("123456"), throwsFormatException);
+    //   });
+    //   test('"1234567"', () {
+    //     expect(() => fromBase32("1234567"), throwsFormatException);
+    //   });
+    //   test('"123456789"', () {
+    //     expect(() => fromBase32("123456789"), throwsFormatException);
+    //   });
+    //   test('"1234567890"', () {
+    //     expect(() => fromBase32("1234567890"), throwsFormatException);
+    //   });
+    //   test('"12345678901"', () {
+    //     expect(() => fromBase32("12345678901"), throwsFormatException);
+    //   });
+    //   test('"123456789012"', () {
+    //     expect(() => fromBase32("123456789012"), throwsFormatException);
+    //   });
+    //   test('"1234567890123"', () {
+    //     expect(() => fromBase32("1234567890123"), throwsFormatException);
+    //   });
+    //   test('"12345678901234"', () {
+    //     expect(() => fromBase32("12345678901234"), throwsFormatException);
+    //   });
+    //   test('"123456789012345"', () {
+    //     expect(() => fromBase32("123456789012345"), throwsFormatException);
+    //   });
+    // });
   });
 }

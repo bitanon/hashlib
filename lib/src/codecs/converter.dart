@@ -53,17 +53,17 @@ class Uint8Encoder extends Uint8Converter {
     for (x in input) {
       p = (p << 8) | x;
       for (n += 8; n >= bits; n -= bits, p &= (1 << n) - 1) {
-        l++;
+        l += bits;
         yield alphabet[p >>> (n - bits)];
       }
     }
     if (n > 0) {
-      l++;
+      l += bits;
       yield alphabet[p << (bits - n)];
     }
     if (padding != null) {
       p = padding!;
-      for (; ((l & 7) * (bits & 7)) & 7 != 0; l++) {
+      for (; (l & 7) != 0; l += bits) {
         yield p;
       }
     }
@@ -81,12 +81,13 @@ class Uint8Decoder extends Uint8Converter {
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
-    int p, n, x;
+    int p, n, x, y;
     p = n = 0;
-    for (x in input) {
-      if (x >= alphabet.length) break;
-      x = alphabet[x];
-      if (x == -1) break;
+    for (y in input) {
+      if (y >= alphabet.length || (x = alphabet[y]) == -2) {
+        throw FormatException('Invalid character $y');
+      }
+      if (x < 0) return;
       p = (p << bits) | x;
       for (n += bits; n >= 8; n -= 8, p &= (1 << n) - 1) {
         yield (p >>> (n - 8));

@@ -32,7 +32,7 @@ class XXH128 extends BlockHashBase {
 
   /// Creates a new instance of [XXH128].
   ///
-  /// Paramters:
+  /// Parameters:
   /// - [seed] is an optional 64-bit integer. Default: 0
   /// - [secret] is an array of bytes. The length should be at least 136.
   /// - If the [secret] is present, the [seed] is ignored.
