@@ -20,8 +20,13 @@ class HashDigest extends Object {
 
   /// The message digest as a hexadecimal string with zero padding.
   ///
-  /// If [upper] is true, the output will have uppercase alphabets.
-  String hex([bool upper = false]) => codec.toHex(bytes, upper: upper);
+  /// Parameters:
+  /// - If [upper] is true, the string will be in uppercase alphabets.
+  String hex([bool upper = false]) => codec.toHex(
+        bytes,
+        upper: upper,
+        padding: true,
+      );
 
   /// The message digest as a Base-32 string with no padding.
   ///

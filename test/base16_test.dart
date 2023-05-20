@@ -26,6 +26,28 @@ void main() {
           expect(toHex(b), hex, reason: 'length $i');
         }
       });
+      group('no padding', () {
+        test('[5] => "5"', () {
+          expect(toHex([5], padding: false), "5");
+        });
+        test('[12] => "c"', () {
+          expect(toHex([12], padding: false), "c");
+        });
+        test('[0,0,0,12] => "c"', () {
+          expect(toHex([0, 0, 0, 12], padding: false), "c");
+        });
+        test('random', () {
+          for (int i = 0; i < 100; ++i) {
+            var b = randomBytes(i);
+            var hex = b
+                .expand((x) => x.toRadixString(16).padLeft(2, '0').codeUnits)
+                .skipWhile((value) => value == 48)
+                .map((e) => String.fromCharCode(e))
+                .join();
+            expect(toHex(b, padding: false), hex, reason: 'length $i');
+          }
+        });
+      });
     });
     group('encoding buffer', () {
       var buf = [

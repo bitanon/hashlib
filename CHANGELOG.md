@@ -1,3 +1,7 @@
+# next
+
+- Allow no padding output in `toHex` and `toBinary`
+
 # 1.11.3
 
 - Throws `FormatException` for invalid characters in codecs

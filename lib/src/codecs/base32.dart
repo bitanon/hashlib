@@ -86,6 +86,10 @@ const base32WithPadding = B32Codec.padded();
 const base32lowerWithPadding = B32Codec.paddedLower();
 
 /// Encode an array of 8-bit integers to Base32 string
+///
+/// Parameters:
+/// - If [upper] is true, the string will be in uppercase alphabets.
+/// - If [padding] is true, the string will be padded with = at the end.
 String toBase32(
   Iterable<int> input, {
   bool upper = true,

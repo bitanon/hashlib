@@ -75,8 +75,18 @@ class BinaryCodec extends Uint8Codec {
 const base2 = BinaryCodec();
 
 /// Encode an array of 8-bit integers to Base2 (binary) string
-String toBinary(Iterable<int> input) {
-  return String.fromCharCodes(base2.encoder.convert(input));
+///
+/// Parameters:
+/// - If [padding] is true, the string will be padded with 0 at the start.
+String toBinary(
+  Iterable<int> input, {
+  bool padding = true,
+}) {
+  var out = base2.encoder.convert(input);
+  if (!padding) {
+    out = out.skipWhile((value) => value == _zero);
+  }
+  return String.fromCharCodes(out);
 }
 
 /// Decode an array of 8-bit integers from Base2 (binary) string

@@ -58,6 +58,9 @@ const base64 = B64Codec();
 const base64WithPadding = B64Codec.padded();
 
 /// Encode an array of 8-bit integers to Base64 string (no padding)
+///
+/// Parameters:
+/// - If [padding] is true, the string will be padded with = at the end.
 String toBase64(Iterable<int> input, {bool padding = false}) {
   var codec = padding ? base64WithPadding : base64;
   return String.fromCharCodes(codec.encoder.convert(input));

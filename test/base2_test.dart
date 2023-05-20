@@ -29,6 +29,28 @@ void main() {
           expect(toBinary(b), equals(r), reason: 'length $i');
         }
       });
+      group('no padding', () {
+        test('[1] => "1"', () {
+          expect(toBinary([1], padding: false), "1");
+        });
+        test('[10] => "1010"', () {
+          expect(toBinary([10], padding: false), "1010");
+        });
+        test('[0,0,0,10] => "1010"', () {
+          expect(toBinary([0, 0, 0, 10], padding: false), "1010");
+        });
+        test('random', () {
+          for (int i = 0; i < 100; ++i) {
+            var b = randomBytes(i);
+            var hex = b
+                .expand((x) => x.toRadixString(2).padLeft(8, '0').codeUnits)
+                .skipWhile((value) => value == 48)
+                .map((e) => String.fromCharCode(e))
+                .join();
+            expect(toBinary(b, padding: false), hex, reason: 'length $i');
+          }
+        });
+      });
     });
     group("decoding", () {
       test('"" => []', () {

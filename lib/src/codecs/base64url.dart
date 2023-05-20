@@ -58,6 +58,9 @@ const base64url = B64URLCodec();
 const base64urlWithPadding = B64URLCodec.padded();
 
 /// Encode an array of 8-bit integers to URL-safe Base64 string (no padding)
+///
+/// Parameters:
+/// - If [padding] is true, the string will be padded with = at the end.
 String toBase64Url(Iterable<int> input, {bool padding = false}) {
   var codec = padding ? base64urlWithPadding : base64url;
   return String.fromCharCodes(codec.encoder.convert(input));
