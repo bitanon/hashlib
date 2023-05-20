@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    if: github.repository == 'dipu-bd/hashlib'
+    if: github.repository == 'bitanon/hashlib'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

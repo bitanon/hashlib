@@ -1,10 +1,10 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:convert' show Encoding;
+import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib/src/codecs_base.dart' as codec;
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 class HashDigest extends Object {
   final Uint8List bytes;
@@ -16,13 +16,13 @@ class HashDigest extends Object {
 
   /// The message digest as a string of hexadecimal digits.
   @override
-  String toString() => codec.toHex(bytes);
+  String toString() => hex();
 
   /// The message digest as a hexadecimal string with zero padding.
   ///
   /// Parameters:
   /// - If [upper] is true, the string will be in uppercase alphabets.
-  String hex([bool upper = false]) => codec.toHex(
+  String hex([bool upper = false]) => toHex(
         bytes,
         upper: upper,
         padding: true,
@@ -36,7 +36,7 @@ class HashDigest extends Object {
     bool upper = true,
     bool padding = false,
   }) =>
-      codec.toBase32(
+      toBase32(
         bytes,
         upper: upper,
         padding: padding,
@@ -51,21 +51,17 @@ class HashDigest extends Object {
     bool padding = false,
   }) =>
       urlSafe
-          ? codec.toBase64(bytes, padding: padding)
-          : codec.toBase64Url(bytes, padding: padding);
+          ? toBase64(bytes, padding: padding)
+          : toBase64Url(bytes, padding: padding);
 
   /// The message digest as a string of ASCII alphabets.
-  @Deprecated('Use the ascii() method')
-  String toAscii() => codec.toAscii(bytes);
-
-  /// The message digest as a string of ASCII alphabets.
-  String ascii() => codec.toAscii(bytes);
+  String ascii() => cvt.ascii.decode(bytes);
 
   /// The message digest as a string of UTF-8 alphabets.
   String utf8() => String.fromCharCodes(bytes);
 
   /// Returns the digest in the given [encoding]
-  String to(Encoding encoding) => encoding.decode(bytes);
+  String to(cvt.Encoding encoding) => encoding.decode(bytes);
 
   /// Returns the least significant bytes as a number.
   ///
@@ -111,7 +107,7 @@ class HashDigest extends Object {
     } else if (other is TypedData && other is! Uint8List) {
       return isEqual(other.buffer.asUint8List());
     } else if (other is String) {
-      return isEqual(codec.base16.decodeFromString(other));
+      return isEqual(base16.decodeFromString(other));
     } else if (other is Iterable<int>) {
       if (other is List<int>) {
         if (other.length != bytes.length) {

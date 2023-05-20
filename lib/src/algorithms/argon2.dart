@@ -4,9 +4,9 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/argon2.dart';
-import 'package:hashlib/src/codecs/base64.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 import 'argon2_64bit.dart' if (dart.library.js) 'argon2_32bit.dart';
 
@@ -319,7 +319,7 @@ class Argon2HashDigest extends HashDigest {
         "\$m=${ctx.memorySizeKB}"
         ",t=${ctx.passes}"
         ",p=${ctx.lanes}"
-        "\$${toBase64(ctx.salt)}"
-        "\$${toBase64(bytes)}";
+        "\$${toBase64(ctx.salt, padding: false)}"
+        "\$${toBase64(bytes, padding: false)}";
   }
 }

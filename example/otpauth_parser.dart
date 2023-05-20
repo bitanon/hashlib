@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 /// Parse any otpauth URI
 OTPAuth parse(String keyUri) {
@@ -99,7 +100,7 @@ List<String> deocdeMigations(String migrationUri) {
     i++;
     len = data[i];
     i++;
-    secret = toBase32(data.skip(i).take(len));
+    secret = toBase32(data.skip(i).take(len), padding: false);
     i += len;
 
     bool release = false;

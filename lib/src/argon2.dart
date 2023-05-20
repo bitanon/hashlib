@@ -4,7 +4,7 @@
 import 'dart:math';
 
 import 'package:hashlib/src/algorithms/argon2.dart';
-import 'package:hashlib/src/codecs/base64.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 export 'package:hashlib/src/algorithms/argon2.dart'
     show Argon2, Argon2Type, Argon2Version, Argon2HashDigest;

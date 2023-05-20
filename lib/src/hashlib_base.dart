@@ -5,7 +5,6 @@ export 'alder32.dart';
 export 'argon2.dart';
 export 'blake2b.dart';
 export 'blake2s.dart';
-export 'codecs_base.dart';
 export 'core/block_hash.dart';
 export 'core/hash_base.dart';
 export 'core/hash_digest.dart';

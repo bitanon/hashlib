@@ -1,6 +1,6 @@
 # next
 
-- Allow no padding output in `toHex` and `toBinary`
+- Move codecs to separate package: [hashlib_codecs](https://github.com/bitanon/hashlib_codecs)
 
 # 1.11.3
 
@@ -41,12 +41,12 @@
 
 ## 1.10.0
 
-- Adds support for `Poly1305` MAC generation: [#5](https://github.com/dipu-bd/hashlib/issues/5)
+- Adds support for `Poly1305` MAC generation: [#5](https://github.com/bitanon/hashlib/issues/5)
   - New class: `Poly1305`
   - New methods: `poly1305`, `poly1305auth`
 - Adds support for OTP generation:
-  - `HOTP` - Hash-based OTP generation [#8](https://github.com/dipu-bd/hashlib/issues/8)
-  - `TOTP` - Time-based OTP generation [#9](https://github.com/dipu-bd/hashlib/issues/9)
+  - `HOTP` - Hash-based OTP generation [#8](https://github.com/bitanon/hashlib/issues/8)
+  - `TOTP` - Time-based OTP generation [#9](https://github.com/bitanon/hashlib/issues/9)
 - Name all hash algorithms and a registry to loopup algorithms by name.
   - `BlockHashRegistry` - for block hash algorithms
   - `HashRegistry` - for all hash algorithms
