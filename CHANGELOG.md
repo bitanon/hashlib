@@ -1,4 +1,4 @@
-# next
+# 1.11.4
 
 - Move codecs to separate package: [hashlib_codecs](https://github.com/bitanon/hashlib_codecs)
 

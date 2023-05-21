@@ -18,47 +18,34 @@ class HashDigest extends Object {
   @override
   String toString() => hex();
 
+  /// The message digest as a binary string with zero padding.
+  String binary() => toBinary(bytes);
+
   /// The message digest as a hexadecimal string with zero padding.
   ///
   /// Parameters:
   /// - If [upper] is true, the string will be in uppercase alphabets.
-  String hex([bool upper = false]) => toHex(
-        bytes,
-        upper: upper,
-        padding: true,
-      );
+  String hex([bool upper = false]) => toHex(bytes, upper: upper);
 
   /// The message digest as a Base-32 string with no padding.
   ///
   /// If [upper] is true, the output will have uppercase alphabets.
   /// If [padding] is true, the output will have `=` padding at the end.
-  String base32({
-    bool upper = true,
-    bool padding = false,
-  }) =>
-      toBase32(
-        bytes,
-        upper: upper,
-        padding: padding,
-      );
+  String base32({bool upper = true, bool padding = false}) =>
+      toBase32(bytes, lower: !upper, padding: padding);
 
   /// The message digest as a Base-64 string with no padding.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
   /// If [padding] is true, the output will have `=` padding at the end.
-  String base64({
-    bool urlSafe = false,
-    bool padding = false,
-  }) =>
-      urlSafe
-          ? toBase64(bytes, padding: padding)
-          : toBase64Url(bytes, padding: padding);
+  String base64({bool urlSafe = false, bool padding = false}) =>
+      toBase64(bytes, padding: padding, url: urlSafe);
 
   /// The message digest as a string of ASCII alphabets.
   String ascii() => cvt.ascii.decode(bytes);
 
   /// The message digest as a string of UTF-8 alphabets.
-  String utf8() => String.fromCharCodes(bytes);
+  String utf8() => cvt.utf8.decode(bytes);
 
   /// Returns the digest in the given [encoding]
   String to(cvt.Encoding encoding) => encoding.decode(bytes);
