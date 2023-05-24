@@ -45,7 +45,7 @@ class XXHash32 extends BlockHashBase {
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int xxh32code(String input, [Encoding? encoding]) {
-  return xxh32.string(input, encoding).remainder();
+  return xxh32.string(input, encoding).number();
 }
 
 /// Extension to [String] to generate [xxh32] code
@@ -55,6 +55,6 @@ extension XXHash32StringExtension on String {
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int xxh32code([Encoding? encoding]) {
-    return xxh32.string(this, encoding).remainder();
+    return xxh32.string(this, encoding).number();
   }
 }

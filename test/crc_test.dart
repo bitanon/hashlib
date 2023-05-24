@@ -11,6 +11,7 @@ void main() {
     });
     test('CRC-16 with a string', () {
       expect(crc16.string("Wikipedia").hex(), "ee3e");
+      expect(crc16code("Wikipedia"), 0xee3e);
     });
 
     test('CRC-32 with empty string', () {
@@ -18,6 +19,7 @@ void main() {
     });
     test('CRC-32 with a string', () {
       expect(crc32.string("Wikipedia").hex(), "adaac02e");
+      expect(crc32code("Wikipedia"), 0xadaac02e);
     });
 
     test('CRC-64 with empty string', () {

@@ -37,5 +37,5 @@ class _Alder32 extends HashBase {
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int alder32code(String input, [Encoding? encoding]) {
-  return alder32.string(input, encoding).remainder();
+  return alder32.string(input, encoding).number();
 }

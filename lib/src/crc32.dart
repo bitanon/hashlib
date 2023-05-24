@@ -30,7 +30,7 @@ class _CRC32 extends HashBase {
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int crc32code(String input, [Encoding? encoding]) {
-  return crc32.string(input, encoding).remainder();
+  return crc32.string(input, encoding).number();
 }
 
 /// Extension to [String] to generate [crc32] code
@@ -40,6 +40,6 @@ extension CRC32StringExtension on String {
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int crc32code([Encoding? encoding]) {
-    return crc32.string(this, encoding).remainder();
+    return crc32.string(this, encoding).number();
   }
 }

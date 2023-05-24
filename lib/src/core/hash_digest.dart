@@ -41,6 +41,22 @@ class HashDigest extends Object {
   String base64({bool urlSafe = false, bool padding = false}) =>
       toBase64(bytes, padding: padding, url: urlSafe);
 
+  /// The message digest as a BigInt.
+  ///
+  /// If [endian] is [Endian.little], it will treat the digest bytes as a little
+  /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
+  /// digest bytes as a big endian number.
+  BigInt bigInt({Endian endian = Endian.little}) =>
+      toBigInt(bytes, endian: endian);
+
+  /// Gets 64-bit unsiged integer from the message digest.
+  ///
+  /// If [endian] is [Endian.little], it will treat the digest bytes as a little
+  /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
+  /// digest bytes as a big endian number.
+  int number([Endian endian = Endian.big]) =>
+      toBigInt(bytes, endian: endian).toUnsigned(64).toInt();
+
   /// The message digest as a string of ASCII alphabets.
   String ascii() => cvt.ascii.decode(bytes);
 
@@ -49,25 +65,6 @@ class HashDigest extends Object {
 
   /// Returns the digest in the given [encoding]
   String to(cvt.Encoding encoding) => encoding.decode(bytes);
-
-  /// Returns the least significant bytes as a number.
-  ///
-  /// If [endian] is big, it will return the last few bytes as a number;
-  /// Otherwise, if [endian] is little, it will return the first few bytes
-  /// as a number.
-  int remainder([Endian endian = Endian.big]) {
-    int result = 0;
-    if (endian == Endian.big) {
-      for (int i = bytes.length - 1, p = 0; i >= 0; --i, p += 8) {
-        result |= bytes[i] << p;
-      }
-    } else {
-      for (int i = 0, p = 0; i < 8 && i < bytes.length; ++i, p += 8) {
-        result |= bytes[i] << p;
-      }
-    }
-    return result;
-  }
 
   @override
   int get hashCode => bytes.hashCode;

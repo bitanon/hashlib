@@ -28,5 +28,5 @@ class _CRC16 extends HashBase {
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int crc16code(String input, [Encoding? encoding]) {
-  return crc16.string(input, encoding).remainder();
+  return crc16.string(input, encoding).number();
 }

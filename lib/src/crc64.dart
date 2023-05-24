@@ -30,7 +30,7 @@ class _CRC64 extends HashBase {
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int crc64code(String input, [Encoding? encoding]) {
-  return crc64.string(input, encoding).remainder();
+  return crc64.string(input, encoding).number();
 }
 
 /// Gets the CRC-64 hash of a String in hexadecimal.

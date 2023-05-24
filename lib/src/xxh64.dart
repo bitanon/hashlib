@@ -45,7 +45,7 @@ class XXHash64 extends BlockHashBase {
 /// - [input] is the string to hash.
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`.
 int xxh64code(String input, [Encoding? encoding]) {
-  return xxh64.string(input, encoding).remainder();
+  return xxh64.string(input, encoding).number();
 }
 
 /// Gets the 64-bit xxHash hash of a String in hexadecimal.
@@ -64,7 +64,7 @@ extension XXHash64StringExtension on String {
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int xxh64code([Encoding? encoding]) {
-    return xxh64.string(this, encoding).remainder();
+    return xxh64.string(this, encoding).number();
   }
 
   /// Gets the 64-bit xxHash hash of a String in hexadecimal.

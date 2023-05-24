@@ -1,6 +1,9 @@
 # 1.11.4
 
 - Move codecs to separate package: [hashlib_codecs](https://github.com/bitanon/hashlib_codecs)
+- Support BigInt conversion in `HashDigest`
+  - Renames `remainder` -> `number`
+  - Adds `bigInt` method to get `BigInt` from bytes
 
 # 1.11.3
 

@@ -59,7 +59,7 @@ class XXH3 extends BlockHashBase {
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
 int xxh3code(String input, [Encoding? encoding]) {
-  return xxh3.string(input, encoding).remainder();
+  return xxh3.string(input, encoding).number();
 }
 
 /// Gets the 64-bit XXH3 hash of a String in hexadecimal.
@@ -78,7 +78,7 @@ extension XXH3StringExtension on String {
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
   int xxh3code([Encoding? encoding]) {
-    return xxh3.string(this, encoding).remainder();
+    return xxh3.string(this, encoding).number();
   }
 
   /// Gets the 64-bit XXH3 hash of a String in hexadecimal.
