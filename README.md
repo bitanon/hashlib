@@ -60,6 +60,14 @@ This library contains implementations of secure hash functions, checksum generat
 | HOTP       | `HOTP`            | RFC-4226 |
 | TOTP       | `TOTP`            | RFC-6238 |
 
+## Demo
+
+A demo application is available in Google Play Store featuring the capabilities of this package.
+
+<a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="192px" /></a>
+
+<a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt="demo app preview" src="https://raw.githubusercontent.com/bitanon/hashlib_demo/master/images/demo.gif" height="640px"/></a>
+
 ## Getting Started
 
 The following import will give you access to all of the algorithms in this package.

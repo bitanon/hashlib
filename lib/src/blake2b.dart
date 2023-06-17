@@ -25,14 +25,11 @@ const Blake2b blake2b384 = Blake2b(384 >>> 3);
 /// Use [Blake2b] for keyed hash generation.
 const Blake2b blake2b512 = Blake2b(512 >>> 3);
 
-/// The BLAKE-2b is a member of BLAKE-2 family optimized for 64-bit platforms
-/// and can generate MACs efficiently.
-///
-/// The BLAKE2 hash function may be used by digital signature algorithms
-/// and message authentication and integrity protection mechanisms in
-/// applications such as Public Key Infrastructure (PKI), secure
-/// communication protocols, cloud storage, intrusion detection, forensic
-/// suites, and version control systems.
+/// Blake2b is a highly secure cryptographic hash function optimized for 64-bit
+/// platforms. It generates hash values of data ranging from 1 to 64 bytes in
+/// size. It doesn't require a separate keying mechanism and can be used in
+/// various applications, serving as a more efficient alternative to other hash
+/// algorithms like SHA and HMAC-SHA.
 ///
 /// This implementation is based on the [RFC-7693][rfc]
 ///
@@ -47,7 +44,7 @@ class Blake2b extends BlockHashBase {
   ///
   /// Parameters:
   /// - [digestSize] The number of bytes in the output.
-  /// - [key] An optional key for MAC generation. Must be less than 64 bytes.
+  /// - [key] An optional key for MAC generation. Should not exceed 64 bytes.
   /// - [salt] An optional nonce. Must be exactly 16 bytes long.
   /// - [personalization] Second optional nonce. Must be exactly 16 bytes long.
   const Blake2b(

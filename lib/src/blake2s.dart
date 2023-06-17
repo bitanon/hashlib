@@ -25,14 +25,10 @@ const Blake2s blake2s224 = Blake2s(224 >>> 3);
 /// Use [Blake2s] for keyed hash generation.
 const Blake2s blake2s256 = Blake2s(256 >>> 3);
 
-/// The BLAKE-2s is a member of BLAKE-2 family optimized for 32-bit platforms
-/// and can generate MACs efficiently.
-///
-/// The BLAKE2 hash function may be used by digital signature algorithms
-/// and message authentication and integrity protection mechanisms in
-/// applications such as Public Key Infrastructure (PKI), secure
-/// communication protocols, cloud storage, intrusion detection, forensic
-/// suites, and version control systems.
+/// Blake2s is a cryptographic hash function optimized for 8-bit to 32-bit
+/// platforms. It generates hash values of data ranging from 1 to 32 bytes in
+/// size. Blake2s is highly secure and can be used in various applications as a
+/// fast and secure replacement for legacy algorithms like MD5 and HMAC-MD5.
 ///
 /// This implementation is based on the [RFC-7693][rfc]
 ///
@@ -47,7 +43,7 @@ class Blake2s extends BlockHashBase {
   ///
   /// Parameters:
   /// - [digestSize] The number of bytes in the output.
-  /// - [key] An optional key for MAC generation. Must be less than 32 bytes.
+  /// - [key] An optional key for MAC generation. Should not exceed 32 bytes.
   /// - [salt] An optional nonce. Must be exactly 8 bytes long.
   /// - [personalization] Second optional nonce. Must be exactly 8 bytes long.
   ///
