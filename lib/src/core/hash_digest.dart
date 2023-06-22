@@ -18,27 +18,30 @@ class HashDigest extends Object {
   @override
   String toString() => hex();
 
-  /// The message digest as a binary string with zero padding.
+  /// The message digest as a binary string.
   String binary() => toBinary(bytes);
 
-  /// The message digest as a hexadecimal string with zero padding.
+  /// The message digest as a octal string.
+  String octal() => toOctal(bytes);
+
+  /// The message digest as a hexadecimal string.
   ///
   /// Parameters:
   /// - If [upper] is true, the string will be in uppercase alphabets.
   String hex([bool upper = false]) => toHex(bytes, upper: upper);
 
-  /// The message digest as a Base-32 string with no padding.
+  /// The message digest as a Base-32 string.
   ///
   /// If [upper] is true, the output will have uppercase alphabets.
   /// If [padding] is true, the output will have `=` padding at the end.
-  String base32({bool upper = true, bool padding = false}) =>
+  String base32({bool upper = true, bool padding = true}) =>
       toBase32(bytes, lower: !upper, padding: padding);
 
   /// The message digest as a Base-64 string with no padding.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
   /// If [padding] is true, the output will have `=` padding at the end.
-  String base64({bool urlSafe = false, bool padding = false}) =>
+  String base64({bool urlSafe = false, bool padding = true}) =>
       toBase64(bytes, padding: padding, url: urlSafe);
 
   /// The message digest as a BigInt.
@@ -47,7 +50,7 @@ class HashDigest extends Object {
   /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
   /// digest bytes as a big endian number.
   BigInt bigInt({Endian endian = Endian.little}) =>
-      toBigInt(bytes, endian: endian);
+      toBigInt(bytes, msbFirst: endian == Endian.big);
 
   /// Gets 64-bit unsiged integer from the message digest.
   ///
@@ -55,7 +58,7 @@ class HashDigest extends Object {
   /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
   /// digest bytes as a big endian number.
   int number([Endian endian = Endian.big]) =>
-      toBigInt(bytes, endian: endian).toUnsigned(64).toInt();
+      toBigInt(bytes, msbFirst: endian == Endian.big).toUnsigned(64).toInt();
 
   /// The message digest as a string of ASCII alphabets.
   String ascii() => cvt.ascii.decode(bytes);
@@ -91,7 +94,7 @@ class HashDigest extends Object {
     } else if (other is TypedData && other is! Uint8List) {
       return isEqual(other.buffer.asUint8List());
     } else if (other is String) {
-      return isEqual(base16.decodeFromString(other));
+      return isEqual(fromHex(other));
     } else if (other is Iterable<int>) {
       if (other is List<int>) {
         if (other.length != bytes.length) {

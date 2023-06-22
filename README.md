@@ -10,6 +10,8 @@
 
 This library contains implementations of secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 
+> Checkout the [hashlib_codecs](https://pub.dev/packages/hashlib_codecs) that is being used by this package to encode and decode bytes.
+
 ## Features
 
 ### Block Hash Algorithms

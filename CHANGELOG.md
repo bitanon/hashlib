@@ -1,3 +1,8 @@
+# 1.12.0
+
+- **Breaking**: The `HashDigest.base32` and `HashDigest.base64` will have padding by default.
+- Bump version of the [hashlib_codecs](https://pub.dev/packages/hashlib_codecs)
+
 # 1.11.4
 
 - Move codecs to separate package: [hashlib_codecs](https://github.com/bitanon/hashlib_codecs)
