@@ -9,6 +9,9 @@ abstract class KeyDerivatorBase {
   /// The length of derived key in bytes
   int get derivedKeyLength;
 
+  /// The name of this algorithm
+  String get name;
+
   /// Generate a derived key from a [password]
   HashDigest convert(List<int> password);
 

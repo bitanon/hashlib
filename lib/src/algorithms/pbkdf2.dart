@@ -3,9 +3,9 @@
 
 import 'dart:typed_data';
 
+import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
-import 'package:hashlib/src/core/mac_base.dart';
 
 /// This is an implementation of Password Based Key Derivation Algorithm,
 /// PBKDF2 derived from [RFC-8081][rfc], which internally uses a MAC based
@@ -22,8 +22,8 @@ import 'package:hashlib/src/core/mac_base.dart';
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc8018.html#section-5.2
 class PBKDF2 extends KeyDerivatorBase {
-  /// The underlying Pseudo Random Function (PRF)
-  final MACSinkBase sink;
+  /// The underlying Pseudo Random Function (PRF) generator
+  final HMAC mac;
 
   /// The byte array containing salt
   final List<int> salt;
@@ -34,16 +34,20 @@ class PBKDF2 extends KeyDerivatorBase {
   @override
   final int derivedKeyLength;
 
+  @override
+  final String name;
+
   const PBKDF2._({
-    required this.sink,
+    required this.mac,
     required this.salt,
     required this.iterations,
     required this.derivedKeyLength,
+    required this.name,
   });
 
   /// Create a [PBKDF2] instance with an sink for MAC generation.
   factory PBKDF2(
-    MACSinkBase sink,
+    HMAC hmac,
     List<int> salt,
     int iterations, [
     int? keyLength,
@@ -58,29 +62,17 @@ class PBKDF2 extends KeyDerivatorBase {
     if (keyLength != null && keyLength < 1) {
       throw StateError('The keyLength must be at least 1');
     }
+    keyLength ??= hmac.algo.createSink().hashLength;
 
     // create instance
     return PBKDF2._(
-      sink: sink,
+      mac: hmac,
       salt: salt,
       iterations: iterations,
-      derivedKeyLength: keyLength ?? sink.hashLength,
+      derivedKeyLength: keyLength,
+      name: 'PBKDF2/${hmac.name}',
     );
   }
-
-  /// Create a [PBKDF2] instance with a MAC instance.
-  factory PBKDF2.mac(
-    MACHashBase mac,
-    List<int> salt,
-    int iterations, [
-    int? keyLength,
-  ]) =>
-      PBKDF2(
-        mac.createSink(),
-        salt,
-        iterations,
-        keyLength,
-      );
 
   /// Generate a derived key using the [sink] function.
   ///
@@ -88,14 +80,15 @@ class PBKDF2 extends KeyDerivatorBase {
   /// and the [password] is not provided.
   @override
   HashDigest convert([List<int>? password]) {
+    // Initialize the MAC with the provided password
+    if (password != null) {
+      mac.init(password);
+    }
+
     int i, j, k, t;
     Uint8List hash, block;
-    var result = Uint8List(derivedKeyLength);
-
-    // Initialize the MAC with provided password
-    if (password != null) {
-      sink.init(password);
-    }
+    final sink = mac.createSink();
+    final result = Uint8List(derivedKeyLength);
 
     k = 0;
     for (i = 1; k < derivedKeyLength; i++) {

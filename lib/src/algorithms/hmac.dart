@@ -4,46 +4,37 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
-/// This implementation is derived from the RFC document
-/// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
-///
-/// [rfc2104]: https://www.ietf.org/rfc/rfc2104.html
-class HMACSink extends HashDigestSink with MACSinkBase {
-  final BlockHashSink sink;
-  final Uint8List innerKey;
-  final Uint8List outerKey;
+/// HMAC is a hash-based message authentication code that can be used to
+/// simultaneously verify both the data integrity and authenticity of a message.
+class HMAC extends MACHashBase {
+  final BlockHashBase algo;
+  late final Uint8List innerKey;
+  late final Uint8List outerKey;
 
-  /// The internal block length of the algorithm in bytes
-  final int blockLength;
+  @override
+  final String name;
 
-  /// The message length in bytes
-  final int messageLength;
+  @override
+  List<int>? key;
 
-  HashDigest? _digest;
-  bool _closed = false;
   bool _initialized = false;
 
-  HMACSink(this.sink)
-      : blockLength = sink.blockLength,
-        messageLength = sink.messageLength,
-        innerKey = Uint8List(sink.blockLength),
-        outerKey = Uint8List(sink.blockLength);
-
-  @override
-  bool get closed => _closed;
-
-  @override
-  int get hashLength => sink.hashLength;
+  HMAC(this.algo, [List<int>? key]) : name = 'HMAC/${algo.name}' {
+    if (key != null) init(key);
+  }
 
   @override
   void init(List<int> key) {
+    this.key = key;
+    final sink = algo.createSink();
+    innerKey = Uint8List(sink.blockLength);
+    outerKey = Uint8List(sink.blockLength);
+
     // Keys longer than blockLength are shortened by hashing them
-    if (key.length > blockLength) {
-      sink.reset();
+    if (key.length > sink.blockLength) {
       sink.add(key);
       key = sink.digest().bytes;
     }
@@ -54,51 +45,62 @@ class HMACSink extends HashDigestSink with MACSinkBase {
       innerKey[i] = key[i] ^ 0x36;
       outerKey[i] = key[i] ^ 0x5c;
     }
-    for (; i < blockLength; i++) {
+    for (; i < sink.blockLength; i++) {
       innerKey[i] = 0x36;
       outerKey[i] = 0x5c;
     }
 
-    sink.reset();
-    sink.add(innerKey);
     _initialized = true;
   }
 
   @override
-  void reset() {
+  MACSinkBase createSink() {
     if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
+      throw StateError('The MAC is not initialized with a key');
     }
-    _closed = false;
-    _digest = null;
+    return _HMACSink(algo.createSink(), innerKey, outerKey);
+  }
+}
+
+/// This implementation is derived from the RFC document
+/// [HMAC: Keyed-Hashing for Message Authentication][rfc2104].
+///
+/// [rfc2104]: https://www.ietf.org/rfc/rfc2104.html
+class _HMACSink implements MACSinkBase {
+  final BlockHashSink sink;
+  final Uint8List innerKey;
+  final Uint8List outerKey;
+
+  @override
+  final int hashLength;
+
+  _HMACSink(this.sink, this.innerKey, this.outerKey)
+      : hashLength = sink.hashLength {
+    reset();
+  }
+
+  @override
+  void reset() {
     sink.reset();
     sink.add(innerKey);
   }
 
   @override
-  void add(List<int> data, [int start = 0, int? end]) {
-    if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
-    }
-    if (_closed) {
-      throw StateError('The message-digest is already closed');
-    }
-    sink.add(data, start, end);
-  }
+  void add(List<int> data, [int start = 0, int? end]) =>
+      sink.add(data, start, end);
+
+  @override
+  bool get closed => sink.closed;
+
+  @override
+  void close() => digest();
 
   @override
   HashDigest digest() {
-    if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
-    }
-    if (_closed) {
-      return _digest!;
-    }
-    _closed = true;
-    var hash = sink.digest().bytes;
+    final hash = sink.digest().bytes;
     sink.reset();
     sink.add(outerKey);
     sink.add(hash);
-    return _digest = sink.digest();
+    return sink.digest();
   }
 }

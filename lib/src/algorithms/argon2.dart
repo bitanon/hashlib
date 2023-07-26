@@ -37,6 +37,30 @@ enum Argon2Version {
   v13,
 }
 
+String _makeName(Argon2Type type, Argon2Version version) {
+  String prefix, suffix;
+  switch (type) {
+    case Argon2Type.argon2d:
+      prefix = 'argon2d';
+      break;
+    case Argon2Type.argon2i:
+      prefix = 'argon2i';
+      break;
+    case Argon2Type.argon2id:
+      prefix = 'argon2id';
+      break;
+  }
+  switch (version) {
+    case Argon2Version.v10:
+      suffix = '-v10';
+      break;
+    case Argon2Version.v13:
+      suffix = '';
+      break;
+  }
+  return '$prefix$suffix';
+}
+
 /// Creates a context for [Argon2][wiki] password hashing.
 ///
 /// Argon2 is a key derivation algorithm that was selected as the winner of the
@@ -107,6 +131,9 @@ abstract class Argon2 extends KeyDerivatorBase {
   @override
   int get derivedKeyLength => hashLength;
 
+  @override
+  final String name;
+
   Argon2.internal({
     required this.salt,
     required this.version,
@@ -121,7 +148,8 @@ abstract class Argon2 extends KeyDerivatorBase {
     required this.blocks,
     required this.key,
     required this.personalization,
-  }) : midSlice = slices ~/ 2 {
+  })  : midSlice = slices ~/ 2,
+        name = _makeName(type, version) {
     if (hashLength < _minDigestSize) {
       throw ArgumentError('The tag length must be at least $_minDigestSize');
     }

@@ -33,7 +33,7 @@ HashDigest pbkdf2(
   int? keyLength,
 ]) =>
     PBKDF2(
-      HMACSink(sha256.createSink()),
+      HMAC(sha256),
       salt,
       iterations,
       keyLength,
@@ -50,7 +50,7 @@ extension PBKDF2onBlockHashBase on BlockHashBase {
     int? keyLength,
   ]) =>
       PBKDF2(
-        HMACSink(createSink()),
+        HMAC(this),
         salt,
         iterations,
         keyLength,
@@ -58,7 +58,7 @@ extension PBKDF2onBlockHashBase on BlockHashBase {
 }
 
 /// Extension to the HashBase to get an [PBKDF2] instance
-extension PBKDF2onHMAC on MACHashBase {
+extension PBKDF2onHMAC on HMAC {
   /// Generate a secret using [PBKDF2] hash algorithm.
   @pragma('vm:prefer-inline')
   HashDigest pbkdf2(
@@ -66,12 +66,10 @@ extension PBKDF2onHMAC on MACHashBase {
     int iterations = 1000,
     int? keyLength,
   ]) =>
-      PBKDF2
-          .mac(
-            this,
-            salt,
-            iterations,
-            keyLength,
-          )
-          .convert();
+      PBKDF2(
+        this,
+        salt,
+        iterations,
+        keyLength,
+      ).convert();
 }

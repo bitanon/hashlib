@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/algorithms/poly1305.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
@@ -184,7 +186,6 @@ void main() {
     });
 
     test("buffered update", () {
-      var sink = Poly1305Sink();
       var key = [
         0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, //
         0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9,
@@ -197,7 +198,7 @@ void main() {
         0x28, 0x99, 0x57, 0x94, 0x41, 0x27, 0xd7, 0x5e,
       ];
 
-      sink.init(key.sublist(0, 16), key.sublist(16, 32));
+      var sink = Poly1305Sink(Uint8List.fromList(key));
       for (int i = 0; i < 256; i++) {
         var mac = poly1305(
           List.generate(i, (j) => i),

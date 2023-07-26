@@ -61,7 +61,7 @@ const _sigma = [
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2bHash extends BlockHashSink with MACSinkBase {
+class Blake2bHash extends BlockHashSink implements MACSinkBase {
   final Uint64List state = Uint64List.fromList(_seed);
   final Uint64List _initialState = Uint64List(_seed.length);
 

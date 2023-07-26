@@ -71,6 +71,12 @@ class Blake2bMAC extends MACHashBase {
   final List<int>? salt;
   final List<int>? personalization;
 
+  @override
+  final List<int> key;
+
+  @override
+  final String name;
+
   /// Creates a [Blake2b] instance to generate MAC using a [key].
   ///
   /// Optional parameters:
@@ -79,13 +85,10 @@ class Blake2bMAC extends MACHashBase {
   /// - [personalization] Second optional nonce. Must be exactly 16 bytes long.
   const Blake2bMAC(
     this.digestSize,
-    List<int> key, {
+    this.key, {
     this.salt,
     this.personalization,
-  }) : super(key);
-
-  @override
-  String get name => 'BLAKE2b-${digestSize << 3}-MAC';
+  }) : name = 'BLAKE2b-${digestSize << 3}-MAC';
 
   @override
   MACSinkBase createSink() => Blake2bHash(
@@ -94,6 +97,11 @@ class Blake2bMAC extends MACHashBase {
         salt: salt,
         personalization: personalization,
       );
+
+  @override
+  init(List<int> key) {
+    throw UnimplementedError();
+  }
 }
 
 extension Blake2bFactory on Blake2b {

@@ -8,7 +8,7 @@ import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/sha1.dart';
 
-// power of 10 upto max safe integer in javascript
+// power of 10 up to max safe integer in javascript
 const _pow10 = [
   1,
   10,
@@ -29,13 +29,11 @@ const _pow10 = [
 ];
 
 /// Represents an abstract class for implementing [One-Time Password (OTP)
-/// authentication][rfc2289] methods in Dart.
+/// authentication](https://www.ietf.org/rfc/rfc2289.html) methods in Dart.
 ///
 /// This class provides a foundation for creating variable length OTP generation
 /// algorithms. Subclasses must implement the [value] method to generate OTP
 /// values based on a specific algorithm.
-///
-/// [rfc2289]: https://www.ietf.org/rfc/rfc2289.html
 abstract class OTPAuth {
   /// The number of digits in the generated OTP
   final int digits;
@@ -53,13 +51,17 @@ abstract class OTPAuth {
 }
 
 /// An HMAC-based One-Time Password (HOTP) algorithm implementation derived
-/// from [rfc4226].
-///
-/// [rfc4226]: https://www.ietf.org/rfc/rfc4226.html
+/// from [RFC-4226](https://www.ietf.org/rfc/rfc4226.html).
 class HOTP extends OTPAuth {
   final int _max;
   final HMAC mac;
   final List<int> counter;
+
+  /// The secret key
+  final List<int> secret;
+
+  /// The algorithm name
+  final String algorithm;
 
   /// Creates an instance of the [HOTP] class with the specified parameters.
   ///
@@ -72,25 +74,20 @@ class HOTP extends OTPAuth {
   ///   is associated with.
   /// - [issuer] is an optional string to specify the entity issuing the OTP.
   HOTP(
-    List<int> secret, {
+    this.secret, {
     int digits = 6,
     required this.counter,
     BlockHashBase algo = sha1,
     String? label,
     String? issuer,
   })  : mac = HMAC(algo, secret),
+        algorithm = algo.name,
         _max = _pow10[digits],
         super(
           digits,
           label: label,
           issuer: issuer,
         );
-
-  /// The secret key
-  List<int> get secret => mac.key;
-
-  /// The algorithm name
-  String get algorithm => mac.algo.name;
 
   @override
   int value() {
@@ -105,9 +102,7 @@ class HOTP extends OTPAuth {
 }
 
 /// A Time-based One-Time Password (TOTP) algorithm implementation derived
-/// from [rfc6238].
-///
-/// [rfc6238]: https://www.ietf.org/rfc/rfc6238.html
+/// from [RFC-6238](https://www.ietf.org/rfc/rfc6238.html).
 class TOTP extends HOTP {
   final int period;
   int _timeDelta = 0;
