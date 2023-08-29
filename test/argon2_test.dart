@@ -103,8 +103,8 @@ void main() {
       expect(argon2.type, Argon2Type.argon2id);
       expect(argon2.version, Argon2Version.v13);
       expect(argon2.memorySizeKB, 128);
-      expect(argon2.lanes, 4);
-      expect(argon2.passes, 1);
+      expect(argon2.parallelism, 4);
+      expect(argon2.iterations, 1);
       expect(argon2.hashLength, 20);
       expect(argon2.salt, "some salt".codeUnits);
       var result = argon2.convert("password".codeUnits);

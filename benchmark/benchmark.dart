@@ -270,7 +270,7 @@ void main(List<String> args) async {
   dump("- **Hash** : https://pub.dev/packages/hash");
   dump('');
 
-  measureHashFunctions();
+  // measureHashFunctions();
   measureKeyDerivation();
 
   var ram = '3200MHz';

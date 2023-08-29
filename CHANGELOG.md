@@ -1,3 +1,10 @@
+# next
+
+- Refactor `Argon2` class structure.
+  **Breaking** changes:
+  - renames variable: `lanes` to `parallelism`
+  - renames variable: `passes` to `iterations`
+
 # 1.12.0
 
 - **Breaking**: The `HashDigest.base32` and `HashDigest.base64` will have padding by default.

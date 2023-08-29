@@ -92,9 +92,9 @@ Argon2 and scrypt benchmarks on different security parameters:
 
 | Algorithms | test     | little   | moderate  | good       | strong      |
 | ---------- | -------- | -------- | --------- | ---------- | ----------- |
-| scrypt     | 0.085 ms | 2.175 ms | 16.255 ms | 133.4 ms   | 2063.649 ms |
-| argon2i    | 0.397 ms | 2.815 ms | 18.094 ms | 210.069 ms | 2465.087 ms |
-| argon2d    | 0.368 ms | 2.523 ms | 17.282 ms | 205.491 ms | 2408.582 ms |
-| argon2id   | 0.348 ms | 2.554 ms | 16.843 ms | 204.145 ms | 2435.409 ms |
+| scrypt     | 0.067 ms | 2.242 ms | 14.684 ms | 118.737 ms | 1849.659 ms |
+| argon2i    | 0.374 ms | 2.517 ms | 16.873 ms | 203.907 ms | 2406.902 ms |
+| argon2d    | 0.319 ms | 2.453 ms | 16.837 ms | 201.673 ms | 2394.64 ms  |
+| argon2id   | 0.331 ms | 2.609 ms | 16.868 ms | 205.1 ms   | 2453.487 ms |
 
 > All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_

@@ -3,8 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'argon2.dart';
-import 'blake2b.dart';
+import 'common.dart';
+import '../blake2b_64bit.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
@@ -23,48 +23,20 @@ const int _mask32 = 0xFFFFFFFF;
 // |            |            |            |            | -> lane p - 1
 // +------------+------------+------------+------------+
 
-class Argon2Internal extends Argon2 {
+class Argon2Internal {
+  final Argon2Context ctx;
   final _hash0 = Uint8List(64 + 8);
   final _blockR = Uint64List(128);
   final _blockT = Uint64List(128);
   final _input = Uint64List(128);
   final _address = Uint64List(128);
 
-  late final _digest = Uint8List(hashLength);
-  late final _memory = Uint64List(blocks << 7);
+  late final _digest = Uint8List(ctx.hashLength);
+  late final _memory = Uint64List(ctx.blocks << 7);
 
-  Argon2Internal({
-    required List<int> salt,
-    required int hashLength,
-    required int passes,
-    required int memorySizeKB,
-    required int lanes,
-    required int segments,
-    required int columns,
-    required int blocks,
-    required int slices,
-    required List<int>? key,
-    required List<int>? personalization,
-    required Argon2Type type,
-    required Argon2Version version,
-  }) : super.internal(
-          salt: salt,
-          slices: slices,
-          version: version,
-          type: type,
-          hashLength: hashLength,
-          passes: passes,
-          lanes: lanes,
-          memorySizeKB: memorySizeKB,
-          segments: segments,
-          columns: columns,
-          blocks: blocks,
-          key: key,
-          personalization: personalization,
-        );
+  Argon2Internal(this.ctx);
 
-  @override
-  Argon2HashDigest convert(List<int> password) {
+  Uint8List convert(List<int> password) {
     int i, j, k, cols;
     int pass, slice, lane;
     var hash0_32 = _hash0.buffer.asUint32List();
@@ -76,8 +48,8 @@ class Argon2Internal extends Argon2 {
     // Initial block generation: First Lane Blocks
     k = 0;
     hash0_32[16] = 0;
-    cols = columns << 10;
-    for (i = 0; i < lanes; i++, k += cols) {
+    cols = ctx.columns << 10;
+    for (i = 0; i < ctx.lanes; i++, k += cols) {
       // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
       hash0_32[17] = i;
       _expandHash(1024, _hash0, memoryBytes, k);
@@ -86,16 +58,16 @@ class Argon2Internal extends Argon2 {
     // Initial block generation: Second Lane Blocks
     k = 1024;
     hash0_32[16] = 1;
-    for (i = 0; i < lanes; i++, k += cols) {
+    for (i = 0; i < ctx.lanes; i++, k += cols) {
       // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
       hash0_32[17] = i;
       _expandHash(1024, _hash0, memoryBytes, k);
     }
 
     // Further block generation
-    for (pass = 0; pass < passes; ++pass) {
-      for (slice = 0; slice < slices; ++slice) {
-        for (lane = 0; lane < lanes; ++lane) {
+    for (pass = 0; pass < ctx.passes; ++pass) {
+      for (slice = 0; slice < ctx.slices; ++slice) {
+        for (lane = 0; lane < ctx.lanes; ++lane) {
           _fillSegment(pass, slice, lane);
         }
       }
@@ -104,7 +76,7 @@ class Argon2Internal extends Argon2 {
     // Finalization : XOR the last column blocks
     j = cols - 1024;
     var block = memoryBytes.buffer.asUint8List(j, 1024);
-    for (k = 1; k < lanes; ++k) {
+    for (k = 1; k < ctx.lanes; ++k) {
       j += cols;
       for (i = 0; i < 1024; ++i) {
         block[i] ^= memoryBytes[j + i];
@@ -112,8 +84,8 @@ class Argon2Internal extends Argon2 {
     }
 
     // Extend the block to make final result
-    _expandHash(hashLength, block, _digest, 0);
-    return Argon2HashDigest(this, _digest);
+    _expandHash(ctx.hashLength, block, _digest, 0);
+    return _digest;
   }
 
   void _initialHash(Uint8List hash0, List<int> password) {
@@ -122,23 +94,23 @@ class Argon2Internal extends Argon2 {
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
     //         LE32(length(X)) || X)
     var blake2b = Blake2bHash(64);
-    blake2b.addUint32(lanes);
-    blake2b.addUint32(hashLength);
-    blake2b.addUint32(memorySizeKB);
-    blake2b.addUint32(passes);
-    blake2b.addUint32(version.value);
-    blake2b.addUint32(type.index);
+    blake2b.addUint32(ctx.lanes);
+    blake2b.addUint32(ctx.hashLength);
+    blake2b.addUint32(ctx.memorySizeKB);
+    blake2b.addUint32(ctx.passes);
+    blake2b.addUint32(ctx.version.value);
+    blake2b.addUint32(ctx.type.index);
     blake2b.addUint32(password.length);
     blake2b.add(password);
-    blake2b.addUint32(salt.length);
-    blake2b.add(salt);
-    blake2b.addUint32(key?.length ?? 0);
-    if (key != null) {
-      blake2b.add(key!);
+    blake2b.addUint32(ctx.salt.length);
+    blake2b.add(ctx.salt);
+    blake2b.addUint32(ctx.key?.length ?? 0);
+    if (ctx.key != null) {
+      blake2b.add(ctx.key!);
     }
-    blake2b.addUint32(personalization?.length ?? 0);
-    if (personalization != null) {
-      blake2b.add(personalization!);
+    blake2b.addUint32(ctx.personalization?.length ?? 0);
+    if (ctx.personalization != null) {
+      blake2b.add(ctx.personalization!);
     }
 
     var hash = blake2b.digest().bytes;
@@ -204,19 +176,19 @@ class Argon2Internal extends Argon2 {
     int previous, current;
     int i, startIndex, random;
 
-    bool xor = version != Argon2Version.v10 && pass > 0;
-    bool useAddress = (type == Argon2Type.argon2i);
-    if (type == Argon2Type.argon2id) {
-      useAddress = (pass == 0) && (slice < midSlice);
+    bool xor = ctx.version != Argon2Version.v10 && pass > 0;
+    bool useAddress = (ctx.type == Argon2Type.argon2i);
+    if (ctx.type == Argon2Type.argon2id) {
+      useAddress = (pass == 0) && (slice < ctx.midSlice);
     }
 
     if (useAddress) {
       _input[0] = pass;
       _input[1] = lane;
       _input[2] = slice;
-      _input[3] = blocks;
-      _input[4] = passes;
-      _input[5] = type.index;
+      _input[3] = ctx.blocks;
+      _input[4] = ctx.passes;
+      _input[5] = ctx.type.index;
       _input[6] = 0;
     }
 
@@ -230,12 +202,12 @@ class Argon2Internal extends Argon2 {
     }
 
     /* Offset of the current block */
-    current = lane * columns + slice * segments + startIndex;
+    current = lane * ctx.columns + slice * ctx.segments + startIndex;
 
-    for (i = startIndex; i < segments; ++i, ++current) {
-      if (current % columns == 0) {
+    for (i = startIndex; i < ctx.segments; ++i, ++current) {
+      if (current % ctx.columns == 0) {
         /* Last block in this lane */
-        previous = current + columns - 1;
+        previous = current + ctx.columns - 1;
       } else {
         /* Previous block */
         previous = current - 1;
@@ -254,7 +226,7 @@ class Argon2Internal extends Argon2 {
       }
 
       /* 1.2.2 Computing the lane of the reference block */
-      refLane = (random >>> 32) % lanes;
+      refLane = (random >>> 32) % ctx.lanes;
 
       if (pass == 0 && slice == 0) {
         /* Can not reference other lanes yet */
@@ -277,7 +249,7 @@ class Argon2Internal extends Argon2 {
         xor: xor,
         next: current << 7,
         prev: previous << 7,
-        ref: (refLane * columns + refIndex) << 7,
+        ref: (refLane * ctx.columns + refIndex) << 7,
       );
     }
   }
@@ -299,20 +271,20 @@ class Argon2Internal extends Argon2 {
         area = index - 1; // all but the previous
       } else if (sameLane) {
         // The same lane => add current segment
-        area = slice * segments + index - 1;
+        area = slice * ctx.segments + index - 1;
       } else if (index == 0) {
-        area = slice * segments - 1;
+        area = slice * ctx.segments - 1;
       } else {
-        area = slice * segments;
+        area = slice * ctx.segments;
       }
     } else {
       // Other passes
       if (sameLane) {
-        area = columns - segments + index - 1;
+        area = ctx.columns - ctx.segments + index - 1;
       } else if (index == 0) {
-        area = columns - segments - 1;
+        area = ctx.columns - ctx.segments - 1;
       } else {
-        area = columns - segments;
+        area = ctx.columns - ctx.segments;
       }
     }
 
@@ -323,12 +295,12 @@ class Argon2Internal extends Argon2 {
 
     /* 1.2.5 Computing starting position */
     start = 0;
-    if (pass != 0 && slice != slices - 1) {
-      start = (slice + 1) * segments;
+    if (pass != 0 && slice != ctx.slices - 1) {
+      start = (slice + 1) * ctx.segments;
     }
 
     /* 1.2.6. Computing absolute position */
-    return (start + pos) % columns;
+    return (start + pos) % ctx.columns;
   }
 
   /// Fills a memory block and optionally XORs the old block over it.
