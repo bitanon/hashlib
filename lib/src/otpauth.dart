@@ -141,16 +141,16 @@ class TOTP extends HOTP {
           counter: Uint8List(8),
         ) {
     // setup stream controller
-    Timer? _timer;
+    Timer? timer;
     _controller.onCancel = () {
-      _timer?.cancel();
+      timer?.cancel();
     };
     _controller.onListen = () {
       int ms = DateTime.now().millisecondsSinceEpoch;
       int d = _periodMS - (ms + _timeDelta) % _periodMS;
       Future.delayed(Duration(milliseconds: d), () {
         if (!_controller.hasListener) return;
-        _timer = Timer.periodic(Duration(seconds: period), (timer) {
+        timer = Timer.periodic(Duration(seconds: period), (timer) {
           if (!_controller.hasListener) return;
           _controller.sink.add(value());
         });

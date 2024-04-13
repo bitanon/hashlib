@@ -77,43 +77,43 @@ class XXHash32Sink extends BlockHashSink {
   @override
   Uint8List $finalize() {
     int i, t;
-    int _hash;
+    int hash;
 
     if (messageLength < 16) {
-      _hash = (seed & _mask32) + prime32_5;
+      hash = (seed & _mask32) + prime32_5;
     } else {
-      _hash = (_acc1 << 1) | (_acc1 >>> 31);
-      _hash += (_acc2 << 7) | (_acc2 >>> 25);
-      _hash += (_acc3 << 12) | (_acc3 >>> 20);
-      _hash += (_acc4 << 18) | (_acc4 >>> 14);
+      hash = (_acc1 << 1) | (_acc1 >>> 31);
+      hash += (_acc2 << 7) | (_acc2 >>> 25);
+      hash += (_acc3 << 12) | (_acc3 >>> 20);
+      hash += (_acc4 << 18) | (_acc4 >>> 14);
     }
 
-    _hash = (_hash + messageLength) & _mask32;
+    hash = (hash + messageLength) & _mask32;
 
     // process the remaining data
     for (i = t = 0; t + 4 <= pos; ++i, t += 4) {
-      _hash = (_hash + sbuffer[i] * prime32_3) & _mask32;
-      _hash = (_hash << 17) | (_hash >>> 15);
-      _hash = (_hash * prime32_4) & _mask32;
+      hash = (hash + sbuffer[i] * prime32_3) & _mask32;
+      hash = (hash << 17) | (hash >>> 15);
+      hash = (hash * prime32_4) & _mask32;
     }
     for (; t < pos; t++) {
-      _hash = (_hash + buffer[t] * prime32_5) & _mask32;
-      _hash = (_hash << 11) | (_hash >>> 21);
-      _hash = (_hash * prime32_1) & _mask32;
+      hash = (hash + buffer[t] * prime32_5) & _mask32;
+      hash = (hash << 11) | (hash >>> 21);
+      hash = (hash * prime32_1) & _mask32;
     }
 
     // avalanche
-    _hash ^= _hash >>> 15;
-    _hash = (_hash * prime32_2) & _mask32;
-    _hash ^= _hash >>> 13;
-    _hash = (_hash * prime32_3) & _mask32;
-    _hash ^= _hash >>> 16;
+    hash ^= hash >>> 15;
+    hash = (hash * prime32_2) & _mask32;
+    hash ^= hash >>> 13;
+    hash = (hash * prime32_3) & _mask32;
+    hash ^= hash >>> 16;
 
     return Uint8List.fromList([
-      _hash >>> 24,
-      _hash >>> 16,
-      _hash >>> 8,
-      _hash,
+      hash >>> 24,
+      hash >>> 16,
+      hash >>> 8,
+      hash,
     ]);
   }
 }

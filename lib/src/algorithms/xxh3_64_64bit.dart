@@ -150,39 +150,39 @@ class XXH3Sink64bit extends BlockHashSink {
   }
 
   @pragma('vm:prefer-inline')
-  static int _avalanche(int _hash) {
-    _hash ^= _hash >>> 37;
-    _hash *= 0x165667919E3779F9;
-    _hash ^= _hash >>> 32;
-    return _hash;
+  static int _avalanche(int hash) {
+    hash ^= hash >>> 37;
+    hash *= 0x165667919E3779F9;
+    hash ^= hash >>> 32;
+    return hash;
   }
 
   @pragma('vm:prefer-inline')
-  static int _midsizeAvalanche(int _hash) {
-    _hash ^= _hash >>> 33;
-    _hash *= prime64_2;
-    _hash ^= _hash >>> 29;
-    _hash *= prime64_3;
-    _hash ^= _hash >>> 32;
-    return _hash;
+  static int _midsizeAvalanche(int hash) {
+    hash ^= hash >>> 33;
+    hash *= prime64_2;
+    hash ^= hash >>> 29;
+    hash *= prime64_3;
+    hash ^= hash >>> 32;
+    return hash;
   }
 
   @pragma('vm:prefer-inline')
-  static int _rrmxmx(int _hash, int length) {
-    _hash ^= _rotl64(_hash, 49) ^ _rotl64(_hash, 24);
-    _hash *= 0x9FB21C651E98DF25;
-    _hash ^= (_hash >>> 35) + length;
-    _hash *= 0x9FB21C651E98DF25;
-    _hash ^= _hash >>> 28;
-    return _hash;
+  static int _rrmxmx(int hash, int length) {
+    hash ^= _rotl64(hash, 49) ^ _rotl64(hash, 24);
+    hash *= 0x9FB21C651E98DF25;
+    hash ^= (hash >>> 35) + length;
+    hash *= 0x9FB21C651E98DF25;
+    hash ^= hash >>> 28;
+    return hash;
   }
 
   int _finalizeLong(Uint64List stripe) {
     // void hash_long_internal_loop
-    int _hash;
+    int hash;
     int t, n, i, v, l, a, b;
-    const int _lastAccStart = 7;
-    const int _mergeAccStart = 11;
+    const int lastAccStart = 7;
+    const int mergeAccStart = 11;
 
     // last partial block
     for (t = n = 0; t + _stripeLen < pos; n++, t += _stripeLen) {
@@ -196,7 +196,7 @@ class XXH3Sink64bit extends BlockHashSink {
     }
 
     // last stripe
-    t = secret.lengthInBytes - _stripeLen - _lastAccStart;
+    t = secret.lengthInBytes - _stripeLen - lastAccStart;
     for (i = 0; i < acc.length; i++, t += 8) {
       v = stripe[i];
       acc[i ^ 1] += v;
@@ -205,16 +205,16 @@ class XXH3Sink64bit extends BlockHashSink {
     }
 
     // converge into final hash: uint64_t merge_accs
-    _hash = messageLength * prime64_1;
-    t = _mergeAccStart;
+    hash = messageLength * prime64_1;
+    t = mergeAccStart;
     for (i = 0; i < 8; i += 2, t += 16) {
       a = acc[i] ^ secretBD.getUint64(t, Endian.little);
       b = acc[i + 1] ^ secretBD.getUint64(t + 8, Endian.little);
-      _hash += _mul128fold64(a, b);
+      hash += _mul128fold64(a, b);
     }
 
     // avalanche
-    return _avalanche(_hash);
+    return _avalanche(hash);
   }
 
   @pragma('vm:prefer-inline')
@@ -270,32 +270,32 @@ class XXH3Sink64bit extends BlockHashSink {
   }
 
   int _finalizeShort(ByteData input, int length, ByteData key) {
-    int _hash, lhs, rhs, a, b, c, i;
+    int hash, lhs, rhs, a, b, c, i;
     if (length == 0) {
       // hash_t<N> len_0to16
-      _hash = seed;
-      _hash ^= key.getUint64(56, Endian.little);
-      _hash ^= key.getUint64(64, Endian.little);
-      return _midsizeAvalanche(_hash);
+      hash = seed;
+      hash ^= key.getUint64(56, Endian.little);
+      hash ^= key.getUint64(64, Endian.little);
+      return _midsizeAvalanche(hash);
     } else if (length <= 3) {
       // hash_t<N> len_1to3
       a = input.getUint8(0);
       b = input.getUint8(length >>> 1);
       c = input.getUint8(length - 1);
-      _hash = key.getUint32(0, Endian.little);
-      _hash ^= key.getUint32(4, Endian.little);
-      _hash += seed;
-      _hash ^= (a << 16) | (b << 24) | (c) | (length << 8);
-      return _midsizeAvalanche(_hash);
+      hash = key.getUint32(0, Endian.little);
+      hash ^= key.getUint32(4, Endian.little);
+      hash += seed;
+      hash ^= (a << 16) | (b << 24) | (c) | (length << 8);
+      return _midsizeAvalanche(hash);
     } else if (length <= 8) {
       // hash_t<N> len_4to8
       lhs = input.getUint32(0, Endian.little);
       rhs = input.getUint32(length - 4, Endian.little);
-      _hash = key.getUint64(8, Endian.little);
-      _hash ^= key.getUint64(16, Endian.little);
-      _hash -= seed ^ ((_swap32(seed) & _mask32) << 32);
-      _hash ^= (lhs << 32) | rhs;
-      return _rrmxmx(_hash, length);
+      hash = key.getUint64(8, Endian.little);
+      hash ^= key.getUint64(16, Endian.little);
+      hash -= seed ^ ((_swap32(seed) & _mask32) << 32);
+      hash ^= (lhs << 32) | rhs;
+      return _rrmxmx(hash, length);
     } else if (length <= 16) {
       // hash_t<N> len_9to16
       lhs = key.getUint64(24, Endian.little);
@@ -309,52 +309,52 @@ class XXH3Sink64bit extends BlockHashSink {
       lhs ^= input.getUint64(0, Endian.little);
       rhs ^= input.getUint64(length - 8, Endian.little);
 
-      _hash = length + _swap64(lhs) + rhs + _mul128fold64(lhs, rhs);
-      return _avalanche(_hash);
+      hash = length + _swap64(lhs) + rhs + _mul128fold64(lhs, rhs);
+      return _avalanche(hash);
     } else if (length <= 128) {
       // hash_t<N> len_17to128
-      _hash = length * prime64_1;
+      hash = length * prime64_1;
       if (length > 32) {
         if (length > 64) {
           if (length > 96) {
-            _hash += _mix16B(input, 48, key, 96, seed);
-            _hash += _mix16B(input, length - 64, key, 112, seed);
+            hash += _mix16B(input, 48, key, 96, seed);
+            hash += _mix16B(input, length - 64, key, 112, seed);
           }
-          _hash += _mix16B(input, 32, key, 64, seed);
-          _hash += _mix16B(input, length - 48, key, 80, seed);
+          hash += _mix16B(input, 32, key, 64, seed);
+          hash += _mix16B(input, length - 48, key, 80, seed);
         }
-        _hash += _mix16B(input, 16, key, 32, seed);
-        _hash += _mix16B(input, length - 32, key, 48, seed);
+        hash += _mix16B(input, 16, key, 32, seed);
+        hash += _mix16B(input, length - 32, key, 48, seed);
       }
-      _hash += _mix16B(input, 0, key, 0, seed);
-      _hash += _mix16B(input, length - 16, key, 16, seed);
-      return _avalanche(_hash);
+      hash += _mix16B(input, 0, key, 0, seed);
+      hash += _mix16B(input, length - 16, key, 16, seed);
+      return _avalanche(hash);
     } else {
       // hash_t<N> len_129to240
-      const int _startOffset = 3;
-      const int _lastOffset = 17;
-      _hash = length * prime64_1;
+      const int startOffset = 3;
+      const int lastOffset = 17;
+      hash = length * prime64_1;
       // first 128 bytes
       for (i = 0; i < 128; i += 16) {
-        _hash += _mix16B(input, i, key, i, seed);
+        hash += _mix16B(input, i, key, i, seed);
       }
-      _hash = _avalanche(_hash);
+      hash = _avalanche(hash);
       // remaining bytes
       for (i = 128; i + 16 <= length; i += 16) {
-        c = _startOffset + i - 128;
-        _hash += _mix16B(input, i, key, c, seed);
+        c = startOffset + i - 128;
+        hash += _mix16B(input, i, key, c, seed);
       }
       // last byte
-      c = _minSecretSize - _lastOffset;
-      _hash += _mix16B(input, length - 16, key, c, seed);
-      return _avalanche(_hash);
+      c = _minSecretSize - lastOffset;
+      hash += _mix16B(input, length - 16, key, c, seed);
+      return _avalanche(hash);
     }
   }
 
   @override
   Uint8List $finalize() {
     int i;
-    int _hash;
+    int hash;
     ByteData key;
     Uint64List input = Uint64List(_midsizeMax >>> 3);
     Uint8List input8 = input.buffer.asUint8List();
@@ -369,23 +369,23 @@ class XXH3Sink64bit extends BlockHashSink {
       } else {
         key = Uint8List.fromList(_kSecret).buffer.asByteData();
       }
-      _hash = _finalizeShort(input.buffer.asByteData(), i, key);
+      hash = _finalizeShort(input.buffer.asByteData(), i, key);
     } else {
       for (i = 63; i >= 0; --i) {
         input8[i] = last.removeLast();
       }
-      _hash = _finalizeLong(input);
+      hash = _finalizeLong(input);
     }
 
     return Uint8List.fromList([
-      _hash >>> 56,
-      _hash >>> 48,
-      _hash >>> 40,
-      _hash >>> 32,
-      _hash >>> 24,
-      _hash >>> 16,
-      _hash >>> 8,
-      _hash,
+      hash >>> 56,
+      hash >>> 48,
+      hash >>> 40,
+      hash >>> 32,
+      hash >>> 24,
+      hash >>> 16,
+      hash >>> 8,
+      hash,
     ]);
   }
 }

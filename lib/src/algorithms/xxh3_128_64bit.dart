@@ -150,21 +150,21 @@ class XXH3Sink128bit extends BlockHashSink {
   }
 
   @pragma('vm:prefer-inline')
-  static int _avalanche(int _hash) {
-    _hash ^= _hash >>> 37;
-    _hash *= 0x165667919E3779F9;
-    _hash ^= _hash >>> 32;
-    return _hash;
+  static int _avalanche(int hash) {
+    hash ^= hash >>> 37;
+    hash *= 0x165667919E3779F9;
+    hash ^= hash >>> 32;
+    return hash;
   }
 
   @pragma('vm:prefer-inline')
-  static int _midsizeAvalanche(int _hash) {
-    _hash ^= _hash >>> 33;
-    _hash *= prime64_2;
-    _hash ^= _hash >>> 29;
-    _hash *= prime64_3;
-    _hash ^= _hash >>> 32;
-    return _hash;
+  static int _midsizeAvalanche(int hash) {
+    hash ^= hash >>> 33;
+    hash *= prime64_2;
+    hash ^= hash >>> 29;
+    hash *= prime64_3;
+    hash ^= hash >>> 32;
+    return hash;
   }
 
   @pragma('vm:prefer-inline')
@@ -193,8 +193,8 @@ class XXH3Sink128bit extends BlockHashSink {
     // XXH3_hashLong_128b
     int low, high;
     int t, n, i, v, l, a, b;
-    const int _lastAccStart = 7;
-    const int _mergeAccStart = 11;
+    const int lastAccStart = 7;
+    const int mergeAccStart = 11;
 
     // accumulate last partial block
     for (t = n = 0; t + _stripeLen < pos; n++, t += _stripeLen) {
@@ -208,7 +208,7 @@ class XXH3Sink128bit extends BlockHashSink {
     }
 
     // last stripe
-    t = secret.lengthInBytes - _stripeLen - _lastAccStart;
+    t = secret.lengthInBytes - _stripeLen - lastAccStart;
     for (i = 0; i < state.length; i++, t += 8) {
       v = stripe[i];
       state[i ^ 1] += v;
@@ -219,13 +219,13 @@ class XXH3Sink128bit extends BlockHashSink {
     // converge into final hash
     low = messageLength * prime64_1;
     high = ~(messageLength * prime64_2);
-    t = _mergeAccStart;
+    t = mergeAccStart;
     for (i = 0; i < 8; i += 2, t += 16) {
       a = secretBD.getUint64(t, Endian.little);
       b = secretBD.getUint64(t + 8, Endian.little);
       low += _mul128fold64(state[i] ^ a, state[i + 1] ^ b);
     }
-    t = secret.lengthInBytes - _stripeLen - _mergeAccStart;
+    t = secret.lengthInBytes - _stripeLen - mergeAccStart;
     for (i = 0; i < 8; i += 2, t += 16) {
       a = secretBD.getUint64(t, Endian.little);
       b = secretBD.getUint64(t + 8, Endian.little);
@@ -430,8 +430,8 @@ class XXH3Sink128bit extends BlockHashSink {
       high = -_avalanche(high);
     } else {
       // hash_t<N> len_129to240
-      const int _startOffset = 3;
-      const int _lastOffset = 17;
+      const int startOffset = 3;
+      const int lastOffset = 17;
       acc[0] = length * prime64_1;
       acc[1] = 0;
       // first 128 bytes
@@ -456,7 +456,7 @@ class XXH3Sink128bit extends BlockHashSink {
           i,
           i + 16,
           key,
-          _startOffset + i - 128,
+          startOffset + i - 128,
           seed,
         );
       }
@@ -467,7 +467,7 @@ class XXH3Sink128bit extends BlockHashSink {
         length - 16,
         length - 32,
         key,
-        _minSecretSize - _lastOffset - 16,
+        _minSecretSize - lastOffset - 16,
         -seed,
       );
       // mid-range avalanche

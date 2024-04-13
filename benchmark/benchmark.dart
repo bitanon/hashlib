@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:math';
 import "dart:io";
+import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 
@@ -15,6 +15,11 @@ import 'hmac_sha1.dart' as sha1_hmac;
 import 'hmac_sha256.dart' as sha256_hmac;
 import 'md5.dart' as md5;
 import 'poly1305.dart' as poly1305;
+import 'ripemd128.dart' as ripemd128;
+import 'ripemd160.dart' as ripemd160;
+import 'ripemd256.dart' as ripemd256;
+import 'ripemd320.dart' as ripemd320;
+import 'scrypt.dart' as scrypt;
 import 'sha1.dart' as sha1;
 import 'sha224.dart' as sha224;
 import 'sha256.dart' as sha256;
@@ -23,11 +28,6 @@ import 'sha3_256.dart' as sha3_256;
 import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
 import 'xxhash.dart' as xxhash;
-import 'scrypt.dart' as scrypt;
-import 'ripemd128.dart' as ripemd128;
-import 'ripemd160.dart' as ripemd160;
-import 'ripemd256.dart' as ripemd256;
-import 'ripemd320.dart' as ripemd320;
 
 IOSink sink = stdout;
 RandomAccessFile? raf;
@@ -168,7 +168,7 @@ void measureHashFunctions() {
         var runtime = benchmark.measure();
         var hashRate = 1e6 * iter * size / runtime;
         diff[benchmark.name] = runtime;
-        rate[benchmark.name] = formatSize(hashRate) + '/s';
+        rate[benchmark.name] = '${formatSize(hashRate)}/s';
       }
       var me = entry.value.first;
       var mine = diff[me.name]!;

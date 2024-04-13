@@ -446,39 +446,39 @@ class Argon2Internal {
 
   static void _blake2bMixer(
     Uint64List v,
-    int _i0,
-    int _i1,
-    int _i2,
-    int _i3,
-    int _i4,
-    int _i5,
-    int _i6,
-    int _i7,
-    int _i8,
-    int _i9,
-    int _i10,
-    int _i11,
-    int _i12,
-    int _i13,
-    int _i14,
-    int _i15,
+    int i0,
+    int i1,
+    int i2,
+    int i3,
+    int i4,
+    int i5,
+    int i6,
+    int i7,
+    int i8,
+    int i9,
+    int i10,
+    int i11,
+    int i12,
+    int i13,
+    int i14,
+    int i15,
   ) {
-    int v0 = v[_i0];
-    int v1 = v[_i1];
-    int v2 = v[_i2];
-    int v3 = v[_i3];
-    int v4 = v[_i4];
-    int v5 = v[_i5];
-    int v6 = v[_i6];
-    int v7 = v[_i7];
-    int v8 = v[_i8];
-    int v9 = v[_i9];
-    int v10 = v[_i10];
-    int v11 = v[_i11];
-    int v12 = v[_i12];
-    int v13 = v[_i13];
-    int v14 = v[_i14];
-    int v15 = v[_i15];
+    int v0 = v[i0];
+    int v1 = v[i1];
+    int v2 = v[i2];
+    int v3 = v[i3];
+    int v4 = v[i4];
+    int v5 = v[i5];
+    int v6 = v[i6];
+    int v7 = v[i7];
+    int v8 = v[i8];
+    int v9 = v[i9];
+    int v10 = v[i10];
+    int v11 = v[i11];
+    int v12 = v[i12];
+    int v13 = v[i13];
+    int v14 = v[i14];
+    int v15 = v[i15];
 
     // _mix(v, v0, v4, v8, v12);
     v0 += v4 + (_mul32(v0, v4) << 1);
@@ -560,22 +560,22 @@ class Argon2Internal {
     v9 += v14 + (_mul32(v9, v14) << 1);
     v4 = _rotr(v4 ^ v9, 63);
 
-    v[_i0] = v0;
-    v[_i1] = v1;
-    v[_i2] = v2;
-    v[_i3] = v3;
-    v[_i4] = v4;
-    v[_i5] = v5;
-    v[_i6] = v6;
-    v[_i7] = v7;
-    v[_i8] = v8;
-    v[_i9] = v9;
-    v[_i10] = v10;
-    v[_i11] = v11;
-    v[_i12] = v12;
-    v[_i13] = v13;
-    v[_i14] = v14;
-    v[_i15] = v15;
+    v[i0] = v0;
+    v[i1] = v1;
+    v[i2] = v2;
+    v[i3] = v3;
+    v[i4] = v4;
+    v[i5] = v5;
+    v[i6] = v6;
+    v[i7] = v7;
+    v[i8] = v8;
+    v[i9] = v9;
+    v[i10] = v10;
+    v[i11] = v11;
+    v[i12] = v12;
+    v[i13] = v13;
+    v[i14] = v14;
+    v[i15] = v15;
   }
 }
 

@@ -184,7 +184,7 @@ void main(List<String> args) {
     print(uris[i]);
     var totp = parse(uris[i]) as TOTP;
     totp.stream.listen((e) {
-      if (i == 0) print('\nTime: ${DateTime.now()}\n' + ('-' * 40));
+      if (i == 0) print("\nTime: ${DateTime.now()}\n ${'-' * 40}");
       var otp = e.toString().padLeft(totp.digits, '0');
       var left = otp.substring(0, totp.digits ~/ 2);
       var right = otp.substring(totp.digits ~/ 2);

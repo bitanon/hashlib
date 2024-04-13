@@ -70,44 +70,44 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   ///   returned stream closes with an error event.
   @override
   Stream<HashDigest> bind(Stream<List<int>> stream) {
-    bool _paused = false;
-    bool _cancelled = false;
+    bool paused = false;
+    bool cancelled = false;
     StreamSubscription<List<int>>? subscription;
     var controller = StreamController<HashDigest>(sync: false);
     controller.onCancel = () async {
-      _cancelled = true;
+      cancelled = true;
       await subscription?.cancel();
     };
     controller.onPause = () {
-      _paused = true;
+      paused = true;
       subscription?.pause();
     };
     controller.onResume = () {
-      _paused = false;
+      paused = false;
       subscription?.resume();
     };
     controller.onListen = () {
-      if (_cancelled) return;
-      bool _hasError = false;
+      if (cancelled) return;
+      bool hasError = false;
       var sink = createSink();
       subscription = stream.listen(
         (List<int> event) {
           try {
             sink.add(event);
           } catch (err, stack) {
-            _hasError = true;
+            hasError = true;
             subscription?.cancel();
             controller.addError(err, stack);
           }
         },
         cancelOnError: true,
         onError: (Object err, [StackTrace? stack]) {
-          _hasError = true;
+          hasError = true;
           controller.addError(err, stack);
         },
         onDone: () {
           try {
-            if (!_hasError) {
+            if (!hasError) {
               controller.add(sink.digest());
             }
           } catch (err, stack) {
@@ -117,7 +117,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
           }
         },
       );
-      if (_paused) {
+      if (paused) {
         subscription?.pause();
       }
     };

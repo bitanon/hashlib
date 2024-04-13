@@ -112,7 +112,7 @@ class Scrypt extends KeyDerivatorBase {
 
     /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
     @pragma('vm:prefer-inline')
-    void _blockMix() {
+    void blockMix() {
       int i, j, p, q;
       p = 0;
       q = midRO;
@@ -152,7 +152,7 @@ class Scrypt extends KeyDerivatorBase {
         for (j = 0; j < roLength32; ++j) {
           v[j] = inp[j];
         }
-        _blockMix();
+        blockMix();
         // swap inp <-> out
         v = inp;
         inp = out;
@@ -163,7 +163,7 @@ class Scrypt extends KeyDerivatorBase {
         for (j = 0; j < roLength32; ++j) {
           inp[j] ^= v[j];
         }
-        _blockMix();
+        blockMix();
         // swap inp <-> out
         v = inp;
         inp = out;

@@ -91,44 +91,44 @@ class XXHash32Sink extends BlockHashSink {
   @override
   Uint8List $finalize() {
     int i, t;
-    int _hash;
+    int hash;
 
     if (messageLength < 16) {
-      _hash = (seed & _mask32) + prime32_5;
+      hash = (seed & _mask32) + prime32_5;
     } else {
-      _hash = rotl32(_acc1, 1);
-      _hash += rotl32(_acc2, 7);
-      _hash += rotl32(_acc3, 12);
-      _hash += rotl32(_acc4, 18);
+      hash = rotl32(_acc1, 1);
+      hash += rotl32(_acc2, 7);
+      hash += rotl32(_acc3, 12);
+      hash += rotl32(_acc4, 18);
     }
 
-    _hash += messageLength & _mask32;
+    hash += messageLength & _mask32;
 
     // process the remaining data
     for (i = t = 0; t + 4 <= pos; ++i, t += 4) {
-      _hash += cross32(sbuffer[i], prime32_3);
-      _hash = rotl32(_hash, 17);
-      _hash = cross32(_hash, prime32_4);
+      hash += cross32(sbuffer[i], prime32_3);
+      hash = rotl32(hash, 17);
+      hash = cross32(hash, prime32_4);
     }
     for (; t < pos; t++) {
-      _hash += cross32(buffer[t], prime32_5);
-      _hash = rotl32(_hash, 11);
-      _hash = cross32(_hash, prime32_1);
+      hash += cross32(buffer[t], prime32_5);
+      hash = rotl32(hash, 11);
+      hash = cross32(hash, prime32_1);
     }
 
     // avalanche
-    _hash &= _mask32;
-    _hash ^= _hash >>> 15;
-    _hash = cross32(_hash, prime32_2);
-    _hash ^= _hash >>> 13;
-    _hash = cross32(_hash, prime32_3);
-    _hash ^= _hash >>> 16;
+    hash &= _mask32;
+    hash ^= hash >>> 15;
+    hash = cross32(hash, prime32_2);
+    hash ^= hash >>> 13;
+    hash = cross32(hash, prime32_3);
+    hash ^= hash >>> 16;
 
     return Uint8List.fromList([
-      _hash >>> 24,
-      _hash >>> 16,
-      _hash >>> 8,
-      _hash,
+      hash >>> 24,
+      hash >>> 16,
+      hash >>> 8,
+      hash,
     ]);
   }
 }

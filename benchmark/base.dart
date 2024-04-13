@@ -28,7 +28,7 @@ abstract class Benchmark extends BenchmarkBase {
     var nbhps = 1e6 * iter / runtime;
     var rate = nbhps * size;
     var rtms = runtime.round() / 1000;
-    var speed = formatSize(rate) + '/s';
+    var speed = '${formatSize(rate)}/s';
     print('$name ($size x $iter): $rtms ms => nb# ${nbhps.round()} @ $speed');
   }
 
@@ -39,7 +39,7 @@ abstract class Benchmark extends BenchmarkBase {
       var runtime = benchmark.measure();
       var hashRate = 1e6 * iter * size / runtime;
       diff[benchmark.name] = runtime;
-      rate[benchmark.name] = formatSize(hashRate) + '/s';
+      rate[benchmark.name] = '${formatSize(hashRate)}/s';
     }
     var mine = diff[name]!;
     var best = diff.values.fold(mine, min);

@@ -93,7 +93,7 @@ class Argon2Internal {
     return result;
   }
 
-  void _initialHash(Uint8List _hash0, List<int> password) {
+  void _initialHash(Uint8List hash0, List<int> password) {
     // H_0 = H^(64)(LE32(p) || LE32(T) || LE32(m) || LE32(t) ||
     //         LE32(v) || LE32(y) || LE32(length(P)) || P ||
     //         LE32(length(S)) || S ||  LE32(length(K)) || K ||
@@ -120,7 +120,7 @@ class Argon2Internal {
 
     var hash = blake2b.digest().bytes;
     for (int i = 0; i < 64; ++i) {
-      _hash0[i] = hash[i];
+      hash0[i] = hash[i];
     }
   }
 
