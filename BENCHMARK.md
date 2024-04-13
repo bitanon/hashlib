@@ -11,90 +11,91 @@ With string of length 500000 (10 iterations):
 
 | Algorithms    | `hashlib`      | `crypto`                     | `hash`                       | `PointyCastle`                |
 | ------------- | -------------- | ---------------------------- | ---------------------------- | ----------------------------- |
-| MD5           | **158.25MB/s** | 120.80MB/s <br> `31% slower` | 69.00MB/s <br> `129% slower` | 79.41MB/s <br> `99% slower`   |
-| HMAC(MD5)     | **159.98MB/s** | 121.65MB/s <br> `32% slower` | 69.45MB/s <br> `130% slower` | ➖                            |
-| SHA-1         | **147.59MB/s** | 96.42MB/s <br> `53% slower`  | 41.19MB/s <br> `258% slower` | 53.58MB/s <br> `175% slower`  |
-| HMAC(SHA-1)   | **149.01MB/s** | 96.20MB/s <br> `55% slower`  | ➖                           | ➖                            |
-| SHA-224       | **98.60MB/s**  | 84.39MB/s <br> `17% slower`  | 20.12MB/s <br> `390% slower` | 21.03MB/s <br> `369% slower`  |
-| SHA-256       | **97.51MB/s**  | 84.23MB/s <br> `16% slower`  | 20.22MB/s <br> `382% slower` | 20.77MB/s <br> `370% slower`  |
-| HMAC(SHA-256) | **97.77MB/s**  | 83.36MB/s <br> `17% slower`  | ➖                           | ➖                            |
-| SHA-384       | **156.34MB/s** | 49.44MB/s <br> `216% slower` | 17.51MB/s <br> `793% slower` | 5.12MB/s <br> `2955% slower`  |
-| SHA-512       | **157.51MB/s** | 49.35MB/s <br> `219% slower` | 17.41MB/s <br> `805% slower` | 5.08MB/s <br> `2998% slower`  |
-| SHA3-256      | **97.72MB/s**  | ➖                           | ➖                           | 3.13MB/s <br> `3019% slower`  |
-| SHA3-512      | **153.92MB/s** | ➖                           | ➖                           | 1.66MB/s <br> `9174% slower`  |
-| RIPEMD-128    | **200.03MB/s** | ➖                           | ➖                           | 45.51MB/s <br> `340% slower`  |
-| RIPEMD-160    | **66.46MB/s**  | ➖                           | 31.73MB/s <br> `109% slower` | 26.87MB/s <br> `147% slower`  |
-| RIPEMD-256    | **222.37MB/s** | ➖                           | ➖                           | 44.99MB/s <br> `394% slower`  |
-| RIPEMD-320    | **66.47MB/s**  | ➖                           | ➖                           | 26.45MB/s <br> `151% slower`  |
-| BLAKE-2s      | **142.38MB/s** | ➖                           | ➖                           | ➖                            |
-| BLAKE-2b      | **163.08MB/s** | ➖                           | ➖                           | 12.02MB/s <br> `1256% slower` |
-| Poly1305      | **354.80MB/s** | ➖                           | ➖                           | 152.52MB/s <br> `133% slower` |
-| XXH32         | **493.59MB/s** | ➖                           | ➖                           | ➖                            |
-| XXH64         | **501.26MB/s** | ➖                           | ➖                           | ➖                            |
-| XXH3          | **102.48MB/s** | ➖                           | ➖                           | ➖                            |
-| XXH128        | **103.29MB/s** | ➖                           | ➖                           | ➖                            |
+| MD5           | **174.11MB/s** | 143.99MB/s <br> `21% slower` | 80.43MB/s <br> `116% slower` | 87.90MB/s <br> `98% slower`   |
+| HMAC(MD5)     | **172.75MB/s** | 140.49MB/s <br> `23% slower` | 79.53MB/s <br> `117% slower` | ➖                            |
+| SHA-1         | **153.75MB/s** | 108.64MB/s <br> `42% slower` | 45.37MB/s <br> `239% slower` | 55.91MB/s <br> `175% slower`  |
+| HMAC(SHA-1)   | **153.63MB/s** | 106.20MB/s <br> `45% slower` | ➖                           | ➖                            |
+| SHA-224       | **102.70MB/s** | 93.48MB/s <br> `10% slower`  | 21.72MB/s <br> `373% slower` | 22.20MB/s <br> `363% slower`  |
+| SHA-256       | **102.90MB/s** | 93.52MB/s <br> `10% slower`  | 21.72MB/s <br> `374% slower` | 22.43MB/s <br> `359% slower`  |
+| HMAC(SHA-256) | **102.74MB/s** | 93.22MB/s <br> `10% slower`  | ➖                           | ➖                            |
+| SHA-384       | **164.65MB/s** | 54.65MB/s <br> `201% slower` | 18.71MB/s <br> `780% slower` | 5.07MB/s <br> `3150% slower`  |
+| SHA-512       | **164.56MB/s** | 54.62MB/s <br> `201% slower` | 19.07MB/s <br> `763% slower` | 5.20MB/s <br> `3065% slower`  |
+| SHA3-256      | **102.93MB/s** | ➖                           | ➖                           | 3.31MB/s <br> `3009% slower`  |
+| SHA3-512      | **164.45MB/s** | ➖                           | ➖                           | 1.76MB/s <br> `9238% slower`  |
+| RIPEMD-128    | **220.20MB/s** | ➖                           | ➖                           | 45.66MB/s <br> `382% slower`  |
+| RIPEMD-160    | **69.18MB/s**  | ➖                           | 35.07MB/s <br> `97% slower`  | 28.70MB/s <br> `141% slower`  |
+| RIPEMD-256    | **237.84MB/s** | ➖                           | ➖                           | 44.92MB/s <br> `429% slower`  |
+| RIPEMD-320    | **69.01MB/s**  | ➖                           | ➖                           | 28.29MB/s <br> `144% slower`  |
+| BLAKE-2s      | **149.47MB/s** | ➖                           | ➖                           | ➖                            |
+| BLAKE-2b      | **170.34MB/s** | ➖                           | ➖                           | 12.93MB/s <br> `1218% slower` |
+| Poly1305      | **425.28MB/s** | ➖                           | ➖                           | 160.07MB/s <br> `166% slower` |
+| XXH32         | **545.26MB/s** | ➖                           | ➖                           | ➖                            |
+| XXH64         | **540.75MB/s** | ➖                           | ➖                           | ➖                            |
+| XXH3          | **124.28MB/s** | ➖                           | ➖                           | ➖                            |
+| XXH128        | **125.25MB/s** | ➖                           | ➖                           | ➖                            |
 
 With string of length 1000 (5000 iterations):
 
 | Algorithms    | `hashlib`      | `crypto`                     | `hash`                       | `PointyCastle`                |
 | ------------- | -------------- | ---------------------------- | ---------------------------- | ----------------------------- |
-| MD5           | **151.03MB/s** | 116.75MB/s <br> `29% slower` | 87.36MB/s <br> `73% slower`  | 76.49MB/s <br> `97% slower`   |
-| HMAC(MD5)     | **115.39MB/s** | 93.47MB/s <br> `23% slower`  | 63.77MB/s <br> `81% slower`  | ➖                            |
-| SHA-1         | **139.67MB/s** | 92.56MB/s <br> `51% slower`  | 45.23MB/s <br> `209% slower` | 50.75MB/s <br> `175% slower`  |
-| HMAC(SHA-1)   | **92.06MB/s**  | 63.64MB/s <br> `45% slower`  | ➖                           | ➖                            |
-| SHA-224       | **94.08MB/s**  | 79.64MB/s <br> `18% slower`  | 20.74MB/s <br> `354% slower` | 20.07MB/s <br> `369% slower`  |
-| SHA-256       | **93.87MB/s**  | 79.67MB/s <br> `18% slower`  | 20.66MB/s <br> `354% slower` | 19.96MB/s <br> `370% slower`  |
-| HMAC(SHA-256) | **61.69MB/s**  | 56.52MB/s <br> `9% slower`   | ➖                           | ➖                            |
-| SHA-384       | **143.57MB/s** | 47.38MB/s <br> `203% slower` | 20.17MB/s <br> `612% slower` | 4.87MB/s <br> `2846% slower`  |
-| SHA-512       | **144.20MB/s** | 46.81MB/s <br> `208% slower` | 20.64MB/s <br> `598% slower` | 4.87MB/s <br> `2860% slower`  |
-| SHA3-256      | **92.60MB/s**  | ➖                           | ➖                           | 2.85MB/s <br> `3145% slower`  |
-| SHA3-512      | **142.48MB/s** | ➖                           | ➖                           | 1.65MB/s <br> `8544% slower`  |
-| RIPEMD-128    | **190.02MB/s** | ➖                           | ➖                           | 44.51MB/s <br> `327% slower`  |
-| RIPEMD-160    | **65.02MB/s**  | ➖                           | 34.96MB/s <br> `86% slower`  | 26.57MB/s <br> `145% slower`  |
-| RIPEMD-256    | **206.49MB/s** | ➖                           | ➖                           | 44.06MB/s <br> `369% slower`  |
-| RIPEMD-320    | **64.46MB/s**  | ➖                           | ➖                           | 25.91MB/s <br> `149% slower`  |
-| BLAKE-2s      | **136.29MB/s** | ➖                           | ➖                           | ➖                            |
-| BLAKE-2b      | **150.38MB/s** | ➖                           | ➖                           | 11.48MB/s <br> `1209% slower` |
-| Poly1305      | **279.10MB/s** | ➖                           | ➖                           | 149.49MB/s <br> `87% slower`  |
-| XXH32         | **482.94MB/s** | ➖                           | ➖                           | ➖                            |
-| XXH64         | **506.20MB/s** | ➖                           | ➖                           | ➖                            |
-| XXH3          | **96.50MB/s**  | ➖                           | ➖                           | ➖                            |
-| XXH128        | **96.85MB/s**  | ➖                           | ➖                           | ➖                            |
+| MD5           | **173.02MB/s** | 139.81MB/s <br> `24% slower` | 107.34MB/s <br> `61% slower` | 84.78MB/s <br> `104% slower`  |
+| HMAC(MD5)     | **137.62MB/s** | 114.52MB/s <br> `20% slower` | 79.88MB/s <br> `72% slower`  | ➖                            |
+| SHA-1         | **141.82MB/s** | 106.40MB/s <br> `33% slower` | 52.16MB/s <br> `172% slower` | 54.26MB/s <br> `161% slower`  |
+| HMAC(SHA-1)   | **101.76MB/s** | 74.43MB/s <br> `37% slower`  | ➖                           | ➖                            |
+| SHA-224       | **98.85MB/s**  | 90.34MB/s <br> `9% slower`   | 22.61MB/s <br> `337% slower` | 21.64MB/s <br> `357% slower`  |
+| SHA-256       | **98.12MB/s**  | 90.34MB/s <br> `9% slower`   | 22.64MB/s <br> `333% slower` | 21.77MB/s <br> `351% slower`  |
+| HMAC(SHA-256) | **69.03MB/s**  | 63.06MB/s <br> `9% slower`   | ➖                           | ➖                            |
+| SHA-384       | **152.64MB/s** | 52.18MB/s <br> `192% slower` | 22.93MB/s <br> `566% slower` | 5.11MB/s <br> `2890% slower`  |
+| SHA-512       | **151.24MB/s** | 52.18MB/s <br> `190% slower` | 22.62MB/s <br> `569% slower` | 5.11MB/s <br> `2861% slower`  |
+| SHA3-256      | **98.23MB/s**  | ➖                           | ➖                           | 3.11MB/s <br> `3054% slower`  |
+| SHA3-512      | **151.52MB/s** | ➖                           | ➖                           | 1.79MB/s <br> `8377% slower`  |
+| RIPEMD-128    | **211.29MB/s** | ➖                           | ➖                           | 44.55MB/s <br> `374% slower`  |
+| RIPEMD-160    | **66.85MB/s**  | ➖                           | 37.83MB/s <br> `77% slower`  | 27.78MB/s <br> `141% slower`  |
+| RIPEMD-256    | **224.34MB/s** | ➖                           | ➖                           | 43.38MB/s <br> `417% slower`  |
+| RIPEMD-320    | **67.03MB/s**  | ➖                           | ➖                           | 27.39MB/s <br> `145% slower`  |
+| BLAKE-2s      | **144.01MB/s** | ➖                           | ➖                           | ➖                            |
+| BLAKE-2b      | **163.75MB/s** | ➖                           | ➖                           | 12.47MB/s <br> `1213% slower` |
+| Poly1305      | **397.65MB/s** | ➖                           | ➖                           | 154.36MB/s <br> `158% slower` |
+| XXH32         | **506.25MB/s** | ➖                           | ➖                           | ➖                            |
+| XXH64         | **509.56MB/s** | ➖                           | ➖                           | ➖                            |
+| XXH3          | **117.56MB/s** | ➖                           | ➖                           | ➖                            |
+| XXH128        | **118.76MB/s** | ➖                           | ➖                           | ➖                            |
 
 With string of length 10 (100000 iterations):
 
 | Algorithms    | `hashlib`     | `crypto`                    | `hash`                      | `PointyCastle`                 |
 | ------------- | ------------- | --------------------------- | --------------------------- | ------------------------------ |
-| MD5           | **22.52MB/s** | 9.59MB/s <br> `135% slower` | 6.23MB/s <br> `262% slower` | 11.56MB/s <br> `95% slower`    |
-| HMAC(MD5)     | **3.85MB/s**  | 3.66MB/s <br> `5% slower`   | 1.75MB/s <br> `121% slower` | ➖                             |
-| SHA-1         | **16.94MB/s** | 8.34MB/s <br> `103% slower` | 4.23MB/s <br> `300% slower` | 7.39MB/s <br> `129% slower`    |
-| HMAC(SHA-1)   | **2.43MB/s**  | 1.84MB/s <br> `32% slower`  | ➖                          | ➖                             |
-| SHA-224       | **12.15MB/s** | 7.18MB/s <br> `69% slower`  | 2.36MB/s <br> `415% slower` | 3.10MB/s <br> `292% slower`    |
-| SHA-256       | **12.09MB/s** | 7.17MB/s <br> `69% slower`  | 2.45MB/s <br> `393% slower` | 3.07MB/s <br> `295% slower`    |
-| HMAC(SHA-256) | **1.60MB/s**  | 1.57MB/s <br> `2% slower`   | ➖                          | ➖                             |
-| SHA-384       | **9.34MB/s**  | 2.90MB/s <br> `222% slower` | 1.27MB/s <br> `635% slower` | 380.63KB/s <br> `2355% slower` |
-| SHA-512       | **9.36MB/s**  | 2.91MB/s <br> `221% slower` | 1.19MB/s <br> `686% slower` | 378.06KB/s <br> `2376% slower` |
-| SHA3-256      | **11.95MB/s** | ➖                          | ➖                          | 219.64KB/s <br> `5343% slower` |
-| SHA3-512      | **9.51MB/s**  | ➖                          | ➖                          | 219.20KB/s <br> `4238% slower` |
-| RIPEMD-128    | **22.09MB/s** | ➖                          | ➖                          | 6.91MB/s <br> `220% slower`    |
-| RIPEMD-160    | **8.67MB/s**  | ➖                          | 3.47MB/s <br> `150% slower` | 4.07MB/s <br> `113% slower`    |
-| RIPEMD-256    | **23.23MB/s** | ➖                          | ➖                          | 6.71MB/s <br> `246% slower`    |
-| RIPEMD-320    | **8.59MB/s**  | ➖                          | ➖                          | 3.88MB/s <br> `122% slower`    |
-| BLAKE-2s      | **15.12MB/s** | ➖                          | ➖                          | ➖                             |
-| BLAKE-2b      | **12.71MB/s** | ➖                          | ➖                          | 833.86KB/s <br> `1424% slower` |
-| Poly1305      | **58.75MB/s** | ➖                          | ➖                          | 27.05MB/s <br> `117% slower`   |
-| XXH32         | **87.41MB/s** | ➖                          | ➖                          | ➖                             |
-| XXH64         | **67.40MB/s** | ➖                          | ➖                          | ➖                             |
-| XXH3          | **8.56MB/s**  | ➖                          | ➖                          | ➖                             |
-| XXH128        | **8.42MB/s**  | ➖                          | ➖                          | ➖                             |
+| MD5           | **30.58MB/s** | 15.67MB/s <br> `95% slower` | 8.53MB/s <br> `259% slower` | 15.01MB/s <br> `104% slower`   |
+| HMAC(MD5)     | **5.52MB/s**  | 4.79MB/s <br> `15% slower`  | 2.24MB/s <br> `146% slower` | ➖                             |
+| SHA-1         | **18.29MB/s** | 12.38MB/s <br> `48% slower` | 5.37MB/s <br> `240% slower` | 8.27MB/s <br> `121% slower`    |
+| HMAC(SHA-1)   | **2.84MB/s**  | 2.26MB/s <br> `26% slower`  | ➖                          | ➖                             |
+| SHA-224       | **12.84MB/s** | 10.27MB/s <br> `25% slower` | 2.85MB/s <br> `351% slower` | 3.35MB/s <br> `284% slower`    |
+| SHA-256       | **12.69MB/s** | 10.24MB/s <br> `24% slower` | 2.90MB/s <br> `338% slower` | 3.42MB/s <br> `272% slower`    |
+| HMAC(SHA-256) | **1.99MB/s**  | 1.86MB/s <br> `7% slower`   | ➖                          | ➖                             |
+| SHA-384       | **9.92MB/s**  | 3.68MB/s <br> `170% slower` | 1.49MB/s <br> `566% slower` | 392.98KB/s <br> `2424% slower` |
+| SHA-512       | **9.88MB/s**  | 3.65MB/s <br> `171% slower` | 1.50MB/s <br> `558% slower` | 394.32KB/s <br> `2405% slower` |
+| SHA3-256      | **12.81MB/s** | ➖                          | ➖                          | 241.30KB/s <br> `5210% slower` |
+| SHA3-512      | **9.87MB/s**  | ➖                          | ➖                          | 241.88KB/s <br> `3981% slower` |
+| RIPEMD-128    | **30.10MB/s** | ➖                          | ➖                          | 7.45MB/s <br> `304% slower`    |
+| RIPEMD-160    | **10.05MB/s** | ➖                          | 4.45MB/s <br> `126% slower` | 4.38MB/s <br> `129% slower`    |
+| RIPEMD-256    | **29.99MB/s** | ➖                          | ➖                          | 7.08MB/s <br> `324% slower`    |
+| RIPEMD-320    | **9.90MB/s**  | ➖                          | ➖                          | 4.17MB/s <br> `137% slower`    |
+| BLAKE-2s      | **20.02MB/s** | ➖                          | ➖                          | ➖                             |
+| BLAKE-2b      | **15.73MB/s** | ➖                          | ➖                          | 935.11KB/s <br> `1582% slower` |
+| Poly1305      | **64.28MB/s** | ➖                          | ➖                          | 39.51MB/s <br> `63% slower`    |
+| XXH32         | **94.21MB/s** | ➖                          | ➖                          | ➖                             |
+| XXH64         | **76.44MB/s** | ➖                          | ➖                          | ➖                             |
+| XXH3          | **11.31MB/s** | ➖                          | ➖                          | ➖                             |
+| XXH128        | **10.92MB/s** | ➖                          | ➖                          | ➖                             |
 
 Argon2 and scrypt benchmarks on different security parameters:
 
 | Algorithms | test     | little   | moderate  | good       | strong      |
 | ---------- | -------- | -------- | --------- | ---------- | ----------- |
-| scrypt     | 0.067 ms | 2.242 ms | 14.684 ms | 118.737 ms | 1849.659 ms |
-| argon2i    | 0.374 ms | 2.517 ms | 16.873 ms | 203.907 ms | 2406.902 ms |
-| argon2d    | 0.319 ms | 2.453 ms | 16.837 ms | 201.673 ms | 2394.64 ms  |
-| argon2id   | 0.331 ms | 2.609 ms | 16.868 ms | 205.1 ms   | 2453.487 ms |
+| scrypt     | 0.057 ms | 1.459 ms | 10.938 ms | 88.672 ms  | 1391.994 ms |
+| argon2i    | 0.358 ms | 2.763 ms | 16.825 ms | 203.519 ms | 2412.874 ms |
+| argon2d    | 0.276 ms | 2.355 ms | 16.496 ms | 200.327 ms | 2398.527 ms |
+| argon2id   | 0.308 ms | 2.382 ms | 16.928 ms | 200.221 ms | 2415.853 ms |
 
 > All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_
+> Dart SDK version: 3.3.3 (stable) (Tue Mar 26 14:21:33 2024 +0000) on "windows_x64"

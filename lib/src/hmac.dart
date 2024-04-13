@@ -11,20 +11,15 @@ import 'package:hashlib/src/core/mac_base.dart';
 /// simultaneously verify both the data integrity and authenticity of a message.
 class HMAC extends MACHashBase {
   final BlockHashBase algo;
-  late final HMACSink _sink;
 
-  HMAC(this.algo, List<int> key) : super(key) {
-    _sink = HMACSink(algo.createSink());
-    _sink.init(key);
-  }
+  const HMAC(this.algo, List<int> key) : super(key);
 
   @override
   final String name = 'HMAC';
 
   @override
   HMACSink createSink() {
-    _sink.reset();
-    return _sink;
+    return HMACSink(algo.createSink())..init(key);
   }
 }
 

@@ -1,9 +1,11 @@
-# next
+# 1.12.1
 
+- Optimize `HMAC` runtime.
 - Refactor `Argon2` class structure.
   **Breaking** changes:
   - renames variable: `lanes` to `parallelism`
   - renames variable: `passes` to `iterations`
+- Bump version of the [hashlib_codecs](https://pub.dev/packages/hashlib_codecs)
 
 # 1.12.0
 
