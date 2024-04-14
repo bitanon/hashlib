@@ -267,5 +267,5 @@ Argon2 and scrypt benchmarks on different security parameters:
 | argon2id   | 0.308 ms | 2.382 ms | 16.928 ms | 200.221 ms | 2415.853 ms |
 
 > All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_
-> <br>
+>
 > Dart SDK version: 3.3.3 (stable) (Tue Mar 26 14:21:33 2024 +0000) on "windows_x64"
