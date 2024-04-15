@@ -42,8 +42,8 @@ void dump(message) {
 // ---------------------------------------------------------------------
 void measureHashFunctions() {
   final conditions = [
-    [500000, 10],
-    [1000, 5000],
+    [5 << 20, 10],
+    [1 << 10, 5000],
     [10, 100000],
   ];
   for (var condition in conditions) {
@@ -150,13 +150,18 @@ void measureHashFunctions() {
       ],
     };
 
-    var names = algorithms.entries.fold<Set<String>>(
-      Set<String>.identity(),
-      (p, v) => p..addAll(v.value.map((b) => b.name)),
-    );
+    var nameFreq = {};
+    for (var entry in algorithms.entries) {
+      for (var benchmark in entry.value) {
+        nameFreq[benchmark.name] ??= 0;
+        nameFreq[benchmark.name]++;
+      }
+    }
+    var names = nameFreq.keys.toList();
+    names.sort((a, b) => nameFreq[b] - nameFreq[a]);
     var separator = names.map((e) => ('-' * (e.length + 4)));
 
-    dump("With string of length $size ($iter iterations):");
+    dump("With ${formatSize(size)} message ($iter iterations):");
     dump('');
     dump('| Algorithms | `${names.join('` | `')}` |');
     dump('|------------|${separator.join('|')}|');

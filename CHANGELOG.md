@@ -1,3 +1,15 @@
+# 1.13.0
+
+- **Breaking** changes on public methods:
+  - renames `poly1305` -> `poly1305pair`
+  - renames `poly1305auth` -> `poly1305`
+  - accepts 16 bytes key for `poly1305`
+- Refactor `Poly1305` class structure.
+  **Breaking** changes:
+  - renames `Poly1305.auth` -> `Poly1305.pair`
+  - removes getter `secret` (`key` contains both keypair).
+- Refactor benchmark calculation.
+
 # 1.12.1
 
 - Optimize `HMAC` runtime.

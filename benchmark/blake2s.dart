@@ -21,14 +21,14 @@ class HashlibBenchmark extends Benchmark {
 void main() {
   print('--------- BLAKE-2b ----------');
   final conditions = [
+    [5 << 20, 10],
+    [1 << 10, 5000],
     [10, 100000],
-    [1000, 5000],
-    [500000, 10],
   ];
   for (var condition in conditions) {
     int size = condition[0];
     int iter = condition[1];
-    print('---- size=$size | iterations: $iter ----');
+    print('---- size: ${formatSize(size)} | iterations: $iter ----');
     HashlibBenchmark(size, iter).showDiff([]);
     print('');
   }

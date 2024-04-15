@@ -69,11 +69,15 @@ Map<String, int> measureDiff(Iterable<BenchmarkBase> benchmarks) {
   return data;
 }
 
-String formatSize(double size) {
+String formatSize(num value) {
+  double size = value.toDouble();
   const suffix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
   int i;
-  for (i = 0; size >= 1000; i++) {
-    size /= 1000;
+  for (i = 0; size >= 1024; i++) {
+    size /= 1024;
   }
-  return '${size.toStringAsFixed(2)}${suffix[i]}';
+  var left = size.floor();
+  var right = ((size - left) * 100).floorToDouble();
+  var deci = (right / 100).toStringAsFixed(2).substring(2);
+  return '$left${right > 0 ? '.$deci' : ''}${suffix[i]}';
 }

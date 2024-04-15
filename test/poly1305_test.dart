@@ -2,7 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/algorithms/poly1305.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
@@ -91,7 +90,7 @@ void main() {
       var s = fromHex("0103808afb0db2fd4abff6af4149f51b");
       var m = "Cryptographic Forum Research Group".codeUnits;
       var actual = "a8061dc1305136c6c22b8baf0c0127a9";
-      expect(poly1305(m, r, s).hex(), actual);
+      expect(poly1305pair(m, r, s).hex(), actual);
     });
 
     test("example from NACL", () {
@@ -124,7 +123,7 @@ void main() {
         0xf3, 0xff, 0xc7, 0x70, 0x3f, 0x94, 0x00, 0xe5, //
         0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9
       ];
-      var res = poly1305auth(msg, key);
+      var res = poly1305(msg, key);
       expect(res.bytes, equals(mac));
     });
 
@@ -143,7 +142,7 @@ void main() {
         0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       ];
-      var res = poly1305auth(msg, key);
+      var res = poly1305(msg, key);
       expect(res.bytes, equals(mac));
     });
 
@@ -154,7 +153,7 @@ void main() {
         0xdd, 0xb9, 0xda, 0x7d, 0xdd, 0x5e, 0x52, 0x79, //
         0x27, 0x30, 0xed, 0x5c, 0xda, 0x5f, 0x90, 0xa4
       ];
-      var res = poly1305auth(msg, key);
+      var res = poly1305(msg, key);
       expect(res.bytes, mac);
     });
 
@@ -162,7 +161,7 @@ void main() {
       var m = "Cryptographic Forum Research Group".codeUnits;
       var key = List.filled(32, 0);
       var actual = List.filled(16, 0);
-      expect(poly1305auth(m, key).bytes, equals(actual));
+      expect(poly1305(m, key).bytes, equals(actual));
     });
 
     test('random key, empty message', () {
@@ -171,7 +170,7 @@ void main() {
         'c90e3dd155bcd5dfc5ac9a73eed584e6652bd6b403cdafd31bed3427442d29a9',
       );
       var actual = "652bd6b403cdafd31bed3427442d29a9";
-      expect(poly1305auth(m, key).hex(), actual);
+      expect(poly1305(m, key).hex(), actual);
     });
 
     test('random key, single message', () {
@@ -180,11 +179,10 @@ void main() {
         'b90e3dd1e5bc6cdfc5ac9a73eed584e6652bd3b409acdafd31bed3427442dae1',
       );
       var actual = "1aa7542dcbfafa4e04e7808ab84a989f";
-      expect(poly1305auth(m, key).hex(), actual);
+      expect(poly1305(m, key).hex(), actual);
     });
 
     test("buffered update", () {
-      var sink = Poly1305Sink();
       var key = [
         0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, //
         0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9,
@@ -197,9 +195,9 @@ void main() {
         0x28, 0x99, 0x57, 0x94, 0x41, 0x27, 0xd7, 0x5e,
       ];
 
-      sink.init(key.sublist(0, 16), key.sublist(16, 32));
+      var sink = Poly1305(key).createSink();
       for (int i = 0; i < 256; i++) {
-        var mac = poly1305(
+        var mac = poly1305pair(
           List.generate(i, (j) => i),
           List.generate(16, (j) => i),
           List.generate(16, (j) => 0xFF),
@@ -211,7 +209,7 @@ void main() {
 
     test("from bc-java test cases", () {
       for (final x in cases) {
-        var mac = poly1305auth(
+        var mac = poly1305(
           fromHex(x[1]),
           fromHex(x[0]),
         );

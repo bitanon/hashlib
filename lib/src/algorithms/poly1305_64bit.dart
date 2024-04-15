@@ -63,39 +63,22 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   /// Initialize the Poly1305 with the secret and the authentication
   ///
   /// Parameters:
-  /// - [key] : The secret key `r` - a little-endian 16-byte integer
-  /// - [secret] : The authentication key `s` - a little-endian 16-byte integer
+  /// - [keypair] : The keypair (`r`, `s`) - 16 or 32-bytes.
   @override
-  void init(List<int> key, [List<int>? secret]) {
-    if (key.length != blockLength) {
-      throw StateError('The key length must be 16 bytes');
-    }
-    if (secret != null && secret.length != 16) {
-      throw StateError('The secret length must be 16 bytes');
+  void init(List<int> keypair) {
+    if (keypair.length != 16 && keypair.length != 32) {
+      throw StateError('The key length must be 16 or bytes');
     }
 
     _initialized = true;
+    var key = keypair is Uint8List ? keypair : Uint8List.fromList(keypair);
 
     // r = key[15..0]
-    _r0 = ((key[0] & 0xFF)) |
-        ((key[1] & 0xFF) << 8) |
-        ((key[2] & 0xFF) << 16) |
-        ((key[3] & 0xFF) << 24);
-    _r1 = ((key[3] & 0xFF) >>> 2) |
-        ((key[4] & 0xFF) << 6) |
-        ((key[5] & 0xFF) << 14) |
-        ((key[6] & 0xFF) << 22);
-    _r2 = ((key[6] & 0xFF) >>> 4) |
-        ((key[7] & 0xFF) << 4) |
-        ((key[8] & 0xFF) << 12) |
-        ((key[9] & 0xFF) << 20);
-    _r3 = ((key[9] & 0xFF) >>> 6) |
-        ((key[10] & 0xFF) << 2) |
-        ((key[11] & 0xFF) << 10) |
-        ((key[12] & 0xFF) << 18);
-    _r4 = (key[13] & 0xFF) | //
-        ((key[14] & 0xFF) << 8) |
-        ((key[15] & 0xFF) << 16);
+    _r0 = key[0] | (key[1] << 8) | (key[2] << 16) | (key[3] << 24);
+    _r1 = (key[3] >>> 2) | (key[4] << 6) | (key[5] << 14) | (key[6] << 22);
+    _r2 = (key[6] >>> 4) | (key[7] << 4) | (key[8] << 12) | (key[9] << 20);
+    _r3 = (key[9] >>> 6) | (key[10] << 2) | (key[11] << 10) | (key[12] << 18);
+    _r4 = key[13] | (key[14] << 8) | (key[15] << 16);
 
     // clamp(r): r &= 0x0ffffffc0ffffffc0ffffffc0fffffff
     _r0 &= 0x03ffffff;
@@ -109,24 +92,12 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
     _g3 = 5 * _r3;
     _g4 = 5 * _r4;
 
-    if (secret != null) {
-      // s = secret[15..0]
-      _s0 = ((secret[0] & 0xFF)) |
-          ((secret[1] & 0xFF) << 8) |
-          ((secret[2] & 0xFF) << 16) |
-          ((secret[3] & 0xFF) << 24);
-      _s1 = ((secret[4] & 0xFF)) |
-          ((secret[5] & 0xFF) << 8) |
-          ((secret[6] & 0xFF) << 16) |
-          ((secret[7] & 0xFF) << 24);
-      _s2 = ((secret[8] & 0xFF)) |
-          ((secret[9] & 0xFF) << 8) |
-          ((secret[10] & 0xFF) << 16) |
-          ((secret[11] & 0xFF) << 24);
-      _s3 = ((secret[12] & 0xFF)) |
-          ((secret[13] & 0xFF) << 8) |
-          ((secret[14] & 0xFF) << 16) |
-          ((secret[15] & 0xFF) << 24);
+    if (key.length == 32) {
+      // s = key[31..16]
+      _s0 = key[16] | (key[17] << 8) | (key[18] << 16) | (key[19] << 24);
+      _s1 = key[20] | (key[21] << 8) | (key[22] << 16) | (key[23] << 24);
+      _s2 = key[24] | (key[25] << 8) | (key[26] << 16) | (key[27] << 24);
+      _s3 = key[28] | (key[29] << 8) | (key[30] << 16) | (key[31] << 24);
     }
   }
 
@@ -154,25 +125,25 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
     int d0, d1, d2, d3, d4;
 
     // a += n
-    _h0 += ((buffer[0] & 0xFF)) |
-        ((buffer[1] & 0xFF) << 8) |
-        ((buffer[2] & 0xFF) << 16) |
+    _h0 += buffer[0] |
+        (buffer[1] << 8) |
+        (buffer[2] << 16) |
         ((buffer[3] & 0x03) << 24);
-    _h1 += ((buffer[3] & 0xFF) >>> 2) |
-        ((buffer[4] & 0xFF) << 6) |
-        ((buffer[5] & 0xFF) << 14) |
+    _h1 += (buffer[3] >>> 2) |
+        (buffer[4] << 6) |
+        (buffer[5] << 14) |
         ((buffer[6] & 0xF) << 22);
-    _h2 += ((buffer[6] & 0xFF) >>> 4) |
-        ((buffer[7] & 0xFF) << 4) |
-        ((buffer[8] & 0xFF) << 12) |
+    _h2 += (buffer[6] >>> 4) |
+        (buffer[7] << 4) |
+        (buffer[8] << 12) |
         ((buffer[9] & 0x3F) << 20);
-    _h3 += ((buffer[9] & 0xFF) >>> 6) |
-        ((buffer[10] & 0xFF) << 2) |
-        ((buffer[11] & 0xFF) << 10) |
-        ((buffer[12] & 0xFF) << 18);
-    _h4 += (buffer[13] & 0xFF) | //
-        ((buffer[14] & 0xFF) << 8) |
-        ((buffer[15] & 0xFF) << 16) |
+    _h3 += (buffer[9] >>> 6) |
+        (buffer[10] << 2) |
+        (buffer[11] << 10) |
+        (buffer[12] << 18);
+    _h4 += buffer[13] |
+        (buffer[14] << 8) |
+        (buffer[15] << 16) |
         ((buffer[16] & 0x03) << 24);
 
     // a *= r

@@ -40,17 +40,15 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   /// Initialize the Poly1305 with the secret and the authentication
   ///
   /// Parameters:
-  /// - [key] : The secret key `r` - a little-endian 16-byte integer
-  /// - [secret] : The authentication key `s` - a little-endian 16-byte integer
+  /// - [keypair] : The keypair (`r`, `s`) - 16 or 32-bytes.
   @override
-  void init(List<int> key, [List<int>? secret]) {
-    if (key.length != blockLength) {
-      throw StateError('The key length must be 16 bytes');
+  void init(List<int> keypair) {
+    if (keypair.length != 16 && keypair.length != 32) {
+      throw StateError('The key length must be 16 or 32 bytes');
     }
-    if (secret != null && secret.length != 16) {
-      throw StateError('The secret length must be 16 bytes');
-    }
+
     _initialized = true;
+    var key = keypair is Uint8List ? keypair : Uint8List.fromList(keypair);
 
     int i;
     _r = BigInt.zero;
@@ -59,11 +57,11 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
       _r += BigInt.from(key[i] & _clamp[i]);
     }
 
-    if (secret != null) {
+    if (key.length == 32) {
       _s = BigInt.zero;
-      for (i = 15; i >= 0; i--) {
+      for (i = 31; i >= 16; i--) {
         _s <<= 8;
-        _s += BigInt.from(secret[i]);
+        _s += BigInt.from(key[i]);
       }
     }
   }

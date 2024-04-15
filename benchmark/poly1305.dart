@@ -16,11 +16,20 @@ final key = List.generate(16, (i) => random.nextInt(256));
 final secret = List.generate(16, (i) => random.nextInt(256));
 
 class HashlibBenchmark extends Benchmark {
+  Uint8List _key = Uint8List(32);
+  Uint8List _input = Uint8List(0);
   HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
 
   @override
+  void setup() {
+    super.setup();
+    _input = Uint8List.fromList(input);
+    _key = Uint8List.fromList([...key, ...secret]);
+  }
+
+  @override
   void run() {
-    hashlib.poly1305(input, key, secret);
+    hashlib.poly1305(_input, _key);
   }
 }
 
@@ -47,14 +56,14 @@ class PointyCastleBenchmark extends Benchmark {
 void main() {
   print('------- Poly1305 --------');
   final conditions = [
+    [5 << 20, 10],
+    [1 << 10, 5000],
     [10, 100000],
-    [1000, 5000],
-    [500000, 10],
   ];
   for (var condition in conditions) {
     int size = condition[0];
     int iter = condition[1];
-    print('---- size=$size | iterations: $iter ----');
+    print('---- size: ${formatSize(size)} | iterations: $iter ----');
     HashlibBenchmark(size, iter).showDiff([
       PointyCastleBenchmark(size, iter),
     ]);
