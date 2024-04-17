@@ -69,59 +69,12 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   ///   digest, the subscription to input [stream] cancels immediately and the
   ///   returned stream closes with an error event.
   @override
-  Stream<HashDigest> bind(Stream<List<int>> stream) {
-    bool paused = false;
-    bool cancelled = false;
-    StreamSubscription<List<int>>? subscription;
-    var controller = StreamController<HashDigest>(sync: false);
-    controller.onCancel = () async {
-      cancelled = true;
-      await subscription?.cancel();
-    };
-    controller.onPause = () {
-      paused = true;
-      subscription?.pause();
-    };
-    controller.onResume = () {
-      paused = false;
-      subscription?.resume();
-    };
-    controller.onListen = () {
-      if (cancelled) return;
-      bool hasError = false;
-      var sink = createSink();
-      subscription = stream.listen(
-        (List<int> event) {
-          try {
-            sink.add(event);
-          } catch (err, stack) {
-            hasError = true;
-            subscription?.cancel();
-            controller.addError(err, stack);
-          }
-        },
-        cancelOnError: true,
-        onError: (Object err, [StackTrace? stack]) {
-          hasError = true;
-          controller.addError(err, stack);
-        },
-        onDone: () {
-          try {
-            if (!hasError) {
-              controller.add(sink.digest());
-            }
-          } catch (err, stack) {
-            controller.addError(err, stack);
-          } finally {
-            controller.close();
-          }
-        },
-      );
-      if (paused) {
-        subscription?.pause();
-      }
-    };
-    return controller.stream;
+  Stream<HashDigest> bind(Stream<List<int>> stream) async* {
+    var sink = createSink();
+    await for (var x in stream) {
+      sink.add(x);
+    }
+    yield sink.digest();
   }
 
   @override

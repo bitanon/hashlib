@@ -1,3 +1,7 @@
+# 1.13.1
+
+- Expose `Poly1305Sink` to public.
+
 # 1.13.0
 
 - **Breaking** changes on public methods:

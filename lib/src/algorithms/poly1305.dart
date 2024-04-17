@@ -3,9 +3,11 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/core/mac_base.dart';
 
-import 'poly1305_64bit.dart' if (dart.library.js) 'poly1305_32bit.dart';
+import 'poly1305/poly1305_sink.dart';
+
+export 'poly1305/poly1305_sink.dart';
 
 /// A class for performing message authentication with the Poly1305 algorithm.
 ///

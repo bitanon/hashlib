@@ -4,7 +4,8 @@
 import 'package:hashlib/src/algorithms/poly1305.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-export 'package:hashlib/src/algorithms/poly1305.dart' show Poly1305;
+export 'package:hashlib/src/algorithms/poly1305.dart'
+    show Poly1305, Poly1305Sink;
 
 /// Computes the Poly1305 MAC (message authentication code) of the given
 /// [message] using the given the 16 or 32-byte long [keypair] for authentication.
@@ -29,11 +30,11 @@ export 'package:hashlib/src/algorithms/poly1305.dart' show Poly1305;
 ///
 /// See also:
 /// - [poly1305pair] to generate unsigned MACs.
-/// - [The Poly1305 Algorithms][pdf], the original paper on the Poly1305.
 /// - [RFC 8439 - ChaCha20 and Poly1305 for IETF Protocols][rfc8439].
+/// - [The Poly1305 Algorithms][pdf], the original paper on the Poly1305.
 ///
-/// [pdf]: https://cr.yp.to/mac/poly1305-20050329.pdf
 /// [rfc8439]: https://www.ietf.org/rfc/rfc8439.html
+/// [pdf]: https://cr.yp.to/mac/poly1305-20050329.pdf
 @pragma('vm:prefer-inline')
 HashDigest poly1305(List<int> message, List<int> keypair) =>
     Poly1305(keypair).convert(message);
@@ -62,11 +63,11 @@ HashDigest poly1305(List<int> message, List<int> keypair) =>
 ///
 /// See also:
 /// - [poly1305] to generate signed MACs directly from a keypair.
-/// - [The Poly1305 Algorithms][pdf], the original paper on the Poly1305.
 /// - [RFC 8439 - ChaCha20 and Poly1305 for IETF Protocols][rfc8439].
+/// - [The Poly1305 Algorithms][pdf], the original paper on the Poly1305.
 ///
-/// [pdf]: https://cr.yp.to/mac/poly1305-20050329.pdf
 /// [rfc8439]: https://www.ietf.org/rfc/rfc8439.html
+/// [pdf]: https://cr.yp.to/mac/poly1305-20050329.pdf
 @pragma('vm:prefer-inline')
 HashDigest poly1305pair(
   List<int> message,
