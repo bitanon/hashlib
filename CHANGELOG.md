@@ -1,3 +1,11 @@
+# 1.14.0
+
+- Accept random number generator input in the following method parameters:
+  - `randomBytes`
+  - `fillRandom`
+- Adds new method to generate 32-bit random numbers: `randomNumbers`
+- Adds `KeccakRandom` as proof of concept random number generator.
+
 # 1.13.1
 
 - Expose `Poly1305Sink` to public.

@@ -153,7 +153,7 @@ class KeccakHash extends BlockHashSink {
     if (stateSize < 0 || stateSize > 100) {
       throw ArgumentError('The state size is not valid');
     }
-    state = buffer.buffer.asUint32List();
+    state = sbuffer;
   }
 
   @override
@@ -409,5 +409,17 @@ class KeccakHash extends BlockHashSink {
       bytes[i] = buffer[j];
     }
     return bytes;
+  }
+
+  /// Returns a iterable of bytes generated from the Keccak sponge.
+  static Iterable<int> generate([int seed = 0]) sync* {
+    var sink = KeccakHash(stateSize: 64, paddingByte: 0);
+    sink.sbuffer.fillRange(0, sink.sbuffer.length, seed);
+    while (true) {
+      sink.$update();
+      for (var x in sink.buffer) {
+        yield x;
+      }
+    }
   }
 }

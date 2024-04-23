@@ -95,9 +95,6 @@ class KeccakHash extends BlockHashSink {
 
   @override
   void $update([List<int>? block, int offset = 0, bool last = false]) {
-    // Use the 64-bit state
-    var st = qstate;
-
     // Use variables to avoid index processing
     int a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12;
     int a13, a14, a15, a16, a17, a18, a19, a20, a21, a22, a23, a24;
@@ -108,31 +105,31 @@ class KeccakHash extends BlockHashSink {
     int c0, c1, c2, c3, c4, d, r;
 
     // Prepare the state (little-endian)
-    a0 = st[0];
-    a1 = st[1];
-    a2 = st[2];
-    a3 = st[3];
-    a4 = st[4];
-    a5 = st[5];
-    a6 = st[6];
-    a7 = st[7];
-    a8 = st[8];
-    a9 = st[9];
-    a10 = st[10];
-    a11 = st[11];
-    a12 = st[12];
-    a13 = st[13];
-    a14 = st[14];
-    a15 = st[15];
-    a16 = st[16];
-    a17 = st[17];
-    a18 = st[18];
-    a19 = st[19];
-    a20 = st[20];
-    a21 = st[21];
-    a22 = st[22];
-    a23 = st[23];
-    a24 = st[24];
+    a0 = qstate[0];
+    a1 = qstate[1];
+    a2 = qstate[2];
+    a3 = qstate[3];
+    a4 = qstate[4];
+    a5 = qstate[5];
+    a6 = qstate[6];
+    a7 = qstate[7];
+    a8 = qstate[8];
+    a9 = qstate[9];
+    a10 = qstate[10];
+    a11 = qstate[11];
+    a12 = qstate[12];
+    a13 = qstate[13];
+    a14 = qstate[14];
+    a15 = qstate[15];
+    a16 = qstate[16];
+    a17 = qstate[17];
+    a18 = qstate[18];
+    a19 = qstate[19];
+    a20 = qstate[20];
+    a21 = qstate[21];
+    a22 = qstate[22];
+    a23 = qstate[23];
+    a24 = qstate[24];
 
     for (r in _rc) {
       // ---- Theta parity ----
@@ -211,31 +208,31 @@ class KeccakHash extends BlockHashSink {
     }
 
     // Save the state (little-endian)
-    st[0] = a0;
-    st[1] = a1;
-    st[2] = a2;
-    st[3] = a3;
-    st[4] = a4;
-    st[5] = a5;
-    st[6] = a6;
-    st[7] = a7;
-    st[8] = a8;
-    st[9] = a9;
-    st[10] = a10;
-    st[11] = a11;
-    st[12] = a12;
-    st[13] = a13;
-    st[14] = a14;
-    st[15] = a15;
-    st[16] = a16;
-    st[17] = a17;
-    st[18] = a18;
-    st[19] = a19;
-    st[20] = a20;
-    st[21] = a21;
-    st[22] = a22;
-    st[23] = a23;
-    st[24] = a24;
+    qstate[0] = a0;
+    qstate[1] = a1;
+    qstate[2] = a2;
+    qstate[3] = a3;
+    qstate[4] = a4;
+    qstate[5] = a5;
+    qstate[6] = a6;
+    qstate[7] = a7;
+    qstate[8] = a8;
+    qstate[9] = a9;
+    qstate[10] = a10;
+    qstate[11] = a11;
+    qstate[12] = a12;
+    qstate[13] = a13;
+    qstate[14] = a14;
+    qstate[15] = a15;
+    qstate[16] = a16;
+    qstate[17] = a17;
+    qstate[18] = a18;
+    qstate[19] = a19;
+    qstate[20] = a20;
+    qstate[21] = a21;
+    qstate[22] = a22;
+    qstate[23] = a23;
+    qstate[24] = a24;
   }
 
   @override
@@ -265,5 +262,17 @@ class KeccakHash extends BlockHashSink {
       bytes[i] = buffer[j];
     }
     return bytes;
+  }
+
+  /// Returns a iterable of bytes generated from the Keccak sponge.
+  static Iterable<int> generate([int seed = 0]) sync* {
+    var sink = KeccakHash(stateSize: 64, paddingByte: 0);
+    sink.sbuffer.fillRange(0, sink.sbuffer.length, seed);
+    while (true) {
+      sink.$update();
+      for (var x in sink.buffer) {
+        yield x;
+      }
+    }
   }
 }

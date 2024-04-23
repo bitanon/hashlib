@@ -4,17 +4,21 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-Random _generator() {
+export 'package:hashlib/src/algorithms/keccak_random.dart';
+
+Random _defaultGenerator() {
   try {
     return Random.secure();
   } catch (err) {
-    return Random(DateTime.now().millisecondsSinceEpoch);
+    int micros = DateTime.now().millisecond;
+    int millis = DateTime.now().microsecond;
+    return Random((millis << 10) ^ micros);
   }
 }
 
 /// Generate a list of random 8-bit numbers of size [length]
-Uint8List randomBytes(int length) {
-  var random = _generator();
+Uint8List randomBytes(int length, [Random? random]) {
+  random ??= _defaultGenerator();
   var data = Uint8List(length);
   for (int i = 0; i < data.length; i++) {
     data[i] = random.nextInt(256);
@@ -22,20 +26,33 @@ Uint8List randomBytes(int length) {
   return data;
 }
 
-/// Fill the [buffer] with random numbers
-void fillRandom(
-  ByteBuffer buffer, [
-  int offsetInBytes = 0,
-  int? lengthInBytes,
-]) {
-  if (lengthInBytes == null) {
-    lengthInBytes = buffer.lengthInBytes;
-  } else {
-    lengthInBytes = min(lengthInBytes + offsetInBytes, buffer.lengthInBytes);
+/// Generate a list of random 32-bit numbers of size [length]
+Uint32List randomNumbers(int length, [Random? random]) {
+  random ??= _defaultGenerator();
+  var data = Uint32List(length);
+  for (int i = 0; i < data.length; i++) {
+    data[i] = random.nextInt(0x100000000);
   }
-  var random = _generator();
+  return data;
+}
+
+/// Fill the [buffer] with random numbers.
+///
+/// Both the [start] and [length] are in bytes.
+void fillRandom(
+  ByteBuffer buffer, {
+  int start = 0,
+  int? length,
+  Random? random,
+}) {
+  if (length == null) {
+    length = buffer.lengthInBytes;
+  } else {
+    length = min(length + start, buffer.lengthInBytes);
+  }
+  random ??= _defaultGenerator();
   var data = buffer.asUint8List();
-  for (int i = offsetInBytes; i < lengthInBytes; i++) {
+  for (int i = start; i < length; i++) {
     data[i] = random.nextInt(256);
   }
 }
