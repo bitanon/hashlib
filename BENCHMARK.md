@@ -11,6 +11,7 @@ With 5MB message (10 iterations):
 
 | Algorithms    | `hashlib`      | `PointyCastle`                | `crypto`                     | `hash`                       |
 | ------------- | -------------- | ----------------------------- | ---------------------------- | ---------------------------- |
+| MD4           | TODO           | TODO                          | ➖                           | ➖                           |
 | MD5           | **170.44MB/s** | 82.22MB/s <br> `107% slower`  | 136.08MB/s <br> `25% slower` | 75.89MB/s <br> `125% slower` |
 | HMAC(MD5)     | **162.81MB/s** | ➖                            | 134.81MB/s <br> `21% slower` | 77.15MB/s <br> `111% slower` |
 | SHA-1         | **143.81MB/s** | 53.44MB/s <br> `169% slower`  | 102.45MB/s <br> `40% slower` | 43.15MB/s <br> `233% slower` |
@@ -38,6 +39,7 @@ With 1KB message (5000 iterations):
 
 | Algorithms    | `hashlib`      | `PointyCastle`                | `crypto`                     | `hash`                       |
 | ------------- | -------------- | ----------------------------- | ---------------------------- | ---------------------------- |
+| MD4           | TODO           | TODO                          | ➖                           | ➖                           |
 | MD5           | **162.06MB/s** | 80.19MB/s <br> `102% slower`  | 127.99MB/s <br> `27% slower` | 97.19MB/s <br> `67% slower`  |
 | HMAC(MD5)     | **129.87MB/s** | ➖                            | 105.50MB/s <br> `23% slower` | 74.01MB/s <br> `75% slower`  |
 | SHA-1         | **134.21MB/s** | 50.28MB/s <br> `167% slower`  | 96.20MB/s <br> `40% slower`  | 47.46MB/s <br> `183% slower` |
@@ -65,6 +67,7 @@ With 10B message (100000 iterations):
 
 | Algorithms    | `hashlib`     | `PointyCastle`                 | `crypto`                    | `hash`                      |
 | ------------- | ------------- | ------------------------------ | --------------------------- | --------------------------- |
+| MD4           | TODO          | TODO                           | ➖                          | ➖                          |
 | MD5           | **28.40MB/s** | 14.16MB/s <br> `101% slower`   | 14.65MB/s <br> `94% slower` | 8.04MB/s <br> `253% slower` |
 | HMAC(MD5)     | **5.26MB/s**  | ➖                             | 4.46MB/s <br> `18% slower`  | 2.10MB/s <br> `150% slower` |
 | SHA-1         | **16.24MB/s** | 7.46MB/s <br> `118% slower`    | 11.47MB/s <br> `42% slower` | 5.05MB/s <br> `222% slower` |

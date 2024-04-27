@@ -13,6 +13,7 @@ import 'blake2s.dart' as blake2s;
 import 'hmac_md5.dart' as md5_hmac;
 import 'hmac_sha1.dart' as sha1_hmac;
 import 'hmac_sha256.dart' as sha256_hmac;
+import 'md4.dart' as md4;
 import 'md5.dart' as md5;
 import 'poly1305.dart' as poly1305;
 import 'ripemd128.dart' as ripemd128;
@@ -51,6 +52,10 @@ void measureHashFunctions() {
     var iter = condition[1];
 
     var algorithms = {
+      "MD4": [
+        md4.HashlibBenchmark(size, iter),
+        md4.PointyCastleBenchmark(size, iter),
+      ],
       "MD5": [
         md5.HashlibBenchmark(size, iter),
         md5.CryptoBenchmark(size, iter),

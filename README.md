@@ -22,6 +22,7 @@ There is only 1 dependency used by this package:
 
 | Algorithm   | Available methods                                                  |         Source          |
 | ----------- | ------------------------------------------------------------------ | :---------------------: |
+| MD4         | `md4`                                                              |        RFC-1320         |
 | MD5         | `md5`                                                              |        RFC-1321         |
 | SHA-1       | `sha1`                                                             |        RFC-3174         |
 | SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` |        RFC-6234         |
@@ -114,6 +115,7 @@ void main() {
   print('[XXH64] => ${xxh64sum(text)}');
   print('[XXH3] => ${xxh3sum(text)}');
   print('[XXH128] => ${xxh128sum(text)}');
+  print('[MD4] => ${md4.string(text)}');
   print('[MD5] => ${md5.string(text)}');
   print('[SHA-1] => ${sha1.string(text)}');
   print('[SHA-224] => ${sha224.string(text)}');
@@ -185,6 +187,7 @@ With 5MB message (10 iterations):
 
 | Algorithms    | `hashlib`      | `PointyCastle`                | `crypto`                     | `hash`                       |
 | ------------- | -------------- | ----------------------------- | ---------------------------- | ---------------------------- |
+| MD4           | TODO           | TODO                          | ➖                           | ➖                           |
 | MD5           | **170.53MB/s** | 81.35MB/s <br> `110% slower`  | 136.30MB/s <br> `25% slower` | 76.73MB/s <br> `122% slower` |
 | HMAC(MD5)     | **159.58MB/s** | ➖                            | 136.15MB/s <br> `17% slower` | 76.89MB/s <br> `108% slower` |
 | SHA-1         | **142.59MB/s** | 53.02MB/s <br> `169% slower`  | 102.50MB/s <br> `39% slower` | 43.61MB/s <br> `227% slower` |
@@ -212,6 +215,7 @@ With 1KB message (5000 iterations):
 
 | Algorithms    | `hashlib`      | `PointyCastle`                | `crypto`                     | `hash`                       |
 | ------------- | -------------- | ----------------------------- | ---------------------------- | ---------------------------- |
+| MD4           | TODO           | TODO                          | ➖                           | ➖                           |
 | MD5           | **161.58MB/s** | 80.23MB/s <br> `101% slower`  | 127.70MB/s <br> `27% slower` | 98.07MB/s <br> `65% slower`  |
 | HMAC(MD5)     | **129.45MB/s** | ➖                            | 106.28MB/s <br> `22% slower` | 72.41MB/s <br> `79% slower`  |
 | SHA-1         | **131.47MB/s** | 50.05MB/s <br> `163% slower`  | 96.13MB/s <br> `37% slower`  | 47.31MB/s <br> `178% slower` |
@@ -239,6 +243,7 @@ With 10B message (100000 iterations):
 
 | Algorithms    | `hashlib`      | `PointyCastle`                 | `crypto`                    | `hash`                      |
 | ------------- | -------------- | ------------------------------ | --------------------------- | --------------------------- |
+| MD4           | TODO           | TODO                          | ➖                           | ➖                           |
 | MD5           | **28.34MB/s**  | 14.11MB/s <br> `101% slower`   | 14.84MB/s <br> `91% slower` | 8.08MB/s <br> `251% slower` |
 | HMAC(MD5)     | **5.23MB/s**   | ➖                             | 4.47MB/s <br> `17% slower`  | 2.12MB/s <br> `146% slower` |
 | SHA-1         | **16.28MB/s**  | 7.77MB/s <br> `110% slower`    | 11.52MB/s <br> `41% slower` | 5.03MB/s <br> `224% slower` |

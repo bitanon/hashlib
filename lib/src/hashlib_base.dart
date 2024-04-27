@@ -18,6 +18,7 @@ export 'keccak224.dart';
 export 'keccak256.dart';
 export 'keccak384.dart';
 export 'keccak512.dart';
+export 'md4.dart';
 export 'md5.dart';
 export 'otpauth.dart';
 export 'pbkdf2.dart';
