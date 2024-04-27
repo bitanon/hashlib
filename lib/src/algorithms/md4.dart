@@ -94,10 +94,7 @@ class MD4Hash extends BlockHashSink {
 
     for (int i = 32; i < 48; i++) {
       e = b ^ c ^ d;
-      f = ((i & 1) << 3) |
-          (((i >> 1) & 1) << 2) |
-          (((i >> 2) & 1) << 1) |
-          ((i >> 3) & 1);
+      f = ((i & 1) << 3) | ((i & 2) << 1) | ((i >> 1) & 2) | ((i >> 3) & 1);
       t = d;
       d = c;
       c = b;
