@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:pointycastle/digests/md4.dart' as pc_md4;
 import 'package:pointycastle/digests/blake2b.dart' as pc_blake2b;
 import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
 import 'package:pointycastle/digests/sha3.dart' as pc_sha3;
@@ -180,6 +181,26 @@ void main() {
         );
       }));
     });
+  });
+
+  group('MD4 comparison', () {
+    test('with pointy-castle', () {
+      for (int i = 0; i < 1000; ++i) {
+        final data = Uint8List.fromList(List<int>.filled(i, 97));
+        expect(
+          toHex(md4.convert(data).bytes),
+          toHex(pc_md4.MD4Digest().process(data)),
+          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
+        );
+      }
+    });
+
+    test('for a file sync', () {
+      var file = File('LICENSE');
+      var hash = pc_md4.MD4Digest().process(file.readAsBytesSync());
+      var hash2 = md4.fileSync(file);
+      expect(hash2.hex(), toHex(hash));
+    }, tags: 'skip-js');
   });
 
   group('SHA1 comparison', () {

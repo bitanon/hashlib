@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/md4.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// MD4 can be used as a checksum to verify data integrity against unintentional
 /// corruption. Although it was widely used as a cryptographic hash function
@@ -36,15 +35,4 @@ String md4sum(
   bool uppercase = false,
 ]) {
   return md4.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [md4] hash
-extension Md4StringExtension on String {
-  /// Generates a MD4 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  HashDigest md4digest([Encoding? encoding]) {
-    return md4.string(this, encoding);
-  }
 }

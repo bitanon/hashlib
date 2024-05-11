@@ -1,6 +1,9 @@
 # 1.15.0
 
 - Expose `currentTime` in `TOTP`
+- Implement MD4 algorithm.
+  - New constant: `md4`
+  - New method: `md4sum`
 
 # 1.14.0
 
