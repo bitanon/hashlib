@@ -15,6 +15,7 @@ import 'keccak224.dart';
 import 'keccak256.dart';
 import 'keccak384.dart';
 import 'keccak512.dart';
+import 'md4.dart';
 import 'md5.dart';
 import 'sha1.dart';
 import 'sha224.dart';
@@ -64,6 +65,7 @@ void _buildRegistry() {
     _normalize(keccak256.name): keccak256,
     _normalize(keccak384.name): keccak384,
     _normalize(keccak512.name): keccak512,
+    _normalize(md4.name): md4,
     _normalize(md5.name): md5,
     _normalize(sha1.name): sha1,
     _normalize(sha224.name): sha224,

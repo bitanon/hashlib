@@ -1,6 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+// ignore: library_annotations
 @OnPlatform({
   'node': Skip('not supported'),
 })
