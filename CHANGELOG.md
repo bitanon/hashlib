@@ -1,3 +1,7 @@
+# 1.15.0
+
+- Expose `currentTime` in `TOTP`
+
 # 1.14.0
 
 - Accept random number generator input in the following method parameters:
