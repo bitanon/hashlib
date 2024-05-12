@@ -193,7 +193,7 @@ void measureHashFunctions() {
       for (var name in names) {
         message += " | ";
         if (!diff.containsKey(name)) {
-          message += "    \u2796    ";
+          // message += "    \u2796    ";
           continue;
         }
         var value = diff[name]!;
