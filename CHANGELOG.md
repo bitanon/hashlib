@@ -1,6 +1,6 @@
 # 1.16.0
 
-- Implemen SM3 algorithm.
+- Implement SM3 algorithm.
   - New constant: `sm3`
   - New method: `sm3sum`
 
