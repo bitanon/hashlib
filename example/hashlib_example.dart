@@ -44,6 +44,7 @@ void main() {
   print('[SHAKE-256] => ${shake256.of(20).string(text)}');
   print('[BLAKE-2s/256] => ${blake2s256.string(text)}');
   print('[BLAKE-2b/512] => ${blake2b512.string(text)}');
+  print('[SM3] => ${sm3.string(text)}');
   print('');
 
   // Examples of MAC generations

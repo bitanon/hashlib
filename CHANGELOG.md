@@ -1,3 +1,9 @@
+# 1.16.0
+
+- Implemen SM3 algorithm.
+  - New constant: `sm3`
+  - New method: `sm3sum`
+
 # 1.15.0
 
 - Expose `currentTime` in `TOTP`

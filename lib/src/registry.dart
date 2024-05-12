@@ -29,6 +29,7 @@ import 'sha512.dart';
 import 'sha512t.dart';
 import 'shake128.dart';
 import 'shake256.dart';
+import 'sm3.dart';
 import 'xxh128.dart';
 import 'xxh3.dart';
 import 'xxh32.dart';
@@ -90,6 +91,7 @@ void _buildRegistry() {
     _normalize(shake256_256.name): shake256_256,
     _normalize(shake256_384.name): shake256_384,
     _normalize(shake256_512.name): shake256_512,
+    _normalize(sm3.name): sm3,
     _normalize(xxh128.name): xxh128,
     _normalize(xxh3.name): xxh3,
     _normalize(xxh32.name): xxh32,

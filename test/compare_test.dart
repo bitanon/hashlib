@@ -7,17 +7,18 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
-import 'package:pointycastle/digests/md4.dart' as pc_md4;
 import 'package:pointycastle/digests/blake2b.dart' as pc_blake2b;
 import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
+import 'package:pointycastle/digests/md4.dart' as pc_md4;
 import 'package:pointycastle/digests/sha3.dart' as pc_sha3;
+import 'package:pointycastle/digests/sm3.dart' as pc_sm3;
 import 'package:test/test.dart';
 
 void main() {
   group('blake2b512 comparison', () {
     test('with pointycastle', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         final b = pc_blake2b.Blake2bDigest(digestSize: 64);
         expect(
           toHex(blake2b512.convert(data).bytes),
@@ -28,9 +29,9 @@ void main() {
     });
 
     test('with pointycastle with key', () {
-      final key = List<int>.filled(16, 99);
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      final key = randomBytes(16);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         final b = pc_blake2b.Blake2bDigest(
           digestSize: 64,
           key: Uint8List.fromList(key),
@@ -44,9 +45,9 @@ void main() {
     });
 
     test('with pointycastle with salt', () {
-      final salt = List<int>.filled(16, 99);
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      final salt = randomBytes(16);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         final b = pc_blake2b.Blake2bDigest(
           digestSize: 64,
           salt: Uint8List.fromList(salt),
@@ -60,9 +61,9 @@ void main() {
     });
 
     test('with pointycastle with personalization', () {
-      final salt = List<int>.filled(16, 99);
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      final salt = randomBytes(16);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         final b = pc_blake2b.Blake2bDigest(
           digestSize: 64,
           personalization: Uint8List.fromList(salt),
@@ -92,9 +93,9 @@ void main() {
     });
 
     test('with crypto', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
-        final key = List<int>.filled(i & 0x7F, 99);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
+        final key = randomBytes(i & 0x7F);
         expect(
           toHex(sha1.hmac(key).convert(data).bytes),
           toHex(crypto.Hmac(crypto.sha1, key).convert(data).bytes),
@@ -106,8 +107,8 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
-        final key = List<int>.filled(i & 0x7F, 99);
+        final data = randomBytes(i);
+        final key = randomBytes(i & 0x7F);
         expect(
           toHex(sha384.hmac(key).convert(data).bytes),
           toHex(crypto.Hmac(crypto.sha384, key).convert(data).bytes),
@@ -119,8 +120,8 @@ void main() {
 
   group('Keccak comparison', () {
     test('with keccak256', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         var pc = pc_keccak.KeccakDigest(256);
         var other = pc.process(Uint8List.fromList(data));
         expect(
@@ -132,8 +133,8 @@ void main() {
     });
 
     test('with sha3', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         var pc = pc_sha3.SHA3Digest(256);
         var other = pc.process(Uint8List.fromList(data));
         expect(
@@ -161,8 +162,8 @@ void main() {
     }, tags: 'skip-js');
 
     test('with crypto', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(md5.convert(data).bytes),
           toHex(crypto.md5.convert(data).bytes),
@@ -173,7 +174,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(md5.convert(data).bytes),
           toHex(crypto.md5.convert(data).bytes),
@@ -185,8 +186,8 @@ void main() {
 
   group('MD4 comparison', () {
     test('with pointy-castle', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = Uint8List.fromList(List<int>.filled(i, 97));
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(md4.convert(data).bytes),
           toHex(pc_md4.MD4Digest().process(data)),
@@ -203,10 +204,30 @@ void main() {
     }, tags: 'skip-js');
   });
 
+  group('SM3 comparison', () {
+    test('with pointy-castle', () {
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
+        expect(
+          sm3.convert(data).hex(),
+          toHex(pc_sm3.SM3Digest().process(data)),
+          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
+        );
+      }
+    });
+
+    test('for a file sync', () {
+      var file = File('LICENSE');
+      var hash = pc_sm3.SM3Digest().process(file.readAsBytesSync());
+      var hash2 = sm3.fileSync(file);
+      expect(hash2.hex(), toHex(hash));
+    }, tags: 'skip-js');
+  });
+
   group('SHA1 comparison', () {
     test('against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(sha1.convert(data).bytes),
           toHex(crypto.sha1.convert(data).bytes),
@@ -217,7 +238,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(sha1.convert(data).bytes),
           toHex(crypto.sha1.convert(data).bytes),
@@ -229,8 +250,8 @@ void main() {
 
   group('SHA-224 comparison', () {
     test('against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(sha224.convert(data).bytes),
           toHex(crypto.sha224.convert(data).bytes),
@@ -241,7 +262,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(sha224.convert(data).bytes),
           toHex(crypto.sha224.convert(data).bytes),
@@ -252,8 +273,8 @@ void main() {
 
     group('SHA-256 comparison', () {
       test('against known implementations', () {
-        for (int i = 0; i < 1000; ++i) {
-          final data = List<int>.filled(i, 97);
+        for (int i = 0; i < 100; ++i) {
+          final data = randomBytes(i);
           expect(
             toHex(sha256.convert(data).bytes),
             toHex(crypto.sha256.convert(data).bytes),
@@ -264,7 +285,7 @@ void main() {
 
       test('run in parallel', () async {
         await Future.wait(List.generate(10, (i) => i).map((i) async {
-          final data = List<int>.filled(i, 97);
+          final data = randomBytes(i);
           expect(
             toHex(sha256.convert(data).bytes),
             toHex(crypto.sha256.convert(data).bytes),
@@ -277,8 +298,8 @@ void main() {
 
   group('SHA-384 comparison', () {
     test('against known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(sha384.convert(data).bytes),
           toHex(crypto.sha384.convert(data).bytes),
@@ -289,7 +310,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(sha384.convert(data).bytes),
           toHex(crypto.sha384.convert(data).bytes),
@@ -301,8 +322,8 @@ void main() {
 
   group('SHA-512/224 comparison', () {
     test('with known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(sha512t224.convert(data).bytes),
           toHex(crypto.sha512224.convert(data).bytes),
@@ -313,7 +334,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(sha512t224.convert(data).bytes),
           toHex(crypto.sha512224.convert(data).bytes),
@@ -325,8 +346,8 @@ void main() {
 
   group('SHA-512/256 comparison', () {
     test('with known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(sha512t256.convert(data).bytes),
           toHex(crypto.sha512256.convert(data).bytes),
@@ -337,7 +358,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(sha512t256.convert(data).bytes),
           toHex(crypto.sha512256.convert(data).bytes),
@@ -349,8 +370,8 @@ void main() {
 
   group('SHA-512 comparison', () {
     test('with known implementations', () {
-      for (int i = 0; i < 1000; ++i) {
-        final data = List<int>.filled(i, 97);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
         expect(
           toHex(sha512.convert(data).bytes),
           toHex(crypto.sha512.convert(data).bytes),
@@ -361,7 +382,7 @@ void main() {
 
     test('run in parallel', () async {
       await Future.wait(List.generate(10, (i) => i).map((i) async {
-        final data = List<int>.filled(i, 97);
+        final data = randomBytes(i);
         expect(
           toHex(sha512.convert(data).bytes),
           toHex(crypto.sha512.convert(data).bytes),

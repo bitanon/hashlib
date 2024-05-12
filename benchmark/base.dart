@@ -76,8 +76,12 @@ String formatSize(num value) {
   for (i = 0; size >= 1024; i++) {
     size /= 1024;
   }
-  var left = size.floor();
-  var right = ((size - left) * 100).floorToDouble();
+  return '${formatDecimal(size)}${suffix[i]}';
+}
+
+String formatDecimal(double value) {
+  var left = value.floor();
+  var right = ((value - left) * 100).floorToDouble();
   var deci = (right / 100).toStringAsFixed(2).substring(2);
-  return '$left${right > 0 ? '.$deci' : ''}${suffix[i]}';
+  return '$left${right > 0 ? '.$deci' : ''}';
 }

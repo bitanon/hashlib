@@ -43,6 +43,7 @@ export 'sha512.dart';
 export 'sha512t.dart';
 export 'shake128.dart';
 export 'shake256.dart';
+export 'sm3.dart';
 export 'totp.dart';
 export 'xxh128.dart';
 export 'xxh3.dart';

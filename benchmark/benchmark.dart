@@ -28,6 +28,7 @@ import 'sha384.dart' as sha384;
 import 'sha3_256.dart' as sha3_256;
 import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
+import 'sm3.dart' as sm3;
 import 'xxhash.dart' as xxhash;
 
 IOSink sink = stdout;
@@ -66,6 +67,10 @@ void measureHashFunctions() {
         md5_hmac.HashlibBenchmark(size, iter),
         md5_hmac.CryptoBenchmark(size, iter),
         md5_hmac.HashBenchmark(size, iter),
+      ],
+      "SM3": [
+        sm3.HashlibBenchmark(size, iter),
+        sm3.PointyCastleBenchmark(size, iter),
       ],
       "SHA-1": [
         sha1.HashlibBenchmark(size, iter),
@@ -197,12 +202,12 @@ void measureHashFunctions() {
         } else {
           message += '${rate[name]}';
         }
-        if (value > mine) {
-          var p = (100 * (value - mine) / mine).round();
-          message += ' <br> `$p% slower`';
-        } else if (value < mine) {
-          var p = (100 * (mine - value) / mine).round();
-          message += ' <br> `$p% faster`';
+        if (mine < value) {
+          var p = formatDecimal(value / mine);
+          message += ' <br> `${p}x slow`';
+        } else if (mine > value) {
+          var p = formatDecimal(mine / value);
+          message += ' <br> `${p}x fast`';
         }
       }
       message += " |";
