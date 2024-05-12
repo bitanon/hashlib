@@ -68,10 +68,6 @@ void measureHashFunctions() {
         md5_hmac.CryptoBenchmark(size, iter),
         md5_hmac.HashBenchmark(size, iter),
       ],
-      "SM3": [
-        sm3.HashlibBenchmark(size, iter),
-        sm3.PointyCastleBenchmark(size, iter),
-      ],
       "SHA-1": [
         sha1.HashlibBenchmark(size, iter),
         sha1.CryptoBenchmark(size, iter),
@@ -158,6 +154,10 @@ void measureHashFunctions() {
       "XXH128": [
         xxhash.XXH128Benchmark(size, iter, "hashlib"),
       ],
+      "SM3": [
+        sm3.HashlibBenchmark(size, iter),
+        sm3.PointyCastleBenchmark(size, iter),
+      ],
     };
 
     var nameFreq = {};
@@ -183,7 +183,7 @@ void measureHashFunctions() {
         var runtime = benchmark.measure();
         var hashRate = 1e6 * iter * size / runtime;
         diff[benchmark.name] = runtime;
-        rate[benchmark.name] = '${formatSize(hashRate)}/s';
+        rate[benchmark.name] = formatSpeed(hashRate);
       }
       var me = entry.value.first;
       var mine = diff[me.name]!;

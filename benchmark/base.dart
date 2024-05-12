@@ -69,19 +69,41 @@ Map<String, int> measureDiff(Iterable<BenchmarkBase> benchmarks) {
   return data;
 }
 
+String formatDecimal(double value, [int precision = 2]) {
+  var res = value.toStringAsFixed(precision);
+  if (precision == 0) {
+    return res;
+  }
+  int p = res.length - 1;
+  while (res[p] == '0') {
+    p--;
+  }
+  if (res[p] == '.') {
+    p--;
+  }
+  return res.substring(0, p + 1);
+}
+
 String formatSize(num value) {
+  int i;
   double size = value.toDouble();
   const suffix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  int i;
   for (i = 0; size >= 1024; i++) {
     size /= 1024;
   }
   return '${formatDecimal(size)}${suffix[i]}';
 }
 
-String formatDecimal(double value) {
-  var left = value.floor();
-  var right = ((value - left) * 100).floorToDouble();
-  var deci = (right / 100).toStringAsFixed(2).substring(2);
-  return '$left${right > 0 ? '.$deci' : ''}';
+String formatSpeed(num value) {
+  int i;
+  double size = (value * 8).toDouble();
+  const suffix = ['', ' kbps', ' Mbps', ' Gbps', ' Tbps'];
+  size /= 1000;
+  for (i = 1; size >= 1000; i++) {
+    size /= 1000;
+  }
+  if (size >= 100) {
+    size = size.roundToDouble();
+  }
+  return '${formatDecimal(size)}${suffix[i]}';
 }
