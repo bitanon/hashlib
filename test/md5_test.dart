@@ -35,7 +35,7 @@ void main() {
     });
 
     test('with single letter', () {
-      expect("a".md5digest().hex(), tests["a"]);
+      expect(md5sum("a"), tests["a"]);
     });
 
     test('with few letters', () {

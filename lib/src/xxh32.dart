@@ -54,6 +54,7 @@ extension XXHash32StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   int xxh32code([Encoding? encoding]) {
     return xxh32.string(this, encoding).number();
   }

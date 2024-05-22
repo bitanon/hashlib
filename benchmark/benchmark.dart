@@ -287,12 +287,6 @@ void main(List<String> args) async {
 
   measureHashFunctions();
   measureKeyDerivation();
-
-  var ram = '3200MHz';
-  var processor = 'AMD Ryzen 7 5800X';
-  dump('> All benchmarks are done on _${processor}_ processor '
-      'and _${ram}_ RAM using compiled _exe_');
-
   raf?.flushSync();
   raf?.closeSync();
 }

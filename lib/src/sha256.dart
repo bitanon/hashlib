@@ -47,6 +47,7 @@ extension Sha256StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha256digest([Encoding? encoding]) {
     return sha256.string(this, encoding);
   }

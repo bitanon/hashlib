@@ -50,6 +50,7 @@ extension Sha3d512StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha3_512digest([Encoding? encoding]) {
     return sha3_512.string(this, encoding);
   }

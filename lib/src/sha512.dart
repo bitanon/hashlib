@@ -47,6 +47,7 @@ extension Sha512StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha512digest([Encoding? encoding]) {
     return sha512.string(this, encoding);
   }

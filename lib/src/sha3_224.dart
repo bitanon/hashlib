@@ -50,6 +50,7 @@ extension Sha3d224StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha3_224digest([Encoding? encoding]) {
     return sha3_224.string(this, encoding);
   }

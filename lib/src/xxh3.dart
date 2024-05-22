@@ -77,6 +77,7 @@ extension XXH3StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   int xxh3code([Encoding? encoding]) {
     return xxh3.string(this, encoding).number();
   }
@@ -85,6 +86,7 @@ extension XXH3StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   String xxh3sum([Encoding? encoding]) {
     return xxh3.string(this, encoding).hex();
   }

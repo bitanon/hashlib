@@ -44,6 +44,7 @@ extension Md5StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest md5digest([Encoding? encoding]) {
     return md5.string(this, encoding);
   }

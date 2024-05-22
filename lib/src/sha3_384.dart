@@ -50,6 +50,7 @@ extension Sha3d384StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha3_384digest([Encoding? encoding]) {
     return sha3_384.string(this, encoding);
   }

@@ -50,6 +50,7 @@ extension Sha3d256StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha3_256digest([Encoding? encoding]) {
     return sha3_256.string(this, encoding);
   }

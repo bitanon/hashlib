@@ -68,6 +68,7 @@ extension XXH128StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   String xxh128sum([Encoding? encoding]) {
     return xxh128.string(this, encoding).hex();
   }

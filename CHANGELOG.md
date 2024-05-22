@@ -1,3 +1,8 @@
+# 1.16.1
+
+- Put deprecation message on string extensions
+- Update benchmarks
+
 # 1.16.0
 
 - Implement SM3 algorithm.

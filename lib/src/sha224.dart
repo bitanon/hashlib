@@ -47,6 +47,7 @@ extension Sha224StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   HashDigest sha224digest([Encoding? encoding]) {
     return sha224.string(this, encoding);
   }

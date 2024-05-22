@@ -63,6 +63,7 @@ extension XXHash64StringExtension on String {
   ///.
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   int xxh64code([Encoding? encoding]) {
     return xxh64.string(this, encoding).number();
   }
@@ -71,6 +72,7 @@ extension XXHash64StringExtension on String {
   ///
   /// Parameters:
   /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
+  @Deprecated('Use the public method instead.')
   String xxh64sum([Encoding? encoding]) {
     return xxh64.string(this, encoding).hex();
   }

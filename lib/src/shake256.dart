@@ -99,6 +99,7 @@ extension Shake256StringExtension on String {
   ///
   /// Parameters:
   /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  @Deprecated('Use the public method instead.')
   HashDigest shake256digest(int outputSize, [Encoding? encoding]) {
     return Shake256(outputSize).string(this, encoding);
   }
