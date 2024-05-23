@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hash_digest.dart';
+import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 const int _slices = 4;
@@ -20,6 +20,7 @@ const int _minKeySize = 1;
 const int _maxKeySize = 0x3FFFFFF;
 const int _minAD = 1;
 const int _maxAD = 0x3FFFFFF;
+const int _defaultHashLength = 32;
 
 enum Argon2Type {
   argon2d,
@@ -49,21 +50,23 @@ extension Argon2VersionValue on Argon2Version {
 
 class Argon2HashDigest extends HashDigest {
   final Argon2Context ctx;
-  Argon2HashDigest(this.ctx, Uint8List bytes) : super(bytes);
+
+  const Argon2HashDigest(this.ctx, Uint8List bytes) : super(bytes);
 
   @override
   String toString() => encoded();
 
-  /// Gets the encoded Argon2 string
-  String encoded() {
-    return "\$${ctx.type.toString().split('.').last}"
-        "\$v=${ctx.version.value}"
-        "\$m=${ctx.memorySizeKB}"
-        ",t=${ctx.passes}"
-        ",p=${ctx.lanes}"
-        "\$${toBase64(ctx.salt, padding: false)}"
-        "\$${toBase64(bytes, padding: false)}";
-  }
+  /// Gets the PHC-compliant string for this [Argon2HashDigest]
+  String encoded() => toCrypt(
+        CryptDataBuilder(ctx.type.toString().split('.').last)
+            .version('${ctx.version.value}')
+            .param('m', ctx.memorySizeKB)
+            .param('t', ctx.passes)
+            .param('p', ctx.lanes)
+            .saltBytes(ctx.salt)
+            .hashBytes(bytes)
+            .build(),
+      );
 }
 
 /// The configuration used by the [Argon2] algorithm
@@ -126,17 +129,33 @@ class Argon2Context {
     required this.personalization,
   }) : midSlice = slices ~/ 2;
 
+  /// Creates a context for Argon2 password hashing
+  ///
+  /// Required Parameters:
+  /// - [iterations] Number of iterations to perform.
+  /// - [parallelism] Degree of parallelism (i.e. number of threads).
+  /// - [memorySizeKB] Amount of memory (in kibibytes) to use.
+  ///
+  /// Optional Parameters:
+  /// - [salt] Salt (16 bytes recommended for password hashing). If absent, a
+  ///   64 bytes random salt is generated.
+  /// - [hashLength] Desired number of returned bytes. Default: 32.
+  /// - [key] Additional key.
+  /// - [personalization] Arbitrary additional data.
+  /// - [version] Algorithm version; Default: [Argon2Version.v13],
+  /// - [type] Argon2 type; Default: [Argon2Type.argon2id].
   factory Argon2Context({
-    required List<int> salt,
-    required int hashLength,
     required int iterations,
     required int parallelism,
     required int memorySizeKB,
     List<int>? key,
+    List<int>? salt,
     List<int>? personalization,
+    int? hashLength,
     Argon2Version version = Argon2Version.v13,
     Argon2Type type = Argon2Type.argon2id,
   }) {
+    hashLength ??= _defaultHashLength;
     if (hashLength < _minDigestSize) {
       throw ArgumentError('The tag length must be at least $_minDigestSize');
     }
@@ -161,6 +180,7 @@ class Argon2Context {
     if (memorySizeKB > _maxMemory) {
       throw ArgumentError('The memorySizeKB must be at most $_maxMemory');
     }
+    salt ??= randomBytes(64);
     if (salt.length < _minSaltSize) {
       throw ArgumentError('The salt must be at least $_minSaltSize bytes long');
     }

@@ -1,5 +1,10 @@
-# 1.16.1
+# 1.17.0
 
+- Update **Argon2** interface:
+  - Paramters `salt` and `hashLength` are now optional.
+  - If absent, `salt` is generated using default random generator.
+  - Default hash length is now 32 instead of 24.
+  - Extracts method `Argon2Security.optimize` -> `tuneArgon2Security`
 - Put deprecation message on string extensions
 - Update benchmarks
 
@@ -98,7 +103,7 @@
   - `ripemd320`, `ripemd320sum`
 - Codecs are now able to handle padding characters
 
-## 1.10.0
+# 1.10.0
 
 - Adds support for `Poly1305` MAC generation: [#5](https://github.com/bitanon/hashlib/issues/5)
   - New class: `Poly1305`
@@ -161,7 +166,7 @@
 - New example: `otpauth_parser.dart`. It can decode migration string from Google Authenticator and parse any valid otpauth string.
 - Updates benchmarks
 
-## 1.9.0
+# 1.9.0
 
 - Adds SCRYPT:
   - New class: `Scrypt`
@@ -172,7 +177,7 @@
   - adds validation in the constructor
   - adds global `pbkdf2` function
 
-## 1.8.1
+# 1.8.1
 
 - Improves `dart run` using `@pragma('vm:prefer-inline')`
 - Adds new methods:
@@ -183,7 +188,7 @@
 - Removes methods:
   - `xxh128code`
 
-## 1.8.0
+# 1.8.0
 
 - Adds xxHash64
   - New class: `XXHash64`
@@ -206,7 +211,7 @@
   - Uses `>>>` instead of `>>`
 - Uses Hash Rate instead of Runtime for benchmarks
 
-## 1.7.0
+# 1.7.0
 
 - Renames `Argon2Security.small` -> `Argon2Security.little`
 - Adds `Argon2Security.optimize` method to find optimal parameters for a desired runtime.
@@ -225,11 +230,11 @@
   - Accept number of bytes instead of bits for `Blake2b` and `Blake2s`
   - Removes all `Blake2b.of##` and `Blake2s.of##` methods
 
-## 1.6.1
+# 1.6.1
 
 - Fixes enum name getter usage issue for Dart < 2.15.0
 
-## 1.6.0
+# 1.6.0
 
 - Optimize Argon2 (Now it is 6 times faster than 1.5.0)
 - Support for Argon2 in Node platform (TODO: requires optimization)
@@ -251,13 +256,13 @@
   - uses custom base64 conversion that does not include `=` padding.
   - removes `lantin1`
 
-## 1.5.0
+# 1.5.0
 
 - Fixes issues with web platform
 - Adds web support to `blake2b`
 - Adds Argon2, the [Password Hashing Competition](https://www.password-hashing.net/) winner.
 
-## 1.4.0
+# 1.4.0
 
 - Modifies the internal structure for better accessibility
 - Fixes stream binding issue in `HashBase`
@@ -275,7 +280,7 @@
 - Accepts file input in `HashBase`
 - Accepts `salt` and `personalization` values with `Blake2s` and `Blake2b`
 
-## 1.3.0
+# 1.3.0
 
 - Reduces memory overhead by utilizing the buffer in all `BlockHash`
 - Fixes broken sha512 hash fo web VM
@@ -283,7 +288,7 @@
   - `blake2s`
   - `blake2b`
 
-## 1.2.0
+# 1.2.0
 
 - New features available:
   - `crc16`
@@ -291,7 +296,7 @@
   - `crc64`
   - `alder32`
 
-## 1.1.0
+# 1.1.0
 
 - Adds `String` extensions for convenient use all algorithms.
 - Renames functions:
@@ -305,6 +310,6 @@
   - Use `addSlice` instead of `add`
 - Improves performance of some algorithms
 
-## 1.0.0
+# 1.0.0
 
 - First release

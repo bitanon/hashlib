@@ -6,8 +6,7 @@ import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 export 'package:hashlib/src/algorithms/argon2/argon2.dart';
 
-const _defaultHashLength = 24;
-const _defaultSecurity = Argon2Security.moderate;
+const _defaultSecurity = Argon2Security.good;
 
 /// Verifies if the original [password] was derived from the [encoded]
 /// Argon2 hash.
@@ -32,22 +31,21 @@ bool argon2verify(String encoded, List<int> password) {
 Argon2HashDigest argon2d(
   List<int> password,
   List<int> salt, {
-  Argon2Security security = _defaultSecurity,
-  int hashLength = _defaultHashLength,
+  int? hashLength,
   List<int>? key,
   List<int>? personalization,
-}) {
-  return Argon2(
-    salt: salt,
-    type: Argon2Type.argon2d,
-    hashLength: hashLength,
-    iterations: security.t,
-    parallelism: security.p,
-    memorySizeKB: security.m,
-    key: key,
-    personalization: personalization,
-  ).convert(password);
-}
+  Argon2Security security = _defaultSecurity,
+}) =>
+    Argon2(
+      salt: salt,
+      type: Argon2Type.argon2d,
+      hashLength: hashLength,
+      iterations: security.t,
+      parallelism: security.p,
+      memorySizeKB: security.m,
+      key: key,
+      personalization: personalization,
+    ).convert(password);
 
 /// Encode a password using default Argon2i algorithm
 ///
@@ -63,22 +61,21 @@ Argon2HashDigest argon2d(
 Argon2HashDigest argon2i(
   List<int> password,
   List<int> salt, {
-  Argon2Security security = _defaultSecurity,
-  int hashLength = _defaultHashLength,
+  int? hashLength,
   List<int>? key,
   List<int>? personalization,
-}) {
-  return Argon2(
-    salt: salt,
-    type: Argon2Type.argon2i,
-    hashLength: hashLength,
-    iterations: security.t,
-    parallelism: security.p,
-    memorySizeKB: security.m,
-    key: key,
-    personalization: personalization,
-  ).convert(password);
-}
+  Argon2Security security = _defaultSecurity,
+}) =>
+    Argon2(
+      salt: salt,
+      type: Argon2Type.argon2i,
+      hashLength: hashLength,
+      iterations: security.t,
+      parallelism: security.p,
+      memorySizeKB: security.m,
+      key: key,
+      personalization: personalization,
+    ).convert(password);
 
 /// Encode a password using default Argon2id algorithm
 ///
@@ -92,19 +89,18 @@ Argon2HashDigest argon2i(
 Argon2HashDigest argon2id(
   List<int> password,
   List<int> salt, {
-  Argon2Security security = _defaultSecurity,
-  int hashLength = _defaultHashLength,
+  int? hashLength,
   List<int>? key,
   List<int>? personalization,
-}) {
-  return Argon2(
-    salt: salt,
-    type: Argon2Type.argon2id,
-    hashLength: hashLength,
-    iterations: security.t,
-    parallelism: security.p,
-    memorySizeKB: security.m,
-    key: key,
-    personalization: personalization,
-  ).convert(password);
-}
+  Argon2Security security = _defaultSecurity,
+}) =>
+    Argon2(
+      salt: salt,
+      type: Argon2Type.argon2id,
+      hashLength: hashLength,
+      iterations: security.t,
+      parallelism: security.p,
+      memorySizeKB: security.m,
+      key: key,
+      personalization: personalization,
+    ).convert(password);
