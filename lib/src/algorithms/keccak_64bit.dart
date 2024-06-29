@@ -65,7 +65,7 @@ class KeccakHash extends BlockHashSink {
     if (stateSize < 0 || stateSize > 100) {
       throw ArgumentError('The state size is not valid');
     }
-    qstate = buffer.buffer.asUint64List();
+    qstate = Uint64List.view(buffer.buffer);
   }
 
   @override

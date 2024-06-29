@@ -171,6 +171,6 @@ class SM3Hash extends BlockHashSink {
     for (int i = 0; i < output.length; i++) {
       output[i] = _swap32(state[i]);
     }
-    return output.buffer.asUint8List();
+    return Uint8List.view(output.buffer);
   }
 }

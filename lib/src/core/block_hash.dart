@@ -48,7 +48,7 @@ abstract class BlockHashSink implements HashDigestSink {
   /// - [bufferLength] is the buffer length where blocks are stored temporarily
   BlockHashSink(this.blockLength, {int? bufferLength}) : super() {
     buffer = Uint8List(bufferLength ?? blockLength);
-    sbuffer = buffer.buffer.asUint32List();
+    sbuffer = Uint32List.view(buffer.buffer);
     bdata = buffer.buffer.asByteData();
   }
 

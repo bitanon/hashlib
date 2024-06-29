@@ -3,7 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/core/hash_digest.dart';
+import 'package:hashlib/src/random.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 const int _slices = 4;

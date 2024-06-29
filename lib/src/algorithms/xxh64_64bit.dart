@@ -24,7 +24,7 @@ class XXHash64Sink extends BlockHashSink {
   int _acc3 = 0;
   int _acc4 = 0;
 
-  late final Uint64List qbuffer = buffer.buffer.asUint64List();
+  late final Uint64List qbuffer = Uint64List.view(buffer.buffer);
 
   XXHash64Sink(this.seed) : super(32) {
     reset();

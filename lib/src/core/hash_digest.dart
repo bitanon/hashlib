@@ -90,9 +90,9 @@ class HashDigest extends Object {
     if (other is HashDigest) {
       return isEqual(other.bytes);
     } else if (other is ByteBuffer) {
-      return isEqual(buffer.asUint8List());
+      return isEqual(Uint8List.view(buffer));
     } else if (other is TypedData && other is! Uint8List) {
-      return isEqual(other.buffer.asUint8List());
+      return isEqual(Uint8List.view(other.buffer));
     } else if (other is String) {
       return isEqual(fromHex(other));
     } else if (other is Iterable<int>) {

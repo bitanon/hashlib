@@ -40,9 +40,9 @@ class Argon2Internal {
     int i, j, k, p;
     int pass, slice, lane;
     var hash0 = Uint8List(64 + 8);
-    var hash0as32 = hash0.buffer.asUint32List();
+    var hash0as32 = Uint32List.view(hash0.buffer);
     var buffer32 = Uint32List(ctx.blocks << 8);
-    var buffer = buffer32.buffer.asUint8List();
+    var buffer = Uint8List.view(buffer32.buffer);
     var result = Uint8List(ctx.hashLength);
 
     // H_0 Generation (64 + 8 = 72 bytes)
@@ -79,7 +79,7 @@ class Argon2Internal {
     // Finalization
     /* XOR the blocks */
     j = ctx.columns - 1;
-    var block = buffer.buffer.asUint8List(j << 10, 1024);
+    var block = Uint8List.view(buffer.buffer, j << 10, 1024);
     for (k = 1; k < ctx.lanes; ++k) {
       j += ctx.columns;
       p = j << 10;

@@ -108,7 +108,7 @@ class Scrypt extends KeyDerivatorBase {
     // Derive the inner blocks
     var sink = HMACSink(sha256.createSink());
     var inner = PBKDF2(sink, salt, 1, innerKeyLength).convert(password);
-    Uint32List inner32 = inner.buffer.asUint32List();
+    var inner32 = Uint32List.view(inner.buffer);
 
     /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
     @pragma('vm:prefer-inline')

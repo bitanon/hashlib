@@ -51,7 +51,7 @@ void fillRandom(
     length = min(length + start, buffer.lengthInBytes);
   }
   random ??= _defaultGenerator();
-  var data = buffer.asUint8List();
+  var data = Uint8List.view(buffer);
   for (int i = start; i < length; i++) {
     data[i] = random.nextInt(256);
   }

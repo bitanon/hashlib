@@ -137,6 +137,6 @@ class MD4Hash extends BlockHashSink {
     $update();
 
     // Convert the state to 8-bit byte array
-    return state.buffer.asUint8List().sublist(0, hashLength);
+    return Uint8List.view(state.buffer).sublist(0, hashLength);
   }
 }

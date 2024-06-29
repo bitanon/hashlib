@@ -1,3 +1,7 @@
+# next
+
+- Convert all asUint...List to Uint...List.view
+
 # 1.17.0
 
 - Update **Argon2** interface:

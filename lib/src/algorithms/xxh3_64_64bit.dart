@@ -40,9 +40,9 @@ class XXH3Sink64bit extends BlockHashSink {
   final Uint8List secret;
   final Uint64List acc = Uint64List(8);
   final ListQueue<int> last = ListQueue<int>(_midsizeMax);
-  late final Uint64List qbuffer = buffer.buffer.asUint64List();
+  late final Uint64List qbuffer = Uint64List.view(buffer.buffer);
+  late final Uint64List secret64 = Uint64List.view(secret.buffer);
   late final ByteData secretBD = secret.buffer.asByteData();
-  late final Uint64List secret64 = secret.buffer.asUint64List();
 
   @override
   final int hashLength = 8;
@@ -61,7 +61,7 @@ class XXH3Sink64bit extends BlockHashSink {
       return XXH3Sink64bit.withSecret();
     }
     var secret = Uint8List.fromList(_kSecret);
-    var secret64 = secret.buffer.asUint64List();
+    var secret64 = Uint64List.view(secret.buffer);
     for (int i = 0; i < secret64.length; i += 2) {
       secret64[i] += seed;
     }
@@ -357,7 +357,7 @@ class XXH3Sink64bit extends BlockHashSink {
     int hash;
     ByteData key;
     Uint64List input = Uint64List(_midsizeMax >>> 3);
-    Uint8List input8 = input.buffer.asUint8List();
+    Uint8List input8 = Uint8List.view(input.buffer);
 
     if (messageLength <= _midsizeMax) {
       var it = last.iterator;

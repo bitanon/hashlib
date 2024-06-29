@@ -106,11 +106,12 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
 
     _h += _s;
 
-    return Uint32List.fromList([
+    var result = Uint32List.fromList([
       (_h % _m).toUnsigned(32).toInt(),
       ((_h >> 32) % _m).toUnsigned(32).toInt(),
       ((_h >> 64) % _m).toUnsigned(32).toInt(),
       ((_h >> 96) % _m).toUnsigned(32).toInt(),
-    ]).buffer.asUint8List();
+    ]);
+    return Uint8List.view(result.buffer);
   }
 }

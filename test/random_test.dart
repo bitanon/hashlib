@@ -23,7 +23,7 @@ void main() {
       int sum = 0;
       for (int i = 0; i < 100; ++i) {
         fillRandom(list.buffer, start: 5, length: 9);
-        var bytes = list.buffer.asUint8List();
+        var bytes = Uint8List.view(list.buffer);
         sum += bytes.skip(5).take(9).any((n) => n > 0) ? 1 : 0;
         expect(bytes.take(5).toList(), equals([0, 0, 0, 0, 0]));
         expect(bytes.skip(5 + 9).toList(), equals([0, 0, 0, 0, 0, 0]));

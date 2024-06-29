@@ -39,8 +39,8 @@ class Argon2Internal {
   Uint8List convert(List<int> password) {
     int i, j, k, cols;
     int pass, slice, lane;
-    var hash0_32 = _hash0.buffer.asUint32List();
-    var memoryBytes = _memory.buffer.asUint8List();
+    var hash0_32 = Uint32List.view(_hash0.buffer);
+    var memoryBytes = Uint8List.view(_memory.buffer);
 
     // H_0 Generation (64 + 8 = 72 bytes)
     _initialHash(_hash0, password);
@@ -75,7 +75,7 @@ class Argon2Internal {
 
     // Finalization : XOR the last column blocks
     j = cols - 1024;
-    var block = memoryBytes.buffer.asUint8List(j, 1024);
+    var block = Uint8List.view(memoryBytes.buffer, j, 1024);
     for (k = 1; k < ctx.lanes; ++k) {
       j += cols;
       for (i = 0; i < 1024; ++i) {

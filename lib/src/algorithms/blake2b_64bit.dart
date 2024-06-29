@@ -68,7 +68,7 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
   @override
   final int hashLength;
 
-  late final Uint64List qbuffer = buffer.buffer.asUint64List();
+  late final Uint64List qbuffer = Uint64List.view(buffer.buffer);
 
   /// For internal use only.
   Blake2bHash(
@@ -309,6 +309,6 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
     $update(buffer, 0, true);
 
     // Convert the state to 8-bit byte array
-    return state.buffer.asUint8List().sublist(0, hashLength);
+    return Uint8List.view(state.buffer).sublist(0, hashLength);
   }
 }
