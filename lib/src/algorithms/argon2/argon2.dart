@@ -164,7 +164,7 @@ class Argon2 extends KeyDerivatorBase {
       parallelism: int.parse(p),
       memorySizeKB: int.parse(m),
       salt: data.saltBytes(),
-      hashLength: data.hash?.length,
+      hashLength: data.hashBytes()?.lengthInBytes,
       key: key,
       personalization: personalization,
     );
