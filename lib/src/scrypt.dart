@@ -1,10 +1,12 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/src/algorithms/scrypt.dart';
+import 'package:hashlib/src/algorithms/scrypt/scrypt.dart';
+import 'package:hashlib/src/algorithms/scrypt/security.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-export 'package:hashlib/src/algorithms/scrypt.dart' show Scrypt, ScryptSecurity;
+export 'algorithms/scrypt/scrypt.dart' show Scrypt;
+export 'algorithms/scrypt/security.dart' show ScryptSecurity;
 
 /// Generate a secure password using the [scrypt][rfc] algorithm.
 ///

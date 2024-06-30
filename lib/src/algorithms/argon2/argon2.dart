@@ -20,6 +20,8 @@ export 'security.dart';
 /// Example of password hashing using Argon2:
 ///
 /// ```dart
+/// final salt = utf.encode("some salt")
+/// final password = utf8.encode('password');
 /// final argon2 = Argon2(
 ///   version: Argon2Version.v13,
 ///   type: Argon2Type.argon2id,
@@ -27,10 +29,9 @@ export 'security.dart';
 ///   iterations: 2,
 ///   parallelism: 8,
 ///   memorySizeKB: 1 << 18,
-///   salt: "some salt".codeUnits,
+///   salt: salt,
 /// );
-///
-/// final digest = argon2.encode('password'.codeUnits);
+/// final digest = argon2.encode(password);
 /// ```
 ///
 /// [phc]: https://www.password-hashing.net/
@@ -133,40 +134,15 @@ class Argon2 extends KeyDerivatorBase {
   /// The encoded string may look like this:
   /// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
   factory Argon2.fromEncoded(
-    String encoded, {
+    CryptData data, {
     List<int>? key,
     List<int>? personalization,
   }) {
-    var data = fromCrypt(encoded);
-    var type =
-        Argon2Type.values.singleWhere((e) => "$e".split('.').last == data.id);
-    Argon2Version version =
-        Argon2Version.values.singleWhere((e) => '${e.value}' == data.version);
-    if (data.params == null) {
-      throw ArgumentError('No paramters');
-    }
-    var m = data.params!['m'];
-    if (m == null) {
-      throw ArgumentError('Missing parameter: m');
-    }
-    var t = data.params!['t'];
-    if (t == null) {
-      throw ArgumentError('Missing parameter: t');
-    }
-    var p = data.params!['p'];
-    if (p == null) {
-      throw ArgumentError('Missing parameter: p');
-    }
-    return Argon2(
-      type: type,
-      version: version,
-      iterations: int.parse(t),
-      parallelism: int.parse(p),
-      memorySizeKB: int.parse(m),
-      salt: data.saltBytes(),
-      hashLength: data.hashBytes()?.lengthInBytes,
+    var ctx = Argon2Context.fromEncoded(
+      data,
       key: key,
       personalization: personalization,
     );
+    return Argon2._(ctx);
   }
 }

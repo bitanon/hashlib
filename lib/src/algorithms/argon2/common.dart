@@ -35,6 +35,43 @@ enum Argon2Version {
   v13,
 }
 
+String _typeToName(Argon2Type type) {
+  switch (type) {
+    case Argon2Type.argon2d:
+      return 'argon2d';
+    case Argon2Type.argon2i:
+      return 'argon2i';
+    case Argon2Type.argon2id:
+      return 'argon2id';
+    default:
+      throw ArgumentError('Invalid type');
+  }
+}
+
+Argon2Type _nameToType(String name) {
+  switch (name) {
+    case 'argon2d':
+      return Argon2Type.argon2d;
+    case 'argon2i':
+      return Argon2Type.argon2i;
+    case 'argon2id':
+      return Argon2Type.argon2id;
+    default:
+      throw ArgumentError('Invalid type');
+  }
+}
+
+Argon2Version _valueToVersion(int value) {
+  switch (value) {
+    case 0x10:
+      return Argon2Version.v10;
+    case 0x13:
+      return Argon2Version.v13;
+    default:
+      throw ArgumentError('Invalid version');
+  }
+}
+
 extension Argon2VersionValue on Argon2Version {
   /// The integer value for the version
   int get value {
@@ -58,16 +95,7 @@ class Argon2HashDigest extends HashDigest {
   String toString() => encoded();
 
   /// Gets the PHC-compliant string for this [Argon2HashDigest]
-  String encoded() => toCrypt(
-        CryptDataBuilder(ctx.type.toString().split('.').last)
-            .version('${ctx.version.value}')
-            .param('m', ctx.memorySizeKB)
-            .param('t', ctx.passes)
-            .param('p', ctx.lanes)
-            .saltBytes(ctx.salt)
-            .hashBytes(bytes)
-            .build(),
-      );
+  String encoded() => ctx.toEncoded(bytes);
 }
 
 /// The configuration used by the [Argon2] algorithm
@@ -223,6 +251,59 @@ class Argon2Context {
       blocks: blocks,
       key: key,
       personalization: personalization,
+    );
+  }
+
+  /// Creates an [Argon2Context] instance from an [encoded] PHC string.
+  ///
+  /// The encoded string may look like this:
+  /// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
+  factory Argon2Context.fromEncoded(
+    CryptData data, {
+    List<int>? key,
+    List<int>? personalization,
+  }) {
+    var type = _nameToType(data.id);
+    var version = _valueToVersion(int.tryParse(data.version ?? '0') ?? 0);
+    if (data.params == null) {
+      throw ArgumentError('No paramters');
+    }
+    var m = data.params!['m'];
+    if (m == null) {
+      throw ArgumentError('Missing parameter: m');
+    }
+    var t = data.params!['t'];
+    if (t == null) {
+      throw ArgumentError('Missing parameter: t');
+    }
+    var p = data.params!['p'];
+    if (p == null) {
+      throw ArgumentError('Missing parameter: p');
+    }
+    return Argon2Context(
+      type: type,
+      version: version,
+      iterations: int.parse(t),
+      parallelism: int.parse(p),
+      memorySizeKB: int.parse(m),
+      salt: data.saltBytes(),
+      hashLength: data.hashBytes()?.lengthInBytes,
+      key: key,
+      personalization: personalization,
+    );
+  }
+
+  /// Gets the PHC-compliant string for this [Argon2HashDigest]
+  String toEncoded(Uint8List hashBytes) {
+    return toCrypt(
+      CryptDataBuilder(_typeToName(type))
+          .version('${version.value}')
+          .param('m', memorySizeKB)
+          .param('t', passes)
+          .param('p', lanes)
+          .saltBytes(salt)
+          .hashBytes(hashBytes)
+          .build(),
     );
   }
 }

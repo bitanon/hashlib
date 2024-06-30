@@ -7,6 +7,21 @@ import 'package:benchmark_harness/benchmark_harness.dart';
 
 Random random = Random();
 
+class KDFBenchmarkBase extends BenchmarkBase {
+  KDFBenchmarkBase(String name) : super(name);
+
+  @override
+  double measure() {
+    final watch = Stopwatch()..start();
+    run();
+    watch.reset();
+    run();
+    run();
+    run();
+    return (watch.elapsedMicroseconds / 3).floorToDouble();
+  }
+}
+
 abstract class Benchmark extends BenchmarkBase {
   final int size;
   final int iter;

@@ -14,9 +14,13 @@ const _defaultSecurity = Argon2Security.good;
 /// The encoded hash may look like this:
 /// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
 bool argon2verify(String encoded, List<int> password) {
-  var instance = Argon2.fromEncoded(encoded);
-  var key = fromBase64(encoded.split('\$').last);
-  return instance.verify(key, password);
+  var data = fromCrypt(encoded);
+  var hash = data.hashBytes();
+  if (hash == null) {
+    throw ArgumentError('No password hash in the encoded string');
+  }
+  var instance = Argon2.fromEncoded(data);
+  return instance.verify(hash, password);
 }
 
 /// Encode a password using default Argon2d algorithm

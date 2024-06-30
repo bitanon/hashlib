@@ -3,6 +3,7 @@
 
 export 'alder32.dart';
 export 'argon2.dart';
+export 'bcrypt.dart';
 export 'blake2b.dart';
 export 'blake2s.dart';
 export 'core/block_hash.dart';
