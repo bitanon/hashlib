@@ -99,7 +99,7 @@ void main() {
       final encoded =
           r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0$24VHMpaU5EkkdH5rpdnb5zeOf3Y";
       final matcher = "db8547329694e44924747e6ba5d9dbe7378e7f76";
-      final argon2 = Argon2.fromEncoded(encoded);
+      final argon2 = Argon2.fromEncoded(fromCrypt(encoded));
       expect(argon2.type, Argon2Type.argon2id);
       expect(argon2.version, Argon2Version.v13);
       expect(argon2.memorySizeKB, 128);

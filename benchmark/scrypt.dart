@@ -4,32 +4,18 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:pointycastle/export.dart';
 import 'package:pointycastle/key_derivators/scrypt.dart' as pc;
 
+import 'base.dart';
+
 Random random = Random();
 
-class ScryptBenchmarkBase extends BenchmarkBase {
+class HashlibBenchmark extends KDFBenchmarkBase {
   final ScryptSecurity security;
 
-  ScryptBenchmarkBase(String name, this.security) : super(name);
-
-  @override
-  double measure() {
-    final watch = Stopwatch()..start();
-    run();
-    watch.reset();
-    run();
-    run();
-    run();
-    return (watch.elapsedMicroseconds / 3).floorToDouble();
-  }
-}
-
-class HashlibBenchmark extends ScryptBenchmarkBase {
-  HashlibBenchmark(ScryptSecurity security) : super('hashlib', security);
+  HashlibBenchmark(this.security) : super('hashlib');
 
   @override
   void run() {
@@ -42,9 +28,10 @@ class HashlibBenchmark extends ScryptBenchmarkBase {
   }
 }
 
-class PointyCastleBenchmark extends ScryptBenchmarkBase {
-  PointyCastleBenchmark(ScryptSecurity security)
-      : super('PointyCastle', security);
+class PointyCastleBenchmark extends KDFBenchmarkBase {
+  final ScryptSecurity security;
+
+  PointyCastleBenchmark(this.security) : super('PointyCastle');
 
   @override
   void run() {
@@ -82,14 +69,14 @@ void main() {
   print('');
   print('--------- PointyCastle/SCRYPT ----------');
   runtime = PointyCastleBenchmark(ScryptSecurity.test).measure();
-  print('hashlib/scrypt[test]: ${runtime / 1000} ms');
+  print('pc/scrypt[test]: ${runtime / 1000} ms');
   runtime = PointyCastleBenchmark(ScryptSecurity.little).measure();
-  print('hashlib/scrypt[little]: ${runtime / 1000} ms');
+  print('pc/scrypt[little]: ${runtime / 1000} ms');
   runtime = PointyCastleBenchmark(ScryptSecurity.moderate).measure();
-  print('hashlib/scrypt[moderate]: ${runtime / 1000} ms');
+  print('pc/scrypt[moderate]: ${runtime / 1000} ms');
   runtime = PointyCastleBenchmark(ScryptSecurity.good).measure();
-  print('hashlib/scrypt[good]: ${runtime / 1000} ms');
+  print('pc/scrypt[good]: ${runtime / 1000} ms');
   runtime = PointyCastleBenchmark(ScryptSecurity.strong).measure();
-  print('hashlib/scrypt[strong]: ${runtime / 1000} ms');
+  print('pc/scrypt[strong]: ${runtime / 1000} ms');
   print('');
 }

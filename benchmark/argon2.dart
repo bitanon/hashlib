@@ -5,27 +5,13 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:argon2/argon2.dart' as argon2;
-import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:hashlib/hashlib.dart';
+
+import 'base.dart';
 
 Random random = Random();
 
-class Argon2BenchmarkBase extends BenchmarkBase {
-  Argon2BenchmarkBase(String name) : super(name);
-
-  @override
-  double measure() {
-    final watch = Stopwatch()..start();
-    run();
-    watch.reset();
-    run();
-    run();
-    run();
-    return (watch.elapsedMicroseconds / 3).floorToDouble();
-  }
-}
-
-class HashlibArgon2iBenchmark extends Argon2BenchmarkBase {
+class HashlibArgon2iBenchmark extends KDFBenchmarkBase {
   final Argon2Security security;
 
   HashlibArgon2iBenchmark(this.security) : super('hashlib');
@@ -43,7 +29,7 @@ class HashlibArgon2iBenchmark extends Argon2BenchmarkBase {
   }
 }
 
-class HashlibArgon2dBenchmark extends Argon2BenchmarkBase {
+class HashlibArgon2dBenchmark extends KDFBenchmarkBase {
   final Argon2Security security;
 
   HashlibArgon2dBenchmark(this.security) : super('hashlib');
@@ -61,7 +47,7 @@ class HashlibArgon2dBenchmark extends Argon2BenchmarkBase {
   }
 }
 
-class HashlibArgon2idBenchmark extends Argon2BenchmarkBase {
+class HashlibArgon2idBenchmark extends KDFBenchmarkBase {
   final Argon2Security security;
 
   HashlibArgon2idBenchmark(this.security) : super('hashlib');
@@ -79,7 +65,7 @@ class HashlibArgon2idBenchmark extends Argon2BenchmarkBase {
   }
 }
 
-class Argon2Argon2idBenchmark extends Argon2BenchmarkBase {
+class Argon2Argon2idBenchmark extends KDFBenchmarkBase {
   final Argon2Security security;
 
   Argon2Argon2idBenchmark(this.security) : super('argon2');

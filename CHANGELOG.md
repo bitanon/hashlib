@@ -1,6 +1,11 @@
-# next
+# 1.18.0
 
+- Implement BCrypt algorithm.
+  - New class: `Bcrypt`
+  - New methods: `bcrypt`, `bcryptSalt`, `bcryptVerify`, `bcryptDigest`
 - Convert all asUint...List to Uint...List.view
+- Refactor: `Argon2.fromEncoded` will now accept `CryptData` only.
+- New method: `Argon2Context.fromEncoded` accepting `CryptData`.
 
 # 1.17.0
 

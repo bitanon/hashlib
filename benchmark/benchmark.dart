@@ -8,6 +8,7 @@ import 'package:hashlib/hashlib.dart';
 
 import 'argon2.dart' as argon2;
 import 'base.dart';
+import 'bcrypt.dart' as bcrypt;
 import 'blake2b.dart' as blake2b;
 import 'blake2s.dart' as blake2s;
 import 'hmac_md5.dart' as md5_hmac;
@@ -221,7 +222,7 @@ void measureHashFunctions() {
 // Key Derivation Algorithm Benchmarks
 // ---------------------------------------------------------------------
 void measureKeyDerivation() {
-  dump('Argon2 and scrypt benchmarks on different security parameters:');
+  dump('Key derivator algorithm benchmarks on different security parameters:');
   dump('');
   var argon2Levels = [
     Argon2Security.test,
@@ -237,14 +238,26 @@ void measureKeyDerivation() {
     ScryptSecurity.good,
     ScryptSecurity.strong,
   ];
+  var bcryptLevels = [
+    BcryptSecurity.test,
+    BcryptSecurity.little,
+    BcryptSecurity.moderate,
+    BcryptSecurity.good,
+    BcryptSecurity.strong,
+  ];
   var algorithms = {
     'scrypt': scryptLevels.map((e) => scrypt.HashlibBenchmark(e)),
+    'bcrypt': bcryptLevels.map((e) => bcrypt.HashlibBenchmark(e)),
     'argon2i': argon2Levels.map((e) => argon2.HashlibArgon2iBenchmark(e)),
     'argon2d': argon2Levels.map((e) => argon2.HashlibArgon2dBenchmark(e)),
     'argon2id': argon2Levels.map((e) => argon2.HashlibArgon2idBenchmark(e)),
   };
 
-  var names = argon2Levels.map((e) => e.name);
+  var names = {
+    ...argon2Levels.map((e) => e.name),
+    ...scryptLevels.map((e) => e.name),
+    ...bcryptLevels.map((e) => e.name),
+  }.toList();
   var separator = names.map((e) => ('-' * (e.length + 2)));
   dump('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
   dump('|------------|${separator.join('|')}|');
