@@ -1,3 +1,7 @@
+# 1.18.1
+
+- Fix import issue for _web_ platform.
+
 # 1.18.0
 
 - Implement BCrypt algorithm.

@@ -152,14 +152,14 @@ void main() {
       var hash = await crypto.md5.bind(file.openRead()).first;
       var hash2 = await md5.file(file);
       expect(hash2.hex(), toHex(hash.bytes));
-    }, tags: 'skip-js');
+    }, tags: 'vm-only');
 
     test('for a file sync', () async {
       var file = File('LICENSE');
       var hash = await crypto.md5.bind(file.openRead()).first;
       var hash2 = md5.fileSync(file);
       expect(hash2.hex(), toHex(hash.bytes));
-    }, tags: 'skip-js');
+    }, tags: 'vm-only');
 
     test('with crypto', () {
       for (int i = 0; i < 100; ++i) {
@@ -201,7 +201,7 @@ void main() {
       var hash = pc_md4.MD4Digest().process(file.readAsBytesSync());
       var hash2 = md4.fileSync(file);
       expect(hash2.hex(), toHex(hash));
-    }, tags: 'skip-js');
+    }, tags: 'vm-only');
   });
 
   group('SM3 comparison', () {
@@ -221,7 +221,7 @@ void main() {
       var hash = pc_sm3.SM3Digest().process(file.readAsBytesSync());
       var hash2 = sm3.fileSync(file);
       expect(hash2.hex(), toHex(hash));
-    }, tags: 'skip-js');
+    }, tags: 'vm-only');
   });
 
   group('SHA1 comparison', () {

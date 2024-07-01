@@ -6,7 +6,8 @@ concurrency: 8
 platforms: [vm, node]
 
 tags:
-  skip-js:
+  vm-only:
+    skip: true
     on_platform:
-      node:
-        skip: true
+      vm:
+        skip: false

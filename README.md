@@ -174,6 +174,11 @@ void main() {
   var scryptLittle = ScryptSecurity.little;
   print("[scrypt] => ${scrypt(pw, salt, security: scryptLittle, dklen: 24)}");
   print('');
+
+  // Examples of bcrypt key derivation
+  var bcryptLittle = BcryptSecurity.little;
+  print("[bcrypt] => ${bcrypt(pw, bcryptSalt(security: bcryptLittle))}");
+  print('');
 }
 ```
 
