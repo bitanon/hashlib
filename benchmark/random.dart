@@ -7,14 +7,16 @@ import 'package:hashlib/hashlib.dart';
 
 import 'base.dart';
 
+const int _maxInt = 1 << 32;
+
 class HashlibBenchmark extends Benchmark {
-  final random = KeccakRandom();
+  final random = HashlibRandom.keccak();
   HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
 
   @override
   void run() {
     for (int i = 0; i < size; ++i) {
-      random.nextBool();
+      random.nextInt();
     }
   }
 }
@@ -26,7 +28,7 @@ class RandomBenchmark extends Benchmark {
   @override
   void run() {
     for (int i = 0; i < size; ++i) {
-      random.nextBool();
+      random.nextInt(_maxInt);
     }
   }
 }
@@ -39,7 +41,7 @@ class SecureRandomBenchmark extends Benchmark {
   @override
   void run() {
     for (int i = 0; i < size; ++i) {
-      random.nextBool();
+      random.nextInt(_maxInt);
     }
   }
 }

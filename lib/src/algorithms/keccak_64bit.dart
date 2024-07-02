@@ -263,16 +263,4 @@ class KeccakHash extends BlockHashSink {
     }
     return bytes;
   }
-
-  /// Returns a iterable of bytes generated from the Keccak sponge.
-  static Iterable<int> generate([int seed = 0]) sync* {
-    var sink = KeccakHash(stateSize: 64, paddingByte: 0);
-    sink.sbuffer.fillRange(0, sink.sbuffer.length, seed);
-    while (true) {
-      sink.$update();
-      for (var x in sink.buffer) {
-        yield x;
-      }
-    }
-  }
 }

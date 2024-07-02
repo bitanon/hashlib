@@ -1,58 +1,37 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:math';
 import 'dart:typed_data';
 
-export 'package:hashlib/src/algorithms/keccak_random.dart';
+import 'package:hashlib/src/core/hashlib_random.dart';
 
-Random _defaultGenerator() {
-  try {
-    return Random.secure();
-  } catch (err) {
-    int micros = DateTime.now().millisecond;
-    int millis = DateTime.now().microsecond;
-    return Random((millis << 10) ^ micros);
-  }
-}
+export 'package:hashlib/src/core/hashlib_random.dart';
+export 'package:hashlib/src/core/hashlib_salt.dart';
 
 /// Generate a list of random 8-bit numbers of size [length]
-Uint8List randomBytes(int length, [Random? random]) {
-  random ??= _defaultGenerator();
-  var data = Uint8List(length);
-  for (int i = 0; i < data.length; i++) {
-    data[i] = random.nextInt(256);
-  }
-  return data;
-}
+@pragma('vm:prefer-inline')
+Uint8List randomBytes(
+  int length, [
+  RandomGenerator generator = RandomGenerator.system,
+]) =>
+    HashlibRandom(generator: generator).nextBytes(length);
 
 /// Generate a list of random 32-bit numbers of size [length]
-Uint32List randomNumbers(int length, [Random? random]) {
-  random ??= _defaultGenerator();
-  var data = Uint32List(length);
-  for (int i = 0; i < data.length; i++) {
-    data[i] = random.nextInt(0x100000000);
-  }
-  return data;
-}
+@pragma('vm:prefer-inline')
+Uint32List randomNumbers(
+  int length, [
+  RandomGenerator generator = RandomGenerator.system,
+]) =>
+    HashlibRandom(generator: generator).nextNumbers(length);
 
 /// Fill the [buffer] with random numbers.
 ///
 /// Both the [start] and [length] are in bytes.
+@pragma('vm:prefer-inline')
 void fillRandom(
   ByteBuffer buffer, {
   int start = 0,
   int? length,
-  Random? random,
-}) {
-  if (length == null) {
-    length = buffer.lengthInBytes;
-  } else {
-    length = min(length + start, buffer.lengthInBytes);
-  }
-  random ??= _defaultGenerator();
-  var data = Uint8List.view(buffer);
-  for (int i = start; i < length; i++) {
-    data[i] = random.nextInt(256);
-  }
-}
+  RandomGenerator generator = RandomGenerator.system,
+}) =>
+    HashlibRandom(generator: generator).fill(buffer, start, length);
