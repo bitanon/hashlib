@@ -47,15 +47,3 @@ class XXHash32 extends BlockHashBase {
 int xxh32code(String input, [Encoding? encoding]) {
   return xxh32.string(input, encoding).number();
 }
-
-/// Extension to [String] to generate [xxh32] code
-extension XXHash32StringExtension on String {
-  /// Gets the 32-bit xxHash value of a String
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  int xxh32code([Encoding? encoding]) {
-    return xxh32.string(this, encoding).number();
-  }
-}

@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-256 is a member of SHA-2 family which uses 256-bit internal state to
 /// generate a message digest of 256-bit long.
@@ -39,16 +38,4 @@ String sha256sum(
   bool uppercase = false,
 ]) {
   return sha256.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [sha256] hash
-extension Sha256StringExtension on String {
-  /// Generates a SHA-256 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest sha256digest([Encoding? encoding]) {
-    return sha256.string(this, encoding);
-  }
 }

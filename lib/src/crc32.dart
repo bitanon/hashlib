@@ -32,15 +32,3 @@ class _CRC32 extends HashBase {
 int crc32code(String input, [Encoding? encoding]) {
   return crc32.string(input, encoding).number();
 }
-
-/// Extension to [String] to generate [crc32] code
-extension CRC32StringExtension on String {
-  /// Gets the CRC-32 value of a String
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  int crc32code([Encoding? encoding]) {
-    return crc32.string(this, encoding).number();
-  }
-}

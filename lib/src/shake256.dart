@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/shake.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHAKE-256 is a member of SHA-3 family which uses 256-bit blocks to
 /// generate a message digest of arbitrary length.
@@ -91,16 +90,4 @@ String shake256sum(
   bool uppercase = false,
 ]) {
   return Shake256(outputSize).string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [shake256] hash
-extension Shake256StringExtension on String {
-  /// Generates a SHAKE-256 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  @Deprecated('Use the public method instead.')
-  HashDigest shake256digest(int outputSize, [Encoding? encoding]) {
-    return Shake256(outputSize).string(this, encoding);
-  }
 }

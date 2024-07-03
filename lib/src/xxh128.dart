@@ -61,15 +61,3 @@ class XXH128 extends BlockHashBase {
 String xxh128sum(String input, [Encoding? encoding]) {
   return xxh128.string(input, encoding).hex();
 }
-
-/// Extension to [String] to generate [xxh128] code
-extension XXH128StringExtension on String {
-  /// Gets the 128-bit XXH3 hash of a String in hexadecimal.
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  String xxh128sum([Encoding? encoding]) {
-    return xxh128.string(this, encoding).hex();
-  }
-}

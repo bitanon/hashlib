@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha2.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-224 is a member of SHA-2 family which uses 256-bit internal state to
 /// generate a message digest of 224-bit long.
@@ -39,16 +38,4 @@ String sha224sum(
   bool uppercase = false,
 ]) {
   return sha224.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [sha224] hash
-extension Sha224StringExtension on String {
-  /// Generates a SHA-224 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest sha224digest([Encoding? encoding]) {
-    return sha224.string(this, encoding);
-  }
 }

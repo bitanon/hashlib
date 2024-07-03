@@ -7,11 +7,71 @@ import 'package:hashlib/hashlib.dart';
 
 import 'base.dart';
 
-const int _maxInt = 1 << 32;
+const int _maxInt = 0xFFFFFFFF;
 
-class HashlibBenchmark extends Benchmark {
-  final random = HashlibRandom.keccak();
-  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
+class SystemRandomBenchmark extends Benchmark {
+  final random = HashlibRandom(RandomGenerator.system);
+  SystemRandomBenchmark(int size, int iter) : super('system', size, iter);
+
+  @override
+  void run() {
+    for (int i = 0; i < size; ++i) {
+      random.nextInt();
+    }
+  }
+}
+
+class SecureRandomBenchmark extends Benchmark {
+  final random = HashlibRandom(RandomGenerator.secure);
+  SecureRandomBenchmark(int size, int iter) : super('secure', size, iter);
+
+  @override
+  void run() {
+    for (int i = 0; i < size; ++i) {
+      random.nextInt();
+    }
+  }
+}
+
+class KeccakRandomBenchmark extends Benchmark {
+  final random = HashlibRandom(RandomGenerator.keccak);
+  KeccakRandomBenchmark(int size, int iter) : super('keccak', size, iter);
+
+  @override
+  void run() {
+    for (int i = 0; i < size; ++i) {
+      random.nextInt();
+    }
+  }
+}
+
+class SHA256RandomBenchmark extends Benchmark {
+  final random = HashlibRandom(RandomGenerator.sha256);
+  SHA256RandomBenchmark(int size, int iter) : super('sha256', size, iter);
+
+  @override
+  void run() {
+    for (int i = 0; i < size; ++i) {
+      random.nextInt();
+    }
+  }
+}
+
+class SM3RandomBenchmark extends Benchmark {
+  final random = HashlibRandom(RandomGenerator.sm3);
+  SM3RandomBenchmark(int size, int iter) : super('sm3', size, iter);
+
+  @override
+  void run() {
+    for (int i = 0; i < size; ++i) {
+      random.nextInt();
+    }
+  }
+}
+
+class XXH64RandomBenchmark extends Benchmark {
+  final random = HashlibRandom(RandomGenerator.xxh64);
+  XXH64RandomBenchmark(int size, int iter) : super('xxh64', size, iter);
 
   @override
   void run() {
@@ -33,9 +93,9 @@ class RandomBenchmark extends Benchmark {
   }
 }
 
-class SecureRandomBenchmark extends Benchmark {
+class SystemSecureRandomBenchmark extends Benchmark {
   final random = Random.secure();
-  SecureRandomBenchmark(int size, int iter)
+  SystemSecureRandomBenchmark(int size, int iter)
       : super('Random.secure', size, iter);
 
   @override
@@ -57,9 +117,14 @@ void main() {
     int size = condition[0];
     int iter = condition[1];
     print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).showDiff([
-      RandomBenchmark(size, iter),
+    RandomBenchmark(size, iter).showDiff([
+      SystemSecureRandomBenchmark(size, iter),
       SecureRandomBenchmark(size, iter),
+      SystemRandomBenchmark(size, iter),
+      KeccakRandomBenchmark(size, iter),
+      SM3RandomBenchmark(size, iter),
+      SHA256RandomBenchmark(size, iter),
+      XXH64RandomBenchmark(size, iter),
     ]);
     print('');
   }

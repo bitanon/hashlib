@@ -69,6 +69,18 @@ There is only 1 dependency used by this package:
 | CRC        | `crc16`, `crc32`, `crc64` | Wikipedia |
 | Alder32    | `alder32`                 | Wikipedia |
 
+### Random Number Generation
+
+Available generators:
+
+- secure
+- system
+- keccak
+- sha256
+- md5
+- xxh64
+- sm3
+
 ## Demo
 
 A demo application is available in Google Play Store featuring the capabilities of this package.

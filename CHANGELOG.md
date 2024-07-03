@@ -1,3 +1,14 @@
+# 1.19.0
+
+- Improve support for random generator
+  - `HashlibRandom` class for generating random number, bool, strings etc.
+  - Refactor `KeccakRandom` to be available as `HashlibRandom.keccak`
+- [**Breaking Changes**]:
+  - Remove all deprecated string extension
+  - Remove `consume`, use `bind` instead.
+  - `consumeAs` is renamed to `stringStraem` .
+  - Introduced `byteStream`
+
 # 1.18.1
 
 - Fix import issue for _web_ platform.

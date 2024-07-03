@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/hashlib_base.dart';
 import 'package:test/test.dart';
 
 const int _maxInt = 0xFFFFFFFF;
@@ -14,7 +15,43 @@ Iterable<int> testGenerator() sync* {
   }
 }
 
+var testRandom = HashlibRandom.generator(testGenerator().iterator);
+
+void runFunctionalText(HashlibRandom rand) {
+  rand.nextInt();
+  rand.nextBetween(30, 50);
+  rand.nextBool();
+  rand.nextByte();
+  rand.nextBytes(10);
+  rand.nextDouble();
+  rand.nextInt();
+  rand.nextNumbers(10);
+  rand.nextString(10);
+  rand.nextWord();
+}
+
 void main() {
+  group('functional tests', () {
+    test("system random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.system));
+    });
+    test("keccak random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.keccak));
+    });
+    test("sha256 random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.sha256));
+    });
+    test("sm3 random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.sm3));
+    });
+    test("md5 random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.md5));
+    });
+    test("xxh64 random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.xxh64));
+    }, tags: ['vm-only']);
+  });
+
   test('random bytes length = 0', () {
     expect(randomBytes(0), []);
   });
@@ -26,28 +63,56 @@ void main() {
   });
   test('fill random', () {
     int i, c;
-    var r = HashlibRandom.generator(testGenerator().iterator);
     for (c = 0; c <= 100; ++c) {
       for (i = 0; i + c <= 100; ++i) {
         var data = Uint8List(100);
-        r.fill(data.buffer, i, c);
+        testRandom.fill(data.buffer, i, c);
         int s = data.fold<int>(0, (p, e) => p + (e > 0 ? 1 : 0));
         expect(s, c, reason: 'fill($i, $c) : $data');
       }
     }
   });
 
+  test('next between', () {
+    var rand = HashlibRandom(RandomGenerator.keccak, seed: 100);
+    expect(rand.nextBetween(0, 0), 0);
+    expect(rand.nextBetween(1, 1), 1);
+    expect(rand.nextBetween(5, 10), lessThanOrEqualTo(10));
+    expect(rand.nextBetween(10, 5), greaterThanOrEqualTo(5));
+    expect(rand.nextBetween(-5, -2), lessThan(0));
+    expect(rand.nextBetween(-5, -15), lessThan(0));
+  });
+
+  test('random string throws StateError on empty whitelist', () {
+    expect(
+        () => randomString(
+              50,
+              whitelist: [],
+            ),
+        throwsStateError);
+    expect(
+        () => randomString(
+              50,
+              whitelist: [1, 2, 3],
+              blacklist: [1, 2, 3],
+            ),
+        throwsStateError);
+    expect(
+        () => randomString(
+              50,
+              numeric: true,
+              blacklist: '0123456789'.codeUnits,
+            ),
+        throwsStateError);
+  });
+
   group('keccak random', () {
-    test('without seed', () {
-      var rand = HashlibRandom.keccak(0);
-      expect(rand.nextInt(), 1088544231);
-    });
     test('with seed', () {
-      var rand = HashlibRandom.keccak(100);
-      expect(rand.nextInt(), 826887880);
+      var rand = HashlibRandom(RandomGenerator.keccak, seed: 100);
+      expect(rand.nextInt(), 4172722486);
     });
     test('default seed', () {
-      var rand = HashlibRandom.keccak();
+      var rand = HashlibRandom(RandomGenerator.keccak);
       for (int i = 0; i < 100; ++i) {
         expect(rand.nextBetween(0, 1), lessThanOrEqualTo(1));
         expect(rand.nextBetween(0, 3), lessThanOrEqualTo(3));
@@ -64,7 +129,7 @@ void main() {
       }
     });
     test('random bytes length = 100', () {
-      expect(randomBytes(100, RandomGenerator.keccak).length, 100);
+      expect(randomBytes(100, generator: RandomGenerator.keccak).length, 100);
     });
   });
 }

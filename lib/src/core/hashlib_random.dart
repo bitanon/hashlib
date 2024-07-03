@@ -4,8 +4,25 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/algorithms/random_generators.dart';
+
 export 'package:hashlib/src/algorithms/random_generators.dart'
     show RandomGenerator;
+
+const int _mask32 = 0xFFFFFFFF;
+
+const String _alphaLower = 'abcdefghijklmnopqrstuvwxyz';
+const String _alphaUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const String _numeric = '0123456789';
+const List<int> _controls = [
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, //
+  11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+  21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+  127
+];
+const List<int> _punctuations = [
+  33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, //
+  58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126,
+];
 
 /// Provides a generator for secure random values
 class HashlibRandom {
@@ -15,23 +32,13 @@ class HashlibRandom {
   const HashlibRandom.generator(this._generator);
 
   /// Creates an instance based on [generator] with optional [seed] value.
-  factory HashlibRandom({
-    int? seed,
-    RandomGenerator generator = RandomGenerator.system,
-  }) =>
+  factory HashlibRandom(RandomGenerator generator, {int? seed}) =>
       HashlibRandom.generator(generator.build(seed).iterator);
 
-  /// Creates an instance based on [RandomGenerator.system].
-  factory HashlibRandom.system([int? seed]) => HashlibRandom(
-        seed: seed,
-        generator: RandomGenerator.system,
-      );
-
-  /// Creates an instance based on [RandomGenerator.keccak].
-  factory HashlibRandom.keccak([int? seed]) => HashlibRandom(
-        seed: seed,
-        generator: RandomGenerator.keccak,
-      );
+  /// Creates an instance based on [RandomGenerator.secure] generator with
+  /// optional [seed] value.
+  factory HashlibRandom.secure({int? seed}) =>
+      HashlibRandom.generator(RandomGenerator.secure.build(seed).iterator);
 
   /// Generates a 32-bit bit random  number
   @pragma('vm:prefer-inline')
@@ -54,11 +61,20 @@ class HashlibRandom {
 
   /// Generates a double number
   @pragma('vm:prefer-inline')
-  double nextDouble() => nextInt() / 0xFFFFFFFF;
+  double nextDouble() => nextInt() / _mask32;
 
   /// Generates a 32-bit bit random number between [low] and [high], inclusive.
-  @pragma('vm:prefer-inline')
-  int nextBetween(int low, int high) => (nextInt() % (high - low)) + low;
+  int nextBetween(int low, int high) {
+    if (low == high) {
+      return low;
+    }
+    if (low > high) {
+      int t = low;
+      low = high;
+      high = t;
+    }
+    return (nextInt() % (high - low)) + low;
+  }
 
   /// Fill the buffer with random values.
   ///
@@ -99,5 +115,95 @@ class HashlibRandom {
     var data = Uint32List(length);
     fill(data.buffer);
     return data;
+  }
+
+  /// Generate the next random string of specific [length].
+  ///
+  /// If no parameter is provided, it will return a random string using
+  /// ASCII characters only (character code 0 to 127).
+  ///
+  /// If [whitelist] or [blacklist] are provided, they will get priority over
+  /// other parameters. Otherwise, these two list will be generated from the
+  /// other parameter.
+  ///
+  /// Other Parameters:
+  /// - [lower] : lowercase letters.
+  /// - [upper] : uppercase letters.
+  /// - [controls] : control characters.
+  /// - [punctuations] : punctuations.
+  ///
+  /// If these parameters are set, it will be ignored. Otherwise, if `true`, the
+  /// corresponding characters will be added to the [whitelist], or if `false`,
+  /// to the [blacklist].
+  ///
+  /// If the [whitelist] is already set, these parameters has no effect when
+  /// they are set to true. If the [blacklist] is already set, these parameters
+  /// has no effect when they are set to false.
+  String nextString(
+    int length, {
+    bool? lower,
+    bool? upper,
+    bool? numeric,
+    bool? controls,
+    bool? punctuations,
+    List<int>? whitelist,
+    List<int>? blacklist,
+  }) {
+    Set<int> white = {};
+    Set<int> black = {};
+    if (lower != null) {
+      if (lower) {
+        white.addAll(_alphaLower.codeUnits);
+      } else {
+        black.addAll(_alphaLower.codeUnits);
+      }
+    }
+    if (upper != null) {
+      if (upper) {
+        white.addAll(_alphaUpper.codeUnits);
+      } else {
+        black.addAll(_alphaUpper.codeUnits);
+      }
+    }
+    if (numeric != null) {
+      if (numeric) {
+        white.addAll(_numeric.codeUnits);
+      } else {
+        black.addAll(_numeric.codeUnits);
+      }
+    }
+    if (controls != null) {
+      if (controls) {
+        white.addAll(_controls);
+      } else {
+        black.addAll(_controls);
+      }
+    }
+    if (punctuations != null) {
+      if (punctuations) {
+        white.addAll(_punctuations);
+      } else {
+        black.addAll(_punctuations);
+      }
+    }
+
+    if (whitelist != null) {
+      white.addAll(whitelist);
+      black.removeAll(whitelist);
+    } else if (white.isEmpty) {
+      white.addAll(List.generate(128, (i) => i));
+    }
+    white.removeAll(black);
+    if (blacklist != null) {
+      white.removeAll(blacklist);
+    }
+    if (white.isEmpty) {
+      throw StateError('Empty whitelist');
+    }
+
+    var list = white.toList(growable: false);
+    Iterable<int> codes = nextBytes(length);
+    codes = codes.map((x) => list[x % list.length]);
+    return String.fromCharCodes(codes);
   }
 }

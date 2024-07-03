@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha1.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA-1 produces a message digest based on principle similar to MD5, except
 /// it can generate a 160-bit hash. Since 2005, SHA-1 has not been considered
@@ -38,16 +37,4 @@ String sha1sum(
   bool uppercase = false,
 ]) {
   return sha1.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [sha1] hash
-extension Sha1StringExtension on String {
-  /// Generates a SHA-1 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest sha1digest([Encoding? encoding]) {
-    return sha1.string(this, encoding);
-  }
 }

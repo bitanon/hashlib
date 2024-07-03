@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha3.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA3-256 is a member of SHA-3 family which uses 256-bit blocks to
 /// generate a message digest of 256-bit long.
@@ -42,16 +41,4 @@ String sha3_256sum(
   bool uppercase = false,
 ]) {
   return sha3_256.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [sha3_256] hash
-extension Sha3d256StringExtension on String {
-  /// Generates a SHA3-256 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest sha3_256digest([Encoding? encoding]) {
-    return sha3_256.string(this, encoding);
-  }
 }

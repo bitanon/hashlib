@@ -3,7 +3,9 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 export 'hash_base_stub.dart' if (dart.library.io) 'hash_base_io.dart';
@@ -50,6 +52,48 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   @pragma('vm:prefer-inline')
   HashDigestSink createSink();
 
+  /// Process the byte array [input] and returns a [HashDigest].
+  @pragma('vm:prefer-inline')
+  HashDigest convert(List<int> input) {
+    var sink = createSink();
+    sink.add(input);
+    return sink.digest();
+  }
+
+  /// Process the [input] string and returns a [HashDigest].
+  ///
+  /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
+  HashDigest string(String input, [Encoding? encoding]) {
+    var sink = createSink();
+    if (encoding != null) {
+      sink.add(encoding.encode(input));
+    } else {
+      sink.add(input.codeUnits);
+    }
+    return sink.digest();
+  }
+
+  /// Consumes the entire [stream] of byte array and generates a [HashDigest].
+  Future<HashDigest> byteStream(
+    Stream<int> stream, [
+    int bufferSize = 1024,
+  ]) async {
+    var sink = createSink();
+    var buffer = Uint8List(bufferSize);
+    int p = 0;
+    await for (var x in stream) {
+      buffer[p++] = x;
+      if (p == bufferSize) {
+        sink.add(buffer);
+        p = 0;
+      }
+    }
+    if (p > 0) {
+      sink.add(buffer, 0, p);
+    }
+    return sink.digest();
+  }
+
   /// Transforms the byte array input stream to generate a new stream
   /// which contains a single [HashDigest]
   ///
@@ -77,46 +121,21 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
     yield sink.digest();
   }
 
-  @override
-  StreamTransformer<RS, RT> cast<RS, RT>() =>
-      StreamTransformer.castFrom<List<int>, HashDigest, RS, RT>(this);
-
-  /// Process the byte array [input] and returns a [HashDigest].
-  @pragma('vm:prefer-inline')
-  HashDigest convert(List<int> input) {
-    var sink = createSink();
-    sink.add(input);
-    return sink.digest();
-  }
-
-  /// Process the [input] string and returns a [HashDigest].
-  ///
-  /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
-  HashDigest string(String input, [Encoding? encoding]) {
-    var sink = createSink();
-    if (encoding != null) {
-      var data = encoding.encode(input);
-      sink.add(data);
-    } else {
-      sink.add(input.codeUnits);
-    }
-    return sink.digest();
-  }
-
-  /// Consumes the entire [stream] of byte array and generates a [HashDigest].
-  @pragma('vm:prefer-inline')
-  Future<HashDigest> consume(Stream<List<int>> stream) {
-    return bind(stream).first;
-  }
-
   /// Consumes the entire [stream] of string and generates a [HashDigest].
   ///
   /// Default [encoding] scheme to get the input bytes is [latin1].
-  @pragma('vm:prefer-inline')
-  Future<HashDigest> consumeAs(
+  Future<HashDigest> stringStraem(
     Stream<String> stream, [
-    Encoding encoding = latin1,
+    Encoding? encoding,
   ]) {
-    return bind(stream.transform(encoding.encoder)).first;
+    if (encoding == null) {
+      return bind(stream.map((s) => s.codeUnits)).first;
+    } else {
+      return bind(stream.transform(encoding.encoder)).first;
+    }
   }
+
+  @override
+  StreamTransformer<RS, RT> cast<RS, RT>() =>
+      StreamTransformer.castFrom<List<int>, HashDigest, RS, RT>(this);
 }

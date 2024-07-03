@@ -56,24 +56,3 @@ int xxh64code(String input, [Encoding? encoding]) {
 String xxh64sum(String input, [Encoding? encoding]) {
   return xxh64.string(input, encoding).hex();
 }
-
-/// Extension to [String] to generate [xxh64] code.
-extension XXHash64StringExtension on String {
-  /// Gets the 64-bit xxHash value of a String.
-  ///.
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  int xxh64code([Encoding? encoding]) {
-    return xxh64.string(this, encoding).number();
-  }
-
-  /// Gets the 64-bit xxHash hash of a String in hexadecimal.
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  String xxh64sum([Encoding? encoding]) {
-    return xxh64.string(this, encoding).hex();
-  }
-}

@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha3.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA3-512 is a member of SHA-3 family which uses 512-bit blocks to
 /// generate a message digest of 512-bit long.
@@ -42,16 +41,4 @@ String sha3_512sum(
   bool uppercase = false,
 ]) {
   return sha3_512.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [sha3_512] hash
-extension Sha3d512StringExtension on String {
-  /// Generates a SHA3-512 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest sha3_512digest([Encoding? encoding]) {
-    return sha3_512.string(this, encoding);
-  }
 }

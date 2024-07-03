@@ -85,7 +85,7 @@ void main() {
                 List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
             .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
             .map((s) => s.codeUnits);
-        final result = await sm3.consume(stream);
+        final result = await sm3.bind(stream).first;
         expect(result.hex(), entry.value);
       }
     });

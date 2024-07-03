@@ -2,14 +2,25 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:hashlib/src/algorithms/keccak.dart';
+import 'package:hashlib/src/algorithms/md4.dart';
+import 'package:hashlib/src/algorithms/sha2.dart';
+import 'package:hashlib/src/algorithms/sm3.dart';
+import 'package:hashlib/src/algorithms/xxh64.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 
-const int _maxLong = 1 << 32;
+const int _mask32 = 0xFFFFFFFF;
 
 enum RandomGenerator {
-  keccak,
+  secure,
   system,
+  keccak,
+  sha256,
+  md5,
+  xxh64,
+  sm3,
 }
 
 extension RandomGeneratorIterable on RandomGenerator {
@@ -17,6 +28,16 @@ extension RandomGeneratorIterable on RandomGenerator {
     switch (this) {
       case RandomGenerator.keccak:
         return _RandomGenerators.$keccakGenerateor(seed);
+      case RandomGenerator.sha256:
+        return _RandomGenerators.$hashGenerateor(SHA256Hash(), seed);
+      case RandomGenerator.md5:
+        return _RandomGenerators.$hashGenerateor(MD4Hash(), seed);
+      case RandomGenerator.xxh64:
+        return _RandomGenerators.$hashGenerateor(XXHash64Sink(111), seed);
+      case RandomGenerator.sm3:
+        return _RandomGenerators.$hashGenerateor(SM3Hash(), seed);
+      case RandomGenerator.secure:
+        return _RandomGenerators.$secureGenerator();
       case RandomGenerator.system:
       default:
         return _RandomGenerators.$systemGenerator(seed);
@@ -24,25 +45,91 @@ extension RandomGeneratorIterable on RandomGenerator {
   }
 }
 
-abstract class _RandomGenerators {
-  /// Generate a seed based on current time
-  static int $generateSeed() =>
-      (DateTime.now().microsecond << 10) ^ DateTime.now().millisecond;
+void main() {
+  var it = _RandomGenerators.$systemGenerator().iterator;
+  it.moveNext();
+  print(it.current);
+  it.moveNext();
+  print(it.current);
+  it.moveNext();
+  print(it.current);
+  it.moveNext();
+  print(it.current);
+  it.moveNext();
+  print(it.current);
+}
 
-  /// Returns secure [Random], or a seeded Random on failure.
-  static Random $systemRandom([int? seed]) {
+abstract class _RandomGenerators {
+  static int _seedCounter = 0x9BDC06A7;
+
+  /// Generate a 64-bit random seed
+  static int $generateSeed() {
+    var now = DateTime.now();
+    var code = now.microsecondsSinceEpoch;
+    code -= _seedCounter++;
+    if (code.bitLength & 1 == 1) {
+      code *= ~code;
+    }
+    code ^= ~_seedCounter++ << 5;
+    return code;
+  }
+
+  /// Generate a seed based on current time
+  static void $seedList(TypedData data, int seed) {
+    var list = Uint32List.view(data.buffer);
+    var inp = [
+      0x90BEFFFA ^ seed,
+      0xD5A79147,
+      0x14292967 + list.length,
+      0xD192E819 | ~seed,
+      0x59F111F1 ^ -seed.bitLength,
+      0xD6990624 ^ ~seed >>> 32,
+      0x106AA070 + seed,
+      0x71374491 - seed,
+      0x06CA6351 ^ seed,
+      0x650A7354 ^ ~seed,
+      0xF40E3585 - ~seed,
+      0x766A0ABB ^ -seed,
+      0x81C2C92E ^ ~list.length,
+      0x92722C85 | ~seed,
+      0x748F82EE ^ -list.length,
+      0x78A5636F | -seed,
+    ];
+
+    int i, x;
+    for (i = 0; i < 16 && i < list.length; ++i) {
+      list[i] ^= inp[i];
+    }
+    for (x = seed; i < list.length; ++i) {
+      list[i] ^= x = (x >>> (i & 15)) ^ seed;
+      list[i] ^= list[i - 16];
+      list[i] ^= -list[i - 7];
+    }
+    var list8 = Uint8List.view(data.buffer);
+    for (i = list.lengthInBytes; i < list8.length; ++i) {
+      list8[i] ^= seed >>> (i & 31);
+    }
+  }
+
+  /// Returns a iterable of 32-bit integers backed by system's [Random].
+  static Iterable<int> $secureGenerator() sync* {
+    Random random;
     try {
-      return Random.secure();
+      random = Random.secure();
     } catch (err) {
-      return Random(seed ?? $generateSeed());
+      random = Random($generateSeed());
+    }
+    while (true) {
+      yield random.nextInt(_mask32);
     }
   }
 
   /// Returns a iterable of 32-bit integers backed by system's [Random].
   static Iterable<int> $systemGenerator([int? seed]) sync* {
-    Random random = $systemRandom(seed);
+    seed ??= $generateSeed();
+    Random random = Random(seed);
     while (true) {
-      yield random.nextInt(_maxLong);
+      yield random.nextInt(_mask32);
     }
   }
 
@@ -50,12 +137,33 @@ abstract class _RandomGenerators {
   static Iterable<int> $keccakGenerateor([int? seed]) sync* {
     seed ??= $generateSeed();
     var sink = KeccakHash(stateSize: 64, paddingByte: 0);
-    sink.sbuffer.fillRange(0, sink.sbuffer.length, seed);
+    $seedList(sink.sbuffer, seed);
     while (true) {
       sink.$update();
       for (var x in sink.sbuffer) {
         yield x;
       }
+    }
+  }
+
+  /// Returns a iterable of 32-bit integers generated from the [sink].
+  static Iterable<int> $hashGenerateor(
+    HashDigestSink sink, [
+    int? seed,
+  ]) sync* {
+    seed ??= $generateSeed();
+    var input = Uint8List(sink.hashLength);
+    for (int i = 0;; i++) {
+      if (i & 31 == 0) {
+        $seedList(input, seed);
+      }
+      sink.add(input);
+      var digest = sink.digest();
+      sink.reset();
+      for (var x in Uint32List.view(digest.buffer)) {
+        yield x;
+      }
+      input = digest.bytes;
     }
   }
 }

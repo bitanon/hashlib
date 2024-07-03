@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/sha3.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHA3-224 is a member of SHA-3 family which uses 224-bit blocks to
 /// generate a message digest of 224-bit long.
@@ -42,16 +41,4 @@ String sha3_224sum(
   bool uppercase = false,
 ]) {
   return sha3_224.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [sha3_224] hash
-extension Sha3d224StringExtension on String {
-  /// Generates a SHA3-224 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest sha3_224digest([Encoding? encoding]) {
-    return sha3_224.string(this, encoding);
-  }
 }

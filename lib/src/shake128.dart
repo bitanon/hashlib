@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/shake.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// SHAKE-128 is a member of SHA-3 family which uses 128-bit blocks to
 /// generate a message digest of arbitrary length.
@@ -91,16 +90,4 @@ String shake128sum(
   bool uppercase = false,
 ]) {
   return Shake128(outputSize).string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [shake128] hash
-extension Shake128StringExtension on String {
-  /// Generates a SHAKE-128 digest of this string
-  ///
-  /// Parameters:
-  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-  @Deprecated('Use the public method instead.')
-  HashDigest shake128digest(int outputSize, [Encoding? encoding]) {
-    return Shake128(outputSize).string(this, encoding);
-  }
 }

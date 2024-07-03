@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:hashlib/src/algorithms/md5.dart';
 import 'package:hashlib/src/core/block_hash.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 /// MD5 can be used as a checksum to verify data integrity against unintentional
 /// corruption. Although it was widely used as a cryptographic hash function
@@ -36,16 +35,4 @@ String md5sum(
   bool uppercase = false,
 ]) {
   return md5.string(input, encoding).hex(uppercase);
-}
-
-/// Extension to [String] to generate [md5] hash
-extension Md5StringExtension on String {
-  /// Generates a MD5 digest of this string
-  ///
-  /// Parameters:
-  /// - If no [encoding] is defined, the `codeUnits` is used to get the bytes.
-  @Deprecated('Use the public method instead.')
-  HashDigest md5digest([Encoding? encoding]) {
-    return md5.string(this, encoding);
-  }
 }
