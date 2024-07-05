@@ -263,4 +263,30 @@ class KeccakHash extends BlockHashSink {
     }
     return bytes;
   }
+
+  /// Returns a iterable of bytes generated from the Keccak sponge.
+  ///
+  /// It will produce exactly [outputSize] bytes before closing the stream.
+  ///
+  /// If [outputSize] is 0, it will generate an infinite sequence of
+  /// bytes.
+  ///
+  /// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
+  Iterable<int> generate() sync* {
+    // make sure that the digest is closed
+    var b = digest().bytes;
+    if (b.isNotEmpty) {
+      yield* b;
+      return;
+    }
+
+    // infinite sponge construction
+    for (int j = 0;; j++) {
+      if (j == blockLength) {
+        $update();
+        j = 0;
+      }
+      yield buffer[j];
+    }
+  }
 }
