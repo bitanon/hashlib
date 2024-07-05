@@ -109,7 +109,7 @@ void main() {
   group('keccak random', () {
     test('with seed', () {
       var rand = HashlibRandom(RandomGenerator.keccak, seed: 100);
-      expect(rand.nextInt(), 4172722486);
+      expect(rand.nextInt(), 4184787772);
     });
     test('default seed', () {
       var rand = HashlibRandom(RandomGenerator.keccak);

@@ -62,7 +62,7 @@ void main() {
 abstract class _RandomGenerators {
   static int _seedCounter = 0x9BDC06A7;
 
-  /// Generate a 64-bit random seed
+  /// Generate a 64-bit random seed based on current time
   static int $generateSeed() {
     var now = DateTime.now();
     var code = now.microsecondsSinceEpoch;
@@ -74,7 +74,7 @@ abstract class _RandomGenerators {
     return code;
   }
 
-  /// Generate a seed based on current time
+  /// Fill the [data] with 32-bit integers generated from the [seed].
   static void $seedList(TypedData data, int seed) {
     var list = Uint32List.view(data.buffer);
     var inp = [
@@ -136,8 +136,11 @@ abstract class _RandomGenerators {
   /// Returns a iterable of 32-bit integers generated from the [KeccakHash].
   static Iterable<int> $keccakGenerateor([int? seed]) sync* {
     seed ??= $generateSeed();
-    var sink = KeccakHash(stateSize: 64, paddingByte: 0);
-    $seedList(sink.sbuffer, seed);
+    var sink = KeccakHash(stateSize: 64, paddingByte: 0, outputSize: 0);
+    var input = Uint8List(sink.hashLength);
+    $seedList(input, seed);
+    sink.add(input);
+    sink.$update();
     while (true) {
       sink.$update();
       for (var x in sink.sbuffer) {
