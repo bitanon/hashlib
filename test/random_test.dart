@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/src/algorithms/random_generators.dart';
 import 'package:hashlib/src/hashlib_base.dart';
 import 'package:test/test.dart';
 
@@ -50,6 +51,15 @@ void main() {
     test("xxh64 random", () {
       runFunctionalText(HashlibRandom(RandomGenerator.xxh64));
     }, tags: ['vm-only']);
+  });
+
+  test('seed generator uniqueness', () {
+    int n = 10000;
+    var m = <int>{};
+    for (int i = 0; i < n; ++i) {
+      m.add(RandomGenerators.$generateSeed());
+    }
+    expect(m.length, n);
   });
 
   test('random bytes length = 0', () {
@@ -108,9 +118,9 @@ void main() {
 
   group('keccak random', () {
     test('with seed', () {
-      var rand = HashlibRandom(RandomGenerator.keccak, seed: 100);
-      expect(rand.nextInt(), 4172722486);
-    });
+      var rand = HashlibRandom(RandomGenerator.keccak, seed: 10);
+      expect(rand.nextInt(), 863158043);
+    }, tags: 'vm-only');
     test('default seed', () {
       var rand = HashlibRandom(RandomGenerator.keccak);
       for (int i = 0; i < 100; ++i) {
