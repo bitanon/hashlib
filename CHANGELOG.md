@@ -8,6 +8,7 @@
   - Remove `consume`, use `bind` instead.
   - `consumeAs` is renamed to `stringStraem` .
   - Introduced `byteStream`
+  - Adds `fillNumbers` to fill List<int> with random integers.
 
 # 1.18.1
 
