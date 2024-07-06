@@ -4,11 +4,11 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/keccak.dart';
+import 'package:hashlib/src/algorithms/keccak/keccak.dart';
 import 'package:hashlib/src/algorithms/md4.dart';
-import 'package:hashlib/src/algorithms/sha2.dart';
+import 'package:hashlib/src/algorithms/sha2/sha2.dart';
 import 'package:hashlib/src/algorithms/sm3.dart';
-import 'package:hashlib/src/algorithms/xxh64.dart';
+import 'package:hashlib/src/algorithms/xxh64/xxh64.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
 const int _mask32 = 0xFFFFFFFF;
@@ -65,20 +65,20 @@ abstract class RandomGenerators {
   static void $seedList(TypedData data, int seed) {
     var list = Uint32List.view(data.buffer);
     var inp = [
-      0x90BEFFFA ^ seed & _mask32,
+      seed & _mask32,
+      seed >>> 32,
+      list.length,
       0xD5A79147,
       0x14292967 + list.length,
-      0xD192E819 | ~seed,
       0x59F111F1 ^ -seed.bitLength,
-      0xD6990624 ^ ~seed >>> 32,
       0x106AA070 + seed,
       0x71374491 - seed,
       0x06CA6351 ^ seed,
-      0x650A7354 ^ ~seed,
-      0xF40E3585 - ~seed,
+      0x650A7354,
+      0xF40E3585,
       0x766A0ABB ^ -seed,
-      0x81C2C92E ^ ~list.length,
-      0x92722C85 | ~seed,
+      0x81C2C92E,
+      0x92722C85,
       0x748F82EE ^ -list.length,
       0x78A5636F | -seed,
     ];
