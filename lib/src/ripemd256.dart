@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/ripemd256.dart';
+import 'package:hashlib/src/algorithms/ripemd/ripemd256.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// RIPEMD-256 (RACE Integrity Primitives Evaluation Message Digest) is a

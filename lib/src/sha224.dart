@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha2.dart';
+import 'package:hashlib/src/algorithms/sha2/sha2.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// SHA-224 is a member of SHA-2 family which uses 256-bit internal state to

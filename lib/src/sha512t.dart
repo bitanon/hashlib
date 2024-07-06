@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/sha2.dart';
+import 'package:hashlib/src/algorithms/sha2/sha2.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// SHA-512/256 is a variation of SHA-512 which uses 512-bit internal state to

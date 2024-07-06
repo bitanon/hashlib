@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/ripemd320.dart';
+import 'package:hashlib/src/algorithms/ripemd/ripemd320.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// RIPEMD-320 (RACE Integrity Primitives Evaluation Message Digest) is a

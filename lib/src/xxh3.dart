@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/xxh3_64.dart';
+import 'package:hashlib/src/algorithms/xxh3/xxh3_64.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// An instance of [XXH3] with seed = 0

@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/src/algorithms/blake2b.dart';
+import 'package:hashlib/src/algorithms/blake2b/blake2b.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
