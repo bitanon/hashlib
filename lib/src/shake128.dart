@@ -98,10 +98,15 @@ String shake128sum(
 /// With a proper seed, this can work as a random number generator.
 ///
 /// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
-Iterable<int> shake128generator([List<int>? seed]) {
-  final hash = Shake128Hash(0);
+Iterable<int> shake128generator([List<int>? seed]) sync* {
+  final sink = Shake128Hash(0);
   if (seed != null) {
-    hash.add(seed, 0, seed.length);
+    sink.add(seed, 0, seed.length);
   }
-  return hash.generate();
+  while (true) {
+    sink.$update();
+    for (var x in sink.buffer) {
+      yield x;
+    }
+  }
 }
