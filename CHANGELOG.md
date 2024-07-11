@@ -4,6 +4,9 @@
   - `shake128generator`
   - `shake256generator`
 - Generalize the random seed list generation to support web
+- Expose methods to get padded string value from TOTP:
+  - `valueString`
+  - `streamString`
 
 # 1.19.1
 

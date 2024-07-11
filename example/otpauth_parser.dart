@@ -183,9 +183,8 @@ void main(List<String> args) {
   for (int i = 0; i < uris.length; ++i) {
     print(uris[i]);
     var totp = parse(uris[i]) as TOTP;
-    totp.stream.listen((e) {
+    totp.streamString.listen((otp) {
       if (i == 0) print("\nTime: ${DateTime.now()}\n ${'-' * 40}");
-      var otp = e.toString().padLeft(totp.digits, '0');
       var left = otp.substring(0, totp.digits ~/ 2);
       var right = otp.substring(totp.digits ~/ 2);
       var joined = '$left $right';

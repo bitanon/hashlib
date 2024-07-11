@@ -63,8 +63,13 @@ class TOTP extends HOTP {
     };
   }
 
-  /// A broadcast stream that reports new OTP on every [period] interval
+  /// A broadcast stream that reports new OTP value on every [period] interval
   Stream<int> get stream => _controller.stream;
+
+  /// A broadcast stream that reports new OTP value as string on every [period]
+  /// interval
+  Stream<String> get streamString =>
+      _controller.stream.map((e) => e.toString().padLeft(digits, '0'));
 
   /// The current time in milliseconds since EPOCH with adjusted delta shift
   int get currentTime => DateTime.now().millisecondsSinceEpoch + _timeDelta;

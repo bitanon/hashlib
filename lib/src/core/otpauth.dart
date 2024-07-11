@@ -21,6 +21,10 @@ abstract class OTPAuth {
     this.issuer,
   }) : assert(digits >= 4 && digits <= 15);
 
-  /// Generates the OTP value
+  /// Generates the next OTP value
   int value();
+
+  /// Returns the next OTP value as string
+  @pragma('vm:prefer-inline')
+  String valueString() => value().toString().padLeft(digits, '0');
 }
