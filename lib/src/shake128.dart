@@ -100,13 +100,14 @@ String shake128sum(
 /// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
 Iterable<int> shake128generator([List<int>? seed]) sync* {
   final sink = Shake128Hash(0);
-  if (seed != null) {
-    sink.add(seed, 0, seed.length);
+  if (seed != null && seed.isNotEmpty) {
+    sink.add(seed);
   }
+  sink.$finalize();
   while (true) {
-    sink.$update();
     for (var x in sink.buffer) {
       yield x;
     }
+    sink.$update();
   }
 }

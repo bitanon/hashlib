@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -42,6 +43,25 @@ void main() {
       final out = await digest.first;
       expect(out.hex().substring((512 - 32) * 2),
           "6a1a9d7846436e4dca5728b6f760eef0ca92bf0be5615e96959d767197a0beeb");
+    });
+
+    test('SHAKE128 generator', () {
+      var original = shake128sum('', 64);
+      expect(toHex(shake128generator().take(64)), equals(original));
+    });
+    test('SHAKE256 generator', () {
+      var original = shake256sum('', 64);
+      expect(toHex(shake256generator().take(64)), equals(original));
+    });
+    test('SHAKE128 generator with seed', () {
+      var seed = '012345678910111213141516171819'.codeUnits;
+      var original = Shake128(64).convert(seed).hex();
+      expect(toHex(shake128generator(seed).take(64)), equals(original));
+    });
+    test('SHAKE256 generator with seed', () {
+      var seed = '012345678910111213141516171819'.codeUnits;
+      var original = Shake256(64).convert(seed).hex();
+      expect(toHex(shake256generator(seed).take(64)), equals(original));
     });
   });
 }

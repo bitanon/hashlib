@@ -1,3 +1,10 @@
+# 1.19.2
+
+- Expose infinite generator methods for SHAKE
+  - `shake128generator`
+  - `shake256generator`
+- Generalize the random seed list generation to support web
+
 # 1.19.1
 
 - Improve support for random generator

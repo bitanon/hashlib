@@ -103,10 +103,11 @@ Iterable<int> shake256generator([List<int>? seed]) sync* {
   if (seed != null) {
     sink.add(seed, 0, seed.length);
   }
+  sink.$finalize();
   while (true) {
-    sink.$update();
     for (var x in sink.buffer) {
       yield x;
     }
+    sink.$update();
   }
 }
