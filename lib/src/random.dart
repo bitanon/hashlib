@@ -11,7 +11,7 @@ export 'package:hashlib/src/core/hashlib_random.dart';
 @pragma('vm:prefer-inline')
 Uint8List randomBytes(
   int length, {
-  RandomGenerator generator = RandomGenerator.system,
+  RandomGenerator generator = RandomGenerator.secure,
 }) =>
     HashlibRandom(generator).nextBytes(length);
 
@@ -19,11 +19,11 @@ Uint8List randomBytes(
 @pragma('vm:prefer-inline')
 Uint32List randomNumbers(
   int length, {
-  RandomGenerator generator = RandomGenerator.system,
+  RandomGenerator generator = RandomGenerator.secure,
 }) =>
     HashlibRandom(generator).nextNumbers(length);
 
-/// Fill the [buffer] with random numbers.
+/// Fills the [buffer] with random numbers.
 ///
 /// Both the [start] and [length] are in bytes.
 @pragma('vm:prefer-inline')
@@ -31,9 +31,26 @@ void fillRandom(
   ByteBuffer buffer, {
   int start = 0,
   int? length,
-  RandomGenerator generator = RandomGenerator.system,
+  RandomGenerator generator = RandomGenerator.secure,
 }) =>
     HashlibRandom(generator).fill(buffer, start, length);
+
+/// Fills the [list] with random 32-bit numbers.
+///
+/// Both the [start] and [length] are in bytes.
+void fillNumbers(
+  List<int> list, {
+  int start = 0,
+  int? length,
+  RandomGenerator generator = RandomGenerator.secure,
+}) {
+  int n = length ?? list.length;
+  if (n == 0) return;
+  var rand = HashlibRandom(generator);
+  for (; n > 0 && start < list.length; ++start, --n) {
+    list[start] = rand.nextInt();
+  }
+}
 
 /// Generate a list of random ASCII string of size [length].
 ///
@@ -48,7 +65,7 @@ String randomString(
   bool? punctuations,
   List<int>? whitelist,
   List<int>? blacklist,
-  RandomGenerator generator = RandomGenerator.system,
+  RandomGenerator generator = RandomGenerator.secure,
 }) =>
     HashlibRandom(generator).nextString(
       length,

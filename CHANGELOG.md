@@ -1,4 +1,4 @@
-# 1.19.0
+# 1.19.1
 
 - Improve support for random generator
   - `HashlibRandom` class for generating random number, bool, strings etc.
@@ -8,6 +8,8 @@
   - Remove `consume`, use `bind` instead.
   - `consumeAs` is renamed to `stringStraem` .
   - Introduced `byteStream`
+  - Adds `fillNumbers` to fill List<int> with random integers.
+  - Use secure random generator by default
 
 # 1.18.1
 

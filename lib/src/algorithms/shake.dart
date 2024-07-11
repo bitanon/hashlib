@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'keccak_64bit.dart' if (dart.library.js) 'keccak_32bit.dart';
+import 'keccak/keccak.dart';
 
 class Shake128Hash extends KeccakHash {
   /// Create a SHAKE-128 hash generator with arbitrary output size.

@@ -4,14 +4,15 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/keccak.dart';
+import 'package:hashlib/src/algorithms/keccak/keccak.dart';
 import 'package:hashlib/src/algorithms/md4.dart';
-import 'package:hashlib/src/algorithms/sha2.dart';
+import 'package:hashlib/src/algorithms/sha2/sha2.dart';
 import 'package:hashlib/src/algorithms/sm3.dart';
-import 'package:hashlib/src/algorithms/xxh64.dart';
+import 'package:hashlib/src/algorithms/xxh64/xxh64.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
 const int _mask32 = 0xFFFFFFFF;
+const int _maxSafeNumber = 0x1FFFFFFFFFFFFF;
 
 enum RandomGenerator {
   secure,
@@ -27,39 +28,25 @@ extension RandomGeneratorIterable on RandomGenerator {
   Iterable<int> build([int? seed]) {
     switch (this) {
       case RandomGenerator.keccak:
-        return _RandomGenerators.$keccakGenerateor(seed);
+        return RandomGenerators.$keccakGenerateor(seed);
       case RandomGenerator.sha256:
-        return _RandomGenerators.$hashGenerateor(SHA256Hash(), seed);
+        return RandomGenerators.$hashGenerateor(SHA256Hash(), seed);
       case RandomGenerator.md5:
-        return _RandomGenerators.$hashGenerateor(MD4Hash(), seed);
+        return RandomGenerators.$hashGenerateor(MD4Hash(), seed);
       case RandomGenerator.xxh64:
-        return _RandomGenerators.$hashGenerateor(XXHash64Sink(111), seed);
+        return RandomGenerators.$hashGenerateor(XXHash64Sink(111), seed);
       case RandomGenerator.sm3:
-        return _RandomGenerators.$hashGenerateor(SM3Hash(), seed);
+        return RandomGenerators.$hashGenerateor(SM3Hash(), seed);
       case RandomGenerator.secure:
-        return _RandomGenerators.$secureGenerator();
+        return RandomGenerators.$secureGenerator();
       case RandomGenerator.system:
       default:
-        return _RandomGenerators.$systemGenerator(seed);
+        return RandomGenerators.$systemGenerator(seed);
     }
   }
 }
 
-void main() {
-  var it = _RandomGenerators.$systemGenerator().iterator;
-  it.moveNext();
-  print(it.current);
-  it.moveNext();
-  print(it.current);
-  it.moveNext();
-  print(it.current);
-  it.moveNext();
-  print(it.current);
-  it.moveNext();
-  print(it.current);
-}
-
-abstract class _RandomGenerators {
+abstract class RandomGenerators {
   static int _seedCounter = 0x9BDC06A7;
 
   /// Generate a 64-bit random seed
@@ -71,27 +58,27 @@ abstract class _RandomGenerators {
       code *= ~code;
     }
     code ^= ~_seedCounter++ << 5;
-    return code;
+    return code & _maxSafeNumber;
   }
 
   /// Generate a seed based on current time
   static void $seedList(TypedData data, int seed) {
     var list = Uint32List.view(data.buffer);
     var inp = [
-      0x90BEFFFA ^ seed,
+      seed & _mask32,
+      seed >>> 32,
+      list.length,
       0xD5A79147,
       0x14292967 + list.length,
-      0xD192E819 | ~seed,
       0x59F111F1 ^ -seed.bitLength,
-      0xD6990624 ^ ~seed >>> 32,
       0x106AA070 + seed,
       0x71374491 - seed,
       0x06CA6351 ^ seed,
-      0x650A7354 ^ ~seed,
-      0xF40E3585 - ~seed,
+      0x650A7354,
+      0xF40E3585,
       0x766A0ABB ^ -seed,
-      0x81C2C92E ^ ~list.length,
-      0x92722C85 | ~seed,
+      0x81C2C92E,
+      0x92722C85,
       0x748F82EE ^ -list.length,
       0x78A5636F | -seed,
     ];

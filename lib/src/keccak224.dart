@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/keccak.dart';
+import 'package:hashlib/src/algorithms/keccak/keccak.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 
 /// Keccak-224 is a member of Keccak family hash functions that generates
