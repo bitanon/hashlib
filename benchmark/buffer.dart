@@ -196,21 +196,21 @@ class ByteDataViewBenchmark extends Benchmark {
 
 void main() {
   print('-------- BUFFER ---------');
-  ListBenchmark(1 << 7, 1 << 15).showDiff([
+  ListBenchmark(1 << 7, 1 << 15).measureDiff([
     ListGrowingBenchmark(1 << 7, 1 << 15),
     ByteDataBenchmark(1 << 7, 1 << 15),
     ByteDataViewBenchmark(1 << 7, 1 << 15),
     Uint8ListBenchmark(1 << 7, 1 << 15),
   ]);
   print('');
-  ListBenchmark(1 << 11, 1 << 11).showDiff([
+  ListBenchmark(1 << 11, 1 << 11).measureDiff([
     ListGrowingBenchmark(1 << 11, 1 << 11),
     ByteDataBenchmark(1 << 11, 1 << 11),
     ByteDataViewBenchmark(1 << 11, 1 << 11),
     Uint8ListBenchmark(1 << 11, 1 << 11),
   ]);
   print('');
-  ListBenchmark(1 << 18, 1 << 3).showDiff([
+  ListBenchmark(1 << 18, 1 << 3).measureDiff([
     ListGrowingBenchmark(1 << 18, 1 << 3),
     ByteDataBenchmark(1 << 18, 1 << 3),
     ByteDataViewBenchmark(1 << 18, 1 << 3),

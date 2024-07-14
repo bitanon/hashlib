@@ -41,7 +41,7 @@ void main() {
     int size = condition[0];
     int iter = condition[1];
     print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).showDiff([
+    HashlibBenchmark(size, iter).measureDiff([
       CryptoBenchmark(size, iter),
     ]);
     print('');

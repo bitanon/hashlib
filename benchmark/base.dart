@@ -7,23 +7,64 @@ import 'package:benchmark_harness/benchmark_harness.dart';
 
 Random random = Random();
 
-class KDFBenchmarkBase extends BenchmarkBase {
-  KDFBenchmarkBase(String name) : super(name);
+mixin BenchmarkTools {
+  int get size;
+  int get iter;
+  String get name;
 
-  @override
-  double measure() {
-    final watch = Stopwatch()..start();
-    run();
-    watch.reset();
-    run();
-    run();
-    run();
-    return (watch.elapsedMicroseconds / 3).floorToDouble();
+  void $showRate(double runtime) {
+    var nbhps = 1e6 * iter / runtime;
+    var rate = nbhps * size;
+    var rtms = runtime.round() / 1000;
+    var speed = formatSpeed(rate);
+    var mark = '${formatSize(size)} x $iter';
+    print('$name($mark): $rtms ms => ${nbhps.round()} rounds @ $speed');
+  }
+
+  void $showDiff(Map<String, double> diff) {
+    var rate = <String, String>{};
+    for (var name in diff.keys) {
+      var runtime = diff[name]!;
+      var hashRate = 1e6 * iter * size / runtime;
+      diff[name] = runtime;
+      rate[name] = formatSpeed(hashRate);
+    }
+    var mine = diff[name]!;
+    var best = diff.values.fold(mine, min);
+    for (var entry in diff.entries) {
+      var message = "${entry.key} : ${rate[entry.key]}";
+      var value = diff[entry.key]!;
+      if (value == best) {
+        message += ' [best]';
+      }
+      if (mine < value) {
+        var p = formatDecimal(value / mine);
+        message += ' => ${p}x slow';
+      } else if (mine > value) {
+        var p = formatDecimal(mine / value);
+        message += ' => ${p}x fast';
+      }
+      print(message);
+    }
+  }
+
+  void measureDiff([List<BenchmarkTools> others = const []]) {
+    var diff = <String, double>{};
+    for (var benchmark in {this, ...others}) {
+      if (benchmark is Benchmark) {
+        diff[benchmark.name] = benchmark.measure();
+      } else {
+        continue;
+      }
+    }
+    $showDiff(diff);
   }
 }
 
-abstract class Benchmark extends BenchmarkBase {
+abstract class Benchmark extends BenchmarkBase with BenchmarkTools {
+  @override
   final int size;
+  @override
   final int iter;
   final List<int> input;
 
@@ -39,40 +80,22 @@ abstract class Benchmark extends BenchmarkBase {
   }
 
   void measureRate() {
-    var runtime = measure();
-    var nbhps = 1e6 * iter / runtime;
-    var rate = nbhps * size;
-    var rtms = runtime.round() / 1000;
-    var speed = '${formatSize(rate)}/s';
-    print('$name ($size x $iter): $rtms ms => nb# ${nbhps.round()} @ $speed');
+    $showRate(measure());
   }
+}
 
-  void showDiff([List<BenchmarkBase> others = const []]) {
-    var diff = <String, double>{};
-    var rate = <String, String>{};
-    for (var benchmark in {this, ...others}) {
-      var runtime = benchmark.measure();
-      var hashRate = 1e6 * iter * size / runtime;
-      diff[benchmark.name] = runtime;
-      rate[benchmark.name] = '${formatSize(hashRate)}/s';
-    }
-    var mine = diff[name]!;
-    var best = diff.values.fold(mine, min);
-    for (var entry in diff.entries) {
-      var message = "${entry.key} : ${rate[entry.key]}";
-      var value = diff[entry.key]!;
-      if (value == best) {
-        message += ' [best]';
-      }
-      if (value > mine) {
-        var p = (100 * (value - mine) / mine).round();
-        message += ' ~ $p% slower';
-      } else if (value < mine) {
-        var p = (100 * (mine - value) / mine).round();
-        message += ' ~ $p% faster';
-      }
-      print(message);
-    }
+class KDFBenchmarkBase extends BenchmarkBase {
+  KDFBenchmarkBase(String name) : super(name);
+
+  @override
+  double measure() {
+    final watch = Stopwatch()..start();
+    run();
+    watch.reset();
+    run();
+    run();
+    run();
+    return (watch.elapsedMicroseconds / 3).floorToDouble();
   }
 }
 

@@ -117,7 +117,7 @@ void main() {
     int size = condition[0];
     int iter = condition[1];
     print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    RandomBenchmark(size, iter).showDiff([
+    RandomBenchmark(size, iter).measureDiff([
       SystemSecureRandomBenchmark(size, iter),
       SecureRandomBenchmark(size, iter),
       SystemRandomBenchmark(size, iter),

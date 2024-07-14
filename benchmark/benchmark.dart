@@ -300,6 +300,7 @@ void main(List<String> args) async {
 
   measureHashFunctions();
   measureKeyDerivation();
+
   raf?.flushSync();
   raf?.closeSync();
 }
