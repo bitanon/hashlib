@@ -10,10 +10,12 @@ class XXH3Sink128bit extends BlockHashSink {
   final int hashLength = 16;
 
   factory XXH3Sink128bit.withSeed(int seed) {
+    seed;
     throw UnimplementedError('XXH3-128 is not supported in Node platform');
   }
 
   factory XXH3Sink128bit.withSecret([List<int>? secret]) {
+    secret;
     throw UnimplementedError('XXH3-128 is not supported in Node platform');
   }
 

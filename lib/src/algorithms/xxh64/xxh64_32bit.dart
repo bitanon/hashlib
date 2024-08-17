@@ -10,6 +10,7 @@ class XXHash64Sink extends BlockHashSink {
   final int hashLength = 8;
 
   XXHash64Sink(int seed) : super(32) {
+    seed;
     throw UnimplementedError('XXHash64 is not supported in Node platform');
   }
 

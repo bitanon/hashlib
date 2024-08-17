@@ -97,9 +97,6 @@ class Scrypt extends KeyDerivatorBase {
   factory Scrypt.fromSecurity(
     ScryptSecurity security, {
     List<int>? salt,
-    int blockSize = 8,
-    int parallelism = 1,
-    int derivedKeyLength = 64,
   }) {
     return Scrypt(
       salt: salt,

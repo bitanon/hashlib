@@ -98,7 +98,7 @@ class Argon2HashDigest extends HashDigest {
   String encoded() => ctx.toEncoded(bytes);
 }
 
-/// The configuration used by the [Argon2] algorithm
+/// The configuration used by the **Argon2** algorithm
 class Argon2Context {
   /// Argon2 Hash Type
   final Argon2Type type;

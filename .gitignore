@@ -3,9 +3,10 @@
 .dart_tool/
 .packages
 
-# Conventional directory for build outputs.
+# Conventional directory for project outputs.
 build/
 doc/
+coverage/
 benchmark/**/*.exe
 test/**/*.exe
 

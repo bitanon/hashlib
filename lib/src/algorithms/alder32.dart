@@ -8,8 +8,8 @@ import 'package:hashlib/src/core/hash_digest.dart';
 
 const int _alder32Mod = 65521;
 
-/// This implementation is derived from the [ZLIB Compressed Data Format
-/// Specification version 3.3][rfc]
+/// This implementation is derived from the [ ZLIB Compressed Data Format
+/// Specification version 3.3 ][rfc]
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc1950.html
 class Alder32Hash extends HashDigestSink {

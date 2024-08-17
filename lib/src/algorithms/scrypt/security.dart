@@ -2,7 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 /// This contains some recommended values of memory, iteration and parallelism
-/// values for [Scrypt] algorithm.
+/// values for **Scrypt** algorithm.
 ///
 /// It is best to try out different combinations of these values to achieve the
 /// desired runtime on a target machine.

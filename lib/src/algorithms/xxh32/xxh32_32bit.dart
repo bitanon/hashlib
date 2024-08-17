@@ -54,7 +54,7 @@ class XXHash32Sink extends BlockHashSink {
     }
   }
 
-  /// Returns ([a] * [b]) & [mask32]
+  /// Returns ([a] * [b]) within 32-bit Galois field
   static int cross32(int a, int b) {
     int ah = (a >>> 16) & _mask16;
     int al = a & _mask16;

@@ -1,15 +1,26 @@
+# For more information about the core and recommended set of lints, see
+# https://dart.dev/go/core-lints
+#
+# For additional information about configuring this file, see
+# https://dart.dev/guides/language/analysis-options
+
 include: package:lints/recommended.yaml
 
-# linter:
-#   rules:
-#     - constant_identifier_names
+linter:
+  rules:
+    - camel_case_types
+    - only_throw_errors
+    - comment_references
+    - library_annotations
+    - invalid_case_patterns
+    - combinators_ordering
+    - always_declare_return_types
+    - one_member_abstracts
+    - cancel_subscriptions
+    - avoid_unused_constructor_parameters
 
 analyzer:
   exclude:
     - build/**
-
-# For more information about the core and recommended set of lints, see
-# https://dart.dev/go/core-lints
-
-# For additional information about configuring this file, see
-# https://dart.dev/guides/language/analysis-options
+    - test/**
+    - benchmark/**

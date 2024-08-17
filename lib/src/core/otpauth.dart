@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-/// Represents an abstract class for implementing [One-Time Password (OTP)
-/// authentication][rfc2289] methods in Dart.
+/// Represents an abstract class for implementing [ One-Time Password (OTP)
+/// authentication ][rfc2289] methods in Dart.
 ///
 /// This class provides a foundation for creating variable length OTP generation
 /// algorithms. Subclasses must implement the [value] method to generate OTP

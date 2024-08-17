@@ -8,7 +8,7 @@ import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 export 'algorithms/bcrypt/bcrypt.dart' show Bcrypt;
 export 'algorithms/bcrypt/common.dart'
-    show BcryptVersion, BcryptContext, BcryptHashDigest;
+    show BcryptContext, BcryptHashDigest, BcryptVersion;
 export 'algorithms/bcrypt/security.dart' show BcryptSecurity;
 
 /// Generate a secure password using the [Bcrypt] algorithm.
