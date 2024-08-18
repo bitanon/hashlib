@@ -15,7 +15,7 @@ class HMAC extends MACHashBase {
   const HMAC(this.algo, List<int> key) : super(key);
 
   @override
-  final String name = 'HMAC';
+  String get name => '${algo.name}/HMAC';
 
   @override
   HMACSink createSink() {

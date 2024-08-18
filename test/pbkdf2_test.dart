@@ -6,6 +6,18 @@ import 'package:test/test.dart';
 
 void main() {
   group('PBKDF2 test', () {
+    test("Default method: pbkdf2", () {
+      var hash = pbkdf2(
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        50,
+        32,
+      );
+      var matcher =
+          '09d106dccc35eae63c48aa472394de511547ce296ab55685b7ba8b304bec68fe';
+      expect(hash.hex(), matcher);
+    });
+
     test("with MD5", () {
       var hash = md5.pbkdf2(
         'password'.codeUnits,

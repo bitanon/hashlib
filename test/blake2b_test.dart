@@ -6,6 +6,21 @@ import 'package:test/test.dart';
 
 void main() {
   group('blake2b512 test', () {
+    test("Blake2b name", () {
+      expect(Blake2b(8).name, 'BLAKE2b-64');
+      expect(blake2b160.name, 'BLAKE2b-160');
+      expect(blake2b256.name, 'BLAKE2b-256');
+      expect(blake2b384.name, 'BLAKE2b-384');
+      expect(blake2b512.name, 'BLAKE2b-512');
+    });
+    test("Blake2bMac name", () {
+      final key = [1];
+      expect(Blake2bMAC(8, key).name, 'BLAKE2b-64-MAC');
+      expect(blake2b160.mac(key).name, 'BLAKE2b-160-MAC');
+      expect(blake2b256.mac(key).name, 'BLAKE2b-256-MAC');
+      expect(blake2b384.mac(key).name, 'BLAKE2b-384-MAC');
+      expect(blake2b512.mac(key).name, 'BLAKE2b-512-MAC');
+    });
     test('with empty string', () {
       expect(
           blake2b512.string("").hex(),

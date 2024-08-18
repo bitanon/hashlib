@@ -6,6 +6,21 @@ import 'package:test/test.dart';
 
 void main() {
   group('blake2s256 test', () {
+    test("Blake2s name", () {
+      expect(Blake2s(8).name, 'BLAKE2s-64');
+      expect(blake2s128.name, 'BLAKE2s-128');
+      expect(blake2s160.name, 'BLAKE2s-160');
+      expect(blake2s224.name, 'BLAKE2s-224');
+      expect(blake2s256.name, 'BLAKE2s-256');
+    });
+    test("Blake2sMac name", () {
+      final key = [1];
+      expect(Blake2sMAC(8, key).name, 'BLAKE2s-64-MAC');
+      expect(blake2s128.mac(key).name, 'BLAKE2s-128-MAC');
+      expect(blake2s160.mac(key).name, 'BLAKE2s-160-MAC');
+      expect(blake2s224.mac(key).name, 'BLAKE2s-224-MAC');
+      expect(blake2s256.mac(key).name, 'BLAKE2s-256-MAC');
+    });
     test('with empty string', () {
       expect(blake2s256.string("").hex(),
           "69217a3079908094e11121d042354a7c1f55b6482ca1a51e1b250dfd1ed0eef9");
@@ -50,6 +65,17 @@ void main() {
     test('with empty string and a secret', () {
       expect(blake2s256.mac('secret'.codeUnits).string('').hex(),
           "864f60ce88fc1c80c7b3b4f0bb920255fb464484a9dc7346f1d0e4e190d358cd");
+    });
+    test('Blake2s config with a key', () {
+      final hasher = blake2s256.config(
+        key: 'secret'.codeUnits,
+      );
+      expect(hasher.string('a').hex(),
+          "6252d094f32c706b6fa11529126bdf2910c4dd7638bf866348808df63f62531d");
+    });
+    test('Blake2s config without a key', () {
+      expect(blake2s256.config().string('a').hex(),
+          "4a0d129873403037c2cd9b9048203687f6233fb6738956e0349bd4320fec3e90");
     });
   });
 

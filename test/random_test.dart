@@ -95,7 +95,33 @@ void main() {
   test('random bytes length = 100', () {
     expect(randomBytes(100).length, 100);
   });
-  test('fill random', () {
+
+  test('random numbers length = 0', () {
+    expect(randomNumbers(0), []);
+  });
+  test('random numbers length = 1', () {
+    expect(randomNumbers(1).length, 1);
+  });
+  test('random numbers length = 100', () {
+    expect(randomNumbers(100).length, 100);
+  });
+  test('random numbers value', () {
+    randomNumbers(10).firstWhere((e) => e >= 256);
+  });
+
+  test('fill random bytes', () {
+    var data = Uint8List(10);
+    fillRandom(data.buffer);
+    data.firstWhere((e) => e != 0);
+  });
+
+  test('fill random numbers', () {
+    var data = Uint32List(10);
+    fillNumbers(data);
+    data.firstWhere((e) => e >= 256);
+  });
+
+  test('fill test random', () {
     int i, c;
     for (c = 0; c <= 100; ++c) {
       for (i = 0; i + c <= 100; ++i) {

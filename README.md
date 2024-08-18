@@ -45,7 +45,7 @@ There is only 1 dependency used by this package:
 
 | Algorithm | Available methods                                                | Source   |
 | --------- | ---------------------------------------------------------------- | -------- |
-| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id`, `argon2verify`       | RFC-9106 |
+| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id`, `argon2Verify`       | RFC-9106 |
 | PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`                                   | RFC-8081 |
 | scrypt    | `Scrypt`, `scrypt`,                                              | RFC-7914 |
 | bcrypt    | `Bcrypt`, `bcrypt`, `bcryptSalt`, `bcryptVerify`, `bcryptDigest` |          |

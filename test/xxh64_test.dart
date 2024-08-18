@@ -2,15 +2,12 @@
 // All rights reserved. Check LICENSE file for details.
 
 // ignore: library_annotations
-@OnPlatform({
-  'node': Skip('not supported'),
-})
+@Tags(['vm-only'])
 
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 const seed = 0x9E3779B1;
-const xxh64_1 = XXHash64(seed);
 const data = <int>[
   158, 255, 31, 75, 94, 83, 47, 221, 181, 84, 77, 42, 149, 43, 87, 174, 93, //
   186, 116, 233, 211, 166, 76, 152, 48, 96, 192, 128, 0, 0, 0, 0, 0, 0, 0,
@@ -21,6 +18,16 @@ const data = <int>[
 
 void main() {
   group('XXHash64 test', () {
+    test('xxh64sum', () {
+      final input = String.fromCharCodes(data);
+      expect(xxh64sum(input), "0eab543384f878ad");
+    });
+    test('xxh64code', () {
+      final input = String.fromCharCodes(data);
+      final output = 0x0eab543384f878ad;
+      expect(xxh64code(input), output);
+    });
+
     test('with seed = 0 and an empty string', () {
       expect(xxh64.convert([]).hex(), "ef46db3751d8e999");
     });
@@ -34,20 +41,23 @@ void main() {
       expect(xxh64.convert(data).hex(), "0eab543384f878ad");
     });
 
-    test('with seed = $seed and an empty string', () {
-      expect(xxh64_1.convert([]).hex(), "ac75fda2929b17ef");
+    test('with a seed and an empty string', () {
+      final input = <int>[];
+      expect(xxh64.withSeed(seed).convert(input).hex(), "ac75fda2929b17ef");
     });
 
-    test('with seed = $seed and a single letter', () {
-      expect(xxh64_1.convert([data[0]]).hex(), "739840cb819fa723");
+    test('with a seed and a single letter', () {
+      final input = <int>[data[0]];
+      expect(xxh64.withSeed(seed).convert(input).hex(), "739840cb819fa723");
     });
 
-    test('with seed = $seed and 14 letters', () {
-      expect(xxh64_1.convert(data.take(14).toList()).hex(), "5b9611585efcc9cb");
+    test('with a seed and 14 letters', () {
+      final input = data.take(14).toList();
+      expect(xxh64.withSeed(seed).convert(input).hex(), "5b9611585efcc9cb");
     });
 
-    test('with seed = $seed and 101 letters', () {
-      expect(xxh64_1.convert(data).hex(), "caa65939306f1e21");
+    test('with a seed and 101 letters', () {
+      expect(xxh64.withSeed(seed).convert(data).hex(), "caa65939306f1e21");
     });
   });
 }

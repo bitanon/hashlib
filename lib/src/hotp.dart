@@ -52,7 +52,8 @@ class HOTP extends OTPAuth {
     BlockHashBase algo = sha1,
     String? label,
     String? issuer,
-  })  : mac = HMAC(algo, secret),
+  })  : assert(digits <= 15),
+        mac = HMAC(algo, secret),
         _max = _pow10[digits],
         super(
           digits,

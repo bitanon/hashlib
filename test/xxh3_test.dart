@@ -2,9 +2,9 @@
 // All rights reserved. Check LICENSE file for details.
 
 // ignore: library_annotations
-@OnPlatform({
-  'node': Skip('not supported'),
-})
+@Tags(['vm-only'])
+
+import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
@@ -30,6 +30,18 @@ String secretSum([Iterable<int>? data]) {
 
 void main() {
   group('XXH3 test', () {
+    test("xxh3code", () {
+      var input = String.fromCharCodes(cases.take(12));
+      final expected = 0xa713daf0dfbb77e7;
+      expect(xxh3code(input), expected);
+    });
+
+    test("xxh3sum", () {
+      var input = String.fromCharCodes(cases.take(12));
+      final expected = 'a713daf0dfbb77e7';
+      expect(xxh3sum(input), expected);
+    });
+
     test("with input length = 0", () {
       expect(sum(), "2d06800538d394c2");
     });

@@ -3,11 +3,11 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/algorithms/pbkdf2.dart';
 import 'package:hashlib/src/algorithms/scrypt/security.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
+import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/random.dart';
 import 'package:hashlib/src/sha256.dart';
 
@@ -122,8 +122,8 @@ class Scrypt extends KeyDerivatorBase {
     Uint32List v;
 
     // Derive the inner blocks
-    var sink = HMACSink(sha256.createSink());
-    var inner = PBKDF2(sink, salt, 1, innerKeyLength).convert(password);
+    var mac = sha256.hmac(password);
+    var inner = PBKDF2(mac, salt, 1, innerKeyLength).convert();
     var inner32 = Uint32List.view(inner.buffer);
 
     /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
@@ -191,7 +191,7 @@ class Scrypt extends KeyDerivatorBase {
     }
 
     // Derive final blocks with the outer salt
-    return PBKDF2(sink, inner.bytes, 1, derivedKeyLength).convert(password);
+    return PBKDF2(mac, inner.bytes, 1, derivedKeyLength).convert(password);
   }
 
   @pragma('vm:prefer-inline')

@@ -1,11 +1,11 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/algorithms/pbkdf2.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
+import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/sha256.dart';
 
 export 'package:hashlib/src/algorithms/pbkdf2.dart' show PBKDF2;
@@ -33,11 +33,11 @@ HashDigest pbkdf2(
   int? keyLength,
 ]) =>
     PBKDF2(
-      HMACSink(sha256.createSink()),
+      sha256.hmac(password),
       salt,
       iterations,
       keyLength,
-    ).convert(password);
+    ).convert();
 
 /// Extension on [BlockHashBase] to get an [PBKDF2] instance
 extension PBKDF2onBlockHashBase on BlockHashBase {
@@ -50,11 +50,11 @@ extension PBKDF2onBlockHashBase on BlockHashBase {
     int? keyLength,
   ]) =>
       PBKDF2(
-        HMACSink(createSink()),
+        hmac(password),
         salt,
         iterations,
         keyLength,
-      ).convert(password);
+      ).convert();
 }
 
 /// Extension to the HashBase to get an [PBKDF2] instance
@@ -66,12 +66,10 @@ extension PBKDF2onHMAC on MACHashBase {
     int iterations = 1000,
     int? keyLength,
   ]) =>
-      PBKDF2
-          .mac(
-            this,
-            salt,
-            iterations,
-            keyLength,
-          )
-          .convert();
+      PBKDF2(
+        this,
+        salt,
+        iterations,
+        keyLength,
+      ).convert();
 }

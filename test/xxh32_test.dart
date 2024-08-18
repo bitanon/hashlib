@@ -5,7 +5,6 @@ import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 const seed = 0x9E3779B1;
-const xxh32_1 = XXHash32(seed);
 const data = <int>[
   158, 255, 31, 75, 94, 83, 47, 221, 181, 84, 77, 42, 149, 43, 87, 174, 93, //
   186, 116, 233, 211, 166, 76, 152, 48, 96, 192, 128, 0, 0, 0, 0, 0, 0, 0,
@@ -16,6 +15,10 @@ const data = <int>[
 
 void main() {
   group('XXHash32 test', () {
+    test('xxh32code', () {
+      expect(xxh32code(String.fromCharCodes(data)), 0x1f1aa412);
+    });
+
     test('with seed = 0 and an empty string', () {
       expect(xxh32.convert([]).hex(), "02cc5d05");
     });
@@ -29,20 +32,23 @@ void main() {
       expect(xxh32.convert(data).hex(), "1f1aa412");
     });
 
-    test('with seed = $seed and an empty string', () {
-      expect(xxh32_1.convert([]).hex(), "36b78ae7");
+    test('with a seed and an empty string', () {
+      final input = <int>[];
+      expect(xxh32.withSeed(seed).convert(input).hex(), "36b78ae7");
     });
 
-    test('with seed = $seed and a single letter', () {
-      expect(xxh32_1.convert([data[0]]).hex(), "d5845d64");
+    test('with a seed and a single letter', () {
+      final input = <int>[data[0]];
+      expect(xxh32.withSeed(seed).convert(input).hex(), "d5845d64");
     });
 
-    test('with seed = $seed and 14 letters', () {
-      expect(xxh32_1.convert(data.take(14).toList()).hex(), "4481951d");
+    test('with a seed and 14 letters', () {
+      final input = data.take(14).toList();
+      expect(xxh32.withSeed(seed).convert(input).hex(), "4481951d");
     });
 
-    test('with seed = $seed and 101 letters', () {
-      expect(xxh32_1.convert(data).hex(), "498ec8e2");
+    test('with a seed and 101 letters', () {
+      expect(xxh32.withSeed(seed).convert(data).hex(), "498ec8e2");
     });
   });
 }

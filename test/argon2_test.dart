@@ -112,13 +112,13 @@ void main() {
       expect(result.encoded(), encoded);
     });
 
-    test("argon2verify with encoded", () {
+    test("argon2Verify with encoded", () {
       final encoded =
           r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0$24VHMpaU5EkkdH5rpdnb5zeOf3Y";
-      expect(argon2verify(encoded, "password".codeUnits), isTrue);
+      expect(argon2Verify(encoded, "password".codeUnits), isTrue);
     });
 
-    test("argon2verify with password", () {
+    test("argon2Verify with password", () {
       final matcher = "db8547329694e44924747e6ba5d9dbe7378e7f76";
       var result = Argon2(
         type: Argon2Type.argon2id,
@@ -132,6 +132,61 @@ void main() {
         "password".codeUnits,
       );
       expect(result, true);
+    });
+
+    test('argon2i', () {
+      final result = argon2i(
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        hashLength: 16,
+        security: Argon2Security(
+          'custom',
+          m: 16,
+          p: 1,
+          t: 2,
+        ),
+      );
+      final matcher = "bb5794ea66451b8fce3a84dd02d33949";
+      final encoded =
+          r"$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ";
+      expect(result.hex(), matcher);
+      expect(result.encoded(), encoded);
+    });
+
+    test('argon2d', () {
+      final result = argon2d(
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        hashLength: 16,
+        security: Argon2Security(
+          'custom',
+          m: 16,
+          p: 1,
+          t: 2,
+        ),
+      );
+      final matcher = "cf916880b91ba8a1390fff6b624baa27";
+      final salt = r"$argon2d$v=19$m=16,t=2,p=1$c29tZSBzYWx0";
+      expect(result.hex(), matcher);
+      expect(result.encoded(), startsWith(salt));
+    });
+
+    test('argon2id', () {
+      final result = argon2id(
+        'password'.codeUnits,
+        "some salt".codeUnits,
+        hashLength: 16,
+        security: Argon2Security(
+          'custom',
+          m: 16,
+          p: 1,
+          t: 2,
+        ),
+      );
+      final matcher = "88c91661b3cea3c3853593608881f324";
+      final salt = r"$argon2id$v=19$m=16,t=2,p=1$c29tZSBzYWx0";
+      expect(result.hex(), matcher);
+      expect(result.encoded(), startsWith(salt));
     });
 
     test("multiple call with same instance", () {

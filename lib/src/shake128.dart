@@ -97,16 +97,22 @@ String shake128sum(
 /// If [seed] is provided it will be used as an input to the algorithm.
 /// With a proper seed, this can work as a random number generator.
 ///
-/// **WARNING: Be careful to not go down the rabbit hole of infinite looping!**
+/// Example:
+/// ```
+/// final hash = shake128generator().take(500).toList();
+/// ```
+///
+/// **Warning: This is an infinite `Iterable`. Do not call `toList` directly!**
 Iterable<int> shake128generator([List<int>? seed]) sync* {
+  int i;
   final sink = Shake128Hash(0);
   if (seed != null && seed.isNotEmpty) {
-    sink.add(seed);
+    sink.$process(seed, 0, seed.length);
   }
   sink.$finalize();
   while (true) {
-    for (var x in sink.buffer) {
-      yield x;
+    for (i = 0; i < sink.blockLength; ++i) {
+      yield sink.buffer[i];
     }
     sink.$update();
   }

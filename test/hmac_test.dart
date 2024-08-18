@@ -1,16 +1,24 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:convert';
+
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('HMAC test', () {
+    test("name", () {
+      final key = "key";
+      expect(md5.hmacBy(key).name, 'MD5/HMAC');
+      expect(sha1.hmacBy(key).name, 'SHA1/HMAC');
+      expect(sha256.hmacBy(key).name, 'SHA-256/HMAC');
+    });
     test("with MD5", () {
       final key = "key";
       final msg = "The quick brown fox jumps over the lazy dog";
       final expected = "80070713463e7749b90c2dc24911e275";
-      final actual = md5.hmacBy(key).string(msg).hex();
+      final actual = md5.hmacBy(key, utf8).string(msg).hex();
       expect(actual, expected);
     });
     test("with SHA-1", () {

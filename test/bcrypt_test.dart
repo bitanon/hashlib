@@ -4,20 +4,87 @@
 import 'dart:convert';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('bcrypt test', () {
-    group('version 2a', () {
+    group('functionality test', () {
       // http://openwall.info/wiki/john/sample-hashes
-      test(r"$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe", () {
+      test("bcrypt", () {
         const password = r"password";
+        const salt = r"$2a$05$bvIG6Nmid91Mu9RcmmWZfO";
         const encoded =
             r"$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe";
-        var output = bcrypt(utf8.encode(password), encoded);
+        var output = bcrypt(utf8.encode(password), salt);
         expect(output, equals(encoded));
       });
 
+      test("bcryptVerify", () {
+        const password = r"password";
+        const encoded =
+            r"$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe";
+        expect(bcryptVerify(encoded, password.codeUnits), true);
+      });
+
+      test("bcryptSalt", () {
+        final salt = bcryptSalt(nb: 5, version: BcryptVersion.$2a);
+        expect(salt.length, 29);
+        expect(salt, startsWith(r"$2a$05$"));
+      });
+
+      test("bcryptSalt with security", () {
+        final salt = bcryptSalt(security: BcryptSecurity.strong);
+        expect(salt.length, 29);
+        expect(salt, startsWith(r"$2b$15$"));
+      });
+
+      test("bcryptSalt with security overrides", () {
+        final salt = bcryptSalt(security: BcryptSecurity.strong, nb: 10);
+        expect(salt.length, 29);
+        expect(salt, startsWith(r"$2b$10$"));
+      });
+
+      test("bcryptDigest", () {
+        var password = "password".codeUnits;
+        var salt = fromBase64(
+          "bvIG6Nmid91Mu9RcmmWZfO",
+          codec: Base64Codec.bcrypt,
+        );
+        var result = fromBase64(
+          '5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe',
+          codec: Base64Codec.bcrypt,
+        );
+        final output = bcryptDigest(
+          password,
+          nb: 5,
+          salt: salt,
+          version: BcryptVersion.$2a,
+        );
+        expect(output.bytes, equals(result));
+      });
+
+      test("bcryptDigest with security", () {
+        var password = "password".codeUnits;
+        var salt = fromBase64(
+          "bvIG6Nmid91Mu9RcmmWZfO",
+          codec: Base64Codec.bcrypt,
+        );
+        var result = fromBase64(
+          '5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe',
+          codec: Base64Codec.bcrypt,
+        );
+        final output = bcryptDigest(
+          password,
+          salt: salt,
+          version: BcryptVersion.$2a,
+          security: BcryptSecurity.little,
+        );
+        expect(output.bytes, equals(result));
+      });
+    });
+
+    group('version 2a', () {
       // http://cvsweb.openwall.com/cgi/cvsweb.cgi/Owl/packages/glibc/crypt_blowfish/wrapper.c?rev=HEAD
       test(r"$2a$05$CCCCCCCCCCCCCCCCCCCCC.E5YPO9kmyuRGyh0XouQYb4YMJKvyOeW", () {
         const password = r"U*U";

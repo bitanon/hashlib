@@ -52,13 +52,27 @@ class HashDigest extends Object {
   BigInt bigInt({Endian endian = Endian.little}) =>
       toBigInt(bytes, msbFirst: endian == Endian.big);
 
-  /// Gets 64-bit unsiged integer from the message digest.
+  /// Gets unsiged integer of [bitLength]-bit from the message digest.
   ///
   /// If [endian] is [Endian.little], it will treat the digest bytes as a little
   /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
   /// digest bytes as a big endian number.
-  int number([Endian endian = Endian.big]) =>
-      toBigInt(bytes, msbFirst: endian == Endian.big).toUnsigned(64).toInt();
+  int number([int bitLength = 8, Endian endian = Endian.big]) {
+    int result = 0;
+    int n = bytes.length;
+    if (endian == Endian.little) {
+      for (int i = (n > bitLength ? bitLength : n) - 1; i >= 0; i--) {
+        result <<= 8;
+        result |= bytes[i];
+      }
+    } else {
+      for (int i = n > bitLength ? n - bitLength : 0; i < n; i++) {
+        result <<= 8;
+        result |= bytes[i];
+      }
+    }
+    return result;
+  }
 
   /// The message digest as a string of ASCII alphabets.
   String ascii() => cvt.ascii.decode(bytes);

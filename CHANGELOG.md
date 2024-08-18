@@ -1,3 +1,15 @@
+# 1.20.0
+
+- Fixes `HashDigest.number` for 64-bit
+- Fixes `shake128generator` and `shake256generator`
+  - Issue: Wrong bytes after length > blockLength
+- Improves test coverage
+- [**Breaking Changes**]:
+  - Renames `argon2verify` -> `argon2Verify`
+  - Uses Duration for period in TOTP
+  - Makes `PBKDF2.mac` as the default constructor.
+    The previous default one accepting a sink is removed.
+
 # 1.19.2
 
 - Expose infinite generator methods for SHAKE

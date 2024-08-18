@@ -40,7 +40,7 @@ OTPAuth parse(String keyUri) {
         secret,
         algo: algo,
         digits: digits,
-        period: period,
+        period: Duration(seconds: period),
         label: label,
         issuer: issuer,
       );

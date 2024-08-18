@@ -13,7 +13,7 @@ const _defaultSecurity = Argon2Security.good;
 ///
 /// The encoded hash may look like this:
 /// `$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ`
-bool argon2verify(String encoded, List<int> password) {
+bool argon2Verify(String encoded, List<int> password) {
   var data = fromCrypt(encoded);
   var hash = data.hashBytes();
   if (hash == null) {

@@ -13,7 +13,7 @@ import 'package:hashlib/src/sha1.dart';
 ///
 /// [rfc6238]: https://www.ietf.org/rfc/rfc6238.html
 class TOTP extends HOTP {
-  final int period;
+  final Duration period;
   int _timeDelta = 0;
   final int _periodMS;
   final _controller = StreamController<int>.broadcast();
@@ -31,11 +31,11 @@ class TOTP extends HOTP {
   TOTP(
     List<int> secret, {
     int digits = 6,
-    this.period = 30,
     String? label,
     String? issuer,
+    this.period = const Duration(seconds: 30),
     BlockHashBase algo = sha1,
-  })  : _periodMS = period * 1000,
+  })  : _periodMS = period.inMilliseconds,
         super(
           secret,
           algo: algo,
@@ -51,10 +51,8 @@ class TOTP extends HOTP {
     };
     _controller.onListen = () {
       int d = _periodMS - (currentTime % _periodMS);
-      Future.delayed(Duration(milliseconds: d), () {
-        if (!_controller.hasListener) return;
-        timer = Timer.periodic(Duration(seconds: period), (timer) {
-          if (!_controller.hasListener) return;
+      timer = Timer(Duration(milliseconds: d), () {
+        timer = Timer.periodic(period, (_) {
           _controller.sink.add(value());
         });
         _controller.sink.add(value());

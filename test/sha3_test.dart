@@ -1,23 +1,24 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:convert';
+
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('SHA3 test', () {
+    test('name', () {
+      expect(sha3_224.name, 'SHA3-224');
+      expect(sha3_256.name, 'SHA3-256');
+      expect(sha3_384.name, 'SHA3-384');
+      expect(sha3_512.name, 'SHA3-512');
+    });
+
     test('SHA3-224 with empty string', () {
       expect(sha3_224sum(""),
           "6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7");
-    });
-
-    test('SHA3-256 with short message', () {
-      final input =
-          "9f2fcc7c90de090d6b87cd7e9718c1ea6cb21118fc2d5de9f97e5db6ac1e9c10";
-      final output =
-          "2f1a5f7159e34ea19cddc70ebf9b81f1a66db40615d7ead3cc1f1b954d82a3af";
-      expect(sha3_256.convert(fromHex(input)).hex(), output);
     });
 
     test('SHA3-384 with exact block size', () {
@@ -30,6 +31,16 @@ void main() {
           "d1c0fa85c8d183beff99ad9d752b263e286b477f79f0710b0103170173978133"
           "44b99daf3bb7b1bc5e8d722bac85943a";
       expect(sha3_384.convert(fromHex(input)).hex(), output);
+      final encoded = String.fromCharCodes(fromHex(input));
+      expect(sha3_384sum(encoded), output);
+    });
+
+    test('SHA3-256 with short message', () {
+      final input =
+          "9f2fcc7c90de090d6b87cd7e9718c1ea6cb21118fc2d5de9f97e5db6ac1e9c10";
+      final output =
+          "2f1a5f7159e34ea19cddc70ebf9b81f1a66db40615d7ead3cc1f1b954d82a3af";
+      expect(sha3_256.convert(fromHex(input)).hex(), output);
     });
 
     test('SHA3-512 with multi block size', () {
@@ -46,6 +57,8 @@ void main() {
           "6e8b8bd195bdd560689af2348bdc74ab7cd05ed8b9a57711e9be71e9726fda45"
           "91fee12205edacaf82ffbbaf16dff9e702a708862080166c2ff6ba379bc7ffc2";
       expect(sha3_512.convert(fromHex(input)).hex(), output);
+      final encoded = String.fromCharCodes(fromHex(input));
+      expect(sha3_512sum(encoded), output);
     });
 
     test('SHA3-256 with "a"', () {

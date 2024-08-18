@@ -19,7 +19,7 @@ abstract class OTPAuth {
     this.digits, {
     this.label,
     this.issuer,
-  }) : assert(digits >= 4 && digits <= 15);
+  }) : assert(digits >= 4);
 
   /// Generates the next OTP value
   int value();

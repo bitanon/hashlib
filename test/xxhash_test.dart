@@ -2,9 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 // ignore: library_annotations
-@OnPlatform({
-  'node': Skip('not supported'),
-})
+@Tags(['vm-only'])
 
 import 'dart:io';
 

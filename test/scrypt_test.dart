@@ -147,5 +147,30 @@ void main() {
           'c03c4b68fd46e13c9c0e7f7946ee6856cf068f1702e2fbd98';
       expect(hash.hex(), matcher);
     });
+
+    test("with security", () {
+      var hash = hashlib.scrypt(
+        [],
+        [],
+        security: hashlib.ScryptSecurity.test,
+      );
+      var matcher =
+          '5517696d05d1df94fb42f067d9fcdb14d9effe8ac37500957e1b6f1d383ea029'
+          '61accf2409bba1ae87c94c6fc69f9b32393eea0b877eb7803c2f151a888acdb6';
+      expect(hash.hex(), matcher);
+    });
+
+    test("with security overrides", () {
+      var hash = hashlib.scrypt(
+        [],
+        [],
+        security: hashlib.ScryptSecurity.test,
+        r: 1,
+      );
+      var matcher =
+          '77d6576238657b203b19ca42c18a0497f16b4844e3074ae8dfdffa3fede21442'
+          'fcd0069ded0948f8326a753a0fc81f17e8d3e0fb2e0d3628cf35e20c38d18906';
+      expect(hash.hex(), matcher);
+    });
   });
 }
