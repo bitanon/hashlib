@@ -118,6 +118,12 @@ void main() {
       expect(argon2Verify(encoded, "password".codeUnits), isTrue);
     });
 
+    test("argon2Verify without the hash", () {
+      final password = "password".codeUnits;
+      final encoded = r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0";
+      expect(() => argon2Verify(encoded, password), throwsArgumentError);
+    });
+
     test("argon2Verify with password", () {
       final matcher = "db8547329694e44924747e6ba5d9dbe7378e7f76";
       var result = Argon2(

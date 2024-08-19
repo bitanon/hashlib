@@ -27,5 +27,5 @@ abstract class MACHashBase extends HashBase {
   /// Verify if the [tag] is derived from the [message] using this MAC.
   @pragma('vm:prefer-inline')
   bool verify(List<int> tag, List<int> message) =>
-      convert(message).isEqual(message);
+      convert(message).isEqual(tag);
 }

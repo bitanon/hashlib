@@ -65,12 +65,6 @@ void main() {
       });
     });
 
-    test('with known cases', () {
-      tests.forEach((key, value) {
-        expect(sha384sum(key), value);
-      });
-    });
-
     test('with stream', () async {
       for (final entry in tests.entries) {
         final stream = Stream.fromIterable(

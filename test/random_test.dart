@@ -106,19 +106,20 @@ void main() {
     expect(randomNumbers(100).length, 100);
   });
   test('random numbers value', () {
-    randomNumbers(10).firstWhere((e) => e >= 256);
+    final result = randomNumbers(10);
+    expect(result, anyElement(greaterThan(255)));
   });
 
   test('fill random bytes', () {
     var data = Uint8List(10);
     fillRandom(data.buffer);
-    data.firstWhere((e) => e != 0);
+    expect(data, anyElement(isNonZero));
   });
 
   test('fill random numbers', () {
     var data = Uint32List(10);
     fillNumbers(data);
-    data.firstWhere((e) => e >= 256);
+    expect(data, anyElement(greaterThan(255)));
   });
 
   test('fill test random', () {
@@ -178,5 +179,188 @@ void main() {
               blacklist: '0123456789'.codeUnits,
             ),
         throwsStateError);
+  });
+
+  group('HashlibRandom.nextString', () {
+    late HashlibRandom random;
+    final _lower = 'abcdefghijklmnopqrstuvwxyz'.codeUnits;
+    final _upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.codeUnits;
+    final _digits = '0123456789'.codeUnits;
+    final _controls = [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, //
+      11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+      127
+    ];
+    final _punctuations = [
+      33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, //
+      58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126,
+    ];
+
+    setUp(() {
+      // Mock generator with predictable values
+      random = HashlibRandom.generator([
+        65, 66, 67, 68, 69, 70, 71, 72, 73, 74, //
+        75, 76, 77, 78, 79, 80, 81, 82, 83, 84
+      ].iterator);
+    });
+
+    test('should return a string of correct length', () {
+      final result = random.nextString(10);
+      expect(result.length, equals(10));
+    });
+
+    test('should contain only ASCII characters by default', () {
+      final result = random.nextString(10);
+      for (int i = 0; i < result.length; i++) {
+        expect(result.codeUnitAt(i), inInclusiveRange(0, 127));
+      }
+    });
+
+    test('should include only lowercase characters when lower is true', () {
+      final result = random.nextString(
+        25,
+        lower: true,
+        upper: false,
+        numeric: false,
+        controls: false,
+        punctuations: false,
+      );
+      expect(result.codeUnits, everyElement(isIn(_lower)));
+    });
+
+    test('should include uppercase characters when upper is true', () {
+      final result = random.nextString(
+        25,
+        lower: false,
+        upper: true,
+        numeric: false,
+        controls: false,
+        punctuations: false,
+      );
+      expect(result.codeUnits, everyElement(isIn(_upper)));
+    });
+
+    test('should include numeric characters when numeric is true', () {
+      final result = random.nextString(
+        25,
+        lower: false,
+        upper: false,
+        numeric: true,
+        controls: false,
+        punctuations: false,
+      );
+      expect(result.codeUnits, everyElement(isIn(_digits)));
+    });
+
+    test('should include control characters when controls is true', () {
+      final result = random.nextString(
+        25,
+        lower: false,
+        upper: false,
+        numeric: false,
+        controls: true,
+        punctuations: false,
+      );
+      expect(result.codeUnits, everyElement(isIn(_controls)));
+    });
+
+    test('should include punctuation characters when punctuations is true', () {
+      final result = random.nextString(
+        25,
+        lower: false,
+        upper: false,
+        numeric: false,
+        controls: false,
+        punctuations: true,
+      );
+      expect(result.codeUnits, everyElement(isIn(_punctuations)));
+    });
+
+    test('should include multiple (lower, numeric)', () {
+      final result = random.nextString(
+        50,
+        lower: true,
+        upper: false,
+        numeric: true,
+        controls: false,
+        punctuations: false,
+      );
+      final matcher = [..._lower, ..._digits];
+      expect(result.codeUnits, everyElement(isIn(matcher)));
+    });
+
+    test('should include multiple (upper, numeric)', () {
+      final result = random.nextString(
+        50,
+        lower: false,
+        upper: true,
+        numeric: true,
+        controls: false,
+        punctuations: false,
+      );
+      final matcher = [..._upper, ..._digits];
+      expect(result.codeUnits, everyElement(isIn(matcher)));
+    });
+
+    test('should include multiple (numeric, controls)', () {
+      final result = random.nextString(
+        50,
+        lower: false,
+        upper: false,
+        numeric: true,
+        controls: true,
+        punctuations: false,
+      );
+      final matcher = [..._controls, ..._digits];
+      expect(result.codeUnits, everyElement(isIn(matcher)));
+    });
+
+    test('should include multiple (lower, punctuations)', () {
+      final result = random.nextString(
+        50,
+        lower: true,
+        upper: false,
+        numeric: false,
+        controls: false,
+        punctuations: true,
+      );
+      final matcher = [..._lower, ..._punctuations];
+      expect(result.codeUnits, everyElement(isIn(matcher)));
+    });
+
+    test('should use whitelist if provided', () {
+      final whitelist = [65, 66, 67]; // A, B, C
+      final result = random.nextString(10, whitelist: whitelist);
+      expect(result.codeUnits, everyElement(isIn(whitelist)));
+    });
+
+    test('should remove characters in blacklist', () {
+      final blacklist = [65, 66, 67]; // A, B, C
+      final result = random.nextString(10, blacklist: blacklist, lower: true);
+      expect(result.codeUnits, isNot(anyOf(blacklist)));
+    });
+
+    test('should throw StateError if whitelist is empty', () {
+      expect(() => random.nextString(10, whitelist: []),
+          throwsA(isA<StateError>()));
+    });
+
+    test('should return an empty string if length is 0', () {
+      final result = random.nextString(0);
+      expect(result, isEmpty);
+    });
+
+    test('should return deterministic output with the same seed', () {
+      final generator1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].iterator;
+      final generator2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].iterator;
+      final random1 = HashlibRandom.generator(generator1);
+      final random2 = HashlibRandom.generator(generator2);
+
+      final result1 = random1.nextString(10);
+      final result2 = random2.nextString(10);
+
+      expect(result1, equals(result2));
+    });
   });
 }

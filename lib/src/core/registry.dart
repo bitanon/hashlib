@@ -94,7 +94,7 @@ class BlockHashRegistry {
   static void register(BlockHashBase algo, [String? name]) {
     _buildRegistry();
     name = _norm(name ?? algo.name);
-    _blockHash[_norm(name)] = algo;
+    _blockHash[name] = algo;
   }
 }
 

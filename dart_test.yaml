@@ -4,6 +4,7 @@
 timeout: 1m
 concurrency: 8
 platforms: [vm, node]
+allow_duplicate_test_names: false
 
 tags:
   vm-only:
@@ -11,3 +12,7 @@ tags:
     on_platform:
       vm:
         skip: false
+  skip-vm:
+    on_platform:
+      vm:
+        skip: true

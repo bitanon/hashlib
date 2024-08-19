@@ -100,7 +100,7 @@ List<String> deocdeMigations(String migrationUri) {
     i++;
     len = data[i];
     i++;
-    secret = toBase32(data.skip(i).take(len), padding: false);
+    secret = toBase32(data.skip(i).take(len).toList(), padding: false);
     i += len;
 
     bool release = false;

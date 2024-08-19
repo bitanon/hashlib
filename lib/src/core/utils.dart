@@ -40,13 +40,13 @@ String keepAlphaNumeric(String value) {
 
 /// Transform [value] to uppercase and keeps only letters and digits.
 String normalizeName(String value) {
-  return String.fromCharCodes(() sync* {
-    for (int c in value.codeUnits) {
-      if ((c >= _zero && c <= _nine) || (c >= _bigA && c <= _bigZ)) {
-        yield c;
-      } else if (c >= _smallA && c <= _smallZ) {
-        yield c - _smallA + _bigA;
-      }
+  List<int> normal = [];
+  for (int c in value.codeUnits) {
+    if ((c >= _zero && c <= _nine) || (c >= _bigA && c <= _bigZ)) {
+      normal.add(c);
+    } else if (c >= _smallA && c <= _smallZ) {
+      normal.add(c - _smallA + _bigA);
     }
-  }());
+  }
+  return String.fromCharCodes(normal);
 }

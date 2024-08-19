@@ -168,7 +168,7 @@ void main() {
       expect(hash.hex(), matcher);
     });
 
-    test("with SHA-256", () {
+    test("long password with SHA-256", () {
       var hash = sha256.pbkdf2(
         'passwd'.codeUnits,
         "salt".codeUnits,

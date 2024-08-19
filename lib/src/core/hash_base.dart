@@ -2,8 +2,8 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:convert' show Encoding;
+import 'dart:typed_data' show Uint8List;
 
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
@@ -73,27 +73,6 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
     return sink.digest();
   }
 
-  /// Consumes the entire [stream] of byte array and generates a [HashDigest].
-  Future<HashDigest> byteStream(
-    Stream<int> stream, [
-    int bufferSize = 1024,
-  ]) async {
-    var sink = createSink();
-    var buffer = Uint8List(bufferSize);
-    int p = 0;
-    await for (var x in stream) {
-      buffer[p++] = x;
-      if (p == bufferSize) {
-        sink.add(buffer);
-        p = 0;
-      }
-    }
-    if (p > 0) {
-      sink.add(buffer, 0, p);
-    }
-    return sink.digest();
-  }
-
   /// Transforms the byte array input stream to generate a new stream
   /// which contains a single [HashDigest]
   ///
@@ -121,9 +100,30 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
     yield sink.digest();
   }
 
+  /// Consumes the entire [stream] of byte array and generates a [HashDigest].
+  Future<HashDigest> byteStream(
+    Stream<int> stream, [
+    int bufferSize = 1024,
+  ]) async {
+    var sink = createSink();
+    var buffer = Uint8List(bufferSize);
+    int p = 0;
+    await for (var x in stream) {
+      buffer[p++] = x;
+      if (p == bufferSize) {
+        sink.add(buffer);
+        p = 0;
+      }
+    }
+    if (p > 0) {
+      sink.add(buffer, 0, p);
+    }
+    return sink.digest();
+  }
+
   /// Consumes the entire [stream] of string and generates a [HashDigest].
   ///
-  /// Default [encoding] scheme to get the input bytes is [latin1].
+  /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
   Future<HashDigest> stringStraem(
     Stream<String> stream, [
     Encoding? encoding,
@@ -136,6 +136,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   }
 
   @override
-  StreamTransformer<RS, RT> cast<RS, RT>() =>
-      StreamTransformer.castFrom<List<int>, HashDigest, RS, RT>(this);
+  StreamTransformer<RS, RT> cast<RS, RT>() {
+    throw UnsupportedError('The transformer do not support casting');
+  }
 }

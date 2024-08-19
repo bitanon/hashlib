@@ -6,9 +6,6 @@ import 'dart:typed_data';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
-// Maximum length of message allowed (considering both the JS and Dart VM)
-const int _maxMessageLength = 0x3FFFFFFFFFFFF; // (1 << 50) - 1
-
 abstract class BlockHashBase extends HashBase {
   const BlockHashBase();
 
@@ -16,7 +13,7 @@ abstract class BlockHashBase extends HashBase {
   BlockHashSink createSink();
 }
 
-abstract class BlockHashSink implements HashDigestSink {
+abstract class BlockHashSink extends HashDigestSink {
   /// The flag tracking if the [digest] is called once.
   bool _closed = false;
 
@@ -58,15 +55,6 @@ abstract class BlockHashSink implements HashDigestSink {
   /// Get the message length in bits
   int get messageLengthInBits => messageLength << 3;
 
-  /// Internal method to update the message-digest with a single [block].
-  ///
-  /// The method starts reading the block from [offset] index
-  void $update(List<int> block, [int offset = 0, bool last = false]);
-
-  /// Finalizes the message digest with the remaining message block,
-  /// and returns the output as byte array.
-  Uint8List $finalize();
-
   @override
   void reset() {
     pos = 0;
@@ -80,12 +68,7 @@ abstract class BlockHashSink implements HashDigestSink {
     if (_closed) {
       throw StateError('The message-digest is already closed');
     }
-
     end ??= data.length;
-    if (messageLength - start > _maxMessageLength - end) {
-      throw StateError('Exceeds the maximum message size limit');
-    }
-
     $process(data, start, end);
   }
 
@@ -115,9 +98,10 @@ abstract class BlockHashSink implements HashDigestSink {
     }
   }
 
-  @override
-  @pragma('vm:prefer-inline')
-  void close() => digest();
+  /// Internal method to update the message-digest with a single [block].
+  ///
+  /// The method starts reading the block from [offset] index
+  void $update(List<int> block, [int offset = 0, bool last = false]);
 
   @override
   HashDigest digest() {
@@ -126,4 +110,8 @@ abstract class BlockHashSink implements HashDigestSink {
     _digest = HashDigest($finalize());
     return _digest!;
   }
+
+  /// Finalizes the message digest with the remaining message block,
+  /// and returns the output as byte array.
+  Uint8List $finalize();
 }

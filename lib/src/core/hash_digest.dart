@@ -57,7 +57,15 @@ class HashDigest extends Object {
   /// If [endian] is [Endian.little], it will treat the digest bytes as a little
   /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
   /// digest bytes as a big endian number.
-  int number([int bitLength = 8, Endian endian = Endian.big]) {
+  int number([int bitLength = 64, Endian endian = Endian.big]) {
+    if (bitLength < 8 || bitLength > 64 || (bitLength & 7) > 0) {
+      throw ArgumentError(
+        'Invalid bit length. '
+        'It must be a number between 8 to 64 and a multiple of 8.',
+      );
+    } else {
+      bitLength >>>= 3;
+    }
     int result = 0;
     int n = bytes.length;
     if (endian == Endian.little) {
@@ -87,7 +95,7 @@ class HashDigest extends Object {
   int get hashCode => bytes.hashCode;
 
   @override
-  bool operator ==(other) => isEqual(other);
+  bool operator ==(other) => other is HashDigest && bytes == other.bytes;
 
   /// Checks if the message digest equals to [other].
   ///

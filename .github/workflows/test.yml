@@ -7,7 +7,7 @@ on:
     paths: ['**.dart', '**.yaml', '**.yml']
   pull_request:
     branches: [master]
-    paths: ['**.dart', '**.yaml']
+    paths: ['**.dart', '**.yaml', '**.yml']
 
 jobs:
   coverage:

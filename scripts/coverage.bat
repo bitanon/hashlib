@@ -1,5 +1,5 @@
 @echo off
-rd /s /q "coverage" || goto :error
+rd /s /q "coverage" 2>nul
 mkdir "coverage" || goto :error
 
 call dart test -p vm --coverage="./coverage" --reporter json | tojunit > "./coverage/junit.xml"

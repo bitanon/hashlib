@@ -3,7 +3,7 @@
 .dart_tool/
 .packages
 
-# Conventional directory for project outputs.
+# Conventional directory for outputs.
 build/
 doc/
 coverage/

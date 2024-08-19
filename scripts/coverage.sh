@@ -1,6 +1,6 @@
 #!/bin/sh
 set -ex
-rm -rf coverage
+rm -rf coverage || echo '' >/dev/null
 mkdir -p coverage
 dart test -p vm --coverage="./coverage" --reporter json | tojunit > "./coverage/junit.xml"
 dart pub global run coverage:format_coverage --lcov --in="./coverage/test" --out="./coverage/lcov.info" --report-on="./lib"

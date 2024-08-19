@@ -86,27 +86,6 @@ void main() {
 
     group('version 2a', () {
       // http://cvsweb.openwall.com/cgi/cvsweb.cgi/Owl/packages/glibc/crypt_blowfish/wrapper.c?rev=HEAD
-      test(r"$2a$05$CCCCCCCCCCCCCCCCCCCCC.E5YPO9kmyuRGyh0XouQYb4YMJKvyOeW", () {
-        const password = r"U*U";
-        const encoded =
-            r"$2a$05$CCCCCCCCCCCCCCCCCCCCC.E5YPO9kmyuRGyh0XouQYb4YMJKvyOeW";
-        var output = bcrypt(utf8.encode(password), encoded);
-        expect(output, equals(encoded));
-      });
-      test(r"$2a$05$CCCCCCCCCCCCCCCCCCCCC.VGOzA784oUp/Z0DY336zx7pLYAy0lwK", () {
-        const password = r"U*U*";
-        const encoded =
-            r"$2a$05$CCCCCCCCCCCCCCCCCCCCC.VGOzA784oUp/Z0DY336zx7pLYAy0lwK";
-        var output = bcrypt(utf8.encode(password), encoded);
-        expect(output, equals(encoded));
-      });
-      test(r"$2a$05$XXXXXXXXXXXXXXXXXXXXXOAcXxm9kjPGEMsLznoKqmqw7tc8WCx4a", () {
-        const password = r"U*U*U";
-        const encoded =
-            r"$2a$05$XXXXXXXXXXXXXXXXXXXXXOAcXxm9kjPGEMsLznoKqmqw7tc8WCx4a";
-        var output = bcrypt(utf8.encode(password), encoded);
-        expect(output, equals(encoded));
-      });
       test(r"$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.", () {
         const password = r"";
         const encoded =
