@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
@@ -18,12 +20,15 @@ void main() {
         memorySizeKB: 16,
         salt: "some salt".codeUnits,
       );
+      final password = 'password'.codeUnits;
       final matcher = "bb5794ea66451b8fce3a84dd02d33949";
       final encoded =
           r"$argon2i$v=19$m=16,t=2,p=1$c29tZSBzYWx0$u1eU6mZFG4/OOoTdAtM5SQ";
-      var result = argon2.convert('password'.codeUnits);
+      var result = argon2.convert(password);
+      expect(result.toString(), equals(encoded));
       expect(result.hex(), matcher);
       expect(result.encoded(), encoded);
+      expect(argon2.encode(password), encoded);
     });
     test("argon2d m=16, t=2, p=1 @ out = 16", () {
       final argon2 = Argon2(
@@ -209,6 +214,369 @@ void main() {
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
+    });
+
+    test("with personalization", () {
+      final personalization = "personalization".codeUnits;
+      final argon2 = Argon2.fromSecurity(
+        Argon2Security.test,
+        hashLength: 16,
+        type: Argon2Type.argon2id,
+        salt: "some salt".codeUnits,
+        personalization: personalization,
+      );
+      final matcher = "33561b7ad59b447aa5f6e3113d2f32ca";
+      expect(argon2.convert('password'.codeUnits).hex(), matcher);
+      expect(argon2.personalization, equals(personalization));
+    });
+
+    test("with key", () {
+      final key = "random key".codeUnits;
+      final argon2 = Argon2.fromSecurity(
+        Argon2Security.test,
+        hashLength: 16,
+        type: Argon2Type.argon2id,
+        salt: "some salt".codeUnits,
+        key: key,
+      );
+      final matcher = "4ad0d2f98a6e7f6e3e99c520d1813c07";
+      expect(argon2.convert('password'.codeUnits).hex(), matcher);
+      expect(argon2.key, equals(key));
+    });
+
+    test("with key and personalization", () {
+      final argon2 = Argon2.fromSecurity(
+        Argon2Security.test,
+        hashLength: 16,
+        type: Argon2Type.argon2id,
+        salt: "some salt".codeUnits,
+        key: "random key".codeUnits,
+        personalization: "personalization".codeUnits,
+      );
+      final matcher = "0bd2a8c0386b4125a6f439f2f863fc35";
+      expect(argon2.convert('password'.codeUnits).hex(), matcher);
+    });
+  });
+
+  group('tuneArgon2Security', () {
+    final duration = Duration(milliseconds: 2);
+    test('argument validation', () {
+      expect(
+        () => tuneArgon2Security(duration, strictness: -1),
+        throwsArgumentError,
+      );
+      expect(
+        () => tuneArgon2Security(duration, strictness: 0),
+        throwsArgumentError,
+      );
+      expect(
+        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: -3),
+        throwsArgumentError,
+      );
+      expect(
+        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: 0),
+        throwsArgumentError,
+      );
+      expect(
+        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: 1),
+        throwsArgumentError,
+      );
+      expect(
+        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: 2),
+        throwsArgumentError,
+      );
+    });
+
+    test('call is successful', () async {
+      final params = await tuneArgon2Security(
+        duration,
+        strictness: 1,
+        maxMemoryAsPowerOf2: 8,
+        verbose: false,
+      );
+      expect(params.name, 'optimized');
+
+      Stopwatch watch = Stopwatch()..start();
+      argon2d(
+        "password".codeUnits,
+        "some salt".codeUnits,
+        security: params,
+      );
+      watch.stop();
+      expect(
+        watch.elapsedMilliseconds,
+        lessThanOrEqualTo(100),
+      );
+    });
+  });
+
+  group('Argon2Context Tests', () {
+    // Test for Argon2Context constructor
+    test('Creates Argon2Context with valid parameters', () {
+      var salt = List<int>.generate(16, (i) => i);
+      var context = Argon2Context(
+        iterations: 3,
+        parallelism: 2,
+        memorySizeKB: 8192,
+        salt: salt,
+        hashLength: 32,
+      );
+
+      expect(context.salt, equals(salt));
+      expect(context.passes, equals(3));
+      expect(context.lanes, equals(2));
+      expect(context.memorySizeKB, equals(8192));
+      expect(context.hashLength, equals(32));
+    });
+
+    // Tests for invalid parameters
+    test('Throws if hashLength is too small', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          hashLength: 3,
+        ),
+        throwsA(isA<ArgumentError>().having(
+            (e) => e.message, 'message', 'The tag length must be at least 4')),
+      );
+    });
+
+    test('Throws if hashLength is too large', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          hashLength: 0x3FFFFFF + 1,
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The tag length must be at most 67108863')),
+      );
+    });
+
+    test('Throws if parallelism is too small', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 0,
+          memorySizeKB: 8192,
+        ),
+        throwsA(isA<ArgumentError>().having(
+            (e) => e.message, 'message', 'The parallelism must be at least 1')),
+      );
+    });
+
+    test('Throws if parallelism is too large', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 0x7FFF + 1,
+          memorySizeKB: 8192,
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The parallelism must be at most 32767')),
+      );
+    });
+
+    test('Throws if iterations are too few', () {
+      expect(
+        () => Argon2Context(
+          iterations: 0,
+          parallelism: 2,
+          memorySizeKB: 8192,
+        ),
+        throwsA(isA<ArgumentError>().having(
+            (e) => e.message, 'message', 'The iterations must be at least 1')),
+      );
+    });
+
+    test('Throws if iterations are too many', () {
+      expect(
+        () => Argon2Context(
+          iterations: 0x3FFFFFF + 1,
+          parallelism: 2,
+          memorySizeKB: 8192,
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The iterations must be at most 67108863')),
+      );
+    });
+
+    test('Throws if memorySizeKB is too small for parallelism', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 15,
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The memory size must be at least 8 * parallelism')),
+      );
+    });
+
+    test('Throws if memorySizeKB is too large', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 0x3FFFFFF + 1,
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The memorySizeKB must be at most 67108863')),
+      );
+    });
+
+    test('Throws if salt is too short', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          salt: List<int>.generate(7, (i) => i),
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The salt must be at least 8 bytes long')),
+      );
+    });
+
+    test('Throws if salt is too long', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          salt: List<int>.generate(0x3FFFFFF + 1, (i) => i),
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The salt must be at most 67108863 bytes long')),
+      );
+    });
+
+    test('Throws if key is too short', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          key: [],
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The key must be at least 1 bytes long')),
+      );
+    });
+
+    test('Throws if key is too long', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          key: List<int>.generate(0x3FFFFFF + 1, (i) => i),
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The key must be at most 67108863 bytes long')),
+      );
+    });
+
+    test('Throws if personalization data is too short', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          personalization: [],
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The extra data must be at least 1 bytes')),
+      );
+    });
+
+    test('Throws if personalization data is too long', () {
+      expect(
+        () => Argon2Context(
+          iterations: 3,
+          parallelism: 2,
+          memorySizeKB: 8192,
+          personalization: Uint8List(0x3FFFFFF + 1),
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    // Test for Argon2Context.fromEncoded factory method
+    test('Creates Argon2Context from encoded string with valid parameters', () {
+      var cryptData = fromCrypt(
+          r'$argon2id$v=19$m=8192,t=3,p=2$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      var context = Argon2Context.fromEncoded(cryptData);
+
+      expect(context.type, equals(Argon2Type.argon2id));
+      expect(context.version, equals(Argon2Version.v13));
+      expect(context.memorySizeKB, equals(8192));
+      expect(context.passes, equals(3));
+      expect(context.lanes, equals(2));
+      expect(context.salt.length, equals(9));
+    });
+
+    test('Throws if encoded string has invalid type', () {
+      var cryptData = fromCrypt(
+          r'$argon2x$v=19$m=8192,t=3,p=2$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      expect(
+        () => Argon2Context.fromEncoded(cryptData),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.message, 'message', 'Invalid type')),
+      );
+    });
+
+    test('Throws if encoded string has invalid version', () {
+      var cryptData = fromCrypt(
+          r'$argon2i$v=99$m=8192,t=3,p=2$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      expect(
+        () => Argon2Context.fromEncoded(cryptData),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.message, 'message', 'Invalid version')),
+      );
+    });
+
+    test('Throws if encoded string has no parameters', () {
+      var cryptData =
+          fromCrypt(r'$argon2i$v=19$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      expect(
+        () => Argon2Context.fromEncoded(cryptData),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.message, 'message', 'No paramters')),
+      );
+    });
+
+    test('Throws if encoded string is missing "m" parameter', () {
+      var cryptData = fromCrypt(
+          r'$argon2i$v=19$t=3,p=2$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      expect(
+        () => Argon2Context.fromEncoded(cryptData),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.message, 'message', 'Missing parameter: m')),
+      );
+    });
+
+    test('Throws if encoded string is missing "t" parameter', () {
+      var cryptData = fromCrypt(
+          r'$argon2i$v=19$m=8192,p=2$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      expect(
+        () => Argon2Context.fromEncoded(cryptData),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.message, 'message', 'Missing parameter: t')),
+      );
+    });
+
+    test('Throws if encoded string is missing "p" parameter', () {
+      var cryptData = fromCrypt(
+          r'$argon2i$v=19$m=8192,t=3$c29tZSBzYWx0$CZOgzrCgoVUzMoR/dcUZyw');
+      expect(
+        () => Argon2Context.fromEncoded(cryptData),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.message, 'message', 'Missing parameter: p')),
+      );
     });
   });
 }

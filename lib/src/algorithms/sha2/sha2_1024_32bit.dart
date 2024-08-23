@@ -82,8 +82,8 @@ class SHA2of1024 extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     state.setAll(0, seed);
+    super.reset();
   }
 
   /// z = x ^ y

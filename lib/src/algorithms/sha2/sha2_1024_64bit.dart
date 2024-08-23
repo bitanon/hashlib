@@ -62,8 +62,8 @@ class SHA2of1024 extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     state.setAll(0, seed);
+    super.reset();
   }
 
   /// Rotates 64-bit number x by n bits

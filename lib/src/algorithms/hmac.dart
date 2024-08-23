@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
 /// This implementation is derived from the RFC document
@@ -23,8 +22,6 @@ class HMACSink extends HashDigestSink with MACSinkBase {
   /// The message length in bytes
   final int messageLength;
 
-  HashDigest? _digest;
-  bool _closed = false;
   bool _initialized = false;
 
   HMACSink(this.sink)
@@ -34,7 +31,7 @@ class HMACSink extends HashDigestSink with MACSinkBase {
         outerKey = Uint8List(sink.blockLength);
 
   @override
-  bool get closed => _closed;
+  bool get initialized => _initialized;
 
   @override
   int get hashLength => sink.hashLength;
@@ -45,7 +42,7 @@ class HMACSink extends HashDigestSink with MACSinkBase {
     if (key.length > blockLength) {
       sink.reset();
       sink.add(key);
-      key = sink.digest().bytes;
+      key = sink.$finalize();
     }
 
     // Calculated padded keys for inner and outer sinks
@@ -67,38 +64,30 @@ class HMACSink extends HashDigestSink with MACSinkBase {
   @override
   void reset() {
     if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
+      throw StateError('The instance is not yet initialized with a key');
     }
-    _closed = false;
-    _digest = null;
     sink.reset();
     sink.add(innerKey);
+    super.reset();
   }
 
   @override
-  void add(List<int> data, [int start = 0, int? end]) {
+  void $process(List<int> chunk, int start, int end) {
     if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
+      throw StateError('The instance is not yet initialized with a key');
     }
-    if (_closed) {
-      throw StateError('The message-digest is already closed');
-    }
-    sink.add(data, start, end);
+    sink.$process(chunk, start, end);
   }
 
   @override
-  HashDigest digest() {
+  Uint8List $finalize() {
     if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
+      throw StateError('The instance is not yet initialized with a key');
     }
-    if (_closed) {
-      return _digest!;
-    }
-    _closed = true;
-    var hash = sink.digest().bytes;
+    var hash = sink.$finalize();
     sink.reset();
     sink.add(outerKey);
     sink.add(hash);
-    return _digest = sink.digest();
+    return sink.$finalize();
   }
 }

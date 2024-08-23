@@ -96,8 +96,8 @@ class KeccakHash extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     buffer.fillRange(0, buffer.length, 0);
+    super.reset();
   }
 
   @override
@@ -117,12 +117,6 @@ class KeccakHash extends BlockHashSink {
 
   @override
   Uint8List $finalize() {
-    // Update the final block
-    if (pos == blockLength) {
-      $update();
-      pos = 0;
-    }
-
     // Setting the signature bytes
     buffer[pos] ^= paddingByte;
     buffer[blockLength - 1] ^= 0x80;

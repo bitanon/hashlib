@@ -48,7 +48,7 @@ void main() {
 
     test('with a seed and a single letter', () {
       final input = <int>[data[0]];
-      expect(xxh64.withSeed(seed).convert(input).hex(), "739840cb819fa723");
+      expect(xxh64.withSeed(seed).hex(input), "739840cb819fa723");
     });
 
     test('with a seed and 14 letters', () {
@@ -58,6 +58,19 @@ void main() {
 
     test('with a seed and 101 letters', () {
       expect(xxh64.withSeed(seed).convert(data).hex(), "caa65939306f1e21");
+    });
+
+    test('with 32-byte message', () {
+      final input = "string of 32-bytes long for test";
+      final output = "eb3f9d9890ca89b3";
+      expect(xxh64sum(input), output);
+    });
+
+    test('with 64-byte message', () {
+      final input = "string of 64-bytes for test. "
+          "twice the size of 32-byte string.";
+      final output = "0f6ebfbce5c11a1b";
+      expect(xxh64sum(input), output);
     });
   });
 }

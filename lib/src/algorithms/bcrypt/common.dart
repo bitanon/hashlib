@@ -36,8 +36,6 @@ String _versionToName(BcryptVersion version) {
       return '2x';
     case BcryptVersion.$2y:
       return '2y';
-    default:
-      throw ArgumentError('Invalid version');
   }
 }
 

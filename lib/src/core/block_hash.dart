@@ -4,7 +4,6 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 abstract class BlockHashBase extends HashBase {
   const BlockHashBase();
@@ -14,12 +13,6 @@ abstract class BlockHashBase extends HashBase {
 }
 
 abstract class BlockHashSink extends HashDigestSink {
-  /// The flag tracking if the [digest] is called once.
-  bool _closed = false;
-
-  /// The message digest (available after the [digest] call)
-  HashDigest? _digest;
-
   /// The current position of data in the [buffer]
   int pos = 0;
 
@@ -49,9 +42,6 @@ abstract class BlockHashSink extends HashDigestSink {
     bdata = buffer.buffer.asByteData();
   }
 
-  @override
-  bool get closed => _closed;
-
   /// Get the message length in bits
   int get messageLengthInBits => messageLength << 3;
 
@@ -59,20 +49,10 @@ abstract class BlockHashSink extends HashDigestSink {
   void reset() {
     pos = 0;
     messageLength = 0;
-    _digest = null;
-    _closed = false;
+    super.reset();
   }
 
   @override
-  void add(List<int> data, [int start = 0, int? end]) {
-    if (_closed) {
-      throw StateError('The message-digest is already closed');
-    }
-    end ??= data.length;
-    $process(data, start, end);
-  }
-
-  /// Processes a chunk of input data
   void $process(List<int> chunk, int start, int end) {
     int t = start;
     if (pos > 0) {
@@ -102,16 +82,4 @@ abstract class BlockHashSink extends HashDigestSink {
   ///
   /// The method starts reading the block from [offset] index
   void $update(List<int> block, [int offset = 0, bool last = false]);
-
-  @override
-  HashDigest digest() {
-    if (_closed) return _digest!;
-    _closed = true;
-    _digest = HashDigest($finalize());
-    return _digest!;
-  }
-
-  /// Finalizes the message digest with the remaining message block,
-  /// and returns the output as byte array.
-  Uint8List $finalize();
 }

@@ -158,8 +158,8 @@ class KeccakHash extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     buffer.fillRange(0, buffer.length, 0);
+    super.reset();
   }
 
   @override

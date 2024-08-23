@@ -21,11 +21,11 @@ String sum([Iterable<int>? data]) {
 }
 
 String seedsum([Iterable<int>? data]) {
-  return XXH128.withSeed(seed).convert(data?.toList() ?? []).hex();
+  return XXH128().withSeed(seed).convert(data?.toList() ?? []).hex();
 }
 
 String secretSum([Iterable<int>? data]) {
-  return XXH128.withSecret(secret).convert(data?.toList() ?? []).hex();
+  return XXH128(secret: secret).convert(data?.toList() ?? []).hex();
 }
 
 void main() {
@@ -35,8 +35,15 @@ void main() {
       final output = "a6cd5e9392000f6ac44bdff4074eecdb";
       expect(xxh128sum(input), output);
     });
-    test("XXH128 with secret", () {
+    test("with secret", () {
       expect(secretSum(cases.take(6)), '376bd91b6432f36d0b61c8aca7d4778f');
+    });
+
+    test('The secret length must be at least 136', () {
+      for (int i = 0; i < 136; ++i) {
+        var instance = xxh3_128.withSecret(Uint8List(i));
+        expect(() => instance.convert([2]), throwsArgumentError);
+      }
     });
 
     test("with input length = 0", () {

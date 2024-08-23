@@ -50,8 +50,8 @@ class SHA2of512 extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     state.setAll(0, seed);
+    super.reset();
   }
 
   /// Rotates x right by n bits.

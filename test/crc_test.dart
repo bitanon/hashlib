@@ -44,5 +44,48 @@ void main() {
     test('CRC-64 hex output', () {
       expect(crc64sum("Wikipedia"), "352d6c9d31566506");
     });
+
+    test('CRC-16 sink test', () {
+      final sink = crc16.createSink();
+      expect(sink.closed, isFalse);
+      sink.add([10, 20]);
+      expect(sink.closed, isFalse);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(() => sink.add([10]), throwsStateError);
+      sink.reset();
+      expect(sink.closed, isFalse);
+      sink.add([10, 20, 30]);
+      expect(sink.digest().length, 2);
+      expect(sink.closed, isTrue);
+    });
+    test('CRC-32 sink test', () {
+      final sink = crc32.createSink();
+      expect(sink.closed, isFalse);
+      sink.add([10, 20]);
+      expect(sink.closed, isFalse);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(() => sink.add([10]), throwsStateError);
+      sink.reset();
+      expect(sink.closed, isFalse);
+      sink.add([10, 20, 30]);
+      expect(sink.digest().length, 4);
+      expect(sink.closed, isTrue);
+    });
+    test('CRC-64 sink test', () {
+      final sink = crc64.createSink();
+      expect(sink.closed, isFalse);
+      sink.add([10, 20]);
+      expect(sink.closed, isFalse);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(() => sink.add([10]), throwsStateError);
+      sink.reset();
+      expect(sink.closed, isFalse);
+      sink.add([10, 20, 30]);
+      expect(sink.digest().length, 8);
+      expect(sink.closed, isTrue);
+    });
   });
 }

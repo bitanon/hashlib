@@ -43,8 +43,6 @@ String _typeToName(Argon2Type type) {
       return 'argon2i';
     case Argon2Type.argon2id:
       return 'argon2id';
-    default:
-      throw ArgumentError('Invalid type');
   }
 }
 
@@ -80,8 +78,6 @@ extension Argon2VersionValue on Argon2Version {
         return 0x10;
       case Argon2Version.v13:
         return 0x13;
-      default:
-        throw ArgumentError('Invalid version');
     }
   }
 }
@@ -216,7 +212,7 @@ class Argon2Context {
     if (salt.length > _maxSaltSize) {
       throw ArgumentError('The salt must be at most $_maxSaltSize bytes long');
     }
-    if (key != null && key.isNotEmpty) {
+    if (key != null) {
       if (key.length < _minKeySize) {
         throw ArgumentError('The key must be at least $_minKeySize bytes long');
       }
@@ -224,7 +220,7 @@ class Argon2Context {
         throw ArgumentError('The key must be at most $_maxKeySize bytes long');
       }
     }
-    if (personalization != null && personalization.isNotEmpty) {
+    if (personalization != null) {
       if (personalization.length < _minAD) {
         throw ArgumentError('The extra data must be at least $_minAD bytes');
       }

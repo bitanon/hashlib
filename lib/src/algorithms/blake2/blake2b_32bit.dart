@@ -83,12 +83,10 @@ const int _w15 = _w14 + 2;
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
 class Blake2bHash extends BlockHashSink with MACSinkBase {
+  bool _initialized = false;
   final Uint32List _var = Uint32List(_w15 + 2);
-  final Uint32List state = Uint32List.fromList(_seed);
+  final Uint32List state = Uint32List(_seed.length);
   final Uint32List _initialState = Uint32List(_seed.length);
-
-  @override
-  final int hashLength;
 
   /// For internal use only.
   Blake2bHash(
@@ -101,8 +99,33 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
     if (digestSize < 1 || digestSize > 64) {
       throw ArgumentError('The digest size must be between 1 and 64');
     }
+    init(
+      key,
+      salt: salt,
+      personalization: personalization,
+    );
+  }
 
+  @override
+  final int hashLength;
+
+  @override
+  bool get initialized => _initialized;
+
+  @override
+  void reset() {
+    state.setAll(0, _initialState);
+    super.reset();
+  }
+
+  @override
+  void init(
+    List<int>? key, {
+    List<int>? salt,
+    List<int>? personalization,
+  }) {
     // Parameter block
+    state.setAll(0, _seed);
     state[0] ^= 0x01010000 ^ hashLength;
 
     if (key != null && key.isNotEmpty) {
@@ -153,28 +176,8 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
       }
     }
 
-    _initialState.setAll(0, state);
-  }
-
-  @override
-  void reset() {
-    super.reset();
-    state.setAll(0, _initialState);
-  }
-
-  @override
-  void init(List<int> key) {
-    if (key.length > 64) {
-      throw ArgumentError('The key should not be greater than 64 bytes');
-    }
-    reset();
-    // The first block is the key padded with zeroes
-    buffer.setAll(0, key);
-    pos = blockLength;
-    messageLength += blockLength;
-    // Parameter block
-    state[0] ^= 0x01010000 ^ hashLength ^ (key.length << 8);
     // Save state
+    _initialized = true;
     _initialState.setAll(0, state);
   }
 

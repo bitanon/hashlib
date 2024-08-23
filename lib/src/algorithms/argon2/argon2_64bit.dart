@@ -4,7 +4,7 @@
 import 'dart:typed_data';
 
 import 'common.dart';
-import '../blake2b/blake2b_64bit.dart';
+import '../blake2/blake2b_64bit.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 

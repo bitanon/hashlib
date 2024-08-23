@@ -8,6 +8,9 @@ abstract class MACSinkBase implements HashDigestSink {
   /// The length of generated key in bytes
   int get derivedKeyLength => hashLength;
 
+  /// Whether this MAC has been initialized with a call to [init]
+  bool get initialized;
+
   /// Initialize the MAC sink with the authentication key
   void init(List<int> key);
 }

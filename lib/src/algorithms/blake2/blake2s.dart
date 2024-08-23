@@ -7,34 +7,37 @@ import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
 /*
-              | BLAKE2b          |
+              | BLAKE2s          |
 --------------+------------------+
- Bits in word | w = 64           |
- Rounds in F  | r = 12           |
- Block bytes  | bb = 128         |
- Hash bytes   | 1 <= nn <= 64    |
- Key bytes    | 0 <= kk <= 64    |
- Input bytes  | 0 <= ll < 2**128 |
+ Bits in word | w = 32           |
+ Rounds in F  | r = 10           |
+ Block bytes  | bb = 64          |
+ Hash bytes   | 1 <= nn <= 32    |
+ Key bytes    | 0 <= kk <= 32    |
+ Input bytes  | 0 <= ll < 2**64  |
 --------------+------------------+
  G Rotation   | (R1, R2, R3, R4) |
-  constants = | (32, 24, 16, 63) |
+  constants = | (16, 12,  8,  7) |
 --------------+------------------+
 */
 
-const int _r1 = 32;
-const int _r2 = 24;
-const int _r3 = 16;
-const int _r4 = 63;
+const int _mask32 = 0xFFFFFFFF;
 
+const int _r1 = 16;
+const int _r2 = 12;
+const int _r3 = 8;
+const int _r4 = 7;
+
+// Same as SHA-256
 const _seed = [
-  0x6A09E667F3BCC908,
-  0xBB67AE8584CAA73B,
-  0x3C6EF372FE94F82B,
-  0xA54FF53A5F1D36F1,
-  0x510E527FADE682D1,
-  0x9B05688C2B3E6C1F,
-  0x1F83D9ABFB41BD6B,
-  0x5BE0CD19137E2179,
+  0x6A09E667, // a
+  0xBB67AE85, // b
+  0x3C6EF372, // c
+  0xA54FF53A, // d
+  0x510E527F, // e
+  0x9B05688C, // f
+  0x1F83D9AB, // g
+  0x5BE0CD19, // h
 ];
 
 const _sigma = [
@@ -48,8 +51,6 @@ const _sigma = [
   [13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10], // round 7
   [6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5], // round 8
   [10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0], // round 9
-  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], // round 10
-  [14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3], // round 11
 ];
 
 /// The implementation is derived from [RFC-7693][rfc] document for
@@ -57,39 +58,60 @@ const _sigma = [
 ///
 /// For reference, the official [blake2][blake2] implementation was followed.
 ///
-/// Note that blake2b uses 64-bit operations.
+/// Note that blake2s uses only 32-bit operations.
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2bHash extends BlockHashSink with MACSinkBase {
-  final Uint64List state = Uint64List.fromList(_seed);
-  final Uint64List _initialState = Uint64List(_seed.length);
-
-  @override
-  final int hashLength;
-
-  late final Uint64List qbuffer = Uint64List.view(buffer.buffer);
+class Blake2sHash extends BlockHashSink with MACSinkBase {
+  bool _initialized = false;
+  final Uint32List state = Uint32List(_seed.length);
+  final Uint32List _initialState = Uint32List(_seed.length);
 
   /// For internal use only.
-  Blake2bHash(
+  Blake2sHash(
     int digestSize, {
     List<int>? key,
     List<int>? salt,
     List<int>? personalization,
   })  : hashLength = digestSize,
-        super(1024 >>> 3) {
-    if (digestSize < 1 || digestSize > 64) {
-      throw ArgumentError('The digest size must be between 1 and 64');
+        super(64) {
+    if (digestSize < 1 || digestSize > 32) {
+      throw ArgumentError('The digest size must be between 1 and 32');
     }
+    init(
+      key,
+      salt: salt,
+      personalization: personalization,
+    );
+  }
 
-    // Parameter block
+  @override
+  final int hashLength;
+
+  @override
+  bool get initialized => _initialized;
+
+  @override
+  void reset() {
+    state.setAll(0, _initialState);
+    super.reset();
+  }
+
+  @override
+  void init(
+    List<int>? key, {
+    List<int>? salt,
+    List<int>? personalization,
+  }) {
+    // Start from the seed
+    state.setAll(0, _seed);
     state[0] ^= 0x01010000 ^ hashLength;
 
+    // Add key length to parameter
     if (key != null && key.isNotEmpty) {
       if (key.length > 64) {
         throw ArgumentError('The key should not be greater than 64 bytes');
       }
-      // Add key length to parameter
       state[0] ^= key.length << 8;
       // If the key is present, the first block is the key padded with zeroes
       buffer.setAll(0, key);
@@ -98,51 +120,31 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
     }
 
     if (salt != null && salt.isNotEmpty) {
-      if (salt.length != 16) {
-        throw ArgumentError('The valid length of salt is 16 bytes');
+      if (salt.length != 8) {
+        throw ArgumentError('The valid length of salt is 8 bytes');
       }
-      for (int i = 0, p = 0; i < 8; i++, p += 8) {
+      for (int i = 0, p = 0; i < 4; i++, p += 8) {
         state[4] ^= (salt[i] & 0xFF) << p;
       }
-      for (int i = 8, p = 0; i < 16; i++, p += 8) {
+      for (int i = 4, p = 0; i < 8; i++, p += 8) {
         state[5] ^= (salt[i] & 0xFF) << p;
       }
     }
 
     if (personalization != null && personalization.isNotEmpty) {
-      if (personalization.length != 16) {
-        throw ArgumentError('The valid length of personalization is 16 bytes');
+      if (personalization.length != 8) {
+        throw ArgumentError('The valid length of personalization is 8 bytes');
       }
-      for (int i = 0, p = 0; i < 8; i++, p += 8) {
+      for (int i = 0, p = 0; i < 4; i++, p += 8) {
         state[6] ^= (personalization[i] & 0xFF) << p;
       }
-      for (int i = 8, p = 0; i < 16; i++, p += 8) {
+      for (int i = 4, p = 0; i < 8; i++, p += 8) {
         state[7] ^= (personalization[i] & 0xFF) << p;
       }
     }
 
-    _initialState.setAll(0, state);
-  }
-
-  @override
-  void reset() {
-    super.reset();
-    state.setAll(0, _initialState);
-  }
-
-  @override
-  void init(List<int> key) {
-    if (key.length > 64) {
-      throw ArgumentError('The key should not be greater than 64 bytes');
-    }
-    reset();
-    // The first block is the key padded with zeroes
-    buffer.setAll(0, key);
-    pos = blockLength;
-    messageLength += blockLength;
-    // Parameter block
-    state[0] ^= 0x01010000 ^ hashLength ^ (key.length << 8);
     // Save state
+    _initialized = true;
     _initialState.setAll(0, state);
   }
 
@@ -159,9 +161,9 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
 
   /// Rotates x right by n bits.
   @pragma('vm:prefer-inline')
-  static int _rotr(int x, int n) => (x >>> n) ^ (x << (64 - n));
+  static int _rotr(int x, int n) => ((x & _mask32) >>> n) | ((x << (32 - n)));
 
-  // static void _G(Uint64List v, int a, int b, int c, int d, int x, int y) {
+  // static void _G(Uint32List v, int a, int b, int c, int d, int x, int y) {
   //   v[a] = (v[a] + v[b] + x);
   //   v[d] = _rotr(v[d] ^ v[a], _r1);
   //   v[c] = (v[c] + v[d]);
@@ -174,7 +176,7 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
 
   @override
   void $update([List<int>? block, int offset = 0, bool last = false]) {
-    var m = qbuffer;
+    var m = sbuffer;
     int w0, w1, w2, w3, w4, w5, w6, w7;
     int w8, w9, w10, w11, w12, w13, w14, w15;
 
@@ -193,17 +195,17 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
     w9 = _seed[1];
     w10 = _seed[2];
     w11 = _seed[3];
-    w12 = _seed[4] ^ messageLength;
-    w13 = _seed[5];
+    w12 = _seed[4] ^ (messageLength & _mask32);
+    w13 = _seed[5] ^ (messageLength >>> 32);
     w14 = _seed[6];
     w15 = _seed[7];
 
     if (last) {
-      w14 = ~w14; // invert bits
+      w14 ^= _mask32; // invert bits
     }
 
     // Cryptographic mixing
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 10; i++) {
       var s = _sigma[i];
 
       // _G(v, 0, 4, 8, 12, m[s[0]], m[s[1]]);

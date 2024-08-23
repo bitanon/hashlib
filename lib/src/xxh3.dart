@@ -41,16 +41,16 @@ class XXH3 extends BlockHashBase {
   @override
   final String name = 'XXH3';
 
-  /// Get and instance of [xxh3] with an specific seed
-  factory XXH3.withSeed(int seed) => XXH3(seed: seed);
-
-  /// Get and instance of [xxh3] with a secret
-  factory XXH3.withSecret(List<int> secret) => XXH3(secret: secret);
-
   @override
   XXH3Sink64bit createSink() => secret == null
       ? XXH3Sink64bit.withSeed(seed)
       : XXH3Sink64bit.withSecret(secret);
+
+  /// Get an instance of [xxh3] with an specific seed
+  XXH3 withSeed(int seed) => XXH3(seed: seed, secret: secret);
+
+  /// Get an instance of [xxh3] with a secret
+  XXH3 withSecret(List<int> secret) => XXH3(seed: seed, secret: secret);
 }
 
 /// Gets the 64-bit XXH3 value of a String.

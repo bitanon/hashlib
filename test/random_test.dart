@@ -363,4 +363,50 @@ void main() {
       expect(result1, equals(result2));
     });
   });
+
+  group('Test \$seedList', () {
+    test('Test with a normal length list', () {
+      int seed = 123456789;
+      var data = Uint8List(64);
+      RandomGenerators.$seedList(data, seed);
+      expect(data, isNot(equals(Uint8List(64))));
+    });
+
+    test('Test with small list', () {
+      int seed = 123456789;
+      for (int i = 1; i < 8; ++i) {
+        var data = Uint8List(i);
+        RandomGenerators.$seedList(data, seed);
+        expect(data, isNot(equals(Uint8List(i))));
+      }
+    });
+
+    test('Test with uneven list', () {
+      int seed = 123456789;
+      for (int i = 1; i < 4; ++i) {
+        var data = Uint8List(64 + i);
+        RandomGenerators.$seedList(data, seed);
+        expect(data.skip(64), isNot(equals(Uint8List(i))));
+      }
+    });
+
+    test('Test with same seed', () {
+      int seed = 123456789;
+      var data1 = Uint8List(255);
+      var data2 = Uint8List(255);
+      RandomGenerators.$seedList(data1, seed);
+      RandomGenerators.$seedList(data2, seed);
+      expect(data1, equals(data2));
+    });
+
+    test('Test with different seed', () {
+      int seed1 = 123456789;
+      int seed2 = 987654321;
+      var data1 = Uint8List(255);
+      var data2 = Uint8List(255);
+      RandomGenerators.$seedList(data1, seed1);
+      RandomGenerators.$seedList(data2, seed2);
+      expect(data1, isNot(equals(data2)));
+    });
+  });
 }

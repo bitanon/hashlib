@@ -13,30 +13,55 @@ export 'hash_base_stub.dart' if (dart.library.io) 'hash_base_io.dart';
 /// This sink allows adding arbitrary length byte arrays
 /// and produces a [HashDigest] on [close].
 abstract class HashDigestSink implements Sink<List<int>> {
-  const HashDigestSink();
+  HashDigestSink();
+
+  /// The flag tracking if the [digest] is called once.
+  bool _closed = false;
+
+  /// The message digest (available after the [digest] call)
+  late HashDigest _digest;
 
   /// Returns true if the sink is closed, false otherwise
-  bool get closed;
+  bool get closed => _closed;
 
   /// The length of generated hash in bytes
   int get hashLength;
+
+  /// Resets the current state to start from fresh state
+  void reset() {
+    _closed = false;
+  }
 
   /// Adds [data] to the message-digest.
   ///
   /// Throws [StateError], if it is called after closing the digest.
   @override
-  void add(List<int> data, [int start = 0, int? end]);
+  void add(List<int> data, [int start = 0, int? end]) {
+    if (_closed) {
+      throw StateError('The message-digest is already closed');
+    }
+    $process(data, start, end ?? data.length);
+  }
+
+  /// Processes a chunk of input data
+  void $process(List<int> chunk, int start, int end);
+
+  /// Finalizes the message-digest and returns a [HashDigest]
+  HashDigest digest() {
+    if (_closed) return _digest;
+    _digest = HashDigest($finalize());
+    _closed = true;
+    return _digest;
+  }
+
+  /// Finalizes the message digest with the remaining message block,
+  /// and returns the output as byte array.
+  Uint8List $finalize();
 
   /// Finalizes the message-digest. It calls [digest] method internally.
   @override
   @pragma('vm:prefer-inline')
   void close() => digest();
-
-  /// Finalizes the message-digest and returns a [HashDigest]
-  HashDigest digest();
-
-  /// Resets the current state to start from fresh state
-  void reset();
 }
 
 /// The base class used by the hash algorithm implementations. It implements
@@ -49,7 +74,6 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
   String get name;
 
   /// Create a [HashDigestSink] for generating message-digests
-  @pragma('vm:prefer-inline')
   HashDigestSink createSink();
 
   /// Process the byte array [input] and returns a [HashDigest].
@@ -59,6 +83,10 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
     sink.add(input);
     return sink.digest();
   }
+
+  /// Process the byte array [input] and returns a hash in hexadecimal.
+  @pragma('vm:prefer-inline')
+  String hex(List<int> input) => convert(input).hex();
 
   /// Process the [input] string and returns a [HashDigest].
   ///

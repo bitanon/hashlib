@@ -186,5 +186,21 @@ void main() {
           'fac778f409b9d733e12ca7afb23690b212e5f55397bdc884c73193cb2feec7ef';
       expect(hash.hex(), matcher);
     });
+
+    test("The iterations must be at least 1", () {
+      expect(() => pbkdf2([9], [5], 0), throwsStateError);
+      expect(() => pbkdf2([9], [5], -1), throwsStateError);
+    });
+
+    test("The iterations must be less than 2^31", () {
+      expect(() => pbkdf2([9], [5], 0x80000000), throwsStateError);
+      expect(() => pbkdf2([9], [5], 0x8FFFFFFF), throwsStateError);
+      expect(() => pbkdf2([9], [5], 0xFFFFFFFF), throwsStateError);
+    });
+
+    test("The keyLength must be at least 1", () {
+      expect(() => pbkdf2([9], [5], 10, 0), throwsStateError);
+      expect(() => pbkdf2([9], [5], 10, -1), throwsStateError);
+    });
   });
 }

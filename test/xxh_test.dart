@@ -19,7 +19,7 @@ List<String> readLines(String filename) {
 }
 
 void main() {
-  group('xxHash test with fixures', () {
+  group('XXH test with fixures', () {
     const int maxLength = 1000;
     final text = fixtureFile('long.txt').readAsBytesSync();
 
@@ -32,7 +32,7 @@ void main() {
         if (len > maxLength) break;
         expect(
           parts[1],
-          xxh32.convert(text.take(len).toList()).hex(),
+          xxh32.hex(text.take(len).toList()),
           reason: 'At length: $len',
         );
       }
@@ -47,7 +47,7 @@ void main() {
         if (len > maxLength) break;
         expect(
           parts[1],
-          xxh64.convert(text.take(len).toList()).hex(),
+          xxh64.hex(text.take(len).toList()),
           reason: 'At length: $len',
         );
       }
@@ -61,7 +61,7 @@ void main() {
         int len = int.parse(parts[0]);
         if (len > maxLength) break;
         expect(
-          xxh3.convert(text.take(len).toList()).hex(),
+          xxh3.hex(text.take(len).toList()),
           parts[1],
           reason: 'At length: $len',
         );
@@ -76,7 +76,7 @@ void main() {
         int len = int.parse(parts[0]);
         if (len > maxLength) break;
         expect(
-          xxh128.convert(text.take(len).toList()).hex(),
+          xxh128.hex(text.take(len).toList()),
           parts[1],
           reason: 'At length: $len',
         );

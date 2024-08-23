@@ -4,6 +4,7 @@
 - Fixes `shake128generator` and `shake256generator`
   - Issue: Wrong bytes after length > blockLength
 - Improves test coverage
+- Refactors `HashBase`
 - [**Breaking Changes**]:
   - Renames `argon2verify` -> `argon2Verify`
   - Uses Duration for period in TOTP

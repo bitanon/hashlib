@@ -1,13 +1,13 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('scrypt test', () {
     test("with empty password and empty salt and r=1", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         [],
         [],
         N: 16,
@@ -22,7 +22,7 @@ void main() {
     });
 
     test("with empty password and empty salt and r=2", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         [],
         [],
         N: 16,
@@ -37,7 +37,7 @@ void main() {
     });
 
     test("with empty password and empty salt and p=2", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         [],
         [],
         N: 16,
@@ -52,7 +52,7 @@ void main() {
     });
 
     test("with empty password and 'salt'", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         [],
         "salt".codeUnits,
         N: 16,
@@ -67,7 +67,7 @@ void main() {
     });
 
     test("with 'password' and empty salt", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         "password".codeUnits,
         [],
         N: 16,
@@ -82,7 +82,7 @@ void main() {
     });
 
     test("with empty 'passwd' and 'salt'", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         "passwd".codeUnits,
         "salt".codeUnits,
         N: 16,
@@ -97,7 +97,7 @@ void main() {
     });
 
     test("with a long key length", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         "a test key".codeUnits,
         "some salt".codeUnits,
         N: 16,
@@ -117,7 +117,7 @@ void main() {
     });
 
     test("with long r and p parameters", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         "a test key".codeUnits,
         "some salt".codeUnits,
         N: 16,
@@ -133,7 +133,7 @@ void main() {
     });
 
     test("with random N, r, p", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         "a test key".codeUnits,
         "some salt".codeUnits,
         N: 128,
@@ -149,10 +149,10 @@ void main() {
     });
 
     test("with security", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         [],
         [],
-        security: hashlib.ScryptSecurity.test,
+        security: ScryptSecurity.test,
       );
       var matcher =
           '5517696d05d1df94fb42f067d9fcdb14d9effe8ac37500957e1b6f1d383ea029'
@@ -161,16 +161,108 @@ void main() {
     });
 
     test("with security overrides", () {
-      var hash = hashlib.scrypt(
+      var hash = scrypt(
         [],
         [],
-        security: hashlib.ScryptSecurity.test,
+        security: ScryptSecurity.test,
         r: 1,
       );
       var matcher =
           '77d6576238657b203b19ca42c18a0497f16b4844e3074ae8dfdffa3fede21442'
           'fcd0069ded0948f8326a753a0fc81f17e8d3e0fb2e0d3628cf35e20c38d18906';
       expect(hash.hex(), matcher);
+    });
+  });
+
+  group('Scrypt Factory Tests', () {
+    test("with security", () {
+      var hash = Scrypt.fromSecurity(ScryptSecurity.test, salt: []);
+      var matcher =
+          '5517696d05d1df94fb42f067d9fcdb14d9effe8ac37500957e1b6f1d383ea029'
+          '61accf2409bba1ae87c94c6fc69f9b32393eea0b877eb7803c2f151a888acdb6';
+      expect(hash.convert([]).hex(), matcher);
+    });
+
+    test('throws if cost is less than 1', () {
+      expect(
+        () => Scrypt(cost: 0),
+        throwsA(isA<StateError>().having(
+            (e) => e.message, 'message', 'The cost must be at least 1')),
+      );
+    });
+
+    test('throws if cost is greater than 2^24', () {
+      expect(
+        () => Scrypt(cost: 0x1000000),
+        throwsA(isA<StateError>().having(
+            (e) => e.message, 'message', 'The cost must be less than 2^24')),
+      );
+    });
+
+    test('throws if cost is not a power of 2', () {
+      expect(
+        () => Scrypt(cost: 5),
+        throwsA(isA<StateError>().having(
+            (e) => e.message, 'message', 'The cost must be a power of 2')),
+      );
+    });
+
+    test('throws if derivedKeyLength is less than 1', () {
+      expect(
+        () => Scrypt(cost: 2, derivedKeyLength: 0),
+        throwsA(isA<StateError>().having((e) => e.message, 'message',
+            'The derivedKeyLength must be at least 1')),
+      );
+    });
+
+    test('throws if blockSize is less than 1', () {
+      expect(
+        () => Scrypt(cost: 2, blockSize: 0),
+        throwsA(isA<StateError>().having(
+            (e) => e.message, 'message', 'The blockSize must be at least 1')),
+      );
+    });
+
+    test('throws if parallelism is less than 1', () {
+      expect(
+        () => Scrypt(cost: 2, parallelism: 0),
+        throwsA(isA<StateError>().having(
+            (e) => e.message, 'message', 'The parallelism must be at least 1')),
+      );
+    });
+
+    test('throws if blockSize * parallelism is too big', () {
+      expect(
+        () => Scrypt(cost: 2, blockSize: 0x2000000, parallelism: 1),
+        throwsA(isA<StateError>().having((e) => e.message, 'message',
+            'The blockSize * parallelism is too big')),
+      );
+    });
+
+    test('uses provided salt if not null', () {
+      var salt = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+      var scrypt = Scrypt(cost: 2, salt: salt);
+      expect(scrypt.salt, equals(salt));
+    });
+
+    test('generates a random salt if salt is null', () {
+      var scrypt = Scrypt(cost: 2);
+      expect(scrypt.salt.length, 16);
+    });
+
+    test('creates an instance with valid parameters', () {
+      var salt = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+      var scrypt = Scrypt(
+          cost: 2,
+          salt: salt,
+          blockSize: 8,
+          parallelism: 1,
+          derivedKeyLength: 64);
+      expect(scrypt.salt, equals(salt));
+      expect(scrypt.cost, equals(2));
+      expect(scrypt.blockSize, equals(8));
+      expect(scrypt.parallelism, equals(1));
+      expect(scrypt.derivedKeyLength, equals(64));
     });
   });
 }

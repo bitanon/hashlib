@@ -11,6 +11,9 @@ class HashDigest extends Object {
 
   const HashDigest(this.bytes);
 
+  /// Returns the length of this digest in bytes.
+  int get length => bytes.length;
+
   /// Returns the byte buffer associated with this digest.
   ByteBuffer get buffer => bytes.buffer;
 

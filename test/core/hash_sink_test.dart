@@ -17,29 +17,22 @@ class TestHashDigestSink extends HashDigestSink {
   int get hashLength => 16;
 
   @override
-  bool get closed => _closed;
+  void reset() {
+    _closed = false;
+    _data.clear();
+    super.reset();
+  }
 
   @override
-  void add(List<int> data, [int start = 0, int? end]) {
-    if (_closed) {
-      throw StateError('Sink is closed');
-    }
-    end ??= data.length;
+  void $process(List<int> data, int start, int end) {
     _data.addAll(data.sublist(start, end));
   }
 
   @override
-  HashDigest digest() {
-    _closed = true;
+  Uint8List $finalize() {
     int hash = _data.fold(0, (prev, elem) => prev ^ elem);
     final result = List.filled(hashLength, hash);
-    return HashDigest(Uint8List.fromList(result));
-  }
-
-  @override
-  void reset() {
-    _closed = false;
-    _data.clear();
+    return Uint8List.fromList(result);
   }
 }
 

@@ -42,23 +42,26 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   int _g3 = 0;
   int _g4 = 0;
 
+  /// Creates a new instance to process 16-bytes blocks with 17-bytes buffer
+  Poly1305Sink() : super(16, bufferLength: 17);
+
   @override
   final int hashLength = 16;
 
-  /// Creates a new instance to process 16-bytes blocks with 17-bytes buffer
-  Poly1305Sink() : super(16, bufferLength: 17);
+  @override
+  bool get initialized => _initialized;
 
   @override
   void reset() {
     if (!_initialized) {
       throw StateError('The instance is not initialized');
     }
-    super.reset();
     _h0 = 0;
     _h1 = 0;
     _h2 = 0;
     _h3 = 0;
     _h4 = 0;
+    super.reset();
   }
 
   /// Initialize the Poly1305 with the secret and the authentication
@@ -68,7 +71,7 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   @override
   void init(List<int> keypair) {
     if (keypair.length != 16 && keypair.length != 32) {
-      throw StateError('The key length must be 16 or bytes');
+      throw ArgumentError('The key length must be either 16 or 32 bytes');
     }
 
     _initialized = true;
@@ -105,7 +108,7 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   @override
   void $process(List<int> chunk, int start, int end) {
     if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
+      throw StateError('The instance is not yet initialized with a key');
     }
     buffer[16] = 1;
     for (; start < end; start++, pos++) {
@@ -172,7 +175,7 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   @override
   Uint8List $finalize() {
     if (!_initialized) {
-      throw StateError('The MAC instance is not initialized');
+      throw StateError('The instance is not yet initialized with a key');
     }
 
     if (pos > 0) {

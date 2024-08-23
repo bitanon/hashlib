@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
@@ -214,6 +216,80 @@ void main() {
           fromHex(x[0]),
         );
         expect(mac.hex(), x[2]);
+      }
+    });
+
+    test('pair with invalid key length', () {
+      var s = Uint8List(16);
+      expect(() => poly1305pair([100], [], s), throwsStateError);
+      expect(() => poly1305pair([100], [10], s), throwsStateError);
+      expect(() => poly1305pair([100], Uint8List(32), s), throwsStateError);
+      expect(() => poly1305pair([100], Uint8List(20), s), throwsStateError);
+    });
+
+    test('pair with invalid secret length', () {
+      var r = Uint8List(16);
+      expect(() => poly1305pair([100], r, []), throwsStateError);
+      expect(() => poly1305pair([100], r, [10]), throwsStateError);
+      expect(() => poly1305pair([100], r, Uint8List(20)), throwsStateError);
+    });
+
+    test('pair with secret = null and 16 bit key', () {
+      var r = fromHex("85d6be7857556d337f4452fe42d506a8");
+      var m = "Cryptographic Forum Research Group".codeUnits;
+      expect(poly1305pair(m, r).hex(), equals(poly1305(m, r).hex()));
+    });
+
+    test('pair with secret = null and 32 bit key', () {
+      var r = fromHex(
+        "85d6be7857556d337f4452fe42d506a8"
+        "0103808afb0db2fd4abff6af4149f51b",
+      );
+      var m = "Cryptographic Forum Research Group".codeUnits;
+      expect(poly1305pair(m, r).hex(), equals(poly1305(m, r).hex()));
+    });
+
+    test('sink test', () {
+      final key = fromHex(cases[2][0]);
+      final msg = fromHex(cases[2][1]);
+      final output = cases[2][2];
+
+      final sink = Poly1305Sink();
+      expect(sink.closed, isFalse);
+      expect(sink.initialized, isFalse);
+      expect(() => sink.reset(), throwsStateError);
+      expect(() => sink.add(msg), throwsStateError);
+      expect(() => sink.digest(), throwsStateError);
+
+      sink.init(key);
+      expect(sink.initialized, isTrue);
+      expect(sink.closed, isFalse);
+
+      for (int i = 0; i < msg.length; i += 7) {
+        sink.add(msg.skip(i).take(7).toList());
+      }
+      expect(sink.digest().hex(), equals(output));
+      expect(sink.closed, isTrue);
+      expect(() => sink.add(msg), throwsStateError);
+      expect(sink.digest().hex(), equals(output));
+
+      sink.reset();
+      expect(sink.closed, isFalse);
+      expect(sink.initialized, isTrue);
+
+      sink.add(msg);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
+    });
+
+    test("The key length must be either 16 or 32 bytes", () {
+      for (int i = 0; i < 64; ++i) {
+        if (i == 16 || i == 32) {
+          Poly1305Sink().init(Uint8List(i));
+        } else {
+          expect(() => Poly1305Sink().init(Uint8List(i)), throwsArgumentError);
+        }
       }
     });
   });

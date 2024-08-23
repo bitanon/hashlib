@@ -29,7 +29,11 @@ void main() {
         "abcdefghijklmnopqrstuvwxyz",
         "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-        "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+        "1234567890123456789012345678901234567890123456789012345678901234"
+            "5678901234567890",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678901",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678901"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678901",
       ];
       var r = [
         "0bdc9d2d256b3ee9daae347be6f4dc835a467ffe",
@@ -38,7 +42,9 @@ void main() {
         "f71c27109c692c1b56bbdceb5b9d2865b3708dbc",
         "12a053384a9c0c88e405a06c27dcf49ada62eb2b",
         "b0e20b6e3116640286ed3a87a5713079b21f5189",
-        "9b752e45573d4b39f4dbd3323cab82bf63326bfb"
+        "9b752e45573d4b39f4dbd3323cab82bf63326bfb",
+        "1f931a136bf9f411832ab15bd11a8953111febef",
+        "53875380569546ee9738f5a59fdea9db521cb9ce",
       ];
       for (var i = 0; i < m.length; ++i) {
         expect(ripemd160sum(m[i]), r[i]);
@@ -53,6 +59,26 @@ void main() {
       var m = "Hello, world!";
       var r = "58262d1fbdbe4530d8865d3518c6d6e41002610f";
       expect(ripemd160sum(m), r);
+    });
+
+    test('sink test', () {
+      final input =
+          "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+              .codeUnits;
+      final output = "9b752e45573d4b39f4dbd3323cab82bf63326bfb";
+      final sink = ripemd160.createSink();
+      expect(sink.closed, isFalse);
+      for (int i = 0; i < input.length; i += 48) {
+        sink.add(input.skip(i).take(48).toList());
+      }
+      expect(sink.digest().hex(), equals(output));
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
+      sink.reset();
+      sink.add(input);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
     });
   });
 }

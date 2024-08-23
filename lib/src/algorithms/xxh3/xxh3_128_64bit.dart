@@ -97,7 +97,6 @@ class XXH3Sink128bit extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     state[0] = prime32_3;
     state[1] = prime64_1;
     state[2] = prime64_2;
@@ -106,6 +105,7 @@ class XXH3Sink128bit extends BlockHashSink {
     state[5] = prime32_2;
     state[6] = prime64_5;
     state[7] = prime32_1;
+    super.reset();
   }
 
   @override

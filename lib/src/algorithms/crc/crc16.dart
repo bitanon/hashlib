@@ -4,7 +4,6 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 final Map<int, Uint16List> _tables = {};
 
@@ -13,8 +12,6 @@ class CRC16Hash extends HashDigestSink {
   final Uint16List table;
 
   int _crc;
-  HashDigest? _digest;
-  bool _closed = false;
 
   CRC16Hash({
     this.seed = 0,
@@ -26,36 +23,25 @@ class CRC16Hash extends HashDigestSink {
   final int hashLength = 2;
 
   @override
-  bool get closed => _closed;
-
-  @override
   void reset() {
-    _closed = false;
-    _digest = null;
     _crc = seed;
+    super.reset();
   }
 
   @override
-  void add(List<int> data, [int start = 0, int? end]) {
-    if (_closed) {
-      throw StateError('The message-digest is already closed');
-    }
-    for (end ??= data.length; start < end; start++) {
-      _crc = table[(_crc ^ data[start]) & 0xFF] ^ (_crc >>> 8);
+  void $process(List<int> chunk, int start, int end) {
+    for (; start < end; start++) {
+      _crc = table[(_crc ^ chunk[start]) & 0xFF] ^ (_crc >>> 8);
     }
   }
 
   @override
-  HashDigest digest() {
-    if (_closed) return _digest!;
-    _closed = true;
+  Uint8List $finalize() {
     _crc ^= seed;
-    Uint8List bytes = Uint8List.fromList([
+    return Uint8List.fromList([
       _crc >>> 8,
       _crc,
     ]);
-    _digest = HashDigest(bytes);
-    return _digest!;
   }
 }
 

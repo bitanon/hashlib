@@ -26,10 +26,11 @@ void main() {
       expect(xxh32.convert([data[0]]).hex(), "b85cbee5");
     });
     test('with seed = 0 and 14 letters', () {
-      expect(xxh32.convert(data.take(14).toList()).hex(), "e5aa0ab4");
+      final input = String.fromCharCodes(data.take(14));
+      expect(xxh32sum(input), "e5aa0ab4");
     });
     test('with seed = 0 and 101 letters', () {
-      expect(xxh32.convert(data).hex(), "1f1aa412");
+      expect(xxh32.convert(data).number(), 0x1f1aa412);
     });
 
     test('with a seed and an empty string', () {
@@ -49,6 +50,17 @@ void main() {
 
     test('with a seed and 101 letters', () {
       expect(xxh32.withSeed(seed).convert(data).hex(), "498ec8e2");
+    });
+
+    test('with 32-byte message', () {
+      final input = "string of 32-bytes long for test";
+      expect(xxh32code(input), 0x90d90755);
+    });
+
+    test('with 64-byte message', () {
+      final input =
+          "string of 64-bytes for test. twice the size of 32-byte string.";
+      expect(xxh32code(input), 0x0b438557);
     });
   });
 }

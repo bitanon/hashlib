@@ -52,8 +52,8 @@ class PBKDF2 extends KeyDerivatorBase {
     if (iterations < 1) {
       throw StateError('The iterations must be at least 1');
     }
-    if (iterations > 0xFFFFFFFF) {
-      throw StateError('The iterations must be less than 2^32');
+    if (iterations > 0x7FFFFFFF) {
+      throw StateError('The iterations must be less than 2^31');
     }
     if (keyLength != null && keyLength < 1) {
       throw StateError('The keyLength must be at least 1');

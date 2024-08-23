@@ -46,11 +46,11 @@ class Poly1305 extends MACHashBase {
   /// authenticate only one message. Authenticating multiple messages using the
   /// same ([key], [secret]) could allow for forgeries.
   factory Poly1305.pair(List<int> key, [List<int>? secret]) {
-    if (key.length != 16) {
-      throw StateError('The key length must be 16 bytes');
-    }
     if (secret == null) {
       return Poly1305(key);
+    }
+    if (key.length != 16) {
+      throw StateError('The key length must be 16 bytes');
     }
     if (secret.length != 16) {
       throw StateError('The secret length must be 16 bytes');

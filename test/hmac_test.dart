@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 
+import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
@@ -109,6 +110,35 @@ void main() {
           "f93547db714b06ef0a692062c609b70208ab8d4a280ceee40ed8100f293063";
       final actual = sha3_512.hmacBy(key).string(msg).hex();
       expect(actual, expected);
+    });
+
+    test('sink test', () {
+      final key = "key".codeUnits;
+      final msg = "The quick brown fox jumps over the lazy dog".codeUnits;
+      final output = "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9";
+      final sink = HMACSink(sha1.createSink());
+      expect(sink.closed, isFalse);
+      expect(sink.initialized, isFalse);
+      expect(() => sink.reset(), throwsStateError);
+      expect(() => sink.add(msg), throwsStateError);
+      expect(() => sink.digest(), throwsStateError);
+      sink.init(key);
+      expect(sink.initialized, isTrue);
+      expect(sink.closed, isFalse);
+      for (int i = 0; i < msg.length; i += 7) {
+        sink.add(msg.skip(i).take(7).toList());
+      }
+      expect(sink.digest().hex(), equals(output));
+      expect(sink.closed, isTrue);
+      expect(() => sink.add(msg), throwsStateError);
+      expect(sink.digest().hex(), equals(output));
+      sink.reset();
+      expect(sink.closed, isFalse);
+      expect(sink.initialized, isTrue);
+      sink.add(msg);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
     });
   });
 }

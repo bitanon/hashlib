@@ -15,9 +15,6 @@ class BcryptSecurity {
     required this.nb,
   });
 
-  @override
-  String toString() => "BCryptSecurity($name):nb=$nb";
-
   /// Provides a very low security. Use it for test purposes.
   ///
   /// It uses 2^1 = 2 round for encryption.

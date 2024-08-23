@@ -41,16 +41,16 @@ class XXH128 extends BlockHashBase {
   @override
   final String name = 'XXH128';
 
-  /// Get and instance of [xxh128] with an specific seed
-  factory XXH128.withSeed(int seed) => XXH128(seed: seed);
-
-  /// Get and instance of [xxh128] with a secret
-  factory XXH128.withSecret(List<int> secret) => XXH128(secret: secret);
-
   @override
   XXH3Sink128bit createSink() => secret == null
       ? XXH3Sink128bit.withSeed(seed)
       : XXH3Sink128bit.withSecret(secret);
+
+  /// Get an instance of [xxh128] with an specific seed
+  XXH128 withSeed(int seed) => XXH128(seed: seed, secret: secret);
+
+  /// Get an instance of [xxh128] with a secret
+  XXH128 withSecret(List<int> secret) => XXH128(seed: seed, secret: secret);
 }
 
 /// Gets the 128-bit XXH3 hash of a String in hexadecimal.

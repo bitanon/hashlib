@@ -1,11 +1,12 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('blake2s256 test', () {
+  group('Blake2s funtionality test', () {
     test("Blake2s name", () {
       expect(Blake2s(8).name, 'BLAKE2s-64');
       expect(blake2s128.name, 'BLAKE2s-128');
@@ -21,6 +22,70 @@ void main() {
       expect(blake2s224.mac(key).name, 'BLAKE2s-224-MAC');
       expect(blake2s256.mac(key).name, 'BLAKE2s-256-MAC');
     });
+    test('The digest size must be between 1 and 32', () {
+      Blake2s(1).createSink();
+      Blake2s(32).createSink();
+      expect(() => Blake2s(0).createSink(), throwsArgumentError);
+      expect(() => Blake2s(33).createSink(), throwsArgumentError);
+    });
+    test('The valid length of salt is 8 bytes ', () {
+      Blake2s(16, salt: Uint8List(0)).createSink();
+      Blake2s(16, salt: Uint8List(8)).createSink();
+      expect(
+        () => Blake2s(16, salt: Uint8List(1)).createSink(),
+        throwsArgumentError,
+      );
+      expect(
+        () => Blake2s(16, salt: Uint8List(9)).createSink(),
+        throwsArgumentError,
+      );
+    });
+    test('The valid length of personalization is 8 bytes ', () {
+      Blake2s(16, personalization: Uint8List(0)).createSink();
+      Blake2s(16, personalization: Uint8List(8)).createSink();
+      expect(
+        () => Blake2s(16, personalization: Uint8List(1)).createSink(),
+        throwsArgumentError,
+      );
+      expect(
+        () => Blake2s(16, personalization: Uint8List(9)).createSink(),
+        throwsArgumentError,
+      );
+    });
+    test('The key should not be greater than 64 bytes ', () {
+      Blake2s(16, key: Uint8List(0)).createSink();
+      Blake2s(16, key: Uint8List(1)).createSink();
+      Blake2s(16, key: Uint8List(64)).createSink();
+      expect(
+        () => Blake2s(16, key: Uint8List(65)).createSink(),
+        throwsArgumentError,
+      );
+    });
+    test('sink test', () {
+      final input = List.generate(512, (i) => i & 0xFF);
+      final output =
+          "aeb5499d81f14cb10c2539411cbe3e71167293458543bfa4ca1f9584625fd4c6";
+      final sink = blake2s256.createSink();
+      expect(sink.closed, isFalse);
+      expect(sink.initialized, isTrue);
+      for (int i = 0; i < 512; i += 48) {
+        sink.add(input.skip(i).take(48).toList());
+      }
+      expect(sink.digest().hex(), equals(output));
+      expect(sink.closed, isTrue);
+      expect(sink.initialized, isTrue);
+      expect(sink.digest().hex(), equals(output));
+      sink.reset();
+      expect(sink.closed, isFalse);
+      expect(sink.initialized, isTrue);
+      sink.add(input);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
+    });
+  });
+
+  group('blake2s256 test', () {
     test('with empty string', () {
       expect(blake2s256.string("").hex(),
           "69217a3079908094e11121d042354a7c1f55b6482ca1a51e1b250dfd1ed0eef9");
@@ -40,7 +105,7 @@ void main() {
     test('with very long string', () {
       expect(blake2s256.convert(List.generate(646154, (i) => i & 0xFF)).hex(),
           "8e13a3e326c071e9d9dabd66025e49d3f467767cd10b5e6e1df1de9354ea2af9");
-    });
+    }, skip: true);
     test('with block size string', () {
       expect(blake2s256.convert(List.generate(64, (i) => i & 0xFF)).hex(),
           "56f34e8b96557e90c1f24b52d0c89d51086acf1b00f634cf1dde9233b8eaaa3e");

@@ -30,9 +30,6 @@ class Argon2Security {
     required this.t,
   });
 
-  @override
-  String toString() => "Argon2Security($name):{m=$m,p=$p,t=$t}";
-
   /// Provides a very low security. Use it for test purposes.
   ///
   /// It uses 32KB of RAM, 2 lanes, and 2 iterations.

@@ -34,8 +34,8 @@ class SHA1Hash extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     state.setAll(0, _iv);
+    super.reset();
   }
 
   @override

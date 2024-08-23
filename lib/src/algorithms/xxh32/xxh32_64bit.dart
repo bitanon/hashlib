@@ -32,11 +32,11 @@ class XXHash32Sink extends BlockHashSink {
 
   @override
   void reset() {
-    super.reset();
     _acc1 = (seed & _mask32) + prime32_1 + prime32_2;
     _acc2 = (seed & _mask32) + prime32_2;
     _acc3 = (seed & _mask32) + 0;
     _acc4 = (seed & _mask32) - prime32_1;
+    super.reset();
   }
 
   @override

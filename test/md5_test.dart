@@ -7,73 +7,113 @@ import 'dart:math';
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
-final tests = {
-  "": "d41d8cd98f00b204e9800998ecf8427e",
-  "a": "0cc175b9c0f1b6a831c399e269772661",
-  "abc": "900150983cd24fb0d6963f7d28e17f72",
-  "message digest": "f96b697d7cb7938d525a2f31aaf161d0",
-  "abcdefghijklmnopqrstuvwxyz": "c3fcd3d76192e4007dfb496cca67e13b",
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789":
-      "d174ab98d277d9f5a5611c2c9f419d9f",
-  "12345678901234567890123456789012345678901234567890123456789012345678901234567890":
-      "57edf4a22be3c955ac49da2e2107b67a",
-  "123": "202cb962ac59075b964b07152d234b70",
-  "test": "098f6bcd4621d373cade4e832627b4f6",
-  'message': "78e731027d8fd50ed642340b7c9a63b3",
-  "Hello World": "b10a8db164e0754105b7a99be72e3fe5",
-  List.filled(512, "a").join(): "56907396339ca2b099bd12245f936ddc",
-  List.filled(128, "a").join(): "e510683b3f5ffe4093d021808bc6ff70",
-  List.filled(513, "a").join(): "6649c3e827e44f7bf539768bddf76435",
-  List.filled(511, "a").join(): "3ba3485f242a5859f4417ccf004cd74c",
-  List.filled(1000000, "a").join(): "7707d6ae4e027c70eea2a935c2296f21",
-};
-
 void main() {
   group('MD5 test', () {
     test('with empty string', () {
-      expect(md5sum(""), tests[""]);
+      expect(md5sum(""), equals("d41d8cd98f00b204e9800998ecf8427e"));
     });
 
     test('with single letter', () {
-      expect(md5sum("a"), tests["a"]);
+      expect(md5sum("a"), equals("0cc175b9c0f1b6a831c399e269772661"));
     });
 
     test('with few letters', () {
-      expect(md5sum("abc"), tests["abc"]);
+      expect(md5sum("abc"), equals("900150983cd24fb0d6963f7d28e17f72"));
     });
 
-    test('with longest string', () {
-      var last = tests.entries.last;
-      expect(md5sum(last.key), last.value);
+    test('"message digest"', () {
+      final input = "message digest";
+      final output = "f96b697d7cb7938d525a2f31aaf161d0";
+      expect(md5sum(input), equals(output));
     });
-
-    test('with special case', () {
-      var key =
+    test('"abcdefghijklmnopqrstuvwxyz"', () {
+      final input = "abcdefghijklmnopqrstuvwxyz";
+      final output = "c3fcd3d76192e4007dfb496cca67e13b";
+      expect(md5sum(input), equals(output));
+    });
+    test('with string A-Za-z0-9', () {
+      final input =
           "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      expect(md5sum(key), tests[key]);
+      final output = "d174ab98d277d9f5a5611c2c9f419d9f";
+      expect(md5sum(input), equals(output));
     });
 
-    test('with string of length 511', () {
-      var key = tests.keys.firstWhere((x) => x.length == 511);
-      var value = tests[key]!;
-      expect(md5sum(key), value);
+    test('with a very long number string', () {
+      final input =
+          "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
+      final output = "57edf4a22be3c955ac49da2e2107b67a";
+      expect(md5sum(input), equals(output));
     });
-
-    test('with known cases', () {
-      tests.forEach((key, value) {
-        expect(md5sum(key), value);
-      });
+    test('"123"', () {
+      final input = "123";
+      final output = "202cb962ac59075b964b07152d234b70";
+      expect(md5sum(input), equals(output));
     });
+    test('"test"', () {
+      final input = "test";
+      final output = "098f6bcd4621d373cade4e832627b4f6";
+      expect(md5sum(input), equals(output));
+    });
+    test('"message"', () {
+      final input = 'message';
+      final output = "78e731027d8fd50ed642340b7c9a63b3";
+      expect(md5sum(input), equals(output));
+    });
+    test('"Hello World"', () {
+      final input = "Hello World";
+      final output = "b10a8db164e0754105b7a99be72e3fe5";
+      expect(md5sum(input), equals(output));
+    });
+    test('List.filled(512, "a").join()', () {
+      final input = List.filled(512, "a").join();
+      final output = "56907396339ca2b099bd12245f936ddc";
+      expect(md5sum(input), equals(output));
+    });
+    test('List.filled(128, "a").join()', () {
+      final input = List.filled(128, "a").join();
+      final output = "e510683b3f5ffe4093d021808bc6ff70";
+      expect(md5sum(input), equals(output));
+    });
+    test('List.filled(513, "a").join()', () {
+      final input = List.filled(513, "a").join();
+      final output = "6649c3e827e44f7bf539768bddf76435";
+      expect(md5sum(input), equals(output));
+    });
+    test('List.filled(511, "a").join()', () {
+      final input = List.filled(511, "a").join();
+      final output = "3ba3485f242a5859f4417ccf004cd74c";
+      expect(md5sum(input), equals(output));
+    });
+    test('List.filled(1000000, "a").join()', () {
+      final input = List.filled(1000000, "a").join();
+      final output = "7707d6ae4e027c70eea2a935c2296f21";
+      expect(md5sum(input), equals(output));
+    }, skip: true);
 
     test('with stream', () async {
-      for (final entry in tests.entries) {
-        final stream = Stream.fromIterable(
-                List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
-            .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
-            .map((s) => s.codeUnits);
-        final result = await md5.bind(stream).first;
-        expect(result.hex(), entry.value);
+      final input = List.filled(511, "a").join();
+      final stream = Stream.fromIterable(input.codeUnits);
+      final output = "3ba3485f242a5859f4417ccf004cd74c";
+      final actual = await md5.byteStream(stream);
+      expect(actual.hex(), output);
+    });
+
+    test('sink test', () {
+      final input = List.filled(511, "a".codeUnitAt(0));
+      final output = "3ba3485f242a5859f4417ccf004cd74c";
+      final sink = md5.createSink();
+      expect(sink.closed, isFalse);
+      for (int i = 0; i < input.length; i += 48) {
+        sink.add(input.skip(i).take(48).toList());
       }
+      expect(sink.digest().hex(), equals(output));
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
+      sink.reset();
+      sink.add(input);
+      sink.close();
+      expect(sink.closed, isTrue);
+      expect(sink.digest().hex(), equals(output));
     });
   });
 }

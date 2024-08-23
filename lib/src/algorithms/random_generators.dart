@@ -49,7 +49,7 @@ extension RandomGeneratorIterable on RandomGenerator {
 abstract class RandomGenerators {
   static int _seedCounter = 0x9BDC06A7;
 
-  /// Generate a 64-bit random seed
+  /// Generate a 64-bit random seed based on current time
   static int $generateSeed() {
     var now = DateTime.now();
     var code = now.microsecondsSinceEpoch;
@@ -61,7 +61,7 @@ abstract class RandomGenerators {
     return code & _maxSafeNumber;
   }
 
-  /// Generate a seed based on current time
+  /// Expand the seed to fill the list
   static void $seedList(TypedData data, int seed) {
     var list = Uint32List.view(data.buffer);
     var inp = [

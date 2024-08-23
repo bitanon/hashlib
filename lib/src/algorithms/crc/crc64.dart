@@ -4,7 +4,6 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
-import 'package:hashlib/src/core/hash_digest.dart';
 
 final Map<String, Uint32List> _tables = {};
 
@@ -12,12 +11,9 @@ final Map<String, Uint32List> _tables = {};
 ///
 /// Reference: https://pkg.go.dev/hash/crc64
 class CRC64Hash extends HashDigestSink {
+  int high, low;
   final int seedHigh, seedLow;
   final Uint32List table;
-
-  int high, low;
-  HashDigest? _digest;
-  bool _closed = false;
 
   CRC64Hash({
     this.seedHigh = 0, // MSB of seed
@@ -29,27 +25,19 @@ class CRC64Hash extends HashDigestSink {
         table = _generate64(polynomialHigh, polynomialLow);
 
   @override
-  bool get closed => _closed;
-
-  @override
   final int hashLength = 8;
 
   @override
   void reset() {
-    _closed = false;
-    _digest = null;
     high = seedHigh;
     low = seedLow;
+    super.reset();
   }
 
   @override
-  void add(List<int> data, [int start = 0, int? end]) {
-    if (_closed) {
-      throw StateError('The message-digest is already closed');
-    }
-    end ??= data.length;
+  void $process(List<int> chunk, int start, int end) {
     for (int i, h, l; start < end; start++) {
-      i = ((low ^ data[start]) & 0xFF) << 1;
+      i = ((low ^ chunk[start]) & 0xFF) << 1;
       h = high >>> 8;
       l = (low >>> 8) | ((high & 0xFF) << 24);
       high = table[i] ^ h;
@@ -58,12 +46,10 @@ class CRC64Hash extends HashDigestSink {
   }
 
   @override
-  HashDigest digest() {
-    if (_closed) return _digest!;
-    _closed = true;
+  Uint8List $finalize() {
     high ^= seedHigh;
     low ^= seedLow;
-    Uint8List bytes = Uint8List.fromList([
+    return Uint8List.fromList([
       high >>> 24,
       high >>> 16,
       high >>> 8,
@@ -73,8 +59,6 @@ class CRC64Hash extends HashDigestSink {
       low >>> 8,
       low,
     ]);
-    _digest = HashDigest(bytes);
-    return _digest!;
   }
 }
 

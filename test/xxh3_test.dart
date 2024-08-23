@@ -21,11 +21,11 @@ String sum([Iterable<int>? data]) {
 }
 
 String seedSum(int seed, [Iterable<int>? data]) {
-  return XXH3.withSeed(seed).convert(data?.toList() ?? []).hex();
+  return XXH3(seed: seed).convert(data?.toList() ?? []).hex();
 }
 
 String secretSum([Iterable<int>? data]) {
-  return XXH3.withSecret(secret).convert(data?.toList() ?? []).hex();
+  return XXH3(secret: secret).convert(data?.toList() ?? []).hex();
 }
 
 void main() {
@@ -40,6 +40,18 @@ void main() {
       var input = String.fromCharCodes(cases.take(12));
       final expected = 'a713daf0dfbb77e7';
       expect(xxh3sum(input), expected);
+    });
+
+    test('The secret length must be at least 136', () {
+      for (int i = 0; i < 136; ++i) {
+        expect(() => XXH3().withSecret(Uint8List(i)).convert([2]),
+            throwsArgumentError);
+      }
+    });
+
+    test("withSeed overrides the seed", () {
+      var instance = XXH3(seed: 0).withSeed(seed);
+      expect(instance.convert([]).hex(), "a8a6b918b2f0364a");
     });
 
     test("with input length = 0", () {

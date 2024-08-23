@@ -25,9 +25,6 @@ class ScryptSecurity {
     required this.p,
   });
 
-  @override
-  String toString() => "ScryptSecurity($name):{N=$N,r=$r,p=$p}";
-
   /// Provides a very low security. Use it only for test purposes.
   ///
   /// It uses 16 lanes, 2 blocks per lane and 1 iteration.
