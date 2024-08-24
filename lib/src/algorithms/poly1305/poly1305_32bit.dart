@@ -50,7 +50,7 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   @override
   void init(List<int> keypair) {
     if (keypair.length != 16 && keypair.length != 32) {
-      throw StateError('The key length must be 16 or 32 bytes');
+      throw ArgumentError('The key length must be either 16 or 32 bytes');
     }
 
     _initialized = true;

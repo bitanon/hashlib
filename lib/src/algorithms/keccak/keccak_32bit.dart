@@ -145,7 +145,7 @@ class KeccakHash extends BlockHashSink {
     required this.stateSize,
     required this.paddingByte,
     int? outputSize, // equals to state size if not provided
-  })  : assert(stateSize < 0 || stateSize >= 100),
+  })  : assert(stateSize >= 0 && stateSize < 100),
         hashLength = outputSize ?? stateSize,
         super(
           200 - (stateSize << 1), // rate as blockLength

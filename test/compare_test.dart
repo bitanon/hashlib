@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+@Tags(['vm-only'])
+
 import 'dart:io';
 import 'dart:typed_data';
 

@@ -1,9 +1,9 @@
 # 1.20.0
 
+- [![codecov](https://codecov.io/gh/bitanon/hashlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/hashlib)
 - Fixes `HashDigest.number` for 64-bit
 - Fixes `shake128generator` and `shake256generator`
   - Issue: Wrong bytes after length > blockLength
-- Improves test coverage
 - Refactors `HashBase`
 - [**Breaking Changes**]:
   - Renames `argon2verify` -> `argon2Verify`
@@ -13,6 +13,7 @@
   - New behavior for `HashlibDigest.oct`: The output should
     follow the standard now.
   - Removes support for `tuneArgon2Security`
+  - Bump version for `hashlib_codecs`
 
 # 1.19.2
 
