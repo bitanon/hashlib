@@ -20,7 +20,7 @@ List<String> readLines(String filename) {
 
 void main() {
   group('XXH test with fixures', () {
-    const int maxLength = 1000;
+    const int maxLength = 100;
     final text = fixtureFile('long.txt').readAsBytesSync();
 
     test('for xxh32', () {

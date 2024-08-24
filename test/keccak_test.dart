@@ -7,25 +7,25 @@ import 'package:test/test.dart';
 
 void main() {
   group('Keccak test', () {
-    test('The state size is not valid', () {
-      expect(
-        () => KeccakHash(stateSize: -1, paddingByte: 0),
-        throwsArgumentError,
-      );
+    test('The state size assertion', () {
       KeccakHash(stateSize: 0, paddingByte: 0);
       KeccakHash(stateSize: 50, paddingByte: 0);
       KeccakHash(stateSize: 99, paddingByte: 0);
       expect(
+        () => KeccakHash(stateSize: -1, paddingByte: 0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
         () => KeccakHash(stateSize: 100, paddingByte: 0),
-        throwsArgumentError,
+        throwsA(isA<AssertionError>()),
       );
       expect(
         () => KeccakHash(stateSize: 101, paddingByte: 0),
-        throwsArgumentError,
+        throwsA(isA<AssertionError>()),
       );
       expect(
         () => KeccakHash(stateSize: 150, paddingByte: 0),
-        throwsArgumentError,
+        throwsA(isA<AssertionError>()),
       );
     });
 

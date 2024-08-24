@@ -55,6 +55,8 @@ void main() {
           '5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe',
           codec: Base64Codec.bcrypt,
         );
+        const encoded =
+            r"$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe";
         final output = bcryptDigest(
           password,
           nb: 5,
@@ -62,8 +64,9 @@ void main() {
           version: BcryptVersion.$2a,
         );
         expect(output.bytes, equals(result));
+        expect(output.encoded(), equals(encoded));
+        expect(output.toString(), equals(encoded));
       });
-
       test("bcryptDigest with security", () {
         var password = "password".codeUnits;
         var salt = fromBase64(
@@ -81,6 +84,131 @@ void main() {
           security: BcryptSecurity.little,
         );
         expect(output.bytes, equals(result));
+      });
+      test("Bcrypt instance with security", () {
+        var password = "password".codeUnits;
+        var salt = fromBase64(
+          "bvIG6Nmid91Mu9RcmmWZfO",
+          codec: Base64Codec.bcrypt,
+        );
+        var result = fromBase64(
+          '5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe',
+          codec: Base64Codec.bcrypt,
+        );
+        final output = Bcrypt.fromSecurity(
+          BcryptSecurity.little,
+          salt: salt,
+          version: BcryptVersion.$2a,
+        ).convert(password);
+        expect(output.bytes, equals(result));
+      });
+      test("The cost must be at least 0", () {
+        BcryptContext(cost: 0);
+        expect(() => BcryptContext(cost: -10), throwsArgumentError);
+        expect(() => BcryptContext(cost: -1), throwsArgumentError);
+      });
+      test("The cost must be at most 31", () {
+        BcryptContext(cost: 31);
+        expect(() => BcryptContext(cost: 32), throwsArgumentError);
+        expect(() => BcryptContext(cost: 100), throwsArgumentError);
+      });
+      test("The salt must be exactly 16-bytes", () {
+        BcryptContext(cost: 4, salt: List.filled(16, 0));
+        expect(
+          () => BcryptContext(cost: 4, salt: []),
+          throwsArgumentError,
+        );
+        expect(
+          () => BcryptContext(cost: 4, salt: List.filled(15, 0)),
+          throwsArgumentError,
+        );
+        expect(
+          () => BcryptContext(cost: 4, salt: List.filled(17, 0)),
+          throwsArgumentError,
+        );
+      });
+      test("Bcrypt from encoded", () {
+        Bcrypt.fromEncoded(fromCrypt(r"$2a$05$bvIG6Nmid91Mu9RcmmWZfO"));
+      });
+      test("Bcrypt from encoded with invalid version", () {
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(r"$2c$05$bvIG6Nmid91Mu9RcmmWZfO")),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              'Invalid version',
+            ),
+          ),
+        );
+      });
+      test("Bcrypt from encoded with invalid cost", () {
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(r"$2x$bvIG6Nmid91Mu9RcmmWZfO")),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              'Invalid cost',
+            ),
+          ),
+        );
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(r"$2y$32$bvIG6Nmid91Mu9RcmmWZfO")),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              'The cost must be at most 31',
+            ),
+          ),
+        );
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(r"$2y$-1$bvIG6Nmid91Mu9RcmmWZfO")),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              'The cost must be at least 0',
+            ),
+          ),
+        );
+      });
+      test("Bcrypt from encoded with invalid salt", () {
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(r"$2b$05$bvIG6Nmid91Mu9RcmmWZf")),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              'Invalid hash',
+            ),
+          ),
+        );
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(r"$2b$05$bvIG6Nmid91Mu9RcmmWZf0")),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              'Invalid length',
+            ),
+          ),
+        );
+        expect(
+          () => Bcrypt.fromEncoded(fromCrypt(
+              r"$2b$05$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1")),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              'Invalid hash',
+            ),
+          ),
+        );
+        Bcrypt.fromEncoded(fromCrypt(
+          r"$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s1",
+        ));
       });
     });
 

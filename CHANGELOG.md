@@ -12,6 +12,7 @@
     The previous default one accepting a sink is removed.
   - New behavior for `HashlibDigest.oct`: The output should
     follow the standard now.
+  - Removes support for `tuneArgon2Security`
 
 # 1.19.2
 

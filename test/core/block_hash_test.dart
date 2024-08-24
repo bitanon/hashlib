@@ -7,7 +7,8 @@ import 'package:hashlib/hashlib.dart';
 
 // Concrete implementation for testing purposes
 class TestBlockHashSink extends BlockHashSink {
-  TestBlockHashSink(int blockLength) : super(blockLength, bufferLength: null);
+  TestBlockHashSink(int blockLength, [int? bufferLength])
+      : super(blockLength, bufferLength: bufferLength);
 
   @override
   int hashLength = 8;
@@ -25,6 +26,33 @@ class TestBlockHashSink extends BlockHashSink {
 
 void main() {
   group('BlockHashSink', () {
+    test('Invalid block size', () {
+      expect(
+        () => TestBlockHashSink(0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => TestBlockHashSink(-1),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => TestBlockHashSink(-10),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('Invalid buffer size', () {
+      TestBlockHashSink(1, 0);
+      expect(
+        () => TestBlockHashSink(10, -1),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => TestBlockHashSink(10, -100),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
     test('Initial state', () {
       final sink = TestBlockHashSink(16);
       expect(sink.closed, isFalse);

@@ -50,7 +50,7 @@ BcryptVersion _nameToVersion(String name) {
     case '2y':
       return BcryptVersion.$2y;
     default:
-      throw ArgumentError('Invalid version');
+      throw FormatException('Invalid version');
   }
 }
 
@@ -96,14 +96,14 @@ class BcryptContext {
   }) {
     // validate parameters
     if (cost < 0) {
-      throw StateError('The cost must be at least 0');
+      throw ArgumentError('The cost must be at least 0');
     }
     if (cost > 31) {
-      throw StateError('The cost must be at most 31');
+      throw ArgumentError('The cost must be at most 31');
     }
     salt ??= randomBytes(16);
     if (salt.length != 16) {
-      throw StateError('The salt must be exactly 16-bytes');
+      throw ArgumentError('The salt must be exactly 16-bytes');
     }
     return BcryptContext._(
       cost: cost,
@@ -120,11 +120,18 @@ class BcryptContext {
     var version = _nameToVersion(data.id);
     var cost = int.tryParse(data.salt ?? '0');
     if (cost == null) {
-      throw ArgumentError('Invalid cost');
+      throw FormatException('Invalid cost');
     }
     Uint8List? salt;
-    if (data.hash != null) {
-      salt = fromBase64(data.hash!.substring(0, 22), codec: Base64Codec.bcrypt);
+    var hash = data.hash;
+    if (hash != null) {
+      if (hash.length != 22 && hash.length != 53) {
+        throw FormatException('Invalid hash');
+      }
+      salt = fromBase64(
+        hash.substring(0, 22),
+        codec: Base64Codec.bcrypt,
+      );
     }
     return BcryptContext(
       salt: salt,

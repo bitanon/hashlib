@@ -23,27 +23,25 @@ abstract class BlockHashSink extends HashDigestSink {
   final int blockLength;
 
   /// The main buffer
-  late final Uint8List buffer;
+  final Uint8List buffer;
 
   /// The [buffer] as Uint32List
-  late final Uint32List sbuffer;
+  late final Uint32List sbuffer = Uint32List.view(buffer.buffer);
 
   /// The [buffer] as ByteData
-  late final ByteData bdata;
+  late final ByteData bdata = buffer.buffer.asByteData();
+
+  /// Get the message length in bits
+  int get messageLengthInBits => messageLength << 3;
 
   /// Initialize a new sink for the block hash
   ///
   /// Parameters:
   /// - [blockLength] is the length of each block in each [$update] call.
   /// - [bufferLength] is the buffer length where blocks are stored temporarily
-  BlockHashSink(this.blockLength, {int? bufferLength}) : super() {
-    buffer = Uint8List(bufferLength ?? blockLength);
-    sbuffer = Uint32List.view(buffer.buffer);
-    bdata = buffer.buffer.asByteData();
-  }
-
-  /// Get the message length in bits
-  int get messageLengthInBits => messageLength << 3;
+  BlockHashSink(this.blockLength, {int? bufferLength})
+      : assert(blockLength > 0 && (bufferLength ?? 0) >= 0),
+        buffer = Uint8List(bufferLength ?? blockLength);
 
   @override
   void reset() {

@@ -285,10 +285,14 @@ void main() {
 
     test("The key length must be either 16 or 32 bytes", () {
       for (int i = 0; i < 64; ++i) {
+        final key = Uint8List(i);
         if (i == 16 || i == 32) {
-          Poly1305Sink().init(Uint8List(i));
+          Poly1305Sink().init(key);
         } else {
-          expect(() => Poly1305Sink().init(Uint8List(i)), throwsArgumentError);
+          expect(
+            () => Poly1305Sink().init(key),
+            throwsA(isA<ArgumentError>()),
+          );
         }
       }
     });

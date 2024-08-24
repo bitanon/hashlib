@@ -135,8 +135,8 @@ const int _d = _c4 + 2;
 class KeccakHash extends BlockHashSink {
   final int stateSize;
   final int paddingByte;
-  late final Uint32List state;
   final _var = Uint32List(_d + 2);
+  late final Uint32List state = sbuffer;
 
   @override
   final int hashLength;
@@ -145,16 +145,12 @@ class KeccakHash extends BlockHashSink {
     required this.stateSize,
     required this.paddingByte,
     int? outputSize, // equals to state size if not provided
-  })  : hashLength = outputSize ?? stateSize,
+  })  : assert(stateSize < 0 || stateSize >= 100),
+        hashLength = outputSize ?? stateSize,
         super(
           200 - (stateSize << 1), // rate as blockLength
           bufferLength: 200, // 1600-bit state as buffer
-        ) {
-    if (stateSize < 0 || stateSize > 100) {
-      throw ArgumentError('The state size is not valid');
-    }
-    state = sbuffer;
-  }
+        );
 
   @override
   void reset() {

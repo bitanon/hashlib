@@ -258,58 +258,6 @@ void main() {
     });
   });
 
-  group('tuneArgon2Security', () {
-    final duration = Duration(milliseconds: 2);
-    test('argument validation', () {
-      expect(
-        () => tuneArgon2Security(duration, strictness: -1),
-        throwsArgumentError,
-      );
-      expect(
-        () => tuneArgon2Security(duration, strictness: 0),
-        throwsArgumentError,
-      );
-      expect(
-        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: -3),
-        throwsArgumentError,
-      );
-      expect(
-        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: 0),
-        throwsArgumentError,
-      );
-      expect(
-        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: 1),
-        throwsArgumentError,
-      );
-      expect(
-        () => tuneArgon2Security(duration, maxMemoryAsPowerOf2: 2),
-        throwsArgumentError,
-      );
-    });
-
-    test('call is successful', () async {
-      final params = await tuneArgon2Security(
-        duration,
-        strictness: 1,
-        maxMemoryAsPowerOf2: 8,
-        verbose: false,
-      );
-      expect(params.name, 'optimized');
-
-      Stopwatch watch = Stopwatch()..start();
-      argon2d(
-        "password".codeUnits,
-        "some salt".codeUnits,
-        security: params,
-      );
-      watch.stop();
-      expect(
-        watch.elapsedMilliseconds,
-        lessThanOrEqualTo(100),
-      );
-    });
-  });
-
   group('Argon2Context Tests', () {
     // Test for Argon2Context constructor
     test('Creates Argon2Context with valid parameters', () {
