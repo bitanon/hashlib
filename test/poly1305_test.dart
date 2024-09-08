@@ -197,7 +197,7 @@ void main() {
         0x28, 0x99, 0x57, 0x94, 0x41, 0x27, 0xd7, 0x5e,
       ];
 
-      var sink = Poly1305().by(key).createSink();
+      var sink = poly1305.by(key).createSink();
       for (int i = 0; i < 256; i++) {
         var mac = poly1305
             .pair(

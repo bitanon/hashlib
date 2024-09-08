@@ -10,29 +10,13 @@ import 'package:hashlib/src/core/mac_base.dart';
 
 export 'algorithms/poly1305/poly1305_sink.dart' show Poly1305Sink;
 
-/// The Poly1305 MAC (message authentication code) generator for an input
-/// message using either 16 or 32-byte long authentication key.
-const poly1305 = Poly1305();
-
-class _Poly1305 extends HashBase<Poly1305Sink> with MACHashBase<Poly1305Sink> {
-  final Uint8List key;
-
-  const _Poly1305(this.key);
+class _Poly1305 extends MACHash<Poly1305Sink> {
+  const _Poly1305();
 
   @override
   final String name = 'Poly1305';
 
-  @override
-  Poly1305Sink createSink() => Poly1305Sink(key);
-}
-
-class Poly1305 extends MACHash<Poly1305Sink> {
-  const Poly1305();
-
-  @override
-  final String name = 'Poly1305';
-
-  /// Create a new instance of [Poly1305] with a 16 or 32-byte long keypair.
+  /// Create a new instance of [_Poly1305] with a 16 or 32-byte long keypair.
   /// The first 16-bytes will be used as a secret key to encode the message,
   /// and the last 16-bytes will be used as the authentication key to sign it.
   ///
@@ -47,12 +31,12 @@ class Poly1305 extends MACHash<Poly1305Sink> {
   /// allow for forgeries.
   ///
   /// See also:
-  /// - [Poly1305.pair] to input key(`r`) and secret(`s`) pair separately.
+  /// - [_Poly1305.pair] to input key(`r`) and secret(`s`) pair separately.
   @override
   MACHashBase<Poly1305Sink> by(List<int> keypair) =>
-      _Poly1305(keypair is Uint8List ? keypair : Uint8List.fromList(keypair));
+      Poly1305(keypair is Uint8List ? keypair : Uint8List.fromList(keypair));
 
-  /// Creates a new instance of [Poly1305].
+  /// Creates a new instance of [_Poly1305].
   ///
   /// Parameters:
   /// - [key] is required and must contain exactly 16 bytes.
@@ -68,7 +52,7 @@ class Poly1305 extends MACHash<Poly1305Sink> {
   /// allow for forgeries.
   ///
   /// See also:
-  /// - [Poly1305.by] to input key(`r`) and secret(`s`) pair together.
+  /// - [_Poly1305.by] to input key(`r`) and secret(`s`) pair together.
   MACHashBase<Poly1305Sink> pair(List<int> key, [List<int>? secret]) {
     if (secret == null) {
       return by(key);
@@ -82,8 +66,40 @@ class Poly1305 extends MACHash<Poly1305Sink> {
     var pair = Uint8List(32);
     pair.setAll(0, key);
     pair.setAll(16, secret);
-    return _Poly1305(pair);
+    return Poly1305(pair);
   }
+}
+
+/// The Poly1305 MAC (message authentication code) generator for an input
+/// message using either 16 or 32-byte long authentication key.
+const poly1305 = _Poly1305();
+
+class Poly1305 extends HashBase<Poly1305Sink> with MACHashBase<Poly1305Sink> {
+  final Uint8List keypair;
+
+  @override
+  final String name = 'Poly1305';
+
+  /// Create a new instance of [_Poly1305] with a 16 or 32-byte long keypair.
+  /// The first 16-bytes will be used as a secret key to encode the message,
+  /// and the last 16-bytes will be used as the authentication key to sign it.
+  ///
+  /// Parameters:
+  /// - [keypair] is required and must contain exactly 16 or 32 bytes.
+  ///
+  /// If [keypair] length is 16 bytes, the final digest will not be signed.
+  ///
+  /// **Warning**:
+  /// The algorithm is designed to ensure unforgeability of a message with a
+  /// random key. Authenticating multiple messages using the same key could
+  /// allow for forgeries.
+  ///
+  /// See also:
+  /// - [_Poly1305.pair] to input key(`r`) and secret(`s`) pair separately.
+  const Poly1305(this.keypair);
+
+  @override
+  Poly1305Sink createSink() => Poly1305Sink(keypair);
 }
 
 /// Computes the Poly1305 MAC (message authentication code) of the given

@@ -1,3 +1,7 @@
+# 1.20.2
+
+- Modifies interface for `Poly1305`
+
 # 1.20.1
 
 - Modifies `MACHash` and `MACHashBase` interfaces for accessibility.
