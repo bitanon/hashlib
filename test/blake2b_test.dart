@@ -9,22 +9,23 @@ import 'package:test/test.dart';
 void main() {
   group('Blake2b funtionality test', () {
     test("Blake2b name", () {
-      expect(Blake2b(8).name, 'BLAKE-2b/64');
-      expect(blake2b160.name, 'BLAKE-2b/160');
-      expect(blake2b256.name, 'BLAKE-2b/256');
-      expect(blake2b384.name, 'BLAKE-2b/384');
-      expect(blake2b512.name, 'BLAKE-2b/512');
+      expect(Blake2b(8).name, 'BLAKE2b-64');
+      expect(blake2b160.name, 'BLAKE2b-160');
+      expect(blake2b256.name, 'BLAKE2b-256');
+      expect(blake2b384.name, 'BLAKE2b-384');
+      expect(blake2b512.name, 'BLAKE2b-512');
     });
     test("Blake2bMac name", () {
-      final key = [1];
-      expect(blake2b160.mac.name, 'BLAKE-2b/160/MAC');
-      expect(blake2b256.mac.name, 'BLAKE-2b/256/MAC');
-      expect(blake2b384.mac.name, 'BLAKE-2b/384/MAC');
-      expect(blake2b512.mac.name, 'BLAKE-2b/512/MAC');
-      expect(blake2b160.mac.by(key).name, 'BLAKE-2b/160/MAC');
-      expect(blake2b256.mac.by(key).name, 'BLAKE-2b/256/MAC');
-      expect(blake2b384.mac.by(key).name, 'BLAKE-2b/384/MAC');
-      expect(blake2b512.mac.by(key).name, 'BLAKE-2b/512/MAC');
+      expect(blake2b160.mac.name, 'BLAKE2b-160/MAC');
+      expect(blake2b256.mac.name, 'BLAKE2b-256/MAC');
+      expect(blake2b384.mac.name, 'BLAKE2b-384/MAC');
+      expect(blake2b512.mac.name, 'BLAKE2b-512/MAC');
+      expect(blake2b160.mac.by([1]).name, 'BLAKE2b-160/MAC');
+      expect(blake2b256.mac.by([1]).name, 'BLAKE2b-256/MAC');
+      expect(blake2b384.mac.by([1]).name, 'BLAKE2b-384/MAC');
+      expect(blake2b512.mac.by([1]).name, 'BLAKE2b-512/MAC');
+      expect(blake2b512.mac.pbkdf2([2]).name, 'BLAKE2b-512/MAC/PBKDF2');
+      expect(blake2b512.hmac.pbkdf2([2]).name, 'BLAKE2b-512/HMAC/PBKDF2');
     });
     test('The digest size must be between 1 and 64', () {
       Blake2b(1).createSink();

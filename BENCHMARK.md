@@ -102,13 +102,14 @@ With 10B message (100000 iterations):
 
 Key derivator algorithm benchmarks on different security parameters:
 
-| Algorithms | test     | little   | moderate  | good       | strong      |
-| ---------- | -------- | -------- | --------- | ---------- | ----------- |
-| scrypt     | 0.056 ms | 1.495 ms | 27.024 ms | 88.235 ms  | 2945.416 ms |
-| bcrypt     | 0.226 ms | 2.124 ms | 17.19 ms  | 270.562 ms | 2159.172 ms |
-| argon2i    | 0.334 ms | 2.548 ms | 16.994 ms | 213.406 ms | 2556.027 ms |
-| argon2d    | 0.265 ms | 2.475 ms | 17.222 ms | 211.376 ms | 2528.972 ms |
-| argon2id   | 0.276 ms | 2.549 ms | 19.534 ms | 213.577 ms | 2547.892 ms |
+| Algorithms | little   | moderate  | good       | strong      |
+| ---------- | -------- | --------- | ---------- | ----------- |
+| scrypt     | 1.589 ms | 16.688 ms | 91.663 ms  | 2937.545 ms |
+| bcrypt     | 2.24 ms  | 17.077 ms | 273.729 ms | 2155.139 ms |
+| pbkdf2     | 0.849 ms | 17.091 ms | 283.537 ms | 3419.39 ms  |
+| argon2i    | 3.914 ms | 16.474 ms | 215.783 ms | 2598.387 ms |
+| argon2d    | 2.981 ms | 16.98 ms  | 207.425 ms | 2563.844 ms |
+| argon2id   | 2.311 ms | 16.491 ms | 205.25 ms  | 2576.335 ms |
 
 > All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_
 >

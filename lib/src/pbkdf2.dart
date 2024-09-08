@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/algorithms/pbkdf2/pbkdf2.dart';
+import 'package:hashlib/src/algorithms/pbkdf2/security.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
@@ -9,21 +10,24 @@ import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/sha256.dart';
 
 export 'algorithms/pbkdf2/pbkdf2.dart' show PBKDF2;
+export 'algorithms/pbkdf2/security.dart' show PBKDF2Security;
 
 /// Extension to the HashBase to get an [PBKDF2] instance
 extension PBKDF2onMACHashBase on MACHashBase {
   /// Generate a secret using [PBKDF2] hash algorithm.
   @pragma('vm:prefer-inline')
   PBKDF2 pbkdf2(
-    List<int> salt, [
-    int iterations = 1000,
+    List<int> salt, {
+    PBKDF2Security security = PBKDF2Security.good,
+    int? iterations,
     int? keyLength,
-  ]) =>
-      PBKDF2(
-        this,
+  }) =>
+      PBKDF2.fromSecurity(
+        security,
+        mac: this,
         salt: salt,
-        iterations: iterations,
         keyLength: keyLength,
+        iterations: iterations,
       );
 }
 
@@ -32,15 +36,17 @@ extension PBKDF2onBlockHashBase on BlockHashBase {
   /// Generate a secret using [PBKDF2] hash algorithm.
   @pragma('vm:prefer-inline')
   PBKDF2 pbkdf2(
-    List<int> salt, [
-    int iterations = 1000,
+    List<int> salt, {
+    PBKDF2Security security = PBKDF2Security.good,
+    int? iterations,
     int? keyLength,
-  ]) =>
-      PBKDF2(
-        HMAC(this),
+  }) =>
+      PBKDF2.fromSecurity(
+        security,
+        mac: HMAC(this),
         salt: salt,
-        iterations: iterations,
         keyLength: keyLength,
+        iterations: iterations,
       );
 }
 
@@ -51,8 +57,8 @@ extension PBKDF2onBlockHashBase on BlockHashBase {
 /// Parameters:
 /// - [password] is the raw password to be encoded.
 /// - [salt] should be at least 8 bytes long. 16 bytes is recommended.
-/// - [iterations] is the number of iterations.
-/// - [keyLength] is the number of output bytes.
+/// - [iterations] is the number of iterations. Default: 50000
+/// - [keyLength] is the length of the generated key. Default: 32
 ///
 /// The strength of the generated key depends on the number of [iterations].
 /// The idea is to prevent a brute force attack on the original password by
@@ -63,7 +69,13 @@ extension PBKDF2onBlockHashBase on BlockHashBase {
 HashDigest pbkdf2(
   List<int> password,
   List<int> salt, [
-  int iterations = 1000,
+  int? iterations,
   int? keyLength,
 ]) =>
-    sha256.pbkdf2(salt, iterations, keyLength).convert(password);
+    hmac_sha256
+        .pbkdf2(
+          salt,
+          keyLength: keyLength,
+          iterations: iterations,
+        )
+        .convert(password);

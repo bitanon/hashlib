@@ -43,8 +43,8 @@ class ScryptSecurity {
 
   /// Provides moderate security.
   ///
-  /// It uses cost of 2^10, block size of 8 and parallelism of 5.
-  static const moderate = ScryptSecurity('moderate', N: 1 << 10, r: 8, p: 5);
+  /// It uses cost of 2^10, block size of 8 and parallelism of 3.
+  static const moderate = ScryptSecurity('moderate', N: 1 << 10, r: 8, p: 3);
 
   /// Provides good security. The default parameters from [RFC-7914][rfc]
   ///

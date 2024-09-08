@@ -9,19 +9,16 @@ import 'dart:io';
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
-File fixtureFile(String filename) {
-  return File(Directory('test/fixures/$filename').absolute.path);
-}
-
 List<String> readLines(String filename) {
-  final text = fixtureFile(filename).readAsStringSync();
+  final file = File(Directory('test/fixures/$filename').absolute.path);
+  final text = file.readAsStringSync();
   return text.split(RegExp(r'(\r)?\n'));
 }
 
 void main() {
   group('XXH test with fixures', () {
     const int maxLength = 1500;
-    final text = fixtureFile('long.txt').readAsBytesSync();
+    final text = readLines('long.txt').join('\n').codeUnits;
 
     test('for xxh32', () {
       var actual = readLines('xxh32.csv');

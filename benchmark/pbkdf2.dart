@@ -4,7 +4,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:hashlib/hashlib.dart';
 import 'package:pointycastle/export.dart' show Pbkdf2Parameters;
 import 'package:pointycastle/pointycastle.dart' as pc;
 
@@ -14,58 +14,65 @@ Random random = Random();
 
 final salt = Uint8List.fromList(List.generate(16, (i) => random.nextInt(256)));
 
-class HashlibBenchmark extends Benchmark {
-  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
+class HashlibBenchmark extends KDFBenchmarkBase {
+  final PBKDF2Security security;
+
+  HashlibBenchmark(this.security) : super('hashlib');
 
   @override
   void run() {
-    hashlib.sha256.hmac.pbkdf2(salt, iter, 64).convert(input);
-  }
-
-  @override
-  void exercise() {
-    run();
+    final salt = Uint8List.fromList("some salt".codeUnits);
+    final pass = Uint8List.fromList("some password".codeUnits);
+    PBKDF2.fromSecurity(security, salt: salt, keyLength: 64).convert(pass);
   }
 }
 
-class PointyCastleBenchmark extends Benchmark {
-  Uint8List _input = Uint8List(0);
-  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
+class PointyCastleBenchmark extends KDFBenchmarkBase {
+  final PBKDF2Security security;
 
-  @override
-  void setup() {
-    super.setup();
-    _input = Uint8List.fromList(input);
-  }
+  PointyCastleBenchmark(this.security) : super('hashlib');
 
   @override
   void run() {
+    final salt = Uint8List.fromList("some salt".codeUnits);
+    final pass = Uint8List.fromList("some password".codeUnits);
+    var pbkdf2 = pc.KeyDerivator('SHA-256/HMAC/PBKDF2');
+    pbkdf2.init(Pbkdf2Parameters(salt, security.c, 64));
     var out = Uint8List(64);
-    var d = pc.KeyDerivator('SHA-256/HMAC/PBKDF2');
-    d.init(Pbkdf2Parameters(salt, iter, 64));
-    d.deriveKey(_input, 0, out, 0);
-  }
-
-  @override
-  void exercise() {
-    run();
+    pbkdf2.deriveKey(pass, 0, out, 0);
   }
 }
 
 void main() {
-  print('----- PBKDF2-HMAC(SHA256) -----');
-  final conditions = [
-    [32, 100000],
-    [32, 1000],
-    [32, 10],
-  ];
-  for (var condition in conditions) {
-    int size = condition[0];
-    int iter = condition[1];
-    print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).measureDiff([
-      PointyCastleBenchmark(size, iter),
-    ]);
-    print('');
-  }
+  double runtime;
+  print('--------- Hashlib/PBKDF2 ----------');
+  runtime = HashlibBenchmark(PBKDF2Security.test).measure();
+  print('hashlib/pbkdf2[test]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.little).measure();
+  print('hashlib/pbkdf2[little]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.moderate).measure();
+  print('hashlib/pbkdf2[moderate]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.good).measure();
+  print('hashlib/pbkdf2[good]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.strong).measure();
+  print('hashlib/pbkdf2[strong]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.owasp).measure();
+  print('hashlib/pbkdf2[owasp1]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.owasp2).measure();
+  print('hashlib/pbkdf2[owasp2]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(PBKDF2Security.owasp3).measure();
+  print('hashlib/pbkdf2[owasp3]: ${runtime / 1000} ms');
+  print('');
+  print('--------- PointyCastle/PBKDF2 ----------');
+  runtime = PointyCastleBenchmark(PBKDF2Security.test).measure();
+  print('pc/pbkdf2[test]: ${runtime / 1000} ms');
+  runtime = PointyCastleBenchmark(PBKDF2Security.little).measure();
+  print('pc/pbkdf2[little]: ${runtime / 1000} ms');
+  runtime = PointyCastleBenchmark(PBKDF2Security.moderate).measure();
+  print('pc/pbkdf2[moderate]: ${runtime / 1000} ms');
+  runtime = PointyCastleBenchmark(PBKDF2Security.good).measure();
+  print('pc/pbkdf2[good]: ${runtime / 1000} ms');
+  runtime = PointyCastleBenchmark(PBKDF2Security.strong).measure();
+  print('pc/pbkdf2[strong]: ${runtime / 1000} ms');
+  print('');
 }

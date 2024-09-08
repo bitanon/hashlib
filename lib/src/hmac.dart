@@ -7,7 +7,8 @@ import 'package:hashlib/src/core/mac_base.dart';
 import 'package:hashlib/src/sha256.dart';
 
 /// The HMAC/SHA-256 algorithm
-const hmacSha256 = HMAC(sha256);
+// ignore: constant_identifier_names
+const hmac_sha256 = HMAC(sha256);
 
 /// HMAC is a hash-based message authentication code that can be used to
 /// simultaneously verify both the data integrity and authenticity of a message.

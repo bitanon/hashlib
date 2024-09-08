@@ -3,11 +3,12 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/scrypt/security.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
 import 'package:hashlib/src/pbkdf2.dart';
 import 'package:hashlib/src/random.dart';
+
+import 'security.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
@@ -98,12 +99,14 @@ class Scrypt extends KeyDerivatorBase {
   factory Scrypt.fromSecurity(
     ScryptSecurity security, {
     List<int>? salt,
+    int derivedKeyLength = 64,
   }) {
     return Scrypt(
       salt: salt,
       cost: security.N,
       blockSize: security.r,
       parallelism: security.p,
+      derivedKeyLength: derivedKeyLength,
     );
   }
 

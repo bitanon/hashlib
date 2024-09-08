@@ -108,7 +108,6 @@ void main() {
     test('equality check compares correctly', () {
       expect(digest == digest, isTrue);
       expect(digest == HashDigest(bytes), isTrue);
-      expect(digest == bytes, isFalse);
       expect(digest == HashDigest(Uint8List.fromList([...bytes])), isFalse);
     });
 

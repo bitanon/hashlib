@@ -15,6 +15,7 @@ import 'hmac_md5.dart' as md5_hmac;
 import 'hmac_sha1.dart' as sha1_hmac;
 import 'hmac_sha256.dart' as sha256_hmac;
 import 'md4.dart' as md4;
+import 'pbkdf2.dart' as pbkdf2;
 import 'md5.dart' as md5;
 import 'poly1305.dart' as poly1305;
 import 'ripemd128.dart' as ripemd128;
@@ -234,51 +235,67 @@ void measureHashFunctions() {
 void measureKeyDerivation() {
   dump('Key derivator algorithm benchmarks on different security parameters:');
   dump('');
-  var argon2Levels = [
-    Argon2Security.test,
-    Argon2Security.little,
-    Argon2Security.moderate,
-    Argon2Security.good,
-    Argon2Security.strong,
-  ];
-  var scryptLevels = [
-    ScryptSecurity.test,
-    ScryptSecurity.little,
-    ScryptSecurity.moderate,
-    ScryptSecurity.good,
-    ScryptSecurity.strong,
-  ];
-  var bcryptLevels = [
-    BcryptSecurity.test,
-    BcryptSecurity.little,
-    BcryptSecurity.moderate,
-    BcryptSecurity.good,
-    BcryptSecurity.strong,
-  ];
+  var argon2Levels = {
+    'little': Argon2Security.little,
+    'moderate': Argon2Security.moderate,
+    'good': Argon2Security.good,
+    'strong': Argon2Security.strong,
+  };
+  var scryptLevels = {
+    'little': ScryptSecurity.little,
+    'moderate': ScryptSecurity.moderate,
+    'good': ScryptSecurity.good,
+    'strong': ScryptSecurity.strong,
+  };
+  var bcryptLevels = {
+    'little': BcryptSecurity.little,
+    'moderate': BcryptSecurity.moderate,
+    'good': BcryptSecurity.good,
+    'strong': BcryptSecurity.strong,
+  };
+  var pbkdf2Levels = {
+    'little': PBKDF2Security.little,
+    'moderate': PBKDF2Security.moderate,
+    'good': PBKDF2Security.good,
+    'strong': PBKDF2Security.strong,
+  };
   var algorithms = {
-    'scrypt': scryptLevels.map((e) => scrypt.HashlibBenchmark(e)),
-    'bcrypt': bcryptLevels.map((e) => bcrypt.HashlibBenchmark(e)),
-    'argon2i': argon2Levels.map((e) => argon2.HashlibArgon2iBenchmark(e)),
-    'argon2d': argon2Levels.map((e) => argon2.HashlibArgon2dBenchmark(e)),
-    'argon2id': argon2Levels.map((e) => argon2.HashlibArgon2idBenchmark(e)),
+    'scrypt':
+        scryptLevels.map((k, s) => MapEntry(k, scrypt.HashlibBenchmark(s))),
+    'bcrypt':
+        bcryptLevels.map((k, s) => MapEntry(k, bcrypt.HashlibBenchmark(s))),
+    'pbkdf2':
+        pbkdf2Levels.map((k, s) => MapEntry(k, pbkdf2.HashlibBenchmark(s))),
+    'argon2i': argon2Levels
+        .map((k, s) => MapEntry(k, argon2.HashlibArgon2iBenchmark(s))),
+    'argon2d': argon2Levels
+        .map((k, s) => MapEntry(k, argon2.HashlibArgon2dBenchmark(s))),
+    'argon2id': argon2Levels
+        .map((k, s) => MapEntry(k, argon2.HashlibArgon2idBenchmark(s))),
   };
 
   var names = {
-    ...argon2Levels.map((e) => e.name),
-    ...scryptLevels.map((e) => e.name),
-    ...bcryptLevels.map((e) => e.name),
+    ...argon2Levels.keys,
+    ...scryptLevels.keys,
+    ...bcryptLevels.keys,
   }.toList();
   var separator = names.map((e) => ('-' * (e.length + 2)));
-  dump('| Algorithms | ${argon2Levels.map((e) => e.name).join(' | ')} |');
+
+  dump('| Algorithms | ${names.join(' | ')} |');
   dump('|------------|${separator.join('|')}|');
   for (var entry in algorithms.entries) {
     var algorithm = entry.key;
-    var items = entry.value;
-    var message = '| $algorithm   |';
-    for (var item in items) {
-      var runtime = item.measure();
-      message += ' ${runtime / 1000} ms |';
+    var instances = entry.value;
+    var message = '| $algorithm ';
+    for (var name in names) {
+      message += ' | ';
+      var item = instances[name];
+      if (item != null) {
+        var runtime = item.measure();
+        message += '${runtime / 1000} ms';
+      }
     }
+    message += '|';
     dump(message);
   }
   dump('');

@@ -42,8 +42,8 @@ void main() {
   print('Keccak-512 => ${keccak512.string(text)}');
   print('SHAKE-128 => ${shake128.of(20).string(text)}');
   print('SHAKE-256 => ${shake256.of(20).string(text)}');
-  print('BLAKE-2s/256 => ${blake2s256.string(text)}');
-  print('BLAKE-2b/512 => ${blake2b512.string(text)}');
+  print('BLAKE2s-256 => ${blake2s256.string(text)}');
+  print('BLAKE2b-512 => ${blake2b512.string(text)}');
   print('SM3] => ${sm3.string(text)}');
   print('');
 
@@ -52,16 +52,16 @@ void main() {
   print('HMAC/SHA1 => ${sha1.hmac.byString(text)}');
   print('HMAC/SHA256 => ${sha256.hmac.byString(key).string(text)}');
   print('HMAC/SHA3-256 => ${HMAC(sha3_256).by(pw).string(text)}');
-  print("HMAC/BLAKE-2b/256 => ${blake2b512.hmac.by(pw).string(text)}");
+  print("HMAC/BLAKE2b-256 => ${blake2b512.hmac.by(pw).string(text)}");
   print("BLAKE-2b-MAC/256 => ${blake2b256.mac.by(pw).string(text)}");
   print("BLAKE-2b-MAC/224 => ${Blake2b(28).mac.by(pw).string(text)}");
   print('');
 
   // Examples of PBKDF2 key derivation
-  print("SHA256/HMAC/PBKDF2 => ${pbkdf2(pw, iv, 100).hex()}");
-  print("SHA1/HMAC/PBKDF2 => ${sha1.pbkdf2(iv, 100).hex(pw)}");
-  print("BLAKE-2b/256/HMAC/PBKDF2 => ${blake2b256.pbkdf2(iv, 100).hex(pw)}");
-  print("BLAKE-2b/256/MAC/PBKDF2 => ${blake2b256.mac.pbkdf2(iv, 100).hex(pw)}");
+  print("SHA256/HMAC/PBKDF2 => ${pbkdf2(pw, iv).hex()}");
+  print("BLAKE2b-256/HMAC/PBKDF2 => ${blake2b256.pbkdf2(iv).hex(pw)}");
+  print("BLAKE2b-256/MAC/PBKDF2 => ${blake2b256.mac.pbkdf2(iv).hex(pw)}");
+  print("SHA1/HMAC/PBKDF2 => ${sha1.pbkdf2(iv, iterations: 100).hex(pw)}");
   print('');
 
   // Examples of OTP generation

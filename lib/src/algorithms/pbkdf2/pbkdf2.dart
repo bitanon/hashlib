@@ -6,6 +6,12 @@ import 'dart:typed_data';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
 import 'package:hashlib/src/core/mac_base.dart';
+import 'package:hashlib/src/random.dart';
+
+import 'security.dart';
+
+int _defaultKeyLength = 24;
+int _defaultSaltLength = 16;
 
 /// This is an implementation of Password Based Key Derivation Algorithm,
 /// PBKDF2 derived from [RFC-8081][rfc], which internally uses a MAC based
@@ -46,11 +52,14 @@ class PBKDF2 extends KeyDerivatorBase {
 
   /// Create a [PBKDF2] instance with a MAC instance.
   factory PBKDF2(
-    MACHashBase mac, {
-    required List<int> salt,
-    required int iterations,
+    MACHashBase mac,
+    int iterations, {
+    List<int>? salt,
     int? keyLength,
   }) {
+    keyLength ??= _defaultKeyLength;
+    salt ??= randomBytes(_defaultSaltLength);
+
     // validate parameters
     if (iterations < 1) {
       throw StateError('The iterations must be at least 1');
@@ -58,7 +67,7 @@ class PBKDF2 extends KeyDerivatorBase {
     if (iterations > 0x7FFFFFFF) {
       throw StateError('The iterations must be less than 2^31');
     }
-    if (keyLength != null && keyLength < 1) {
+    if (keyLength < 1) {
       throw StateError('The keyLength must be at least 1');
     }
 
@@ -67,9 +76,24 @@ class PBKDF2 extends KeyDerivatorBase {
       algo: mac,
       salt: salt,
       iterations: iterations,
-      derivedKeyLength: keyLength ?? 24,
+      derivedKeyLength: keyLength,
     );
   }
+
+  /// Create a [PBKDF2] instance from [PBKDF2Security].
+  factory PBKDF2.fromSecurity(
+    PBKDF2Security security, {
+    List<int>? salt,
+    MACHashBase? mac,
+    int? iterations,
+    int? keyLength,
+  }) =>
+      PBKDF2(
+        mac ?? security.mac,
+        iterations ?? security.c,
+        keyLength: keyLength ?? security.dklen,
+        salt: salt,
+      );
 
   @override
   HashDigest convert(List<int> password) {

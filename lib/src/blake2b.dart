@@ -40,7 +40,7 @@ class Blake2b extends BlockHashBase {
   final List<int>? personalization;
 
   @override
-  String get name => 'BLAKE-2b/${digestSize << 3}';
+  String get name => 'BLAKE2b-${digestSize << 3}';
 
   /// Creates an instance to generate hash using BLAKE-2b algorithm.
   ///

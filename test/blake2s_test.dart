@@ -8,22 +8,22 @@ import 'package:test/test.dart';
 void main() {
   group('Blake2s funtionality test', () {
     test("Blake2s name", () {
-      expect(Blake2s(8).name, 'BLAKE-2s/64');
-      expect(blake2s128.name, 'BLAKE-2s/128');
-      expect(blake2s160.name, 'BLAKE-2s/160');
-      expect(blake2s224.name, 'BLAKE-2s/224');
-      expect(blake2s256.name, 'BLAKE-2s/256');
+      expect(Blake2s(8).name, 'BLAKE2s-64');
+      expect(blake2s128.name, 'BLAKE2s-128');
+      expect(blake2s160.name, 'BLAKE2s-160');
+      expect(blake2s224.name, 'BLAKE2s-224');
+      expect(blake2s256.name, 'BLAKE2s-256');
     });
     test("Blake2sMac name", () {
       final key = [1];
-      expect(blake2s128.mac.name, 'BLAKE-2s/128/MAC');
-      expect(blake2s160.mac.name, 'BLAKE-2s/160/MAC');
-      expect(blake2s224.mac.name, 'BLAKE-2s/224/MAC');
-      expect(blake2s256.mac.name, 'BLAKE-2s/256/MAC');
-      expect(blake2s128.mac.by(key).name, 'BLAKE-2s/128/MAC');
-      expect(blake2s160.mac.by(key).name, 'BLAKE-2s/160/MAC');
-      expect(blake2s224.mac.by(key).name, 'BLAKE-2s/224/MAC');
-      expect(blake2s256.mac.by(key).name, 'BLAKE-2s/256/MAC');
+      expect(blake2s128.mac.name, 'BLAKE2s-128/MAC');
+      expect(blake2s160.mac.name, 'BLAKE2s-160/MAC');
+      expect(blake2s224.mac.name, 'BLAKE2s-224/MAC');
+      expect(blake2s256.mac.name, 'BLAKE2s-256/MAC');
+      expect(blake2s128.mac.by(key).name, 'BLAKE2s-128/MAC');
+      expect(blake2s160.mac.by(key).name, 'BLAKE2s-160/MAC');
+      expect(blake2s224.mac.by(key).name, 'BLAKE2s-224/MAC');
+      expect(blake2s256.mac.by(key).name, 'BLAKE2s-256/MAC');
     });
     test('The digest size must be between 1 and 32', () {
       Blake2s(1).createSink();

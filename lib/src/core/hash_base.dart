@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:convert' show Encoding;
 import 'dart:typed_data' show Uint8List;
 
-import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
 export 'hash_base_stub.dart' if (dart.library.io) 'hash_base_io.dart';

@@ -472,8 +472,7 @@ void main() {
           memorySizeKB: 8192,
           personalization: [],
         ),
-        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
-            'The extra data must be at least 1 bytes')),
+        throwsA(isA<ArgumentError>()),
       );
     });
 

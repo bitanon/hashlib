@@ -43,7 +43,7 @@ void main() {
 
     test('number of digits must be at least 4', () {
       for (int i = 0; i < 20; ++i) {
-        var cb = () => TOTP(secret, digits: i).valueString().length;
+        int cb() => TOTP(secret, digits: i).valueString().length;
         if (i < 4 || i > 15) {
           expect(cb, throwsA((e) => e is AssertionError), reason: 'digits: $i');
         } else {

@@ -5,8 +5,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
-import 'package:pointycastle/export.dart';
 import 'package:pointycastle/key_derivators/scrypt.dart' as pc;
+import 'package:pointycastle/export.dart' show ScryptParameters;
 
 import '_base.dart';
 
@@ -19,12 +19,13 @@ class HashlibBenchmark extends KDFBenchmarkBase {
 
   @override
   void run() {
-    scrypt(
-      'long password'.codeUnits,
-      'secret salt'.codeUnits,
-      security: security,
-      dklen: 64,
-    );
+    final salt = Uint8List.fromList('secret salt'.codeUnits);
+    final pass = Uint8List.fromList('long password'.codeUnits);
+    Scrypt.fromSecurity(
+      security,
+      salt: salt,
+      derivedKeyLength: 64,
+    ).convert(pass);
   }
 }
 
@@ -35,21 +36,12 @@ class PointyCastleBenchmark extends KDFBenchmarkBase {
 
   @override
   void run() {
-    var scrypt = pc.Scrypt();
-    scrypt.init(ScryptParameters(
-      security.N,
-      security.r,
-      security.p,
-      64,
-      Uint8List.fromList('secret salt'.codeUnits),
-    ));
-    var out = Uint8List(64);
-    scrypt.deriveKey(
-      Uint8List.fromList('long password'.codeUnits),
-      0,
-      out,
-      0,
-    );
+    final salt = Uint8List.fromList('secret salt'.codeUnits);
+    final pass = Uint8List.fromList('long password'.codeUnits);
+    final scrypt = pc.Scrypt();
+    scrypt.init(ScryptParameters(security.N, security.r, security.p, 64, salt));
+    final out = Uint8List(64);
+    scrypt.deriveKey(pass, 0, out, 0);
   }
 }
 
