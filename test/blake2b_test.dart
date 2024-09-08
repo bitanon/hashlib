@@ -9,19 +9,22 @@ import 'package:test/test.dart';
 void main() {
   group('Blake2b funtionality test', () {
     test("Blake2b name", () {
-      expect(Blake2b(8).name, 'BLAKE2b-64');
-      expect(blake2b160.name, 'BLAKE2b-160');
-      expect(blake2b256.name, 'BLAKE2b-256');
-      expect(blake2b384.name, 'BLAKE2b-384');
-      expect(blake2b512.name, 'BLAKE2b-512');
+      expect(Blake2b(8).name, 'BLAKE-2b/64');
+      expect(blake2b160.name, 'BLAKE-2b/160');
+      expect(blake2b256.name, 'BLAKE-2b/256');
+      expect(blake2b384.name, 'BLAKE-2b/384');
+      expect(blake2b512.name, 'BLAKE-2b/512');
     });
     test("Blake2bMac name", () {
       final key = [1];
-      expect(Blake2bMAC(8, key).name, 'BLAKE2b-64-MAC');
-      expect(blake2b160.mac(key).name, 'BLAKE2b-160-MAC');
-      expect(blake2b256.mac(key).name, 'BLAKE2b-256-MAC');
-      expect(blake2b384.mac(key).name, 'BLAKE2b-384-MAC');
-      expect(blake2b512.mac(key).name, 'BLAKE2b-512-MAC');
+      expect(blake2b160.mac.name, 'BLAKE-2b/160/MAC');
+      expect(blake2b256.mac.name, 'BLAKE-2b/256/MAC');
+      expect(blake2b384.mac.name, 'BLAKE-2b/384/MAC');
+      expect(blake2b512.mac.name, 'BLAKE-2b/512/MAC');
+      expect(blake2b160.mac.by(key).name, 'BLAKE-2b/160/MAC');
+      expect(blake2b256.mac.by(key).name, 'BLAKE-2b/256/MAC');
+      expect(blake2b384.mac.by(key).name, 'BLAKE-2b/384/MAC');
+      expect(blake2b512.mac.by(key).name, 'BLAKE-2b/512/MAC');
     });
     test('The digest size must be between 1 and 64', () {
       Blake2b(1).createSink();
@@ -33,11 +36,11 @@ void main() {
       Blake2b(16, salt: Uint8List(0)).createSink();
       Blake2b(16, salt: Uint8List(16)).createSink();
       expect(
-        () => Blake2b(16, salt: Uint8List(1)).createSink(),
+        () => Blake2b(16, salt: Uint8List(1)).convert([]),
         throwsArgumentError,
       );
       expect(
-        () => Blake2b(16, salt: Uint8List(17)).createSink(),
+        () => Blake2b(16, salt: Uint8List(17)).convert([]),
         throwsArgumentError,
       );
     });
@@ -45,20 +48,20 @@ void main() {
       Blake2b(16, personalization: Uint8List(0)).createSink();
       Blake2b(16, personalization: Uint8List(16)).createSink();
       expect(
-        () => Blake2b(16, personalization: Uint8List(1)).createSink(),
+        () => Blake2b(16, personalization: Uint8List(1)).convert([]),
         throwsArgumentError,
       );
       expect(
-        () => Blake2b(16, personalization: Uint8List(17)).createSink(),
+        () => Blake2b(16, personalization: Uint8List(17)).convert([]),
         throwsArgumentError,
       );
     });
     test('The key should not be greater than 64 bytes ', () {
-      Blake2b(16, key: Uint8List(0)).createSink();
-      Blake2b(16, key: Uint8List(1)).createSink();
-      Blake2b(16, key: Uint8List(64)).createSink();
+      Blake2b(16).mac.by(Uint8List(0)).createSink();
+      Blake2b(16).mac.by(Uint8List(1)).createSink();
+      Blake2b(16).mac.by(Uint8List(64)).createSink();
       expect(
-        () => Blake2b(16, key: Uint8List(65)).createSink(),
+        () => Blake2b(16).mac.by(Uint8List(65)).createSink(),
         throwsArgumentError,
       );
     });
@@ -69,21 +72,27 @@ void main() {
           "dfd8967594cb261fcd88687f4454d80f718116c1b3c32f9f7e169357468cbe67";
       final sink = blake2b512.createSink();
       expect(sink.closed, isFalse);
-      expect(sink.initialized, isTrue);
       for (int i = 0; i < 512; i += 48) {
         sink.add(input.skip(i).take(48).toList());
       }
       expect(sink.digest().hex(), equals(output));
       expect(sink.closed, isTrue);
-      expect(sink.initialized, isTrue);
       expect(sink.digest().hex(), equals(output));
       sink.reset();
       expect(sink.closed, isFalse);
-      expect(sink.initialized, isTrue);
       sink.add(input);
       sink.close();
       expect(sink.closed, isTrue);
       expect(sink.digest().hex(), equals(output));
+    });
+    test('Blake2b config without any parameters', () {
+      expect(blake2b256.config().string('abc').hex(),
+          "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319");
+    });
+    test('Blake2b config with salt', () {
+      final salt = 'some  long  salt'.codeUnits;
+      expect(blake2b256.config(salt: salt).string('a').hex(),
+          "5f6b5bcc59698fbbe2d8ff7b3dd1b7c841cf4b1a8cec88e05c02bc97d12ad52b");
     });
   });
 
@@ -145,13 +154,13 @@ void main() {
 
     test('with a secret', () {
       expect(
-          blake2b512.mac('secret'.codeUnits).string("a").hex(),
+          blake2b512.mac.byString('secret').string("a").hex(),
           "4a1f6558272af9c63689a9383883671379cab5ff6a38b69643529bd27c5b61fe"
           "e24bc919c36d1bb3747630bf90d3459a453c2c3bb5775bbe0c15cc324222114c");
     });
     test('with empty string and a secret', () {
       expect(
-          blake2b512.mac('secret'.codeUnits).string('').hex(),
+          blake2b512.mac.byString('secret').string('').hex(),
           "865aca2ba0b9b941352e4680e14f543d1af37f7a3479304262a5da8c97468d9f"
           "e22636bae941d9c7b83b93efc36e82177606c72a1c00af48bb182c69d1f1abc3");
     });
@@ -167,11 +176,11 @@ void main() {
           "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319");
     });
     test('with empty string and a secret', () {
-      expect(blake2b256.mac('secret'.codeUnits).string('').hex(),
+      expect(blake2b256.mac.byString('secret').string('').hex(),
           "080989147a9b01f885f00d9b90cee0855cfb08aa68d57dc2c92333b2df70a5ea");
     });
     test('with abc and a secret', () {
-      expect(blake2b256.mac('secret'.codeUnits).string('abc').hex(),
+      expect(blake2b256.mac.byString('secret').string('abc').hex(),
           "e23c35713e7249f369b7c6f60291c0af9d6ac0231d80f46e13b1313fe7f4a4d5");
     });
   });
@@ -186,11 +195,11 @@ void main() {
           "384264f676f39536840523f284921cdc68b6846b");
     });
     test('with empty string and a secret', () {
-      expect(blake2b160.mac('secret'.codeUnits).string('').hex(),
+      expect(blake2b160.mac.byString('secret').string('').hex(),
           "f8630ddf0a315edbc8977f2c52040e9cedb70a85");
     });
     test('with abc and a secret', () {
-      expect(blake2b160.mac('secret'.codeUnits).string('abc').hex(),
+      expect(blake2b160.mac.byString('secret').string('abc').hex(),
           "0c3d973f5f44547f37c0c0c34ae8cd9015c324ef");
     });
   });
@@ -210,13 +219,13 @@ void main() {
     });
     test('with empty string and a secret', () {
       expect(
-          blake2b384.mac('secret'.codeUnits).string('').hex(),
+          blake2b384.mac.byString('secret').string('').hex(),
           "6f65d5a686d1eb9783f19bc3fe7dbd077d61714ceba63b2d"
           "11594faee11f98950c2c221379d98d397dfe04c697839472");
     });
     test('with abc and a secret', () {
       expect(
-          blake2b384.mac('secret'.codeUnits).string('abc').hex(),
+          blake2b384.mac.byString('secret').string('abc').hex(),
           "5dad40c5f4f12bde483498c651ce1f5e86e6f47454c953fb"
           "c953c74e34aba9541b689c2000e984c909278304af01c991");
     });

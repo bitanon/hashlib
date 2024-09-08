@@ -8,19 +8,22 @@ import 'package:test/test.dart';
 void main() {
   group('Blake2s funtionality test', () {
     test("Blake2s name", () {
-      expect(Blake2s(8).name, 'BLAKE2s-64');
-      expect(blake2s128.name, 'BLAKE2s-128');
-      expect(blake2s160.name, 'BLAKE2s-160');
-      expect(blake2s224.name, 'BLAKE2s-224');
-      expect(blake2s256.name, 'BLAKE2s-256');
+      expect(Blake2s(8).name, 'BLAKE-2s/64');
+      expect(blake2s128.name, 'BLAKE-2s/128');
+      expect(blake2s160.name, 'BLAKE-2s/160');
+      expect(blake2s224.name, 'BLAKE-2s/224');
+      expect(blake2s256.name, 'BLAKE-2s/256');
     });
     test("Blake2sMac name", () {
       final key = [1];
-      expect(Blake2sMAC(8, key).name, 'BLAKE2s-64-MAC');
-      expect(blake2s128.mac(key).name, 'BLAKE2s-128-MAC');
-      expect(blake2s160.mac(key).name, 'BLAKE2s-160-MAC');
-      expect(blake2s224.mac(key).name, 'BLAKE2s-224-MAC');
-      expect(blake2s256.mac(key).name, 'BLAKE2s-256-MAC');
+      expect(blake2s128.mac.name, 'BLAKE-2s/128/MAC');
+      expect(blake2s160.mac.name, 'BLAKE-2s/160/MAC');
+      expect(blake2s224.mac.name, 'BLAKE-2s/224/MAC');
+      expect(blake2s256.mac.name, 'BLAKE-2s/256/MAC');
+      expect(blake2s128.mac.by(key).name, 'BLAKE-2s/128/MAC');
+      expect(blake2s160.mac.by(key).name, 'BLAKE-2s/160/MAC');
+      expect(blake2s224.mac.by(key).name, 'BLAKE-2s/224/MAC');
+      expect(blake2s256.mac.by(key).name, 'BLAKE-2s/256/MAC');
     });
     test('The digest size must be between 1 and 32', () {
       Blake2s(1).createSink();
@@ -52,12 +55,16 @@ void main() {
         throwsArgumentError,
       );
     });
-    test('The key should not be greater than 64 bytes ', () {
-      Blake2s(16, key: Uint8List(0)).createSink();
-      Blake2s(16, key: Uint8List(1)).createSink();
-      Blake2s(16, key: Uint8List(64)).createSink();
+    test('The key should not be greater than 32 bytes ', () {
+      Blake2s(16).mac.by(Uint8List(0)).createSink();
+      Blake2s(16).mac.by(Uint8List(1)).createSink();
+      Blake2s(16).mac.by(Uint8List(32)).createSink();
       expect(
-        () => Blake2s(16, key: Uint8List(65)).createSink(),
+        () => Blake2s(16).mac.by(Uint8List(33)).createSink(),
+        throwsArgumentError,
+      );
+      expect(
+        () => Blake2s(16).mac.by(Uint8List(64)).createSink(),
         throwsArgumentError,
       );
     });
@@ -67,17 +74,14 @@ void main() {
           "aeb5499d81f14cb10c2539411cbe3e71167293458543bfa4ca1f9584625fd4c6";
       final sink = blake2s256.createSink();
       expect(sink.closed, isFalse);
-      expect(sink.initialized, isTrue);
       for (int i = 0; i < 512; i += 48) {
         sink.add(input.skip(i).take(48).toList());
       }
       expect(sink.digest().hex(), equals(output));
       expect(sink.closed, isTrue);
-      expect(sink.initialized, isTrue);
       expect(sink.digest().hex(), equals(output));
       sink.reset();
       expect(sink.closed, isFalse);
-      expect(sink.initialized, isTrue);
       sink.add(input);
       sink.close();
       expect(sink.closed, isTrue);
@@ -124,23 +128,21 @@ void main() {
     });
 
     test('with a secret', () {
-      expect(blake2s256.mac('secret'.codeUnits).string("a").hex(),
+      expect(blake2s256.mac.byString('secret').string("a").hex(),
           "6252d094f32c706b6fa11529126bdf2910c4dd7638bf866348808df63f62531d");
     });
     test('with empty string and a secret', () {
-      expect(blake2s256.mac('secret'.codeUnits).string('').hex(),
+      expect(blake2s256.mac.byString('secret').string('').hex(),
           "864f60ce88fc1c80c7b3b4f0bb920255fb464484a9dc7346f1d0e4e190d358cd");
     });
-    test('Blake2s config with a key', () {
-      final hasher = blake2s256.config(
-        key: 'secret'.codeUnits,
-      );
-      expect(hasher.string('a').hex(),
-          "6252d094f32c706b6fa11529126bdf2910c4dd7638bf866348808df63f62531d");
-    });
-    test('Blake2s config without a key', () {
+    test('Blake2s config without any parameters', () {
       expect(blake2s256.config().string('a').hex(),
           "4a0d129873403037c2cd9b9048203687f6233fb6738956e0349bd4320fec3e90");
+    });
+    test('Blake2s config with a salt', () {
+      final salt = 'somesalt'.codeUnits;
+      expect(blake2s256.config(salt: salt).string('a').hex(),
+          "01dc5d55926ffeeedf384a3fa709f6be647decd99e85a9695ef2aac8b6d4ffc8");
     });
   });
 
@@ -153,11 +155,11 @@ void main() {
           blake2s128.string('abc').hex(), "aa4938119b1dc7b87cbad0ffd200d0ae");
     });
     test('with empty string and a secret', () {
-      expect(blake2s128.mac('secret'.codeUnits).string('').hex(),
+      expect(blake2s128.mac.byString('secret').string('').hex(),
           "5697f332469e36135bad2a52a79803be");
     });
     test('with abc and a secret', () {
-      expect(blake2s128.mac('secret'.codeUnits).string('abc').hex(),
+      expect(blake2s128.mac.byString('secret').string('abc').hex(),
           "9af4e6ccbbfafb7c9dbc6088ca27f3da");
     });
   });
@@ -172,11 +174,11 @@ void main() {
           "5ae3b99be29b01834c3b508521ede60438f8de17");
     });
     test('with empty string and a secret', () {
-      expect(blake2s160.mac('secret'.codeUnits).string('').hex(),
+      expect(blake2s160.mac.byString('secret').string('').hex(),
           "3bdb8b311ae9f0547671fef3933653996ee65f45");
     });
     test('with abc and a secret', () {
-      expect(blake2s160.mac('secret'.codeUnits).string('abc').hex(),
+      expect(blake2s160.mac.byString('secret').string('abc').hex(),
           "1fda19951bd14742e8b3587b1f195f09975ff628");
     });
   });
@@ -191,11 +193,11 @@ void main() {
           "0b033fc226df7abde29f67a05d3dc62cf271ef3dfea4d387407fbd55");
     });
     test('with empty string and a secret', () {
-      expect(blake2s224.mac('secret'.codeUnits).string('').hex(),
+      expect(blake2s224.mac.byString('secret').string('').hex(),
           "7a37923d75c9d7be6b8fb2946a23d2d7f46067637380f0e91ef8ad0c");
     });
     test('with abc and a secret', () {
-      expect(blake2s224.mac('secret'.codeUnits).string('abc').hex(),
+      expect(blake2s224.mac.byString('secret').string('abc').hex(),
           "d19a652b914f52e1437a5273d74aee9aba8921bbde5656ebddc8ffa8");
     });
   });

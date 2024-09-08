@@ -3,13 +3,11 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/pbkdf2.dart';
 import 'package:hashlib/src/algorithms/scrypt/security.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
-import 'package:hashlib/src/hmac.dart';
+import 'package:hashlib/src/pbkdf2.dart';
 import 'package:hashlib/src/random.dart';
-import 'package:hashlib/src/sha256.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
@@ -28,6 +26,9 @@ const int _mask32 = 0xFFFFFFFF;
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc7914.html
 class Scrypt extends KeyDerivatorBase {
+  @override
+  final String name = 'Scrypt';
+
   /// The byte array containing salt
   final List<int> salt;
 
@@ -115,15 +116,19 @@ class Scrypt extends KeyDerivatorBase {
     int roLength32 = (roLength >>> 2);
     int innerKeyLength = parallelism * roLength;
     int innerKeyLength32 = parallelism * roLength32;
-    List<Uint32List> acc = List.generate(N, (_) => Uint32List(roLength32));
     Uint32List inp = Uint32List(roLength32);
     Uint32List out = Uint32List(roLength32);
     Uint32List t = Uint32List(16);
     Uint32List v;
 
+    // Initialize the memory
+    List<Uint32List> acc = List.filled(N, Uint32List(roLength32));
+    for (int i = 1; i < N; ++i) {
+      acc[i] = Uint32List(roLength32);
+    }
+
     // Derive the inner blocks
-    var mac = sha256.hmac(password);
-    var inner = PBKDF2(mac, salt, 1, innerKeyLength).convert();
+    var inner = pbkdf2(password, salt, 1, innerKeyLength).bytes;
     var inner32 = Uint32List.view(inner.buffer);
 
     /// [length] = 128 * r = 2 * 64 * r = 4 * 32 * r bytes
@@ -191,7 +196,7 @@ class Scrypt extends KeyDerivatorBase {
     }
 
     // Derive final blocks with the outer salt
-    return PBKDF2(mac, inner.bytes, 1, derivedKeyLength).convert(password);
+    return pbkdf2(password, inner, 1, derivedKeyLength);
   }
 
   @pragma('vm:prefer-inline')

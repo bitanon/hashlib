@@ -61,62 +61,47 @@ const _sigma = [
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
-class Blake2bHash extends BlockHashSink with MACSinkBase {
-  bool _initialized = false;
+class Blake2bHash extends BlockHashSink implements MACSinkBase {
+  final List<int>? key;
+  late int _s0, _s1, _s2, _s3, _s4, _s5, _s6, _s7;
   final Uint64List state = Uint64List(_seed.length);
-  final Uint64List _initialState = Uint64List(_seed.length);
   late final Uint64List qbuffer = Uint64List.view(buffer.buffer);
-
-  /// For internal use only.
-  Blake2bHash(
-    int digestSize, {
-    List<int>? key,
-    List<int>? salt,
-    List<int>? personalization,
-  })  : hashLength = digestSize,
-        super(1024 >>> 3) {
-    if (digestSize < 1 || digestSize > 64) {
-      throw ArgumentError('The digest size must be between 1 and 64');
-    }
-    init(
-      key,
-      salt: salt,
-      personalization: personalization,
-    );
-  }
 
   @override
   final int hashLength;
 
   @override
-  bool get initialized => _initialized;
+  final int derivedKeyLength;
 
-  @override
-  void reset() {
-    state.setAll(0, _initialState);
-    super.reset();
-  }
-
-  @override
-  void init(
-    List<int>? key, {
+  /// For internal use only.
+  Blake2bHash(
+    int digestSize, {
+    this.key,
     List<int>? salt,
     List<int>? personalization,
-  }) {
-    // Parameter block
-    state.setAll(0, _seed);
-    state[0] ^= 0x01010000 ^ hashLength;
+  })  : hashLength = digestSize,
+        derivedKeyLength = digestSize,
+        super(1024 >>> 3) {
+    if (digestSize < 1 || digestSize > 64) {
+      throw ArgumentError('The digest size must be between 1 and 64');
+    }
 
-    if (key != null && key.isNotEmpty) {
-      if (key.length > 64) {
+    // Parameter block from the seed
+    _s0 = _seed[0] ^ 0x01010000 ^ hashLength;
+    _s1 = _seed[1];
+    _s2 = _seed[2];
+    _s3 = _seed[3];
+    _s4 = _seed[4];
+    _s5 = _seed[5];
+    _s6 = _seed[6];
+    _s7 = _seed[7];
+
+    if (key != null && key!.isNotEmpty) {
+      if (key!.length > 64) {
         throw ArgumentError('The key should not be greater than 64 bytes');
       }
       // Add key length to parameter
-      state[0] ^= key.length << 8;
-      // If the key is present, the first block is the key padded with zeroes
-      buffer.setAll(0, key);
-      pos = blockLength;
-      messageLength += blockLength;
+      _s0 ^= key!.length << 8;
     }
 
     if (salt != null && salt.isNotEmpty) {
@@ -124,10 +109,10 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
         throw ArgumentError('The valid length of salt is 16 bytes');
       }
       for (int i = 0, p = 0; i < 8; i++, p += 8) {
-        state[4] ^= (salt[i] & 0xFF) << p;
+        _s4 ^= (salt[i] & 0xFF) << p;
       }
       for (int i = 8, p = 0; i < 16; i++, p += 8) {
-        state[5] ^= (salt[i] & 0xFF) << p;
+        _s5 ^= (salt[i] & 0xFF) << p;
       }
     }
 
@@ -136,16 +121,38 @@ class Blake2bHash extends BlockHashSink with MACSinkBase {
         throw ArgumentError('The valid length of personalization is 16 bytes');
       }
       for (int i = 0, p = 0; i < 8; i++, p += 8) {
-        state[6] ^= (personalization[i] & 0xFF) << p;
+        _s6 ^= (personalization[i] & 0xFF) << p;
       }
       for (int i = 8, p = 0; i < 16; i++, p += 8) {
-        state[7] ^= (personalization[i] & 0xFF) << p;
+        _s7 ^= (personalization[i] & 0xFF) << p;
       }
     }
 
-    // Save state
-    _initialized = true;
-    _initialState.setAll(0, state);
+    reset();
+  }
+
+  @override
+  void reset() {
+    super.reset();
+    state[0] = _s0;
+    state[1] = _s1;
+    state[2] = _s2;
+    state[3] = _s3;
+    state[4] = _s4;
+    state[5] = _s5;
+    state[6] = _s6;
+    state[7] = _s7;
+    // If the key is present, the first block is the key padded with zeroes
+    if (key != null) {
+      int i;
+      for (i = 0; i < key!.length; ++i) {
+        buffer[i] = key![i];
+      }
+      for (; i < blockLength; ++i) {
+        buffer[i] = 0;
+      }
+      messageLength = pos = blockLength;
+    }
   }
 
   @override

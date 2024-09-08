@@ -5,23 +5,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:test/test.dart';
 import 'package:hashlib/hashlib.dart';
+import 'package:test/test.dart';
 
 // Concrete implementation for testing purposes
 class TestHashDigestSink extends HashDigestSink {
-  bool _closed = false;
-  List<int> _data = [];
+  final List<int> _data = [];
 
   @override
   int get hashLength => 16;
-
-  @override
-  void reset() {
-    _closed = false;
-    _data.clear();
-    super.reset();
-  }
 
   @override
   void $process(List<int> data, int start, int end) {

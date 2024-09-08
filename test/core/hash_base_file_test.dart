@@ -1,11 +1,13 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+// ignore_for_file: library_annotations
+// ignore_for_file: always_declare_return_types
+
 @Tags(['skip-vm'])
 
-import 'dart:typed_data';
-import 'package:test/test.dart';
 import 'package:hashlib/hashlib.dart';
+import 'package:test/test.dart';
 
 class MockHashBase extends HashBase {
   @override

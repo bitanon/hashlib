@@ -1,49 +1,35 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:convert';
-
 import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/mac_base.dart';
+import 'package:hashlib/src/sha256.dart';
+
+/// The HMAC/SHA-256 algorithm
+const hmacSha256 = HMAC(sha256);
 
 /// HMAC is a hash-based message authentication code that can be used to
 /// simultaneously verify both the data integrity and authenticity of a message.
-class HMAC extends MACHashBase {
-  final BlockHashBase algo;
+class HMAC<T extends BlockHashBase> extends MACHashBase<HMACSink<T>> {
+  /// The algorithm for the MAC generation
+  final T algo;
 
-  const HMAC(this.algo, List<int> key) : super(key);
+  const HMAC(this.algo);
 
   @override
   String get name => '${algo.name}/HMAC';
 
   @override
-  HMACSink createSink() {
-    return HMACSink(algo.createSink())..init(key);
-  }
+  @pragma('vm:prefer-inline')
+  MACHash<HMACSink<T>> by(List<int> key) => MACHash(name, HMACSink(algo, key));
 }
 
 /// Extension on [BlockHashBase] to get an [HMAC] instance
-extension HMAConBlockHashBase on BlockHashBase {
-  /// Get an [HMAC] instance for this hash algorithm.
+extension HMAConBlockHashBase<T extends BlockHashBase> on T {
+  /// Gets a [HMAC] instance builder for this algorithm.
   ///
   /// HMAC is a hash-based message authentication code that can be used to
   /// simultaneously verify both the data integrity and authenticity of a message.
-  @pragma('vm:prefer-inline')
-  HMAC hmac(List<int> key) {
-    return HMAC(this, key);
-  }
-
-  /// Get an [HMAC] instance for this hash algorithm.
-  ///
-  /// HMAC is a hash-based message authentication code that can be used to
-  /// simultaneously verify both the data integrity and authenticity of a message.
-  @pragma('vm:prefer-inline')
-  HMAC hmacBy(String key, [Encoding? encoding]) {
-    if (encoding != null) {
-      return HMAC(this, encoding.encode(key));
-    } else {
-      return HMAC(this, key.codeUnits);
-    }
-  }
+  HMAC<T> get hmac => HMAC(this);
 }

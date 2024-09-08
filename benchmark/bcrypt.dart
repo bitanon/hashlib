@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 
@@ -35,5 +35,7 @@ void main() {
   print('hashlib/bcrypt[good]: ${runtime / 1000} ms');
   runtime = HashlibBenchmark(BcryptSecurity.strong).measure();
   print('hashlib/bcrypt[strong]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(BcryptSecurity.owasp).measure();
+  print('hashlib/bcrypt[owasp]: ${runtime / 1000} ms');
   print('');
 }

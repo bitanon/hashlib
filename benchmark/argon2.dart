@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:argon2/argon2.dart' as argon2;
 import 'package:hashlib/hashlib.dart';
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 
@@ -91,6 +91,29 @@ class Argon2Argon2idBenchmark extends KDFBenchmarkBase {
 
 void main() {
   double runtime;
+  print('--------- Argon2id ----------');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.test).measure();
+  print('hashlib/argon2id[test]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.little).measure();
+  print('hashlib/argon2id[little]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.moderate).measure();
+  print('hashlib/argon2id[moderate]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.good).measure();
+  print('hashlib/argon2id[good]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.strong).measure();
+  print('hashlib/argon2id[strong]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.owasp).measure();
+  print('hashlib/argon2id[owasp1]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.owasp2).measure();
+  print('hashlib/argon2id[owasp2]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.owasp3).measure();
+  print('hashlib/argon2id[owasp3]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.owasp4).measure();
+  print('hashlib/argon2id[owasp4]: ${runtime / 1000} ms');
+  runtime = HashlibArgon2idBenchmark(Argon2Security.owasp5).measure();
+  print('hashlib/argon2id[owasp5]: ${runtime / 1000} ms');
+  print('');
+
   print('--------- Argon2i ----------');
   runtime = HashlibArgon2iBenchmark(Argon2Security.test).measure();
   print('hashlib/argon2i[test]: ${runtime / 1000} ms');
@@ -115,19 +138,6 @@ void main() {
   print('hashlib/argon2d[good]: ${runtime / 1000} ms');
   runtime = HashlibArgon2dBenchmark(Argon2Security.strong).measure();
   print('hashlib/argon2d[strong]: ${runtime / 1000} ms');
-  print('');
-
-  print('--------- Argon2id ----------');
-  runtime = HashlibArgon2idBenchmark(Argon2Security.test).measure();
-  print('hashlib/argon2id[test]: ${runtime / 1000} ms');
-  runtime = HashlibArgon2idBenchmark(Argon2Security.little).measure();
-  print('hashlib/argon2id[little]: ${runtime / 1000} ms');
-  runtime = HashlibArgon2idBenchmark(Argon2Security.moderate).measure();
-  print('hashlib/argon2id[moderate]: ${runtime / 1000} ms');
-  runtime = HashlibArgon2idBenchmark(Argon2Security.good).measure();
-  print('hashlib/argon2id[good]: ${runtime / 1000} ms');
-  runtime = HashlibArgon2idBenchmark(Argon2Security.strong).measure();
-  print('hashlib/argon2id[strong]: ${runtime / 1000} ms');
   print('');
 
   print('--------- Other argon2 argon2id ----------');

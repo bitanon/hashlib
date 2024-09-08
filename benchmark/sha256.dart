@@ -9,7 +9,7 @@ import 'package:hash/hash.dart' as hash;
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:pointycastle/digests/sha256.dart' as pc;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 

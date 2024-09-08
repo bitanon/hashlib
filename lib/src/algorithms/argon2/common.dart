@@ -154,6 +154,9 @@ class Argon2Context {
     required this.personalization,
   }) : midSlice = slices ~/ 2;
 
+  /// Argon2 Hash Type name
+  String get typeName => _typeToName(type);
+
   /// Creates a context for Argon2 password hashing
   ///
   /// Required Parameters:

@@ -90,7 +90,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
 
   /// Process the [input] string and returns a [HashDigest].
   ///
-  /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
+  /// If [encoding] is not specified, the [String.codeUnits] are used.
   HashDigest string(String input, [Encoding? encoding]) {
     var sink = createSink();
     if (encoding != null) {
@@ -151,7 +151,7 @@ abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
 
   /// Consumes the entire [stream] of string and generates a [HashDigest].
   ///
-  /// If the [encoding] is not specified, `codeUnits` are used as input bytes.
+  /// If [encoding] is not specified, the [String.codeUnits] are used.
   Future<HashDigest> stringStraem(
     Stream<String> stream, [
     Encoding? encoding,

@@ -1,11 +1,12 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
 import 'package:hashlib/src/algorithms/random_generators.dart';
-import 'package:hashlib/src/hashlib_base.dart';
 import 'package:test/test.dart';
 
 const int _maxInt = 0xFFFFFFFF;

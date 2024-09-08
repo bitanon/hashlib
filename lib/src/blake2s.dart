@@ -35,91 +35,85 @@ const Blake2s blake2s256 = Blake2s(256 >>> 3);
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 class Blake2s extends BlockHashBase {
   final int digestSize;
-  final List<int>? key;
   final List<int>? salt;
   final List<int>? personalization;
 
-  /// Creates a [Blake2s] instance to generate hash using 32-bit numbers.
+  @override
+  String get name => 'BLAKE-2s/${digestSize << 3}';
+
+  /// Creates an instance to generate hash using BLAKE-2s algorithm.
   ///
   /// Parameters:
   /// - [digestSize] The number of bytes in the output.
-  /// - [key] An optional key for MAC generation. Should not exceed 32 bytes.
   /// - [salt] An optional nonce. Must be exactly 8 bytes long.
   /// - [personalization] Second optional nonce. Must be exactly 8 bytes long.
   ///
+  /// See also:
+  /// - [mac] or [Blake2sMAC] for generating MAC with this algorithm.
   const Blake2s(
     this.digestSize, {
-    this.key,
     this.salt,
     this.personalization,
   });
 
   @override
-  String get name => 'BLAKE2s-${digestSize << 3}';
-
-  @override
   Blake2sHash createSink() => Blake2sHash(
         digestSize,
-        key: key,
         salt: salt,
         personalization: personalization,
       );
-}
 
-class Blake2sMAC extends MACHashBase {
-  final int digestSize;
-  final List<int>? salt;
-  final List<int>? personalization;
-
-  /// Creates a [Blake2s] instance to generate MAC using a [key].
+  /// Get a builder to generate MAC using this algorithm.
   ///
-  /// Optional parameters:
-  /// - [digestSize] The number of bytes in the output
-  /// - [salt] An optional nonce. Must be exactly 16 bytes long.
-  /// - [personalization] Second optional nonce. Must be exactly 16 bytes long.
-  const Blake2sMAC(
-    this.digestSize,
-    List<int> key, {
-    this.salt,
-    this.personalization,
-  }) : super(key);
+  /// Example:
+  /// ```
+  /// final key = 'secret key'.codeUnits;
+  /// final message = 'plain message'.codeUnits;
+  /// final mac = blake2s256.mac.by(key).convert(message);
+  /// ```
+  Blake2sMAC get mac => Blake2sMAC._(this);
 
-  @override
-  String get name => 'BLAKE2s-${digestSize << 3}-MAC';
-
-  @override
-  MACSinkBase createSink() => Blake2sHash(
+  /// Get a new instance with different [salt] and [personalization] value.
+  ///
+  /// If a parameter is null, it passes the current one to the new instance.
+  Blake2s config({
+    List<int>? salt,
+    List<int>? personalization,
+  }) =>
+      Blake2s(
         digestSize,
-        key: key,
-        salt: salt,
-        personalization: personalization,
+        salt: salt ?? this.salt,
+        personalization: personalization ?? this.personalization,
       );
 }
 
-extension Blake2sFactory on Blake2s {
-  Blake2s config({
-    List<int>? key,
-    List<int>? salt,
-    List<int>? personalization,
-  }) {
-    return Blake2s(
-      digestSize,
-      key: key ?? this.key,
-      salt: salt ?? this.salt,
-      personalization: personalization ?? this.personalization,
-    );
-  }
+class Blake2sMAC extends MACHashBase<Blake2sHash> {
+  final Blake2s _algo;
 
-  Blake2sMAC mac(
+  const Blake2sMAC._(this._algo);
+
+  @override
+  String get name => '${_algo.name}/MAC';
+
+  /// Get an [MACHash] instance initialized by a [key].
+  ///
+  /// Parameters:
+  /// - [key] The key for MAC generation. Should not exceed 32 bytes.
+  /// - [salt] An optional nonce. Must be exactly 8 bytes long.
+  /// - [personalization] Second optional nonce. Must be exactly 8 bytes long.
+  @override
+  @pragma('vm:prefer-inline')
+  MACHash<Blake2sHash> by(
     List<int> key, {
     List<int>? salt,
     List<int>? personalization,
   }) {
-    return Blake2sMAC(
-      digestSize,
-      key,
-      salt: salt ?? this.salt,
-      personalization: personalization ?? this.personalization,
+    final sink = Blake2sHash(
+      _algo.digestSize,
+      key: key,
+      salt: salt ?? _algo.salt,
+      personalization: personalization ?? _algo.personalization,
     );
+    return MACHash(name, sink);
   }
 }

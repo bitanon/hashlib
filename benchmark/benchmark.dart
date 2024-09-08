@@ -6,8 +6,8 @@ import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 
+import '_base.dart';
 import 'argon2.dart' as argon2;
-import 'base.dart';
 import 'bcrypt.dart' as bcrypt;
 import 'blake2b.dart' as blake2b;
 import 'blake2s.dart' as blake2s;
@@ -26,7 +26,9 @@ import 'sha1.dart' as sha1;
 import 'sha224.dart' as sha224;
 import 'sha256.dart' as sha256;
 import 'sha384.dart' as sha384;
+import 'sha3_224.dart' as sha3_224;
 import 'sha3_256.dart' as sha3_256;
+import 'sha3_384.dart' as sha3_384;
 import 'sha3_512.dart' as sha3_512;
 import 'sha512.dart' as sha512;
 import 'sm3.dart' as sm3;
@@ -107,9 +109,17 @@ void measureHashFunctions() {
         sha512.HashBenchmark(size, iter),
         sha512.PointyCastleBenchmark(size, iter),
       ],
+      "SHA3-224": [
+        sha3_224.HashlibBenchmark(size, iter),
+        sha3_224.PointyCastleBenchmark(size, iter),
+      ],
       "SHA3-256": [
         sha3_256.HashlibBenchmark(size, iter),
         sha3_256.PointyCastleBenchmark(size, iter),
+      ],
+      "SHA3-384": [
+        sha3_384.HashlibBenchmark(size, iter),
+        sha3_384.PointyCastleBenchmark(size, iter),
       ],
       "SHA3-512": [
         sha3_512.HashlibBenchmark(size, iter),

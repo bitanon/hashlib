@@ -8,7 +8,7 @@ import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:pointycastle/export.dart' show Pbkdf2Parameters;
 import 'package:pointycastle/pointycastle.dart' as pc;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 
@@ -19,12 +19,7 @@ class HashlibBenchmark extends Benchmark {
 
   @override
   void run() {
-    hashlib.sha256.pbkdf2(
-      input,
-      salt,
-      iter,
-      64,
-    );
+    hashlib.sha256.hmac.pbkdf2(salt, iter, 64).convert(input);
   }
 
   @override

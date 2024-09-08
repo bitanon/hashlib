@@ -8,7 +8,7 @@ import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/macs/poly1305.dart' as pc;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 
@@ -29,7 +29,7 @@ class HashlibBenchmark extends Benchmark {
 
   @override
   void run() {
-    hashlib.poly1305(_input, _key);
+    hashlib.poly1305auth(_input, _key);
   }
 }
 

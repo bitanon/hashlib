@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:pointycastle/digests/ripemd128.dart' as pc;
 
-import 'base.dart';
+import '_base.dart';
 
 class HashlibBenchmark extends Benchmark {
   HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);

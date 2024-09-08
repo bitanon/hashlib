@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+// ignore_for_file: library_annotations
+
 @Tags(['vm-only'])
 
 import 'dart:io';
@@ -21,12 +23,11 @@ void main() {
     test('with pointycastle', () {
       for (int i = 0; i < 100; ++i) {
         final data = randomBytes(i);
-        final b = pc_blake2b.Blake2bDigest(digestSize: 64);
-        expect(
-          toHex(blake2b512.convert(data).bytes),
-          toHex(b.process(Uint8List.fromList(data))),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
+        final out1 = blake2b512.convert(data).hex();
+        final out2 = toHex(
+          pc_blake2b.Blake2bDigest(digestSize: 64).process(data),
         );
+        expect(out1, equals(out2), reason: 'size: $i');
       }
     });
 
@@ -34,15 +35,11 @@ void main() {
       final key = randomBytes(16);
       for (int i = 0; i < 100; ++i) {
         final data = randomBytes(i);
-        final b = pc_blake2b.Blake2bDigest(
-          digestSize: 64,
-          key: Uint8List.fromList(key),
+        final out1 = blake2b512.mac.by(key).convert(data).hex();
+        final out2 = toHex(
+          pc_blake2b.Blake2bDigest(digestSize: 64, key: key).process(data),
         );
-        expect(
-          toHex(blake2b512.config(key: key).convert(data).bytes),
-          toHex(b.process(Uint8List.fromList(data))),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
+        expect(out1, equals(out2), reason: 'size: $i');
       }
     });
 
@@ -50,31 +47,73 @@ void main() {
       final salt = randomBytes(16);
       for (int i = 0; i < 100; ++i) {
         final data = randomBytes(i);
-        final b = pc_blake2b.Blake2bDigest(
-          digestSize: 64,
-          salt: Uint8List.fromList(salt),
+        final out1 = blake2b512.config(salt: salt).convert(data).hex();
+        final out2 = toHex(
+          pc_blake2b.Blake2bDigest(digestSize: 64, salt: salt).process(data),
         );
-        expect(
-          toHex(blake2b512.config(salt: salt).convert(data).bytes),
-          toHex(b.process(Uint8List.fromList(data))),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
-        );
+        expect(out1, equals(out2), reason: 'size: $i');
       }
     });
 
     test('with pointycastle with personalization', () {
-      final salt = randomBytes(16);
+      final personalization = randomBytes(16);
       for (int i = 0; i < 100; ++i) {
         final data = randomBytes(i);
-        final b = pc_blake2b.Blake2bDigest(
-          digestSize: 64,
-          personalization: Uint8List.fromList(salt),
+        final out1 = Blake2b(
+          64,
+          personalization: personalization,
+        ).convert(data).hex();
+        final out2 = toHex(
+          pc_blake2b.Blake2bDigest(
+            digestSize: 64,
+            personalization: personalization,
+          ).process(data),
         );
-        expect(
-          toHex(blake2b512.config(personalization: salt).convert(data).bytes),
-          toHex(b.process(Uint8List.fromList(data))),
-          reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
+        expect(out1, equals(out2), reason: 'size: $i');
+      }
+    });
+
+    test('with pointycastle with salt and personalization', () {
+      final salt = randomBytes(16);
+      final personalization = randomBytes(16);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
+        final out1 = Blake2b(
+          64,
+          salt: salt,
+          personalization: personalization,
+        ).convert(data).hex();
+        final out2 = toHex(
+          pc_blake2b.Blake2bDigest(
+            digestSize: 64,
+            salt: salt,
+            personalization: personalization,
+          ).process(data),
         );
+        expect(out1, equals(out2), reason: 'size: $i');
+      }
+    });
+
+    test('with pointycastle with key, salt and personalization', () {
+      final key = randomBytes(16);
+      final salt = randomBytes(16);
+      final personalization = randomBytes(16);
+      for (int i = 0; i < 100; ++i) {
+        final data = randomBytes(i);
+        final out1 = Blake2b(
+          64,
+          salt: salt,
+          personalization: personalization,
+        ).mac.by(key).convert(data).hex();
+        final out2 = toHex(
+          pc_blake2b.Blake2bDigest(
+            digestSize: 64,
+            key: key,
+            salt: salt,
+            personalization: personalization,
+          ).process(data),
+        );
+        expect(out1, equals(out2), reason: 'size: $i');
       }
     });
   });
@@ -85,7 +124,7 @@ void main() {
       var msg = "The quick brown fox jumps over the lazy dog";
       var expected = "80070713463e7749b90c2dc24911e275";
       var actual = toHex(
-        md5.hmacBy(key).convert(msg.codeUnits).bytes,
+        md5.hmac.byString(key).convert(msg.codeUnits).bytes,
       );
       var actual2 = toHex(
         crypto.Hmac(crypto.md5, key.codeUnits).convert(msg.codeUnits).bytes,
@@ -99,7 +138,7 @@ void main() {
         final data = randomBytes(i);
         final key = randomBytes(i & 0x7F);
         expect(
-          toHex(sha1.hmac(key).convert(data).bytes),
+          toHex(sha1.hmac.by(key).convert(data).bytes),
           toHex(crypto.Hmac(crypto.sha1, key).convert(data).bytes),
           reason: 'Key: "${String.fromCharCodes(key)}" [${key.length}]\n'
               'Message: "${String.fromCharCodes(data)}" [${data.length}]',
@@ -112,7 +151,7 @@ void main() {
         final data = randomBytes(i);
         final key = randomBytes(i & 0x7F);
         expect(
-          toHex(sha384.hmac(key).convert(data).bytes),
+          toHex(sha384.hmac.by(key).convert(data).bytes),
           toHex(crypto.Hmac(crypto.sha384, key).convert(data).bytes),
           reason: 'Message: "${String.fromCharCodes(data)}" [${data.length}]',
         );

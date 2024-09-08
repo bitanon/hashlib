@@ -22,8 +22,11 @@ import 'package:hashlib/src/core/mac_base.dart';
 ///
 /// [rfc]: https://www.rfc-editor.org/rfc/rfc8018.html#section-5.2
 class PBKDF2 extends KeyDerivatorBase {
-  /// The underlying Pseudo Random Function (PRF)
-  final MACSinkBase sink;
+  @override
+  String get name => '${algo.name}/PBKDF2';
+
+  /// The underlying algorithm used as Pseudo Random Function (PRF)
+  final MACHashBase algo;
 
   /// The byte array containing salt
   final List<int> salt;
@@ -35,7 +38,7 @@ class PBKDF2 extends KeyDerivatorBase {
   final int derivedKeyLength;
 
   const PBKDF2._({
-    required this.sink,
+    required this.algo,
     required this.salt,
     required this.iterations,
     required this.derivedKeyLength,
@@ -43,11 +46,11 @@ class PBKDF2 extends KeyDerivatorBase {
 
   /// Create a [PBKDF2] instance with a MAC instance.
   factory PBKDF2(
-    MACHashBase mac,
-    List<int> salt,
-    int iterations, [
+    MACHashBase mac, {
+    required List<int> salt,
+    required int iterations,
     int? keyLength,
-  ]) {
+  }) {
     // validate parameters
     if (iterations < 1) {
       throw StateError('The iterations must be at least 1');
@@ -60,29 +63,22 @@ class PBKDF2 extends KeyDerivatorBase {
     }
 
     // create instance
-    final sink = mac.createSink();
     return PBKDF2._(
-      sink: sink,
+      algo: mac,
       salt: salt,
       iterations: iterations,
-      derivedKeyLength: keyLength ?? sink.hashLength,
+      derivedKeyLength: keyLength ?? 24,
     );
   }
 
-  /// Generate a derived key using the [sink] function.
-  ///
-  /// This function will throw an [StateError] if the [sink] is not initialized
-  /// and the [password] is not provided.
   @override
-  HashDigest convert([List<int>? password]) {
+  HashDigest convert(List<int> password) {
     int i, j, k, t;
     Uint8List hash, block;
     var result = Uint8List(derivedKeyLength);
 
     // Initialize the MAC with provided password
-    if (password != null) {
-      sink.init(password);
-    }
+    var sink = algo.by(password).createSink();
 
     k = 0;
     for (i = 1; k < derivedKeyLength; i++) {

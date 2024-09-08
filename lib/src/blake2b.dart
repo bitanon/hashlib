@@ -36,90 +36,85 @@ const Blake2b blake2b512 = Blake2b(512 >>> 3);
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 class Blake2b extends BlockHashBase {
   final int digestSize;
-  final List<int>? key;
   final List<int>? salt;
   final List<int>? personalization;
 
-  /// Creates a [Blake2b] instance to generate hash using 64-bit numbers.
+  @override
+  String get name => 'BLAKE-2b/${digestSize << 3}';
+
+  /// Creates an instance to generate hash using BLAKE-2b algorithm.
   ///
   /// Parameters:
   /// - [digestSize] The number of bytes in the output.
-  /// - [key] An optional key for MAC generation. Should not exceed 64 bytes.
   /// - [salt] An optional nonce. Must be exactly 16 bytes long.
   /// - [personalization] Second optional nonce. Must be exactly 16 bytes long.
+  ///
+  /// See also:
+  /// - [mac] or [Blake2bMAC] for generating MAC with this algorithm.
   const Blake2b(
     this.digestSize, {
-    this.key,
     this.salt,
     this.personalization,
   });
 
   @override
-  String get name => 'BLAKE2b-${digestSize << 3}';
-
-  @override
   Blake2bHash createSink() => Blake2bHash(
         digestSize,
-        key: key,
         salt: salt,
         personalization: personalization,
       );
+
+  /// Get a builder to generate MAC using this algorithm.
+  ///
+  /// Example:
+  /// ```
+  /// final key = 'secret key'.codeUnits;
+  /// final message = 'plain message'.codeUnits;
+  /// final mac = blake2s256.mac.by(key).convert(message);
+  /// ```
+  Blake2bMAC get mac => Blake2bMAC._(this);
+
+  /// Get a new instance with different [salt] and [personalization] value.
+  ///
+  /// If a parameter is null, it passes the current one to the new instance.
+  Blake2b config({
+    List<int>? salt,
+    List<int>? personalization,
+  }) =>
+      Blake2b(
+        digestSize,
+        salt: salt ?? this.salt,
+        personalization: personalization ?? this.personalization,
+      );
 }
 
-class Blake2bMAC extends MACHashBase {
-  final int digestSize;
-  final List<int>? salt;
-  final List<int>? personalization;
+class Blake2bMAC extends MACHashBase<Blake2bHash> {
+  final Blake2b _algo;
 
-  /// Creates a [Blake2b] instance to generate MAC using a [key].
+  const Blake2bMAC._(this._algo);
+
+  @override
+  String get name => '${_algo.name}/MAC';
+
+  /// Get an [MACHash] instance initialized by a [key].
   ///
-  /// Optional parameters:
-  /// - [digestSize] The number of bytes in the output.
+  /// Parameters:
+  /// - [key] An optional key for MAC generation. Should not exceed 64 bytes.
   /// - [salt] An optional nonce. Must be exactly 16 bytes long.
   /// - [personalization] Second optional nonce. Must be exactly 16 bytes long.
-  const Blake2bMAC(
-    this.digestSize,
-    List<int> key, {
-    this.salt,
-    this.personalization,
-  }) : super(key);
-
   @override
-  String get name => 'BLAKE2b-${digestSize << 3}-MAC';
-
-  @override
-  MACSinkBase createSink() => Blake2bHash(
-        digestSize,
-        key: key,
-        salt: salt,
-        personalization: personalization,
-      );
-}
-
-extension Blake2bFactory on Blake2b {
-  Blake2b config({
-    List<int>? key,
-    List<int>? salt,
-    List<int>? personalization,
-  }) {
-    return Blake2b(
-      digestSize,
-      key: key ?? this.key,
-      salt: salt ?? this.salt,
-      personalization: personalization ?? this.personalization,
-    );
-  }
-
-  Blake2bMAC mac(
+  @pragma('vm:prefer-inline')
+  MACHash<Blake2bHash> by(
     List<int> key, {
     List<int>? salt,
     List<int>? personalization,
   }) {
-    return Blake2bMAC(
-      digestSize,
-      key,
-      salt: salt ?? this.salt,
-      personalization: personalization ?? this.personalization,
+    final sink = Blake2bHash(
+      _algo.digestSize,
+      key: key,
+      salt: salt ?? _algo.salt,
+      personalization: personalization ?? _algo.personalization,
     );
+    return MACHash(name, sink);
   }
 }

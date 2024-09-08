@@ -9,7 +9,7 @@ import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:pointycastle/digests/sha224.dart' as pc;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 

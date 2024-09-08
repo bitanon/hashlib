@@ -39,6 +39,9 @@ export 'security.dart';
 class Argon2 extends KeyDerivatorBase {
   final Argon2Context _ctx;
 
+  @override
+  String get name => _ctx.typeName;
+
   /// Argon2 Hash Type
   Argon2Type get type => _ctx.type;
 
@@ -113,13 +116,11 @@ class Argon2 extends KeyDerivatorBase {
     List<int>? key,
     int? hashLength,
     List<int>? personalization,
-    Argon2Version version = Argon2Version.v13,
-    Argon2Type type = Argon2Type.argon2id,
   }) {
     return Argon2(
       salt: salt,
-      version: version,
-      type: type,
+      version: security.version,
+      type: security.type,
       hashLength: hashLength,
       iterations: security.t,
       parallelism: security.p,

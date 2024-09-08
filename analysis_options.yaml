@@ -22,5 +22,3 @@ linter:
 analyzer:
   exclude:
     - build/**
-    - test/**
-    - benchmark/**

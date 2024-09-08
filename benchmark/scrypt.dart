@@ -8,7 +8,7 @@ import 'package:hashlib/hashlib.dart';
 import 'package:pointycastle/export.dart';
 import 'package:pointycastle/key_derivators/scrypt.dart' as pc;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 
@@ -66,6 +66,16 @@ void main() {
   print('hashlib/scrypt[good]: ${runtime / 1000} ms');
   runtime = HashlibBenchmark(ScryptSecurity.strong).measure();
   print('hashlib/scrypt[strong]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.owasp).measure();
+  print('hashlib/scrypt[owasp1]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.owasp2).measure();
+  print('hashlib/scrypt[owasp2]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.owasp3).measure();
+  print('hashlib/scrypt[owasp3]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.owasp4).measure();
+  print('hashlib/scrypt[owasp4]: ${runtime / 1000} ms');
+  runtime = HashlibBenchmark(ScryptSecurity.owasp5).measure();
+  print('hashlib/scrypt[owasp5]: ${runtime / 1000} ms');
   print('');
   print('--------- PointyCastle/SCRYPT ----------');
   runtime = PointyCastleBenchmark(ScryptSecurity.test).measure();

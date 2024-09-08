@@ -1,19 +1,22 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart' as hashlib;
-import 'package:pointycastle/digests/ripemd320.dart' as pc;
+import 'package:pointycastle/digests/sha3.dart' as pc;
 
 import '_base.dart';
+
+Random random = Random();
 
 class HashlibBenchmark extends Benchmark {
   HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
 
   @override
   void run() {
-    hashlib.ripemd320.convert(input).bytes;
+    hashlib.sha224.convert(input).bytes;
   }
 }
 
@@ -29,13 +32,13 @@ class PointyCastleBenchmark extends Benchmark {
 
   @override
   void run() {
-    final d = pc.RIPEMD320Digest();
+    final d = pc.SHA3Digest(224);
     d.process(_input);
   }
 }
 
 void main() {
-  print('--------- RIPEMD-320 ----------');
+  print('--------- SHA3-224 ----------');
   final conditions = [
     [5 << 20, 10],
     [1 << 10, 5000],

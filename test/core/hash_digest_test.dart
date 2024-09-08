@@ -4,9 +4,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:test/test.dart';
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('HashDigest', () {

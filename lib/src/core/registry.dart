@@ -2,7 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/hashlib_base.dart';
 
 import 'utils.dart';
 

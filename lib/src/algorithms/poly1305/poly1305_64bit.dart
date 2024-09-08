@@ -17,8 +17,7 @@ const int _mask26 = 0x03FFFFFF;
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc8439.html
 /// [pdf]: https://cr.yp.to/mac/poly1305-20050329.pdf
-class Poly1305Sink extends BlockHashSink with MACSinkBase {
-  bool _initialized = false;
+class Poly1305Sink extends BlockHashSink implements MACSinkBase {
   // secret key: r
   int _r0 = 0;
   int _r1 = 0;
@@ -42,40 +41,20 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   int _g3 = 0;
   int _g4 = 0;
 
-  /// Creates a new instance to process 16-bytes blocks with 17-bytes buffer
-  Poly1305Sink() : super(16, bufferLength: 17);
-
   @override
   final int hashLength = 16;
 
   @override
-  bool get initialized => _initialized;
+  final int derivedKeyLength = 16;
 
-  @override
-  void reset() {
-    if (!_initialized) {
-      throw StateError('The instance is not initialized');
-    }
-    _h0 = 0;
-    _h1 = 0;
-    _h2 = 0;
-    _h3 = 0;
-    _h4 = 0;
-    super.reset();
-  }
-
-  /// Initialize the Poly1305 with the secret and the authentication
+  /// Creates a new instance to process 16-bytes blocks with 17-bytes buffer
   ///
   /// Parameters:
-  /// - [keypair] : The keypair (`r`, `s`) - 16 or 32-bytes.
-  @override
-  void init(List<int> keypair) {
-    if (keypair.length != 16 && keypair.length != 32) {
+  /// - [key] : The key-pair (`r`, `s`) - 16 or 32-bytes.
+  Poly1305Sink(Uint8List key) : super(16, bufferLength: 17) {
+    if (key.length != 16 && key.length != 32) {
       throw ArgumentError('The key length must be either 16 or 32 bytes');
     }
-
-    _initialized = true;
-    var key = keypair is Uint8List ? keypair : Uint8List.fromList(keypair);
 
     // r = key[15..0]
     _r0 = key[0] | (key[1] << 8) | (key[2] << 16) | (key[3] << 24);
@@ -106,10 +85,17 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
   }
 
   @override
+  void reset() {
+    _h0 = 0;
+    _h1 = 0;
+    _h2 = 0;
+    _h3 = 0;
+    _h4 = 0;
+    super.reset();
+  }
+
+  @override
   void $process(List<int> chunk, int start, int end) {
-    if (!_initialized) {
-      throw StateError('The instance is not yet initialized with a key');
-    }
     buffer[16] = 1;
     for (; start < end; start++, pos++) {
       if (pos == blockLength) {
@@ -174,10 +160,6 @@ class Poly1305Sink extends BlockHashSink with MACSinkBase {
 
   @override
   Uint8List $finalize() {
-    if (!_initialized) {
-      throw StateError('The instance is not yet initialized with a key');
-    }
-
     if (pos > 0) {
       buffer[pos] = 1;
       for (pos++; pos <= 16; pos++) {

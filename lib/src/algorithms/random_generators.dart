@@ -103,7 +103,7 @@ abstract class RandomGenerators {
     Random random;
     try {
       random = Random.secure();
-    } catch (err) {
+    } on UnsupportedError {
       random = Random($generateSeed());
     }
     while (true) {

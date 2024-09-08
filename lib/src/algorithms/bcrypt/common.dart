@@ -83,6 +83,9 @@ class BcryptContext {
     required this.cost,
   });
 
+  /// Ger version name
+  String get versioName => _versionToName(version);
+
   /// Creates an [BcryptContext] instance from encoded string.
   ///
   /// Parameters:

@@ -1,19 +1,17 @@
 # 1.20.0
 
 - [![codecov](https://codecov.io/gh/bitanon/hashlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/hashlib)
-- Fixes `HashDigest.number` for 64-bit
-- Fixes `shake128generator` and `shake256generator`
-  - Issue: Wrong bytes after length > blockLength
-- Refactors `HashBase`
+- Fixes issue in `shake128generator` and `shake256generator`: wrong bytes sequence after 168th and 136th.
+- Fixes `number` for 64-bit integer output in `HashDigest`
+- Fixes `oct` for octal string outupt in `HashDigest`
+- Bump version for `hashlib_codecs`
 - [**Breaking Changes**]:
+  - Refactors `HashBase` and `MACHashBase`
   - Renames `argon2verify` -> `argon2Verify`
-  - Uses Duration for period in TOTP
-  - Makes `PBKDF2.mac` as the default constructor.
-    The previous default one accepting a sink is removed.
-  - New behavior for `HashlibDigest.oct`: The output should
-    follow the standard now.
-  - Removes support for `tuneArgon2Security`
-  - Bump version for `hashlib_codecs`
+  - Renames `poly1305auth` -> `poly1305auth`, and removes `poly1305pair`
+  - Removes for `tuneArgon2Security`. It has been moved to examples folder.
+  - Interfaces for `hmac`, `pbkdf2`, `Blake2bMAC` and `BLAKE2sMAC`
+  - Duration for period in `TOTP`.
 
 # 1.19.2
 

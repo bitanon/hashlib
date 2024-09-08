@@ -92,7 +92,7 @@ void main() {
       var s = fromHex("0103808afb0db2fd4abff6af4149f51b");
       var m = "Cryptographic Forum Research Group".codeUnits;
       var actual = "a8061dc1305136c6c22b8baf0c0127a9";
-      expect(poly1305pair(m, r, s).hex(), actual);
+      expect(poly1305.pair(r, s).convert(m).hex(), actual);
     });
 
     test("example from NACL", () {
@@ -125,7 +125,7 @@ void main() {
         0xf3, 0xff, 0xc7, 0x70, 0x3f, 0x94, 0x00, 0xe5, //
         0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9
       ];
-      var res = poly1305(msg, key);
+      var res = poly1305auth(msg, key);
       expect(res.bytes, equals(mac));
     });
 
@@ -144,7 +144,7 @@ void main() {
         0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       ];
-      var res = poly1305(msg, key);
+      var res = poly1305auth(msg, key);
       expect(res.bytes, equals(mac));
     });
 
@@ -155,7 +155,7 @@ void main() {
         0xdd, 0xb9, 0xda, 0x7d, 0xdd, 0x5e, 0x52, 0x79, //
         0x27, 0x30, 0xed, 0x5c, 0xda, 0x5f, 0x90, 0xa4
       ];
-      var res = poly1305(msg, key);
+      var res = poly1305auth(msg, key);
       expect(res.bytes, mac);
     });
 
@@ -163,7 +163,7 @@ void main() {
       var m = "Cryptographic Forum Research Group".codeUnits;
       var key = List.filled(32, 0);
       var actual = List.filled(16, 0);
-      expect(poly1305(m, key).bytes, equals(actual));
+      expect(poly1305auth(m, key).bytes, equals(actual));
     });
 
     test('random key, empty message', () {
@@ -172,7 +172,7 @@ void main() {
         'c90e3dd155bcd5dfc5ac9a73eed584e6652bd6b403cdafd31bed3427442d29a9',
       );
       var actual = "652bd6b403cdafd31bed3427442d29a9";
-      expect(poly1305(m, key).hex(), actual);
+      expect(poly1305auth(m, key).hex(), actual);
     });
 
     test('random key, single message', () {
@@ -181,7 +181,7 @@ void main() {
         'b90e3dd1e5bc6cdfc5ac9a73eed584e6652bd3b409acdafd31bed3427442dae1',
       );
       var actual = "1aa7542dcbfafa4e04e7808ab84a989f";
-      expect(poly1305(m, key).hex(), actual);
+      expect(poly1305auth(m, key).hex(), actual);
     });
 
     test("buffered update", () {
@@ -197,13 +197,14 @@ void main() {
         0x28, 0x99, 0x57, 0x94, 0x41, 0x27, 0xd7, 0x5e,
       ];
 
-      var sink = Poly1305(key).createSink();
+      var sink = Poly1305().by(key).createSink();
       for (int i = 0; i < 256; i++) {
-        var mac = poly1305pair(
-          List.generate(i, (j) => i),
-          List.generate(16, (j) => i),
-          List.generate(16, (j) => 0xFF),
-        );
+        var mac = poly1305
+            .pair(
+              List.generate(16, (j) => i),
+              List.generate(16, (j) => 0xFF),
+            )
+            .convert(List.generate(i, (j) => i));
         sink.add(mac.bytes);
       }
       expect(sink.digest().bytes, equals(mac));
@@ -211,7 +212,7 @@ void main() {
 
     test("from bc-java test cases", () {
       for (final x in cases) {
-        var mac = poly1305(
+        var mac = poly1305auth(
           fromHex(x[1]),
           fromHex(x[0]),
         );
@@ -221,23 +222,28 @@ void main() {
 
     test('pair with invalid key length', () {
       var s = Uint8List(16);
-      expect(() => poly1305pair([100], [], s), throwsStateError);
-      expect(() => poly1305pair([100], [10], s), throwsStateError);
-      expect(() => poly1305pair([100], Uint8List(32), s), throwsStateError);
-      expect(() => poly1305pair([100], Uint8List(20), s), throwsStateError);
+      expect(() => poly1305.pair([], s).convert([100]), throwsStateError);
+      expect(() => poly1305.pair([10], s).convert([100]), throwsStateError);
+      expect(() => poly1305.pair(Uint8List(32), s).convert([100]),
+          throwsStateError);
+      expect(() => poly1305.pair(Uint8List(20), s).convert([100]),
+          throwsStateError);
     });
 
     test('pair with invalid secret length', () {
       var r = Uint8List(16);
-      expect(() => poly1305pair([100], r, []), throwsStateError);
-      expect(() => poly1305pair([100], r, [10]), throwsStateError);
-      expect(() => poly1305pair([100], r, Uint8List(20)), throwsStateError);
+      expect(() => poly1305.pair(r, []).convert([100]), throwsStateError);
+      expect(() => poly1305.pair(r, [10]).convert([100]), throwsStateError);
+      expect(() => poly1305.pair(r, Uint8List(20)).convert([100]),
+          throwsStateError);
     });
 
     test('pair with secret = null and 16 bit key', () {
       var r = fromHex("85d6be7857556d337f4452fe42d506a8");
       var m = "Cryptographic Forum Research Group".codeUnits;
-      expect(poly1305pair(m, r).hex(), equals(poly1305(m, r).hex()));
+      var out1 = poly1305.pair(r).convert(m).hex();
+      var out2 = poly1305auth(m, r).hex();
+      expect(out1, equals(out2));
     });
 
     test('pair with secret = null and 32 bit key', () {
@@ -246,7 +252,9 @@ void main() {
         "0103808afb0db2fd4abff6af4149f51b",
       );
       var m = "Cryptographic Forum Research Group".codeUnits;
-      expect(poly1305pair(m, r).hex(), equals(poly1305(m, r).hex()));
+      var out1 = poly1305.pair(r).convert(m).hex();
+      var out2 = poly1305auth(m, r).hex();
+      expect(out1, equals(out2));
     });
 
     test('sink test', () {
@@ -254,17 +262,8 @@ void main() {
       final msg = fromHex(cases[2][1]);
       final output = cases[2][2];
 
-      final sink = Poly1305Sink();
+      final sink = Poly1305Sink(key);
       expect(sink.closed, isFalse);
-      expect(sink.initialized, isFalse);
-      expect(() => sink.reset(), throwsStateError);
-      expect(() => sink.add(msg), throwsStateError);
-      expect(() => sink.digest(), throwsStateError);
-
-      sink.init(key);
-      expect(sink.initialized, isTrue);
-      expect(sink.closed, isFalse);
-
       for (int i = 0; i < msg.length; i += 7) {
         sink.add(msg.skip(i).take(7).toList());
       }
@@ -275,7 +274,6 @@ void main() {
 
       sink.reset();
       expect(sink.closed, isFalse);
-      expect(sink.initialized, isTrue);
 
       sink.add(msg);
       sink.close();
@@ -287,12 +285,9 @@ void main() {
       for (int i = 0; i < 64; ++i) {
         final key = Uint8List(i);
         if (i == 16 || i == 32) {
-          Poly1305Sink().init(key);
+          Poly1305Sink(key);
         } else {
-          expect(
-            () => Poly1305Sink().init(key),
-            throwsA(isA<ArgumentError>()),
-          );
+          expect(() => Poly1305Sink(key), throwsA(isA<ArgumentError>()));
         }
       }
     });

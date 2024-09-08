@@ -41,4 +41,11 @@ class BcryptSecurity {
   ///
   /// It uses 2^15 = 32768 rounds for encryption.
   static const strong = BcryptSecurity('strong', nb: 15);
+
+  /// Provides strong security recommended by [OWASP][link].
+  ///
+  /// It uses 2^10 = 1024 rounds for encryption.
+  ///
+  /// [link]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+  static const owasp = BcryptSecurity('owasp', nb: 10);
 }

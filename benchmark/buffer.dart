@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'base.dart';
+import '_base.dart';
 
 class ListBenchmark extends Benchmark {
   List<int> list = [];

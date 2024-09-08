@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 
-import 'base.dart';
+import '_base.dart';
 
 const int _maxInt = 0xFFFFFFFF;
 

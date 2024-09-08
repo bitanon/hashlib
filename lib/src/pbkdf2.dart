@@ -1,14 +1,48 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/src/algorithms/pbkdf2.dart';
+import 'package:hashlib/src/algorithms/pbkdf2/pbkdf2.dart';
 import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/sha256.dart';
 
-export 'package:hashlib/src/algorithms/pbkdf2.dart' show PBKDF2;
+export 'algorithms/pbkdf2/pbkdf2.dart' show PBKDF2;
+
+/// Extension to the HashBase to get an [PBKDF2] instance
+extension PBKDF2onMACHashBase on MACHashBase {
+  /// Generate a secret using [PBKDF2] hash algorithm.
+  @pragma('vm:prefer-inline')
+  PBKDF2 pbkdf2(
+    List<int> salt, [
+    int iterations = 1000,
+    int? keyLength,
+  ]) =>
+      PBKDF2(
+        this,
+        salt: salt,
+        iterations: iterations,
+        keyLength: keyLength,
+      );
+}
+
+/// Extension on [BlockHashBase] to get an [PBKDF2] instance
+extension PBKDF2onBlockHashBase on BlockHashBase {
+  /// Generate a secret using [PBKDF2] hash algorithm.
+  @pragma('vm:prefer-inline')
+  PBKDF2 pbkdf2(
+    List<int> salt, [
+    int iterations = 1000,
+    int? keyLength,
+  ]) =>
+      PBKDF2(
+        HMAC(this),
+        salt: salt,
+        iterations: iterations,
+        keyLength: keyLength,
+      );
+}
 
 /// This is an implementation of Password Based Key Derivation Algorithm,
 /// PBKDF2 derived from [RFC-8081][rfc], which internally uses [sha256] hash
@@ -32,44 +66,4 @@ HashDigest pbkdf2(
   int iterations = 1000,
   int? keyLength,
 ]) =>
-    PBKDF2(
-      sha256.hmac(password),
-      salt,
-      iterations,
-      keyLength,
-    ).convert();
-
-/// Extension on [BlockHashBase] to get an [PBKDF2] instance
-extension PBKDF2onBlockHashBase on BlockHashBase {
-  /// Generate a secret using [PBKDF2] hash algorithm.
-  @pragma('vm:prefer-inline')
-  HashDigest pbkdf2(
-    List<int> password,
-    List<int> salt, [
-    int iterations = 1000,
-    int? keyLength,
-  ]) =>
-      PBKDF2(
-        hmac(password),
-        salt,
-        iterations,
-        keyLength,
-      ).convert();
-}
-
-/// Extension to the HashBase to get an [PBKDF2] instance
-extension PBKDF2onHMAC on MACHashBase {
-  /// Generate a secret using [PBKDF2] hash algorithm.
-  @pragma('vm:prefer-inline')
-  HashDigest pbkdf2(
-    List<int> salt, [
-    int iterations = 1000,
-    int? keyLength,
-  ]) =>
-      PBKDF2(
-        this,
-        salt,
-        iterations,
-        keyLength,
-      ).convert();
-}
+    sha256.pbkdf2(salt, iterations, keyLength).convert(password);

@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/mac_base.dart';
 import 'package:hashlib/src/core/otpauth.dart';
 import 'package:hashlib/src/hmac.dart';
 import 'package:hashlib/src/sha1.dart';
@@ -32,8 +33,18 @@ const _pow10 = [
 /// [rfc4226]: https://www.ietf.org/rfc/rfc4226.html
 class HOTP extends OTPAuth {
   final int _max;
-  final HMAC mac;
+
+  /// The underlying MAC algorithm
+  final MACHash algo;
+
+  /// The secret key
+  final List<int> secret;
+
+  /// The counter value
   final List<int> counter;
+
+  /// The algorithm name
+  String get name => algo.name;
 
   /// Creates an instance of the [HOTP] class with the specified parameters.
   ///
@@ -46,14 +57,14 @@ class HOTP extends OTPAuth {
   ///   is associated with.
   /// - [issuer] is an optional string to specify the entity issuing the OTP.
   HOTP(
-    List<int> secret, {
+    this.secret, {
     int digits = 6,
     required this.counter,
     BlockHashBase algo = sha1,
     String? label,
     String? issuer,
   })  : assert(digits <= 15),
-        mac = HMAC(algo, secret),
+        algo = HMAC(algo).by(secret),
         _max = _pow10[digits],
         super(
           digits,
@@ -61,15 +72,9 @@ class HOTP extends OTPAuth {
           issuer: issuer,
         );
 
-  /// The secret key
-  List<int> get secret => mac.key;
-
-  /// The algorithm name
-  String get algorithm => mac.algo.name;
-
   @override
   int value() {
-    var digest = mac.convert(counter).bytes;
+    var digest = algo.convert(counter).bytes;
     int offset = digest.last & 0xF;
     int dbc = ((digest[offset] & 0x7F) << 24) |
         ((digest[offset + 1] & 0xFF) << 16) |

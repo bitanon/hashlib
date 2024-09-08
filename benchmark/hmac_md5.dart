@@ -7,7 +7,7 @@ import 'package:hash/hash.dart' as hash;
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/hashlib.dart' as hashlib;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 
@@ -18,7 +18,7 @@ class HashlibBenchmark extends Benchmark {
 
   @override
   void run() {
-    hashlib.HMAC(hashlib.md5, key).convert(input).bytes;
+    hashlib.HMAC(hashlib.md5).by(key).convert(input).bytes;
   }
 }
 

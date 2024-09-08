@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:hashlib/hashlib.dart' as hashlib;
 
-import 'base.dart';
+import '_base.dart';
 
 Random random = Random();
 

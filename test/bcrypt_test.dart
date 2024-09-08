@@ -10,6 +10,14 @@ import 'package:test/test.dart';
 void main() {
   group('bcrypt test', () {
     group('functionality test', () {
+      test("name", () {
+        expect(Bcrypt(cost: 10).name, r'Bcrypt/2b');
+        expect(Bcrypt(cost: 10, version: BcryptVersion.$2a).name, r'Bcrypt/2a');
+        expect(Bcrypt(cost: 10, version: BcryptVersion.$2x).name, r'Bcrypt/2x');
+        expect(Bcrypt(cost: 10, version: BcryptVersion.$2y).name, r'Bcrypt/2y');
+        expect(Bcrypt(cost: 10, version: BcryptVersion.$2b).name, r'Bcrypt/2b');
+      });
+
       // http://openwall.info/wiki/john/sample-hashes
       test("bcrypt", () {
         const password = r"password";

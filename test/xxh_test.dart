@@ -14,13 +14,13 @@ File fixtureFile(String filename) {
 }
 
 List<String> readLines(String filename) {
-  final text = fixtureFile('long.txt').readAsStringSync();
+  final text = fixtureFile(filename).readAsStringSync();
   return text.split(RegExp(r'(\r)?\n'));
 }
 
 void main() {
   group('XXH test with fixures', () {
-    const int maxLength = 100;
+    const int maxLength = 1500;
     final text = fixtureFile('long.txt').readAsBytesSync();
 
     test('for xxh32', () {
@@ -30,11 +30,8 @@ void main() {
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
         if (len > maxLength) break;
-        expect(
-          parts[1],
-          xxh32.hex(text.take(len).toList()),
-          reason: 'At length: $len',
-        );
+        var out = xxh32.hex(text.take(len).toList());
+        expect(out, equals(parts[1]), reason: 'length: $len');
       }
     });
 
@@ -45,11 +42,8 @@ void main() {
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
         if (len > maxLength) break;
-        expect(
-          parts[1],
-          xxh64.hex(text.take(len).toList()),
-          reason: 'At length: $len',
-        );
+        var out = xxh64.hex(text.take(len).toList());
+        expect(out, equals(parts[1]), reason: 'length: $len');
       }
     });
 
@@ -60,11 +54,8 @@ void main() {
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
         if (len > maxLength) break;
-        expect(
-          xxh3.hex(text.take(len).toList()),
-          parts[1],
-          reason: 'At length: $len',
-        );
+        var out = xxh3.hex(text.take(len).toList());
+        expect(out, equals(parts[1]), reason: 'length: $len');
       }
     });
 
@@ -75,11 +66,8 @@ void main() {
         if (parts.length != 2) continue;
         int len = int.parse(parts[0]);
         if (len > maxLength) break;
-        expect(
-          xxh128.hex(text.take(len).toList()),
-          parts[1],
-          reason: 'At length: $len',
-        );
+        var out = xxh128.hex(text.take(len).toList());
+        expect(out, equals(parts[1]), reason: 'length: $len');
       }
     });
   });

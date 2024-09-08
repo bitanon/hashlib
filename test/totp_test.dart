@@ -21,8 +21,8 @@ void main() {
 
   group('TOTP', () {
     test('algorithm name', () {
-      expect(TOTP(secret).algorithm, 'SHA1');
-      expect(TOTP(secret, algo: md5).algorithm, 'MD5');
+      expect(TOTP(secret).name, 'SHA1/HMAC');
+      expect(TOTP(secret, algo: md5).name, 'MD5/HMAC');
     });
 
     test('secret, label and issuer values', () {
