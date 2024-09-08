@@ -1,10 +1,10 @@
 # 1.20.2
 
-- Modifies interface for `Poly1305`
+- Modifies `Poly1305` interface: `poly1305` is now available as the builder.
 
 # 1.20.1
 
-- Modifies `MACHash` and `MACHashBase` interfaces for accessibility.
+- Modifies `MACHash` and `MACHashBase` interfaces for better accessibility.
 
 # 1.20.0
 
@@ -16,7 +16,7 @@
 - [**Breaking Changes**]:
   - Refactors `HashBase` and `MACHashBase`
   - Renames `argon2verify` -> `argon2Verify`
-  - Renames `poly1305auth` -> `poly1305auth`, and removes `poly1305pair`
+  - Renames `poly1305` -> `poly1305auth`, and removes `poly1305pair`
   - Removes for `tuneArgon2Security`. It has been moved to examples folder.
   - Interfaces for `hmac`, `pbkdf2`, `Blake2bMAC` and `BLAKE2sMAC`
   - Duration for period in `TOTP`.
