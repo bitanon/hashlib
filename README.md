@@ -8,8 +8,6 @@
 [![pub points](https://img.shields.io/pub/points/hashlib?logo=dart&color=teal)](https://pub.dev/packages/hashlib/score)
 [![popularity](https://img.shields.io/pub/popularity/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 
-<!-- [![test](https://github.com/bitanon/hashlib/actions/workflows/test.yml/badge.svg)](https://github.com/bitanon/hashlib/actions/workflows/test.yml) -->
-
 This library contains implementations of secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 
 ## Depencencies
@@ -199,14 +197,14 @@ void main() {
 
 # Benchmarks
 
-# Benchmarks
-
 Libraries:
 
 - **Hashlib** : https://pub.dev/packages/hashlib
 - **Crypto** : https://pub.dev/packages/crypto
 - **PointyCastle** : https://pub.dev/packages/pointycastle
 - **Hash** : https://pub.dev/packages/hash
+
+<hr/>
 
 With 5MB message (10 iterations):
 
@@ -239,6 +237,8 @@ With 5MB message (10 iterations):
 | XXH128        | **985 Mbps**  |                               |                             |                            |
 | SM3           | **637 Mbps**  | 185 Mbps <br> `3.44x slow`    |                             |                            |
 
+<hr/>
+
 With 1KB message (5000 iterations):
 
 | Algorithms    | `hashlib`     | `PointyCastle`                | `crypto`                    | `hash`                     |
@@ -269,6 +269,8 @@ With 1KB message (5000 iterations):
 | XXH3          | **918 Mbps**  |                               |                             |                            |
 | XXH128        | **925 Mbps**  |                               |                             |                            |
 | SM3           | **599 Mbps**  | 174 Mbps <br> `3.43x slow`    |                             |                            |
+
+<hr/>
 
 With 10B message (100000 iterations):
 
@@ -301,6 +303,8 @@ With 10B message (100000 iterations):
 | XXH128        | **83.76 Mbps** |                              |                                  |                              |
 | SM3           | **101 Mbps**   | 28.19 Mbps <br> `3.57x slow` |                                  |                              |
 
+<hr/>
+
 Key derivator algorithm benchmarks on different security parameters:
 
 | Algorithms | little   | moderate  | good       | strong      |
@@ -311,6 +315,8 @@ Key derivator algorithm benchmarks on different security parameters:
 | argon2i    | 3.914 ms | 16.474 ms | 215.783 ms | 2598.387 ms |
 | argon2d    | 2.981 ms | 16.98 ms  | 207.425 ms | 2563.844 ms |
 | argon2id   | 2.311 ms | 16.491 ms | 205.25 ms  | 2576.335 ms |
+
+<hr/>
 
 > All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_
 >
