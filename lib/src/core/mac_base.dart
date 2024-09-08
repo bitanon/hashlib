@@ -11,21 +11,8 @@ abstract class MACSinkBase extends HashDigestSink {
   int get derivedKeyLength => hashLength;
 }
 
-class MACHash<T extends MACSinkBase> extends HashBase {
-  final T _sink;
-
-  @override
-  final String name;
-
-  const MACHash(this.name, this._sink);
-
-  @override
-  @pragma('vm:prefer-inline')
-  T createSink() {
-    _sink.reset();
-    return _sink;
-  }
-
+/// This can be used as a mixin for MAC algorithm interfaces
+abstract class MACHashBase<T extends HashDigestSink> implements HashBase<T> {
   /// Signing the [message] using this MAC to generate a tag.
   @pragma('vm:prefer-inline')
   HashDigest sign(List<int> message) => convert(message);
@@ -36,21 +23,21 @@ class MACHash<T extends MACSinkBase> extends HashBase {
       convert(message).isEqual(tag);
 }
 
-abstract class MACHashBase<T extends MACSinkBase> {
-  const MACHashBase();
+abstract class MACHash<T extends HashDigestSink> {
+  const MACHash();
 
   /// The name of this algorithm
   String get name;
 
-  /// Get an [MACHash] instance initialized by a [key].
+  /// Get a [MACHashBase] instance initialized by a [key].
   @pragma('vm:prefer-inline')
-  MACHash<T> by(List<int> key);
+  MACHashBase<T> by(List<int> key);
 
-  /// Get an [MACHash] instance initialized by a string [key].
+  /// Get a [MACHashBase] instance initialized by a string [key].
   ///
   /// If [encoding] is not specified, the [String.codeUnits] are used.
   @pragma('vm:prefer-inline')
-  MACHash<T> byString(String key, [Encoding? encoding]) =>
+  MACHashBase<T> byString(String key, [Encoding? encoding]) =>
       by(encoding != null ? encoding.encode(key) : key.codeUnits);
 
   /// Signing the [message] using a [key] to generate a tag.

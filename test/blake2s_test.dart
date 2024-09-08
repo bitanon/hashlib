@@ -6,6 +6,36 @@ import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('Blake2sHash functionality test', () {
+    test('The digest size must be between 1 and 32', () {
+      Blake2sHash(1);
+      Blake2sHash(32);
+      expect(() => Blake2sHash(0), throwsArgumentError);
+      expect(() => Blake2sHash(33), throwsArgumentError);
+      expect(() => Blake2sHash(64), throwsArgumentError);
+    });
+    test('The valid length of salt is 8 bytes ', () {
+      Blake2sHash(16, salt: Uint8List(0));
+      Blake2sHash(16, salt: Uint8List(8));
+      expect(() => Blake2sHash(16, salt: Uint8List(1)), throwsArgumentError);
+      expect(() => Blake2sHash(16, salt: Uint8List(9)), throwsArgumentError);
+      expect(() => Blake2sHash(16, salt: Uint8List(16)), throwsArgumentError);
+    });
+    test('The valid length of personalization is 8 bytes ', () {
+      Blake2sHash(16, aad: Uint8List(0));
+      Blake2sHash(16, aad: Uint8List(8));
+      expect(() => Blake2sHash(16, aad: Uint8List(1)), throwsArgumentError);
+      expect(() => Blake2sHash(16, aad: Uint8List(9)), throwsArgumentError);
+      expect(() => Blake2sHash(16, aad: Uint8List(16)), throwsArgumentError);
+    });
+    test('The key should not be greater than 32 bytes ', () {
+      Blake2sHash(16, key: Uint8List(0));
+      Blake2sHash(16, key: Uint8List(1));
+      Blake2sHash(16, key: Uint8List(32));
+      expect(() => Blake2sHash(16, key: Uint8List(33)), throwsArgumentError);
+      expect(() => Blake2sHash(16, key: Uint8List(64)), throwsArgumentError);
+    });
+  });
   group('Blake2s funtionality test', () {
     test("Blake2s name", () {
       expect(Blake2s(8).name, 'BLAKE2s-64');
@@ -24,49 +54,6 @@ void main() {
       expect(blake2s160.mac.by(key).name, 'BLAKE2s-160/MAC');
       expect(blake2s224.mac.by(key).name, 'BLAKE2s-224/MAC');
       expect(blake2s256.mac.by(key).name, 'BLAKE2s-256/MAC');
-    });
-    test('The digest size must be between 1 and 32', () {
-      Blake2s(1).createSink();
-      Blake2s(32).createSink();
-      expect(() => Blake2s(0).createSink(), throwsArgumentError);
-      expect(() => Blake2s(33).createSink(), throwsArgumentError);
-    });
-    test('The valid length of salt is 8 bytes ', () {
-      Blake2s(16, salt: Uint8List(0)).createSink();
-      Blake2s(16, salt: Uint8List(8)).createSink();
-      expect(
-        () => Blake2s(16, salt: Uint8List(1)).createSink(),
-        throwsArgumentError,
-      );
-      expect(
-        () => Blake2s(16, salt: Uint8List(9)).createSink(),
-        throwsArgumentError,
-      );
-    });
-    test('The valid length of personalization is 8 bytes ', () {
-      Blake2s(16, personalization: Uint8List(0)).createSink();
-      Blake2s(16, personalization: Uint8List(8)).createSink();
-      expect(
-        () => Blake2s(16, personalization: Uint8List(1)).createSink(),
-        throwsArgumentError,
-      );
-      expect(
-        () => Blake2s(16, personalization: Uint8List(9)).createSink(),
-        throwsArgumentError,
-      );
-    });
-    test('The key should not be greater than 32 bytes ', () {
-      Blake2s(16).mac.by(Uint8List(0)).createSink();
-      Blake2s(16).mac.by(Uint8List(1)).createSink();
-      Blake2s(16).mac.by(Uint8List(32)).createSink();
-      expect(
-        () => Blake2s(16).mac.by(Uint8List(33)).createSink(),
-        throwsArgumentError,
-      );
-      expect(
-        () => Blake2s(16).mac.by(Uint8List(64)).createSink(),
-        throwsArgumentError,
-      );
     });
     test('sink test', () {
       final input = List.generate(512, (i) => i & 0xFF);
@@ -134,15 +121,6 @@ void main() {
     test('with empty string and a secret', () {
       expect(blake2s256.mac.byString('secret').string('').hex(),
           "864f60ce88fc1c80c7b3b4f0bb920255fb464484a9dc7346f1d0e4e190d358cd");
-    });
-    test('Blake2s config without any parameters', () {
-      expect(blake2s256.config().string('a').hex(),
-          "4a0d129873403037c2cd9b9048203687f6233fb6738956e0349bd4320fec3e90");
-    });
-    test('Blake2s config with a salt', () {
-      final salt = 'somesalt'.codeUnits;
-      expect(blake2s256.config(salt: salt).string('a').hex(),
-          "01dc5d55926ffeeedf384a3fa709f6be647decd99e85a9695ef2aac8b6d4ffc8");
     });
   });
 

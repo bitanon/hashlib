@@ -35,7 +35,7 @@ class HOTP extends OTPAuth {
   final int _max;
 
   /// The underlying MAC algorithm
-  final MACHash algo;
+  final MACHashBase algo;
 
   /// The secret key
   final List<int> secret;

@@ -54,7 +54,7 @@ void main() {
 
   group('MACHashBase', () {
     test('by create a MACHash', () {
-      expect(sha1.hmac.by([2]), isA<MACHash>());
+      expect(sha1.hmac.by([2]), isA<MACHashBase>());
     });
 
     test('sign should return a HashDigest', () {

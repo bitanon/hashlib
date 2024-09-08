@@ -100,7 +100,7 @@ class Blake2bHash extends BlockHashSink implements MACSinkBase {
     int digestSize, {
     this.key,
     List<int>? salt,
-    List<int>? personalization,
+    List<int>? aad,
   })  : hashLength = digestSize,
         derivedKeyLength = digestSize,
         super(1024 >>> 3) {
@@ -152,21 +152,21 @@ class Blake2bHash extends BlockHashSink implements MACSinkBase {
       }
     }
 
-    if (personalization != null && personalization.isNotEmpty) {
-      if (personalization.length != 16) {
+    if (aad != null && aad.isNotEmpty) {
+      if (aad.length != 16) {
         throw ArgumentError('The valid length of personalization is 16 bytes');
       }
       for (int i = 0, p = 0; i < 4; i++, p += 8) {
-        _s12 ^= (personalization[i] & 0xFF) << p;
+        _s12 ^= (aad[i] & 0xFF) << p;
       }
       for (int i = 4, p = 0; i < 8; i++, p += 8) {
-        _s13 ^= (personalization[i] & 0xFF) << p;
+        _s13 ^= (aad[i] & 0xFF) << p;
       }
       for (int i = 8, p = 0; i < 12; i++, p += 8) {
-        _s14 ^= (personalization[i] & 0xFF) << p;
+        _s14 ^= (aad[i] & 0xFF) << p;
       }
       for (int i = 12, p = 0; i < 16; i++, p += 8) {
-        _s15 ^= (personalization[i] & 0xFF) << p;
+        _s15 ^= (aad[i] & 0xFF) << p;
       }
     }
 

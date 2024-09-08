@@ -22,7 +22,7 @@ class PBKDF2Security {
   final int dklen;
 
   /// The underlying algorithm
-  final MACHashBase mac;
+  final MACHash mac;
 
   const PBKDF2Security(
     this.name, {

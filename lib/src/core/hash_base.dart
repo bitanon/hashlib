@@ -66,14 +66,15 @@ abstract class HashDigestSink implements Sink<List<int>> {
 /// The base class used by the hash algorithm implementations. It implements
 /// the [StreamTransformer] and exposes few convenient methods to handle any
 /// types of data source.
-abstract class HashBase implements StreamTransformer<List<int>, HashDigest> {
+abstract class HashBase<T extends HashDigestSink>
+    implements StreamTransformer<List<int>, HashDigest> {
   const HashBase();
 
   /// The name of this algorithm
   String get name;
 
   /// Create a [HashDigestSink] for generating message-digests
-  HashDigestSink createSink();
+  T createSink();
 
   /// Process the byte array [input] and returns a [HashDigest].
   @pragma('vm:prefer-inline')

@@ -32,7 +32,7 @@ class PBKDF2 extends KeyDerivatorBase {
   String get name => '${algo.name}/PBKDF2';
 
   /// The underlying algorithm used as Pseudo Random Function (PRF)
-  final MACHashBase algo;
+  final MACHash algo;
 
   /// The byte array containing salt
   final List<int> salt;
@@ -52,7 +52,7 @@ class PBKDF2 extends KeyDerivatorBase {
 
   /// Create a [PBKDF2] instance with a MAC instance.
   factory PBKDF2(
-    MACHashBase mac,
+    MACHash mac,
     int iterations, {
     List<int>? salt,
     int? keyLength,
@@ -84,7 +84,7 @@ class PBKDF2 extends KeyDerivatorBase {
   factory PBKDF2.fromSecurity(
     PBKDF2Security security, {
     List<int>? salt,
-    MACHashBase? mac,
+    MACHash? mac,
     int? iterations,
     int? keyLength,
   }) =>

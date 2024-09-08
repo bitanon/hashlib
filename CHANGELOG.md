@@ -1,3 +1,7 @@
+# 1.20.1
+
+- Modifies `MACHash` and `MACHashBase` interfaces for accessibility.
+
 # 1.20.0
 
 - [![codecov](https://codecov.io/gh/bitanon/hashlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/hashlib)

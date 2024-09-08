@@ -7,6 +7,33 @@ import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('Blake2bHash functionality test', () {
+    test('The digest size must be between 1 and 64', () {
+      Blake2bHash(1);
+      Blake2bHash(64);
+      expect(() => Blake2bHash(0), throwsArgumentError);
+      expect(() => Blake2bHash(65), throwsArgumentError);
+    });
+    test('The valid length of salt is 16 bytes ', () {
+      Blake2bHash(16, salt: Uint8List(0));
+      Blake2bHash(16, salt: Uint8List(16));
+      expect(() => Blake2bHash(16, salt: Uint8List(1)), throwsArgumentError);
+      expect(() => Blake2bHash(16, salt: Uint8List(17)), throwsArgumentError);
+    });
+    test('The valid length of personalization is 16 bytes ', () {
+      Blake2bHash(16, aad: Uint8List(0));
+      Blake2bHash(16, aad: Uint8List(16));
+      expect(() => Blake2bHash(16, aad: Uint8List(1)), throwsArgumentError);
+      expect(() => Blake2bHash(16, aad: Uint8List(17)), throwsArgumentError);
+    });
+    test('The key should not be greater than 64 bytes ', () {
+      Blake2bHash(16, key: Uint8List(0));
+      Blake2bHash(16, key: Uint8List(1));
+      Blake2bHash(16, key: Uint8List(64));
+      expect(() => Blake2bHash(16, key: Uint8List(65)), throwsArgumentError);
+    });
+  });
+
   group('Blake2b funtionality test', () {
     test("Blake2b name", () {
       expect(Blake2b(8).name, 'BLAKE2b-64');
@@ -27,45 +54,6 @@ void main() {
       expect(blake2b512.mac.pbkdf2([2]).name, 'BLAKE2b-512/MAC/PBKDF2');
       expect(blake2b512.hmac.pbkdf2([2]).name, 'BLAKE2b-512/HMAC/PBKDF2');
     });
-    test('The digest size must be between 1 and 64', () {
-      Blake2b(1).createSink();
-      Blake2b(64).createSink();
-      expect(() => Blake2b(0).createSink(), throwsArgumentError);
-      expect(() => Blake2b(65).createSink(), throwsArgumentError);
-    });
-    test('The valid length of salt is 16 bytes ', () {
-      Blake2b(16, salt: Uint8List(0)).createSink();
-      Blake2b(16, salt: Uint8List(16)).createSink();
-      expect(
-        () => Blake2b(16, salt: Uint8List(1)).convert([]),
-        throwsArgumentError,
-      );
-      expect(
-        () => Blake2b(16, salt: Uint8List(17)).convert([]),
-        throwsArgumentError,
-      );
-    });
-    test('The valid length of personalization is 16 bytes ', () {
-      Blake2b(16, personalization: Uint8List(0)).createSink();
-      Blake2b(16, personalization: Uint8List(16)).createSink();
-      expect(
-        () => Blake2b(16, personalization: Uint8List(1)).convert([]),
-        throwsArgumentError,
-      );
-      expect(
-        () => Blake2b(16, personalization: Uint8List(17)).convert([]),
-        throwsArgumentError,
-      );
-    });
-    test('The key should not be greater than 64 bytes ', () {
-      Blake2b(16).mac.by(Uint8List(0)).createSink();
-      Blake2b(16).mac.by(Uint8List(1)).createSink();
-      Blake2b(16).mac.by(Uint8List(64)).createSink();
-      expect(
-        () => Blake2b(16).mac.by(Uint8List(65)).createSink(),
-        throwsArgumentError,
-      );
-    });
     test('sink test', () {
       final input = List.generate(512, (i) => i & 0xFF);
       final output =
@@ -85,15 +73,6 @@ void main() {
       sink.close();
       expect(sink.closed, isTrue);
       expect(sink.digest().hex(), equals(output));
-    });
-    test('Blake2b config without any parameters', () {
-      expect(blake2b256.config().string('abc').hex(),
-          "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319");
-    });
-    test('Blake2b config with salt', () {
-      final salt = 'some  long  salt'.codeUnits;
-      expect(blake2b256.config(salt: salt).string('a').hex(),
-          "5f6b5bcc59698fbbe2d8ff7b3dd1b7c841cf4b1a8cec88e05c02bc97d12ad52b");
     });
   });
 

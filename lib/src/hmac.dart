@@ -3,6 +3,7 @@
 
 import 'package:hashlib/src/algorithms/hmac.dart';
 import 'package:hashlib/src/core/block_hash.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 import 'package:hashlib/src/sha256.dart';
 
@@ -12,7 +13,24 @@ const hmac_sha256 = HMAC(sha256);
 
 /// HMAC is a hash-based message authentication code that can be used to
 /// simultaneously verify both the data integrity and authenticity of a message.
-class HMAC<T extends BlockHashBase> extends MACHashBase<HMACSink<T>> {
+class _HMAC<T extends BlockHashBase> extends HashBase<HMACSink<T>>
+    with MACHashBase<HMACSink<T>> {
+  /// The algorithm for the MAC generation
+  final T algo;
+  final List<int> key;
+
+  const _HMAC(this.algo, this.key);
+
+  @override
+  String get name => '${algo.name}/HMAC';
+
+  @override
+  HMACSink<T> createSink() => HMACSink(algo, key);
+}
+
+/// HMAC is a hash-based message authentication code that can be used to
+/// simultaneously verify both the data integrity and authenticity of a message.
+class HMAC<T extends BlockHashBase> extends MACHash<HMACSink<T>> {
   /// The algorithm for the MAC generation
   final T algo;
 
@@ -22,8 +40,7 @@ class HMAC<T extends BlockHashBase> extends MACHashBase<HMACSink<T>> {
   String get name => '${algo.name}/HMAC';
 
   @override
-  @pragma('vm:prefer-inline')
-  MACHash<HMACSink<T>> by(List<int> key) => MACHash(name, HMACSink(algo, key));
+  MACHashBase<HMACSink<T>> by(List<int> key) => _HMAC(algo, key);
 }
 
 /// Extension on [BlockHashBase] to get an [HMAC] instance

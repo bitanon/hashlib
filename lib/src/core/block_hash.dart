@@ -5,11 +5,8 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
 
-abstract class BlockHashBase extends HashBase {
+abstract class BlockHashBase<T extends BlockHashSink> extends HashBase<T> {
   const BlockHashBase();
-
-  @override
-  BlockHashSink createSink();
 }
 
 abstract class BlockHashSink extends HashDigestSink {

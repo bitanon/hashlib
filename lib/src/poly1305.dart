@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'package:hashlib/src/algorithms/poly1305/poly1305_sink.dart';
+import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/core/mac_base.dart';
 
@@ -13,7 +14,19 @@ export 'algorithms/poly1305/poly1305_sink.dart' show Poly1305Sink;
 /// message using either 16 or 32-byte long authentication key.
 const poly1305 = Poly1305();
 
-class Poly1305 extends MACHashBase<Poly1305Sink> {
+class _Poly1305 extends HashBase<Poly1305Sink> with MACHashBase<Poly1305Sink> {
+  final Uint8List key;
+
+  const _Poly1305(this.key);
+
+  @override
+  final String name = 'Poly1305';
+
+  @override
+  Poly1305Sink createSink() => Poly1305Sink(key);
+}
+
+class Poly1305 extends MACHash<Poly1305Sink> {
   const Poly1305();
 
   @override
@@ -36,11 +49,8 @@ class Poly1305 extends MACHashBase<Poly1305Sink> {
   /// See also:
   /// - [Poly1305.pair] to input key(`r`) and secret(`s`) pair separately.
   @override
-  @pragma('vm:prefer-inline')
-  MACHash<Poly1305Sink> by(List<int> keypair) {
-    var key8 = keypair is Uint8List ? keypair : Uint8List.fromList(keypair);
-    return MACHash(name, Poly1305Sink(key8));
-  }
+  MACHashBase<Poly1305Sink> by(List<int> keypair) =>
+      _Poly1305(keypair is Uint8List ? keypair : Uint8List.fromList(keypair));
 
   /// Creates a new instance of [Poly1305].
   ///
@@ -59,7 +69,7 @@ class Poly1305 extends MACHashBase<Poly1305Sink> {
   ///
   /// See also:
   /// - [Poly1305.by] to input key(`r`) and secret(`s`) pair together.
-  MACHash<Poly1305Sink> pair(List<int> key, [List<int>? secret]) {
+  MACHashBase<Poly1305Sink> pair(List<int> key, [List<int>? secret]) {
     if (secret == null) {
       return by(key);
     }
@@ -72,7 +82,7 @@ class Poly1305 extends MACHashBase<Poly1305Sink> {
     var pair = Uint8List(32);
     pair.setAll(0, key);
     pair.setAll(16, secret);
-    return by(pair);
+    return _Poly1305(pair);
   }
 }
 

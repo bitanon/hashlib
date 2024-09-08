@@ -13,7 +13,7 @@ export 'algorithms/pbkdf2/pbkdf2.dart' show PBKDF2;
 export 'algorithms/pbkdf2/security.dart' show PBKDF2Security;
 
 /// Extension to the HashBase to get an [PBKDF2] instance
-extension PBKDF2onMACHashBase on MACHashBase {
+extension PBKDF2onMACHashBase on MACHash {
   /// Generate a secret using [PBKDF2] hash algorithm.
   @pragma('vm:prefer-inline')
   PBKDF2 pbkdf2(

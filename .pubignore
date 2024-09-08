@@ -1,6 +1,7 @@
 /test
-/script
-/benchmark
 /coverage
+/benchmark
+/doc
 /build
+/scripts
 /.github
