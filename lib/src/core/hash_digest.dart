@@ -4,7 +4,7 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:hashlib/codecs.dart';
 
 class HashDigest extends Object {
   final Uint8List bytes;
@@ -120,12 +120,17 @@ class HashDigest extends Object {
       return isEqual(Uint8List.view(other.buffer));
     } else if (other is String) {
       return isEqual(fromHex(other));
-    } else if (other is Iterable<int>) {
-      if (other is List<int>) {
-        if (other.length != bytes.length) {
+    } else if (other is List<int>) {
+      if (other.length != bytes.length) {
+        return false;
+      }
+      for (int i = 0; i < bytes.length; ++i) {
+        if (other[i] != bytes[i++]) {
           return false;
         }
       }
+      return true;
+    } else if (other is Iterable<int>) {
       int i = 0;
       for (int x in other) {
         if (i >= bytes.length || x != bytes[i++]) {

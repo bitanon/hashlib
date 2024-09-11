@@ -1,5 +1,5 @@
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 void main() {
   var text = "Happy Hashing!";

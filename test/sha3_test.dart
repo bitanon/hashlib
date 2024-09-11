@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
 void main() {

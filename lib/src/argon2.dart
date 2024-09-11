@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/algorithms/argon2/argon2.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 export 'package:hashlib/src/algorithms/argon2/argon2.dart';
 

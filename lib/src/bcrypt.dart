@@ -1,10 +1,10 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/algorithms/bcrypt/bcrypt.dart';
 import 'package:hashlib/src/algorithms/bcrypt/common.dart';
 import 'package:hashlib/src/algorithms/bcrypt/security.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 export 'algorithms/bcrypt/bcrypt.dart' show Bcrypt;
 export 'algorithms/bcrypt/common.dart'

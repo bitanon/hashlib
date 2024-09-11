@@ -104,8 +104,8 @@ Check the [API Reference](https://pub.dev/documentation/hashlib/latest/) for det
 Examples can be found inside the `example` folder.
 
 ```dart
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 void main() {
   var text = "Happy Hashing!";
@@ -164,10 +164,10 @@ void main() {
   print('');
 
   // Examples of PBKDF2 key derivation
-  print("SHA256/HMAC/PBKDF2 => ${pbkdf2(pw, iv, 100).hex()}");
-  print("SHA1/HMAC/PBKDF2 => ${sha1.pbkdf2(iv, 100).hex(pw)}");
-  print("BLAKE2b-256/HMAC/PBKDF2 => ${blake2b256.pbkdf2(iv, 100).hex(pw)}");
-  print("BLAKE2b-256/MAC/PBKDF2 => ${blake2b256.mac.pbkdf2(iv, 100).hex(pw)}");
+  print("SHA256/HMAC/PBKDF2 => ${pbkdf2(pw, iv).hex()}");
+  print("BLAKE2b-256/HMAC/PBKDF2 => ${blake2b256.pbkdf2(iv).hex(pw)}");
+  print("BLAKE2b-256/MAC/PBKDF2 => ${blake2b256.mac.pbkdf2(iv).hex(pw)}");
+  print("SHA1/HMAC/PBKDF2 => ${sha1.pbkdf2(iv, iterations: 100).hex(pw)}");
   print('');
 
   // Examples of OTP generation

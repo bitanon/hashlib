@@ -3,10 +3,10 @@
 
 import 'dart:typed_data';
 
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/algorithms/bcrypt/common.dart';
 import 'package:hashlib/src/algorithms/bcrypt/security.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 class Bcrypt extends KeyDerivatorBase {
   final BcryptContext _ctx;

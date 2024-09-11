@@ -3,10 +3,10 @@
 
 import 'dart:typed_data';
 
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/algorithms/bcrypt/bcrypt.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/random.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 enum BcryptVersion {
   /// This is a revised version of original v2 with UTF-8 character support

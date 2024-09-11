@@ -122,6 +122,11 @@ void main() {
       expect(digest.isEqual(byteArray), isTrue);
     });
 
+    test('isEqual returns true for equal byte iterables', () {
+      final byteIterables = {1, 2, 3, 4, 5, 6, 7, 8};
+      expect(digest.isEqual(byteIterables), isTrue);
+    });
+
     test('isEqual returns true for equal ByteBuffer', () {
       final buffer = bytes.buffer;
       expect(digest.isEqual(buffer), isTrue);

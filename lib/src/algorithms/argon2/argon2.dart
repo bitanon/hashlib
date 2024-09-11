@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 import 'argon2_64bit.dart' if (dart.library.js) 'argon2_32bit.dart';
 import 'common.dart';
