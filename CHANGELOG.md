@@ -1,3 +1,7 @@
+# 1.20.4
+
+- Ensure seed uniqueness in `RandomGenerators` across Isolates
+
 # 1.20.3
 
 - Exports hashlib_codecs from current package. To get it: `import 'package:hashlib/codecs.dart';`

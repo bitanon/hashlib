@@ -3,10 +3,9 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/random_generators.dart';
+import 'package:hashlib/src/algorithms/random/random.dart';
 
-export 'package:hashlib/src/algorithms/random_generators.dart'
-    show RandomGenerator;
+export 'package:hashlib/src/algorithms/random/random.dart' show RandomGenerator;
 
 const int _mask32 = 0xFFFFFFFF;
 

@@ -3,10 +3,12 @@
 
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/algorithms/random_generators.dart';
+import 'package:hashlib/src/algorithms/random/random.dart';
 import 'package:test/test.dart';
 
 const int _maxInt = 0xFFFFFFFF;
@@ -78,14 +80,31 @@ void main() {
     }, tags: ['vm-only']);
   });
 
-  test('seed generator uniqueness', () {
-    int n = 10000;
-    var m = <int>{};
-    for (int i = 0; i < n; ++i) {
-      m.add(RandomGenerators.$generateSeed());
-    }
-    expect(m.length, n);
+  test('seed generator uniqueness with futures', () async {
+    final seeds = await Future.wait(List.generate(
+      1000,
+      (_) => Future.microtask(() {
+        return Generators.$nextSeed();
+      }),
+    ));
+    expect(seeds.toSet().length, 1000);
   });
+
+  test('seed generator uniqueness with isolates', () async {
+    var version = Platform.version;
+    var major = int.parse(version.split('.')[0]);
+    var minor = int.parse(version.split('.')[1]);
+    if (major > 2 || (major == 2 && minor >= 19)) {
+      final seeds = await Future.wait(List.generate(
+        1000,
+        // ignore: sdk_version_since
+        (_) => Isolate.run(() {
+          return Generators.$nextSeed();
+        }),
+      ));
+      expect(seeds.toSet().length, 1000);
+    }
+  }, tags: ['vm-only']);
 
   test('random bytes length = 0', () {
     expect(randomBytes(0), []);
@@ -369,7 +388,7 @@ void main() {
     test('Test with a normal length list', () {
       int seed = 123456789;
       var data = Uint8List(64);
-      RandomGenerators.$seedList(data, seed);
+      Generators.$seedList(data, seed);
       expect(data, isNot(equals(Uint8List(64))));
     });
 
@@ -377,7 +396,7 @@ void main() {
       int seed = 123456789;
       for (int i = 1; i < 8; ++i) {
         var data = Uint8List(i);
-        RandomGenerators.$seedList(data, seed);
+        Generators.$seedList(data, seed);
         expect(data, isNot(equals(Uint8List(i))));
       }
     });
@@ -386,7 +405,7 @@ void main() {
       int seed = 123456789;
       for (int i = 1; i < 4; ++i) {
         var data = Uint8List(64 + i);
-        RandomGenerators.$seedList(data, seed);
+        Generators.$seedList(data, seed);
         expect(data.skip(64), isNot(equals(Uint8List(i))));
       }
     });
@@ -395,8 +414,8 @@ void main() {
       int seed = 123456789;
       var data1 = Uint8List(255);
       var data2 = Uint8List(255);
-      RandomGenerators.$seedList(data1, seed);
-      RandomGenerators.$seedList(data2, seed);
+      Generators.$seedList(data1, seed);
+      Generators.$seedList(data2, seed);
       expect(data1, equals(data2));
     });
 
@@ -405,8 +424,8 @@ void main() {
       int seed2 = 987654321;
       var data1 = Uint8List(255);
       var data2 = Uint8List(255);
-      RandomGenerators.$seedList(data1, seed1);
-      RandomGenerators.$seedList(data2, seed2);
+      Generators.$seedList(data1, seed1);
+      Generators.$seedList(data2, seed2);
       expect(data1, isNot(equals(data2)));
     });
   });
