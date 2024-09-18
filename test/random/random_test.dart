@@ -17,6 +17,11 @@ Iterable<int> testGenerator() sync* {
   }
 }
 
+@pragma('vm:entry-point')
+void nextSeedIsolate(SendPort port) {
+  port.send(Generators.$nextSeed());
+}
+
 var testRandom = HashlibRandom.generator(testGenerator().iterator);
 
 void runFunctionalText(HashlibRandom rand) {
@@ -92,18 +97,14 @@ void main() {
   });
 
   test('seed generator uniqueness with isolates', () async {
-    final seeds = await Future.wait(List.generate(
-      1000,
-      (_) => Isolate.spawn(
-        (e) => {},
-        null,
-        errorsAreFatal: true,
-      ).then((value) {
-        return Generators.$nextSeed();
-      }),
+    final receiver = ReceivePort();
+    await Future.wait(List.generate(
+      100,
+      (_) => Isolate.spawn(nextSeedIsolate, receiver.sendPort),
     ));
-    expect(seeds.toSet().length, 1000);
-  }, tags: ['vm-only']);
+    final seeds = await receiver.take(100).toList();
+    expect(seeds.toSet().length, 100);
+  }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
 
   test('random bytes length = 0', () {
     expect(randomBytes(0), []);

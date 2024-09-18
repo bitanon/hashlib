@@ -8,6 +8,28 @@ import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/uuid.dart';
 import 'package:test/test.dart';
 
+@pragma('vm:entry-point')
+void runIsolate(inp) {
+  final port = inp[0] as SendPort;
+  switch (inp[1] as String) {
+    case 'v1':
+      return port.send(uuid.v1());
+    case 'v3':
+      return port.send(uuid.v3());
+    case 'v4':
+      return port.send(uuid.v4());
+    case 'v5':
+      return port.send(uuid.v5());
+    case 'v6':
+      return port.send(uuid.v6());
+    case 'v7':
+      return port.send(uuid.v7());
+    case 'v8':
+      return port.send(uuid.v8());
+  }
+  throw ArgumentError('Undefined version');
+}
+
 void main() {
   group('UUID v1', () {
     test("known value", () {
@@ -27,18 +49,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v1'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v1();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('UUID v3', () {
@@ -58,18 +80,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v3'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v3();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('UUID v4', () {
@@ -89,18 +111,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v4'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v4();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('UUID v5', () {
@@ -120,18 +142,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v5'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v5();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('UUID v6', () {
@@ -152,18 +174,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v6'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v6();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('UUID v7', () {
@@ -184,18 +206,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v7'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v7();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('UUID v8', () {
@@ -234,18 +256,18 @@ void main() {
     });
 
     test('uniqueness with isolates', () async {
-      final seeds = await Future.wait(List.generate(
-        1000,
+      final receiver = ReceivePort();
+      await Future.wait(List.generate(
+        100,
         (_) => Isolate.spawn(
-          (e) => {},
-          null,
+          runIsolate,
+          [receiver.sendPort, 'v8'],
           errorsAreFatal: true,
-        ).then((value) {
-          return uuid.v8();
-        }),
+        ),
       ));
-      expect(seeds.toSet().length, 1000);
-    }, tags: ['vm-only']);
+      final items = await receiver.take(100).toList();
+      expect(items.toSet().length, 100);
+    }, tags: ['vm-only'], timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('NamespaceValue', () {
