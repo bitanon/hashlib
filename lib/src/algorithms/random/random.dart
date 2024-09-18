@@ -1,142 +1,206 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:math' show Random;
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/keccak/keccak.dart';
-import 'package:hashlib/src/algorithms/md4.dart';
-import 'package:hashlib/src/algorithms/sha2/sha2.dart';
-import 'package:hashlib/src/algorithms/sm3.dart';
-import 'package:hashlib/src/algorithms/xxh64/xxh64.dart';
-import 'package:hashlib/src/core/hash_base.dart';
-
-import 'random_vm.dart' if (dart.library.js) 'random_js.dart';
+import 'generators.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
-enum RandomGenerator {
-  secure,
-  system,
-  keccak,
-  sha256,
-  md5,
-  xxh64,
-  sm3,
-}
+const String _alphaLower = 'abcdefghijklmnopqrstuvwxyz';
+const String _alphaUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const String _numeric = '0123456789';
+const List<int> _controls = [
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, //
+  11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+  21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+  127
+];
+const List<int> _punctuations = [
+  33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, //
+  58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126,
+];
 
-extension RandomGeneratorIterable on RandomGenerator {
-  Iterable<int> build([int? seed]) {
-    switch (this) {
-      case RandomGenerator.keccak:
-        return Generators.$keccakGenerateor(seed);
-      case RandomGenerator.sha256:
-        return Generators.$hashGenerateor(SHA256Hash(), seed);
-      case RandomGenerator.md5:
-        return Generators.$hashGenerateor(MD4Hash(), seed);
-      case RandomGenerator.xxh64:
-        return Generators.$hashGenerateor(XXHash64Sink(111), seed);
-      case RandomGenerator.sm3:
-        return Generators.$hashGenerateor(SM3Hash(), seed);
-      case RandomGenerator.secure:
-        return Generators.$secureGenerator();
-      case RandomGenerator.system:
-      default:
-        return Generators.$systemGenerator(seed);
-    }
-  }
-}
+/// Provides a generator for secure random values
+class HashlibRandom {
+  final Iterator<int> _generator;
 
-abstract class Generators {
-  /// Get a random seed
+  /// Create a instance with custom generator
+  const HashlibRandom.generator(this._generator);
+
+  /// Creates an instance based on [generator] with optional [seed] value.
+  factory HashlibRandom(RandomGenerator generator, {int? seed}) =>
+      HashlibRandom.generator(generator.build(seed).iterator);
+
+  /// Creates an instance based on [RandomGenerator.secure] generator with
+  /// optional [seed] value.
+  factory HashlibRandom.secure({int? seed}) =>
+      HashlibRandom.generator(RandomGenerator.secure.build(seed).iterator);
+
+  /// Generates a 32-bit bit random  number
   @pragma('vm:prefer-inline')
-  static int $nextSeed() => $generateSeed();
+  int nextInt() {
+    _generator.moveNext();
+    return _generator.current;
+  }
 
-  /// Expand the seed to fill the list
-  static void $seedList(TypedData data, int seed) {
-    var list = Uint32List.view(data.buffer);
-    var inp = [
-      seed & _mask32,
-      seed >>> 32,
-      list.length,
-      0xD5A79147,
-      0x14292967 + list.length,
-      0x59F111F1 ^ -seed.bitLength,
-      0x106AA070 + seed,
-      0x71374491 - seed,
-      0x06CA6351 ^ seed,
-      0x650A7354,
-      0xF40E3585,
-      0x766A0ABB ^ -seed,
-      0x81C2C92E,
-      0x92722C85,
-      0x748F82EE ^ -list.length,
-      0x78A5636F | -seed,
-    ];
+  /// Generates a 8-bit bit random number
+  @pragma('vm:prefer-inline')
+  int nextByte() => nextInt() & 0xFF;
 
-    int i, x;
-    for (i = 0; i < 16 && i < list.length; ++i) {
-      list[i] ^= inp[i];
+  /// Generates a 16-bit bit random  number
+  @pragma('vm:prefer-inline')
+  int nextWord() => nextInt() & 0xFFFF;
+
+  /// Generates a boolean value
+  @pragma('vm:prefer-inline')
+  bool nextBool() => nextByte() & 0x55 == 0;
+
+  /// Generates a double number
+  @pragma('vm:prefer-inline')
+  double nextDouble() => nextInt() / _mask32;
+
+  /// Generates a 32-bit bit random number between [low] and [high], inclusive.
+  int nextBetween(int low, int high) {
+    if (low == high) {
+      return low;
     }
-    for (x = seed; i < list.length; ++i) {
-      list[i] ^= x = (x >>> (i & 15)) ^ seed;
-      list[i] ^= list[i - 16];
-      list[i] ^= -list[i - 7];
+    if (low > high) {
+      int t = low;
+      low = high;
+      high = t;
     }
-    var list8 = Uint8List.view(data.buffer);
-    for (i = list.lengthInBytes; i < list8.length; ++i) {
-      list8[i] ^= seed >>> (i & 31);
+    return (nextInt() % (high - low)) + low;
+  }
+
+  /// Fill the buffer with random values.
+  ///
+  /// Paramters:
+  /// - [offsetInBytes] the start offset in bytes for the fill operation.
+  /// - [lengthInBytes] the total bytes to fill. If `null`, fills to the end.
+  void fill(ByteBuffer buffer, [int offsetInBytes = 0, int? lengthInBytes]) {
+    int i, n;
+    i = offsetInBytes;
+    n = lengthInBytes ?? buffer.lengthInBytes;
+    if (n <= 0) return;
+    var list8 = Uint8List.view(buffer);
+    for (; n > 0 && i < list8.length && i & 3 != 0; i++, n--) {
+      list8[i] = nextByte();
+    }
+    if (n <= 0) return;
+    var list32 = Uint32List.view(buffer);
+    for (i >>>= 2; n >= 4 && i < list32.length; i++, n -= 4) {
+      list32[i] = nextInt();
+    }
+    if (n <= 0) return;
+    for (i <<= 2; n > 0 && i < list8.length; i++, n--) {
+      list8[i] = nextByte();
     }
   }
 
-  /// Returns a iterable of 32-bit integers backed by system's [Random].
-  static Iterable<int> $secureGenerator() sync* {
-    var random = secureRandom();
-    while (true) {
-      yield random.nextInt(_mask32);
-    }
+  /// Generate a list of random 8-bit bytes of size [length]
+  @pragma('vm:prefer-inline')
+  Uint8List nextBytes(int length) {
+    var data = Uint8List(length);
+    fill(data.buffer);
+    return data;
   }
 
-  /// Returns a iterable of 32-bit integers backed by system's [Random].
-  static Iterable<int> $systemGenerator([int? seed]) sync* {
-    seed ??= $generateSeed();
-    var random = Random(seed);
-    while (true) {
-      yield random.nextInt(_mask32);
-    }
+  /// Generate a list of random 32-bit numbers of size [length]
+  @pragma('vm:prefer-inline')
+  Uint32List nextNumbers(int length) {
+    var data = Uint32List(length);
+    fill(data.buffer);
+    return data;
   }
 
-  /// Returns a iterable of 32-bit integers generated from the [KeccakHash].
-  static Iterable<int> $keccakGenerateor([int? seed]) sync* {
-    seed ??= $generateSeed();
-    var sink = KeccakHash(stateSize: 64, paddingByte: 0);
-    $seedList(sink.sbuffer, seed);
-    while (true) {
-      sink.$update();
-      for (var x in sink.sbuffer) {
-        yield x;
+  /// Generate the next random string of specific [length].
+  ///
+  /// If no parameter is provided, it will return a random string using
+  /// ASCII characters only (character code 0 to 127).
+  ///
+  /// If [whitelist] or [blacklist] are provided, they will get priority over
+  /// other parameters. Otherwise, these two list will be generated from the
+  /// other parameter.
+  ///
+  /// Other Parameters:
+  /// - [lower] : lowercase letters.
+  /// - [upper] : uppercase letters.
+  /// - [controls] : control characters.
+  /// - [punctuations] : punctuations.
+  ///
+  /// If these parameters are set, it will be ignored. Otherwise, if `true`, the
+  /// corresponding characters will be added to the [whitelist], or if `false`,
+  /// to the [blacklist].
+  ///
+  /// If the [whitelist] is already set, these parameters has no effect when
+  /// they are set to true. If the [blacklist] is already set, these parameters
+  /// has no effect when they are set to false.
+  String nextString(
+    int length, {
+    bool? lower,
+    bool? upper,
+    bool? numeric,
+    bool? controls,
+    bool? punctuations,
+    List<int>? whitelist,
+    List<int>? blacklist,
+  }) {
+    Set<int> white = {};
+    Set<int> black = {};
+    if (lower != null) {
+      if (lower) {
+        white.addAll(_alphaLower.codeUnits);
+      } else {
+        black.addAll(_alphaLower.codeUnits);
       }
     }
-  }
-
-  /// Returns a iterable of 32-bit integers generated from the [sink].
-  static Iterable<int> $hashGenerateor(
-    HashDigestSink sink, [
-    int? seed,
-  ]) sync* {
-    seed ??= $generateSeed();
-    var input = Uint8List(sink.hashLength);
-    for (int i = 0;; i++) {
-      if (i & 31 == 0) {
-        $seedList(input, seed);
+    if (upper != null) {
+      if (upper) {
+        white.addAll(_alphaUpper.codeUnits);
+      } else {
+        black.addAll(_alphaUpper.codeUnits);
       }
-      sink.add(input);
-      var digest = sink.digest();
-      sink.reset();
-      for (var x in Uint32List.view(digest.buffer)) {
-        yield x;
-      }
-      input = digest.bytes;
     }
+    if (numeric != null) {
+      if (numeric) {
+        white.addAll(_numeric.codeUnits);
+      } else {
+        black.addAll(_numeric.codeUnits);
+      }
+    }
+    if (controls != null) {
+      if (controls) {
+        white.addAll(_controls);
+      } else {
+        black.addAll(_controls);
+      }
+    }
+    if (punctuations != null) {
+      if (punctuations) {
+        white.addAll(_punctuations);
+      } else {
+        black.addAll(_punctuations);
+      }
+    }
+
+    if (whitelist != null) {
+      white.addAll(whitelist);
+      black.removeAll(whitelist);
+    } else if (white.isEmpty) {
+      white.addAll(List.generate(128, (i) => i));
+    }
+    white.removeAll(black);
+    if (blacklist != null) {
+      white.removeAll(blacklist);
+    }
+    if (white.isEmpty) {
+      throw StateError('Empty whitelist');
+    }
+
+    var list = white.toList(growable: false);
+    Iterable<int> codes = nextBytes(length);
+    codes = codes.map((x) => list[x % list.length]);
+    return String.fromCharCodes(codes);
   }
 }

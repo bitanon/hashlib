@@ -3,12 +3,10 @@
 
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
-import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/src/algorithms/random/random.dart';
+import 'package:hashlib/random.dart';
 import 'package:test/test.dart';
 
 const int _maxInt = 0xFFFFFFFF;
@@ -36,6 +34,9 @@ void runFunctionalText(HashlibRandom rand) {
 
 void main() {
   group('functional tests', () {
+    test("secure random", () {
+      runFunctionalText(HashlibRandom(RandomGenerator.secure));
+    });
     test("system random", () {
       runFunctionalText(HashlibRandom(RandomGenerator.system));
     });
@@ -91,19 +92,17 @@ void main() {
   });
 
   test('seed generator uniqueness with isolates', () async {
-    var version = Platform.version;
-    var major = int.parse(version.split('.')[0]);
-    var minor = int.parse(version.split('.')[1]);
-    if (major > 2 || (major == 2 && minor >= 19)) {
-      final seeds = await Future.wait(List.generate(
-        1000,
-        // ignore: sdk_version_since
-        (_) => Isolate.run(() {
-          return Generators.$nextSeed();
-        }),
-      ));
-      expect(seeds.toSet().length, 1000);
-    }
+    final seeds = await Future.wait(List.generate(
+      1000,
+      (_) => Isolate.spawn(
+        (e) => {},
+        null,
+        errorsAreFatal: true,
+      ).then((value) {
+        return Generators.$nextSeed();
+      }),
+    ));
+    expect(seeds.toSet().length, 1000);
   }, tags: ['vm-only']);
 
   test('random bytes length = 0', () {

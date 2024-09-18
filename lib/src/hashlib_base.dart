@@ -26,7 +26,6 @@ export 'md4.dart';
 export 'md5.dart';
 export 'pbkdf2.dart';
 export 'poly1305.dart';
-export 'random.dart';
 export 'ripemd128.dart';
 export 'ripemd160.dart';
 export 'ripemd256.dart';

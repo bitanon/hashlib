@@ -5,3 +5,4 @@ dart format --fix .
 dart analyze --fatal-infos
 dart doc --validate-links
 dart test
+pana --exit-code-threshold 0

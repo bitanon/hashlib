@@ -3,15 +3,18 @@ import 'package:hashlib/hashlib.dart';
 
 void main() {
   var text = "Happy Hashing!";
-  var key = "password";
-  var pw = key.codeUnits;
-  var iv = "some salt".codeUnits;
   print("text => $text");
+
+  final key = "password";
+  final salt = "some salt";
   print("key => $key");
-  print("salt => ${toHex(iv)}");
+  print("salt => $salt");
   print('');
 
-  // Example of hash code generations
+  final pw = key.codeUnits;
+  final iv = salt.codeUnits;
+
+  // Example of hash-code generations
   print('XXH32 => ${xxh32code(text)}');
   print('CRC32 => ${crc32code(text)}');
   print('Alder32 => ${alder32code(text)}');
@@ -57,33 +60,10 @@ void main() {
   print("BLAKE-2b-MAC/224 => ${Blake2b(28).mac.by(pw).string(text)}");
   print('');
 
-  // Examples of PBKDF2 key derivation
-  print("SHA256/HMAC/PBKDF2 => ${pbkdf2(pw, iv).hex()}");
-  print("BLAKE2b-256/HMAC/PBKDF2 => ${blake2b256.pbkdf2(iv).hex(pw)}");
-  print("BLAKE2b-256/MAC/PBKDF2 => ${blake2b256.mac.pbkdf2(iv).hex(pw)}");
-  print("SHA1/HMAC/PBKDF2 => ${sha1.pbkdf2(iv, iterations: 100).hex(pw)}");
-  print('');
-
   // Examples of OTP generation
   int nw = DateTime.now().millisecondsSinceEpoch ~/ 30000;
   var counter = fromHex(nw.toRadixString(16).padLeft(16, '0'));
   print('TOTP[time=$nw] => ${TOTP(iv).value()}');
   print('HOTP[counter=$nw] => ${HOTP(iv, counter: counter).value()}');
-  print('');
-
-  // Examples of Argon2 key derivation
-  var argon2Test = Argon2Security.test;
-  print("[Argon2i] => ${argon2i(pw, iv, security: argon2Test)}");
-  print("[Argon2d] => ${argon2d(pw, iv, security: argon2Test)}");
-  print("[Argon2id] => ${argon2id(pw, iv, security: argon2Test)}");
-
-  // Examples of scrypt key derivation
-  var scryptLittle = ScryptSecurity.little;
-  print("[scrypt] => ${scrypt(pw, iv, security: scryptLittle, dklen: 24)}");
-  print('');
-
-  // Examples of bcrypt key derivation
-  var bcryptLittle = BcryptSecurity.little;
-  print("[bcrypt] => ${bcrypt(pw, bcryptSalt(security: bcryptLittle))}");
   print('');
 }

@@ -4,6 +4,7 @@
 import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/random.dart';
 
 import '_base.dart';
 

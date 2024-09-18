@@ -11,6 +11,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:hashlib/codecs.dart';
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/random.dart';
 import 'package:pointycastle/digests/blake2b.dart' as pc_blake2b;
 import 'package:pointycastle/digests/keccak.dart' as pc_keccak;
 import 'package:pointycastle/digests/md4.dart' as pc_md4;

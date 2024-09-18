@@ -1,10 +1,15 @@
+# 1.21.0
+
+- Moves random generators outside of the base package; `import 'package:hashlib/random.dart';`
+- Introduces UUID generators. Example: `uuid.v4()`
+
 # 1.20.4
 
 - Ensure seed uniqueness in `RandomGenerators` across Isolates
 
 # 1.20.3
 
-- Exports hashlib_codecs from current package. To get it: `import 'package:hashlib/codecs.dart';`
+- Exports hashlib_codecs from current package; `import 'package:hashlib/codecs.dart';`
 
 # 1.20.2
 

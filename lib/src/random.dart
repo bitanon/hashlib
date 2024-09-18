@@ -3,9 +3,11 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/hashlib_random.dart';
+import 'package:hashlib/src/algorithms/random/generators.dart';
+import 'package:hashlib/src/algorithms/random/random.dart';
 
-export 'package:hashlib/src/core/hashlib_random.dart';
+export 'algorithms/random/generators.dart' show Generators, RandomGenerator;
+export 'algorithms/random/random.dart' show HashlibRandom;
 
 /// Generate a list of random 8-bit numbers of size [length]
 @pragma('vm:prefer-inline')

@@ -1,18 +1,19 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:js' show context;
+import 'dart:async';
 import 'dart:math' show Random;
 
 const int _mask32 = 0xFFFFFFFF;
 
-int _seedCounter = context.hashCode;
+int _seedCounter = Zone.current.hashCode;
 
-@pragma('vm:prefer-inline')
-Random secureRandom() => Random($generateSeed());
+final _secure = Random($generateSeed());
+
+Random secureRandom() => _secure;
 
 int $generateSeed() {
-  int code = DateTime.now().microsecondsSinceEpoch;
+  int code = DateTime.now().millisecondsSinceEpoch;
   code -= _seedCounter++;
   if (code.bitLength & 1 == 1) {
     code *= ~code;
