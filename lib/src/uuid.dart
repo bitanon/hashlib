@@ -27,35 +27,19 @@ const _v8 = UUIDv8();
 const uuid = _UUID();
 
 enum Namespace {
-  dns,
-  url,
-  oid,
-  x500,
-  nil,
-  max,
-  time,
-}
+  dns._('6ba7b810-9dad-11d1-80b4-00c04fd430c8'),
+  url._('6ba7b811-9dad-11d1-80b4-00c04fd430c8'),
+  oid._('6ba7b812-9dad-11d1-80b4-00c04fd430c8'),
+  x500._('6ba7b814-9dad-11d1-80b4-00c04fd430c8'),
+  nil._('00000000-0000-0000-0000-000000000000'),
+  max._('ffffffff-ffff-ffff-ffff-ffffffffffff');
 
-/// Adds a [value] attribute to [Namespace] enum to get the string value.
-extension NamespaceValue on Namespace {
-  String get value {
-    switch (this) {
-      case Namespace.dns:
-        return '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-      case Namespace.url:
-        return '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
-      case Namespace.oid:
-        return '6ba7b812-9dad-11d1-80b4-00c04fd430c8';
-      case Namespace.x500:
-        return '6ba7b814-9dad-11d1-80b4-00c04fd430c8';
-      case Namespace.nil:
-        return '00000000-0000-0000-0000-000000000000';
-      case Namespace.max:
-        return 'ffffffff-ffff-ffff-ffff-ffffffffffff';
-      case Namespace.time:
-        return _v6.generate();
-    }
-  }
+  /// The string value of this namespace
+  final String value;
+
+  const Namespace._(this.value);
+
+  static String get time => _v6.generate();
 }
 
 class _UUID {

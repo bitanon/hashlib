@@ -4,7 +4,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:hashlib/src/core/block_hash.dart';
 import 'package:hashlib/src/hotp.dart';
 import 'package:hashlib/src/sha1.dart';
 
@@ -29,21 +28,14 @@ class TOTP extends HOTP {
   ///   is associated with.
   /// - [issuer] is an optional string to specify the entity issuing the OTP.
   TOTP(
-    List<int> secret, {
-    int digits = 6,
-    String? label,
-    String? issuer,
+    super.secret, {
+    super.algo = sha1,
+    super.digits = 6,
+    super.label,
+    super.issuer,
     this.period = const Duration(seconds: 30),
-    BlockHashBase algo = sha1,
   })  : _periodMS = period.inMilliseconds,
-        super(
-          secret,
-          algo: algo,
-          digits: digits,
-          label: label,
-          issuer: issuer,
-          counter: Uint8List(8),
-        ) {
+        super(counter: Uint8List(8)) {
     // setup stream controller
     Timer? timer;
     _controller.onCancel = () {

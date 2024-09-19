@@ -1,3 +1,8 @@
+# 2.0.0
+
+- ![dart support](https://img.shields.io/badge/dart-%3e%3d%202.17.0-39f?logo=dart)]
+- Makes the Random Generators more efficient.
+
 # 1.21.0
 
 - Moves random generators outside of the base package; `import 'package:hashlib/random.dart';`

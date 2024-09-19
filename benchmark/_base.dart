@@ -68,9 +68,7 @@ abstract class Benchmark extends BenchmarkBase with BenchmarkTools {
   final int iter;
   final List<int> input;
 
-  Benchmark(String name, this.size, this.iter)
-      : input = List.filled(size, 0x3f),
-        super(name);
+  Benchmark(super.name, this.size, this.iter) : input = List.filled(size, 0x3f);
 
   @override
   void exercise() {
@@ -85,7 +83,7 @@ abstract class Benchmark extends BenchmarkBase with BenchmarkTools {
 }
 
 class KDFBenchmarkBase extends BenchmarkBase {
-  KDFBenchmarkBase(String name) : super(name);
+  KDFBenchmarkBase(super.name);
 
   @override
   double measure() {

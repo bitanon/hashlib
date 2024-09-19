@@ -12,7 +12,7 @@ class Bcrypt extends KeyDerivatorBase {
   final BcryptContext _ctx;
 
   @override
-  String get name => 'Bcrypt/${_ctx.versioName}';
+  String get name => 'Bcrypt/${_ctx.version.name}';
 
   @override
   final int derivedKeyLength = 23;

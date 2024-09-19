@@ -508,7 +508,7 @@ void main() {
       expect(
         () => Argon2Context.fromEncoded(cryptData),
         throwsA(isA<ArgumentError>()
-            .having((e) => e.message, 'message', 'Invalid type')),
+            .having((e) => e.message, 'message', 'Unknown type')),
       );
     });
 
@@ -518,7 +518,7 @@ void main() {
       expect(
         () => Argon2Context.fromEncoded(cryptData),
         throwsA(isA<ArgumentError>()
-            .having((e) => e.message, 'message', 'Invalid version')),
+            .having((e) => e.message, 'message', 'Unknown version')),
       );
     });
 
