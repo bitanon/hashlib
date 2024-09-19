@@ -3,16 +3,16 @@
 
 import 'package:hashlib/codecs.dart';
 
-import 'generator_vm.dart' if (dart.library.js) 'generator_js.dart';
+import 'generators.dart' show secureRandom;
 
 const int _mask32 = 0xFFFFFFFF;
 const int _pow32 = _mask32 + 1;
 
 /*
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                           time_low                            |
+|                           time_high                           |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           time_mid            |  ver  |       time_high       |
+|           time_mid            |  ver  |       time_low        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |var|         clock_seq         |             node              |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -20,15 +20,14 @@ const int _pow32 = _mask32 + 1;
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 
-class UUIDv1 {
-  const UUIDv1();
+class UUIDv6 {
+  const UUIDv6();
 
   static const int _g0 = 0x13814000;
   static const int _g1 = 0x01b21dd2;
 
-  /// UUIDv1 is a time-based UUID featuring a 60-bit timestamp represented by
-  /// Coordinated Universal Time (UTC) as a count of 100-nanosecond intervals
-  /// since 00:00:00.00, 15 October 1582.
+  /// UUIDv6 is a field-compatible version of UUIDv1 reordered for improved DB
+  /// locality.
   String generate({
     DateTime? now,
     int? clockSeq,
@@ -60,18 +59,18 @@ class UUIDv1 {
     }
 
     final part1 = codec.convert([
-      tl >>> 24,
-      tl >>> 16,
-      tl >>> 8,
-      tl,
+      th >>> 20,
+      th >>> 12,
+      th >>> 4,
+      ((th & 0xF) << 4) ^ (tl >>> 28),
     ]);
     final part2 = codec.convert([
-      th >>> 8,
-      th,
+      tl >>> 20,
+      tl >>> 12,
     ]);
     final part3 = codec.convert([
-      0x10 ^ ((th >>> 24) & 0xF),
-      th >>> 16,
+      0x60 ^ ((tl >>> 8) & 0xF),
+      tl,
     ]);
     final part4 = codec.convert([
       0x80 ^ ((clockSeq >>> 8) & 0x3F),

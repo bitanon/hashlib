@@ -3,7 +3,7 @@
 
 import 'package:hashlib/codecs.dart';
 
-import 'generator_vm.dart' if (dart.library.js) 'generator_js.dart';
+import 'generators.dart' show secureRandom;
 
 const int _mask32 = 0xFFFFFFFF;
 const int _pow32 = _mask32 + 1;

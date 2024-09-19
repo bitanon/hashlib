@@ -7,22 +7,17 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:hashlib/random.dart';
+import 'package:hashlib/src/random/generators.dart';
 import 'package:test/test.dart';
 
 const int _maxInt = 0xFFFFFFFF;
 
-Iterable<int> testGenerator() sync* {
-  while (true) {
-    yield _maxInt;
-  }
-}
-
 @pragma('vm:entry-point')
 void nextSeedIsolate(SendPort port) {
-  port.send(Generators.$nextSeed());
+  port.send($generateSeed());
 }
 
-var testRandom = HashlibRandom.generator(testGenerator().iterator);
+var testRandom = HashlibRandom.custom(() => _maxInt);
 
 void runFunctionalText(HashlibRandom rand) {
   rand.nextInt();
@@ -40,58 +35,56 @@ void runFunctionalText(HashlibRandom rand) {
 void main() {
   group('functional tests', () {
     test("secure random", () {
-      runFunctionalText(HashlibRandom(RandomGenerator.secure));
+      runFunctionalText(HashlibRandom(RNG.secure));
     });
     test("system random", () {
-      runFunctionalText(HashlibRandom(RandomGenerator.system));
+      runFunctionalText(HashlibRandom(RNG.system));
     });
     group("keccak random", () {
       test('functions', () {
-        runFunctionalText(HashlibRandom(RandomGenerator.keccak));
+        runFunctionalText(HashlibRandom(RNG.keccak));
       });
       test('with seed', () {
-        var rand = HashlibRandom(RandomGenerator.keccak, seed: 100);
+        var rand = HashlibRandom(RNG.keccak, seed: 100);
         expect(rand.nextInt(), 3662713900);
       });
     });
     group("sha256 random", () {
       test("functions", () {
-        runFunctionalText(HashlibRandom(RandomGenerator.sha256));
+        runFunctionalText(HashlibRandom(RNG.sha256));
       });
       test('with seed', () {
-        var rand = HashlibRandom(RandomGenerator.sha256, seed: 100);
-        expect(rand.nextInt(), 3449288731);
+        var rand = HashlibRandom(RNG.sha256, seed: 100);
+        expect(rand.nextInt(), 3624764737);
       });
     });
     group("sm3 random", () {
       test("functions", () {
-        runFunctionalText(HashlibRandom(RandomGenerator.sm3));
+        runFunctionalText(HashlibRandom(RNG.sm3));
       });
       test('with seed', () {
-        var rand = HashlibRandom(RandomGenerator.sm3, seed: 100);
-        expect(rand.nextInt(), 894660838);
+        var rand = HashlibRandom(RNG.sm3, seed: 100);
+        expect(rand.nextInt(), 874203019);
       });
     });
     group("md5 random", () {
       test("functions", () {
-        runFunctionalText(HashlibRandom(RandomGenerator.md5));
+        runFunctionalText(HashlibRandom(RNG.md5));
       });
       test('with seed', () {
-        var rand = HashlibRandom(RandomGenerator.md5, seed: 100);
-        expect(rand.nextInt(), 2852136378);
+        var rand = HashlibRandom(RNG.md5, seed: 100);
+        expect(rand.nextInt(), 368434865);
       });
     });
     test("xxh64 random", () {
-      runFunctionalText(HashlibRandom(RandomGenerator.xxh64));
+      runFunctionalText(HashlibRandom(RNG.xxh64));
     }, tags: ['vm-only']);
   });
 
   test('seed generator uniqueness with futures', () async {
     final seeds = await Future.wait(List.generate(
       1000,
-      (_) => Future.microtask(() {
-        return Generators.$nextSeed();
-      }),
+      (_) => Future.microtask($generateSeed),
     ));
     expect(seeds.toSet().length, 1000);
   });
@@ -219,10 +212,15 @@ void main() {
 
     setUp(() {
       // Mock generator with predictable values
-      random = HashlibRandom.generator([
+      final items = [
         65, 66, 67, 68, 69, 70, 71, 72, 73, 74, //
         75, 76, 77, 78, 79, 80, 81, 82, 83, 84
-      ].iterator);
+      ];
+      int p = 0;
+      random = HashlibRandom.custom(() {
+        p %= items.length;
+        return items[p++];
+      });
     });
 
     test('should return a string of correct length', () {
@@ -372,10 +370,9 @@ void main() {
     });
 
     test('should return deterministic output with the same seed', () {
-      final generator1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].iterator;
-      final generator2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].iterator;
-      final random1 = HashlibRandom.generator(generator1);
-      final random2 = HashlibRandom.generator(generator2);
+      int p = 0, q = 0;
+      final random1 = HashlibRandom.custom(() => p++);
+      final random2 = HashlibRandom.custom(() => q++);
 
       final result1 = random1.nextString(10);
       final result2 = random2.nextString(10);
@@ -388,7 +385,7 @@ void main() {
     test('Test with a normal length list', () {
       int seed = 123456789;
       var data = Uint8List(64);
-      Generators.$seedList(data, seed);
+      $seedList(data, seed);
       expect(data, isNot(equals(Uint8List(64))));
     });
 
@@ -396,7 +393,7 @@ void main() {
       int seed = 123456789;
       for (int i = 1; i < 8; ++i) {
         var data = Uint8List(i);
-        Generators.$seedList(data, seed);
+        $seedList(data, seed);
         expect(data, isNot(equals(Uint8List(i))));
       }
     });
@@ -405,7 +402,7 @@ void main() {
       int seed = 123456789;
       for (int i = 1; i < 4; ++i) {
         var data = Uint8List(64 + i);
-        Generators.$seedList(data, seed);
+        $seedList(data, seed);
         expect(data.skip(64), isNot(equals(Uint8List(i))));
       }
     });
@@ -414,8 +411,8 @@ void main() {
       int seed = 123456789;
       var data1 = Uint8List(255);
       var data2 = Uint8List(255);
-      Generators.$seedList(data1, seed);
-      Generators.$seedList(data2, seed);
+      $seedList(data1, seed);
+      $seedList(data2, seed);
       expect(data1, equals(data2));
     });
 
@@ -424,8 +421,8 @@ void main() {
       int seed2 = 987654321;
       var data1 = Uint8List(255);
       var data2 = Uint8List(255);
-      Generators.$seedList(data1, seed1);
-      Generators.$seedList(data2, seed2);
+      $seedList(data1, seed1);
+      $seedList(data2, seed2);
       expect(data1, isNot(equals(data2)));
     });
   });

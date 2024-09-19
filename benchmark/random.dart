@@ -10,7 +10,7 @@ import '_base.dart';
 const int _maxInt = 0xFFFFFFFF;
 
 class SystemRandomBenchmark extends Benchmark {
-  final random = HashlibRandom(RandomGenerator.system);
+  final random = HashlibRandom(RNG.system);
   SystemRandomBenchmark(int size, int iter) : super('system', size, iter);
 
   @override
@@ -22,7 +22,7 @@ class SystemRandomBenchmark extends Benchmark {
 }
 
 class SecureRandomBenchmark extends Benchmark {
-  final random = HashlibRandom(RandomGenerator.secure);
+  final random = HashlibRandom(RNG.secure);
   SecureRandomBenchmark(int size, int iter) : super('secure', size, iter);
 
   @override
@@ -34,7 +34,7 @@ class SecureRandomBenchmark extends Benchmark {
 }
 
 class KeccakRandomBenchmark extends Benchmark {
-  final random = HashlibRandom(RandomGenerator.keccak);
+  final random = HashlibRandom(RNG.keccak);
   KeccakRandomBenchmark(int size, int iter) : super('keccak', size, iter);
 
   @override
@@ -46,7 +46,7 @@ class KeccakRandomBenchmark extends Benchmark {
 }
 
 class SHA256RandomBenchmark extends Benchmark {
-  final random = HashlibRandom(RandomGenerator.sha256);
+  final random = HashlibRandom(RNG.sha256);
   SHA256RandomBenchmark(int size, int iter) : super('sha256', size, iter);
 
   @override
@@ -58,7 +58,7 @@ class SHA256RandomBenchmark extends Benchmark {
 }
 
 class SM3RandomBenchmark extends Benchmark {
-  final random = HashlibRandom(RandomGenerator.sm3);
+  final random = HashlibRandom(RNG.sm3);
   SM3RandomBenchmark(int size, int iter) : super('sm3', size, iter);
 
   @override
@@ -70,7 +70,7 @@ class SM3RandomBenchmark extends Benchmark {
 }
 
 class XXH64RandomBenchmark extends Benchmark {
-  final random = HashlibRandom(RandomGenerator.xxh64);
+  final random = HashlibRandom(RNG.xxh64);
   XXH64RandomBenchmark(int size, int iter) : super('xxh64', size, iter);
 
   @override

@@ -23,34 +23,31 @@ const List<int> _punctuations = [
 
 /// Provides a generator for secure random values
 class HashlibRandom {
-  final Iterator<int> _generator;
+  final NextIntFunction _nextInt;
 
   /// Create a instance with custom generator
-  const HashlibRandom.generator(this._generator);
+  const HashlibRandom.custom(this._nextInt);
 
   /// Creates an instance based on [generator] with optional [seed] value.
-  factory HashlibRandom(RandomGenerator generator, {int? seed}) =>
-      HashlibRandom.generator(generator.build(seed).iterator);
+  factory HashlibRandom(RNG generator, {int? seed}) =>
+      HashlibRandom.custom(generator.build(seed));
 
-  /// Creates an instance based on [RandomGenerator.secure] generator with
+  /// Creates an instance based on [RNG.secure] generator with
   /// optional [seed] value.
   factory HashlibRandom.secure({int? seed}) =>
-      HashlibRandom.generator(RandomGenerator.secure.build(seed).iterator);
+      HashlibRandom.custom(RNG.secure.build(seed));
 
   /// Generates a 32-bit bit random  number
   @pragma('vm:prefer-inline')
-  int nextInt() {
-    _generator.moveNext();
-    return _generator.current;
-  }
-
-  /// Generates a 8-bit bit random number
-  @pragma('vm:prefer-inline')
-  int nextByte() => nextInt() & 0xFF;
+  int nextInt() => _nextInt();
 
   /// Generates a 16-bit bit random  number
   @pragma('vm:prefer-inline')
   int nextWord() => nextInt() & 0xFFFF;
+
+  /// Generates a 8-bit bit random number
+  @pragma('vm:prefer-inline')
+  int nextByte() => (nextInt() >>> 11) & 0xFF;
 
   /// Generates a boolean value
   @pragma('vm:prefer-inline')

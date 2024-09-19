@@ -3,17 +3,17 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/src/algorithms/random/generators.dart';
-import 'package:hashlib/src/algorithms/random/random.dart';
+import 'random/generators.dart';
+import 'random/random.dart';
 
-export 'algorithms/random/generators.dart' show Generators, RandomGenerator;
-export 'algorithms/random/random.dart' show HashlibRandom;
+export 'random/generators.dart' show RNG;
+export 'random/random.dart' show HashlibRandom;
 
 /// Generate a list of random 8-bit numbers of size [length]
 @pragma('vm:prefer-inline')
 Uint8List randomBytes(
   int length, {
-  RandomGenerator generator = RandomGenerator.secure,
+  RNG generator = RNG.secure,
 }) =>
     HashlibRandom(generator).nextBytes(length);
 
@@ -21,7 +21,7 @@ Uint8List randomBytes(
 @pragma('vm:prefer-inline')
 Uint32List randomNumbers(
   int length, {
-  RandomGenerator generator = RandomGenerator.secure,
+  RNG generator = RNG.secure,
 }) =>
     HashlibRandom(generator).nextNumbers(length);
 
@@ -33,7 +33,7 @@ void fillRandom(
   ByteBuffer buffer, {
   int start = 0,
   int? length,
-  RandomGenerator generator = RandomGenerator.secure,
+  RNG generator = RNG.secure,
 }) =>
     HashlibRandom(generator).fill(buffer, start, length);
 
@@ -44,7 +44,7 @@ void fillNumbers(
   List<int> list, {
   int start = 0,
   int? length,
-  RandomGenerator generator = RandomGenerator.secure,
+  RNG generator = RNG.secure,
 }) {
   int n = length ?? list.length;
   if (n == 0) return;
@@ -67,7 +67,7 @@ String randomString(
   bool? punctuations,
   List<int>? whitelist,
   List<int>? blacklist,
-  RandomGenerator generator = RandomGenerator.secure,
+  RNG generator = RNG.secure,
 }) =>
     HashlibRandom(generator).nextString(
       length,
