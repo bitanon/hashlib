@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-// ignore_for_file: always_declare_return_types
+// ignore_for_file: always_declare_return_types, deprecated_member_use_from_same_package
 
 import 'package:test/test.dart';
 import 'package:hashlib/hashlib.dart'; // Adjust the import path as needed

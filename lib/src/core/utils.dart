@@ -9,6 +9,7 @@ const int _bigA = 65;
 const int _bigZ = 90;
 
 /// Remove all characters except digits
+@Deprecated('It will be removed in 2.0.0')
 String keepNumeric(String value) {
   return String.fromCharCodes(
     value.codeUnits.where(
@@ -18,6 +19,7 @@ String keepNumeric(String value) {
 }
 
 /// Remove all characters except letters
+@Deprecated('It will be removed in 2.0.0')
 String keepAlpha(String value) {
   return String.fromCharCodes(
     value.codeUnits.where(
@@ -27,6 +29,7 @@ String keepAlpha(String value) {
 }
 
 /// Remove all characters except letters and digits
+@Deprecated('It will be removed in 2.0.0')
 String keepAlphaNumeric(String value) {
   return String.fromCharCodes(
     value.codeUnits.where(
@@ -39,6 +42,7 @@ String keepAlphaNumeric(String value) {
 }
 
 /// Transform [value] to uppercase and keeps only letters and digits.
+@Deprecated('It will be removed in 2.0.0')
 String normalizeName(String value) {
   List<int> normal = [];
   for (int c in value.codeUnits) {

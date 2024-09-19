@@ -3,13 +3,13 @@
 
 import 'dart:typed_data';
 
-import 'algorithms/random/uuid_v1.dart';
-import 'algorithms/random/uuid_v3.dart';
-import 'algorithms/random/uuid_v4.dart';
-import 'algorithms/random/uuid_v5.dart';
-import 'algorithms/random/uuid_v6.dart';
-import 'algorithms/random/uuid_v7.dart';
-import 'algorithms/random/uuid_v8.dart';
+import 'random/uuid_v1.dart';
+import 'random/uuid_v3.dart';
+import 'random/uuid_v4.dart';
+import 'random/uuid_v5.dart';
+import 'random/uuid_v6.dart';
+import 'random/uuid_v7.dart';
+import 'random/uuid_v8.dart';
 
 const _v1 = UUIDv1();
 const _v3 = UUIDv3();

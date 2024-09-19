@@ -9,7 +9,9 @@ final _hash = <String, HashBase>{};
 final _blockHash = <String, BlockHashBase>{};
 
 @pragma('vm:prefer-inline')
-String _norm(String name) => normalizeName(name);
+String _norm(String name) =>
+    // ignore: deprecated_member_use_from_same_package
+    normalizeName(name);
 
 void _buildRegistry() {
   if (_hash.isNotEmpty) return;
@@ -82,6 +84,7 @@ void _buildRegistry() {
 }
 
 /// A registry to find a block hash algorithm by name
+@Deprecated('It will be removed in 2.0.0')
 class BlockHashRegistry {
   /// Find a [BlockHashBase] algorithm given a string name
   static BlockHashBase? lookup(String name) {
@@ -98,6 +101,7 @@ class BlockHashRegistry {
 }
 
 /// A registry to find a hash algorithm by name
+@Deprecated('It will be removed in 2.0.0')
 class HashRegistry {
   /// Find a [HashBase] algorithm given a string name
   static HashBase? lookup(String name) {

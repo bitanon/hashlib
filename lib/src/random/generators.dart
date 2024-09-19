@@ -26,7 +26,7 @@ enum RNG {
   sha256,
   md5,
   xxh64,
-  sm3;
+  sm3,
 }
 
 extension RNGBuilder on RNG {
