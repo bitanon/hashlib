@@ -39,6 +39,7 @@ void _buildRegistry() {
     _norm(keccak256.name): keccak256,
     _norm(keccak384.name): keccak384,
     _norm(keccak512.name): keccak512,
+    _norm(md2.name): md2,
     _norm(md4.name): md4,
     _norm(md5.name): md5,
     _norm(ripemd128.name): ripemd128,

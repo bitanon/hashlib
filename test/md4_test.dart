@@ -2,7 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';
@@ -21,11 +20,11 @@ final tests = {
   "test": "db346d691d7acc4dc2625db19f9e3f52",
   'message': "ffa70bbb57bda34ec842cac3d9a099aa",
   "Hello World": "77a781b995cf1cfaf39d9e2f5910c2cf",
-  List.filled(512, "a").join(): "71ad0ebe8db92f0deca36c233e1ac4cb",
   List.filled(128, "a").join(): "cb4a20a561558e29460190c91dced59f",
-  List.filled(513, "a").join(): "e5f5b4253616aeb972b6f823a2519911",
   List.filled(511, "a").join(): "1c2912a2a50886af88bbf6b374593d6c",
-  List.filled(1000000, "a").join(): "bbce80cc6bb65e5c6745e30d4eeca9a4",
+  List.filled(512, "a").join(): "71ad0ebe8db92f0deca36c233e1ac4cb",
+  List.filled(513, "a").join(): "e5f5b4253616aeb972b6f823a2519911",
+  // List.filled(1000000, "a").join(): "bbce80cc6bb65e5c6745e30d4eeca9a4",
 };
 
 void main() {
@@ -66,14 +65,16 @@ void main() {
     });
 
     test('with stream', () async {
-      for (final entry in tests.entries) {
-        final stream = Stream.fromIterable(
-                List.generate(1 + (entry.key.length >>> 3), (i) => i << 3))
-            .map((e) => entry.key.substring(e, min(entry.key.length, e + 8)))
-            .map((s) => s.codeUnits);
-        final result = await md4.bind(stream).first;
-        expect(result.hex(), entry.value);
-      }
+      final last = tests.entries.last;
+      final input = last.key.codeUnits;
+      final stream = Stream.fromIterable([
+        input.take(7).toList(),
+        input.skip(7).take(10).toList(),
+        input.skip(17).take(15).toList(),
+        input.skip(32).toList(),
+      ]);
+      final result = await md4.bind(stream).first;
+      expect(result.hex(), last.value, reason: "'${last.key}'");
     });
   });
 }

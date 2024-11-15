@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:test/test.dart';
 import 'package:hashlib/src/core/utils.dart';
 

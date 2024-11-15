@@ -1,3 +1,7 @@
+# 1.21.1
+
+- Support for MD2: `md2`, `md2sum`
+
 # 1.21.0
 
 - Moves random generators outside of the base package; `import 'package:hashlib/random.dart';`

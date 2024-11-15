@@ -22,9 +22,10 @@ There is only 1 dependency used by this package:
 
 | Algorithm   | Available methods                                                  |        Source        |
 | ----------- | ------------------------------------------------------------------ | :------------------: |
-| MD4         | `md4`                                                              |       RFC-1320       |
-| MD5         | `md5`                                                              |       RFC-1321       |
-| SHA-1       | `sha1`                                                             |       RFC-3174       |
+| MD2         | `md2` , `md2sum`                                                   |       RFC-1319       |
+| MD4         | `md4`, `md4sum`                                                    |       RFC-1320       |
+| MD5         | `md5` , `md5sum`                                                   |       RFC-1321       |
+| SHA-1       | `sha1` , `sha1sum`                                                 |       RFC-3174       |
 | SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` |       RFC-6234       |
 | SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     |       FIPS-202       |
 | SHAKE-128   | `Shake128`, `shake128`, `shake128_128`, `shake128_256`             |       FIPS-202       |
@@ -37,7 +38,7 @@ There is only 1 dependency used by this package:
 | xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         |       Cyan4973       |
 | xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   |       Cyan4973       |
 | RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | ISO/IEC 10118-3:2018 |
-| SM3         | `sm3`                                                              |   GB/T 32905-2016    |
+| SM3         | `sm3` , `sm3sum`                                                   |   GB/T 32905-2016    |
 
 ### Password / Key Derivation Algorithms
 
@@ -148,6 +149,7 @@ void main() {
   print('XXH64 => ${xxh64sum(text)}');
   print('XXH3 => ${xxh3sum(text)}');
   print('XXH128 => ${xxh128sum(text)}');
+  print('MD2 => ${md2.string(text)}');
   print('MD4 => ${md4.string(text)}');
   print('MD5 => ${md5.string(text)}');
   print('SHA-1 => ${sha1.string(text)}');

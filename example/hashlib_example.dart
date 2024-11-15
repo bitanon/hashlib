@@ -26,6 +26,7 @@ void main() {
   print('XXH64 => ${xxh64sum(text)}');
   print('XXH3 => ${xxh3sum(text)}');
   print('XXH128 => ${xxh128sum(text)}');
+  print('MD2 => ${md2.string(text)}');
   print('MD4 => ${md4.string(text)}');
   print('MD5 => ${md5.string(text)}');
   print('SHA-1 => ${sha1.string(text)}');
