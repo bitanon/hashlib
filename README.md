@@ -6,7 +6,7 @@
 [![dart support](https://img.shields.io/badge/dart-%3e%3d%202.14.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
 [![likes](https://img.shields.io/pub/likes/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 [![pub points](https://img.shields.io/pub/points/hashlib?logo=dart&color=teal)](https://pub.dev/packages/hashlib/score)
-[![popularity](https://img.shields.io/pub/popularity/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
+[![Pub Monthly Downloads](https://img.shields.io/pub/dm/hashlib)](https://pub.dev/packages/hashlib/score)
 
 This library contains implementations of secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 
