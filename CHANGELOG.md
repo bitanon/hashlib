@@ -1,3 +1,7 @@
+# 1.21.2
+
+- Updates README.md
+
 # 1.21.1
 
 - Support for MD2: `md2`, `md2sum`
