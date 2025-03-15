@@ -74,13 +74,14 @@ class _Poly1305 extends MACHash<Poly1305Sink> {
 /// message using either 16 or 32-byte long authentication key.
 const poly1305 = _Poly1305();
 
+/// Poly1305 MAC generator with a custom 16 or 32-byte long keypair.
 class Poly1305 extends HashBase<Poly1305Sink> with MACHashBase<Poly1305Sink> {
   final Uint8List keypair;
 
   @override
   final String name = 'Poly1305';
 
-  /// Create a new instance of [_Poly1305] with a 16 or 32-byte long keypair.
+  /// Create a new instance of Poly1305 MAC with a 16 or 32-byte long keypair.
   /// The first 16-bytes will be used as a secret key to encode the message,
   /// and the last 16-bytes will be used as the authentication key to sign it.
   ///

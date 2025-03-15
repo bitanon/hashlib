@@ -36,7 +36,7 @@ const List<int> _k = [
   0x5FCB6FAB3AD6FAEC, 0x6C44198C4A475817,
 ];
 
-/// The implementation is derived from [RFC6234][rfc6234] which follows the
+/// Implementation is derived from [RFC6234][rfc6234] which follows the
 /// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
 ///
 /// It uses 64-bit integer operations internally which is not supported by

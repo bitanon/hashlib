@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:hashlib/src/core/hash_digest.dart';
 
+/// Base class for key generator algorithms
 abstract class KeyDerivatorBase {
   const KeyDerivatorBase();
 

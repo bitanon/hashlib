@@ -19,6 +19,7 @@ const int _mask32 = 0xFFFFFFFF;
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 
+/// Implementation of Universally Unique Identifier version 4
 class UUIDv4 {
   const UUIDv4();
 

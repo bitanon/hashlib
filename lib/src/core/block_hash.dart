@@ -5,10 +5,12 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
 
+/// Base class used by block hash algorithms
 abstract class BlockHashBase<T extends BlockHashSink> extends HashBase<T> {
   const BlockHashBase();
 }
 
+/// Base class used by block hash algorithm sink implementations
 abstract class BlockHashSink extends HashDigestSink {
   /// The current position of data in the [buffer]
   int pos = 0;

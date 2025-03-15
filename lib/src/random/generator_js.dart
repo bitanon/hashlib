@@ -10,8 +10,10 @@ int _seedCounter = Zone.current.hashCode;
 
 final _secure = Random($generateSeed());
 
+/// Returns a secure random generator in JS runtime
 Random secureRandom() => _secure;
 
+/// Generates a random seed in JS runtime
 int $generateSeed() {
   int code = DateTime.now().millisecondsSinceEpoch;
   code -= _seedCounter++;

@@ -6,6 +6,8 @@ import 'dart:typed_data';
 
 import 'package:hashlib/codecs.dart';
 
+/// This holds generated hash digest and provides utilities to extract it in
+/// multiple formats.
 class HashDigest extends Object {
   final Uint8List bytes;
 

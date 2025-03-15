@@ -73,7 +73,7 @@ const int _w13 = _w12 + 2;
 const int _w14 = _w13 + 2;
 const int _w15 = _w14 + 2;
 
-/// The implementation is derived from [RFC-7693][rfc] document for
+/// Implementation is derived from [RFC-7693][rfc] document for
 /// "The BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)".
 ///
 /// For reference, the official [blake2][blake2] implementation was followed.

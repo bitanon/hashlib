@@ -7,6 +7,9 @@ import 'package:hashlib/src/core/hash_base.dart';
 
 final Map<int, Uint16List> _tables = {};
 
+/// A CRC-16 code generator with IBM CRC-16 polynomial.
+///
+/// Reference: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
 class CRC16Hash extends HashDigestSink {
   final int seed;
   final Uint16List table;
