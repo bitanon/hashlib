@@ -20,6 +20,7 @@ import 'package:hashlib/src/random.dart';
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 
+/// Implementation of Universally Unique Identifier version 5
 class UUIDv5 {
   const UUIDv5();
 

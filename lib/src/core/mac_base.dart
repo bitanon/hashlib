@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:hashlib/src/core/hash_base.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 
+/// Base class for the sink used by Message-Authentication-Code generators
 abstract class MACSinkBase extends HashDigestSink {
   /// The length of generated key in bytes
   int get derivedKeyLength => hashLength;

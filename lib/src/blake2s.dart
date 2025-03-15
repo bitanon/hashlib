@@ -89,6 +89,7 @@ class Blake2s extends BlockHashBase<Blake2sHash> with MACHashBase<Blake2sHash> {
   Blake2sMAC get mac => Blake2sMAC(digestSize);
 }
 
+/// A MAC generator based on Blake2s algorithm.
 class Blake2sMAC extends MACHash<Blake2sHash> {
   /// The number of bytes in the output.
   final int digestSize;

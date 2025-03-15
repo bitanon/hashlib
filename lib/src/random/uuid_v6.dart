@@ -20,6 +20,7 @@ const int _pow32 = _mask32 + 1;
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 
+/// Implementation of Universally Unique Identifier version 6
 class UUIDv6 {
   const UUIDv6();
 

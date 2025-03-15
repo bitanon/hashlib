@@ -4,6 +4,7 @@
 import 'sha2_1024_64bit.dart' if (dart.library.js) 'sha2_1024_32bit.dart';
 import 'sha2_512.dart';
 
+/// Implementation of 224-bit hash generator based on 512-bit SHA2.
 class SHA224Hash extends SHA2of512 {
   SHA224Hash()
       : super(
@@ -21,6 +22,7 @@ class SHA224Hash extends SHA2of512 {
         );
 }
 
+/// Implementation of 256-bit hash generator based on 512-bit SHA2.
 class SHA256Hash extends SHA2of512 {
   SHA256Hash()
       : super(
@@ -38,6 +40,7 @@ class SHA256Hash extends SHA2of512 {
         );
 }
 
+/// Implementation of 384-bit hash generator based on 1024-bit SHA2.
 class SHA384Hash extends SHA2of1024 {
   SHA384Hash()
       : super(
@@ -55,6 +58,7 @@ class SHA384Hash extends SHA2of1024 {
         );
 }
 
+/// Implementation of 512-bit hash generator based on 1024-bit SHA2.
 class SHA512Hash extends SHA2of1024 {
   SHA512Hash()
       : super(
@@ -72,6 +76,7 @@ class SHA512Hash extends SHA2of1024 {
         );
 }
 
+/// Implementation of 224-bit hash generator based on 1024-bit SHA2.
 class SHA512t224Hash extends SHA2of1024 {
   SHA512t224Hash()
       : super(
@@ -89,6 +94,7 @@ class SHA512t224Hash extends SHA2of1024 {
         );
 }
 
+/// Implementation of 256-bit hash generator based on 1024-bit SHA2.
 class SHA512t256Hash extends SHA2of1024 {
   SHA512t256Hash()
       : super(

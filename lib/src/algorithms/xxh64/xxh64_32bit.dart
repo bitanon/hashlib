@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/block_hash.dart';
 
+/// Stub for 32-bit machines.
 class XXHash64Sink extends BlockHashSink {
   @override
   final int hashLength = 8;

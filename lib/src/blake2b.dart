@@ -90,6 +90,7 @@ class Blake2b extends BlockHashBase<Blake2bHash> with MACHashBase<Blake2bHash> {
   Blake2bMAC get mac => Blake2bMAC(digestSize);
 }
 
+/// A MAC generator based on Blake2b algorithm.
 class Blake2bMAC extends MACHash<Blake2bHash> {
   /// The number of bytes in the output.
   final int digestSize;

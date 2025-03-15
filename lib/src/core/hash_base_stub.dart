@@ -6,6 +6,7 @@ import 'dart:async';
 import 'hash_base.dart';
 import 'hash_digest.dart';
 
+/// Stub for machines that does not have file IO support.
 extension HashBaseFileSupport on HashBase {
   /// Converts the [input] file and returns a [HashDigest] asynchronously.
   ///

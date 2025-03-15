@@ -21,6 +21,7 @@ const int _mask32 = 0xFFFFFFFF;
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 
+/// Implementation of Universally Unique Identifier version 8
 class UUIDv8 {
   const UUIDv8();
 
