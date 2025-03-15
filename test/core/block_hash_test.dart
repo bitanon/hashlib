@@ -7,8 +7,8 @@ import 'package:hashlib/hashlib.dart';
 
 // Concrete implementation for testing purposes
 class TestBlockHashSink extends BlockHashSink {
-  TestBlockHashSink(int blockLength, [int? bufferLength])
-      : super(blockLength, bufferLength: bufferLength);
+  TestBlockHashSink(super.blockLength, [int? bufferLength])
+      : super(bufferLength: bufferLength);
 
   @override
   int hashLength = 8;

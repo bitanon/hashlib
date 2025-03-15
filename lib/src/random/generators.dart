@@ -26,10 +26,8 @@ enum RNG {
   sha256,
   md5,
   xxh64,
-  sm3,
-}
+  sm3;
 
-extension RNGBuilder on RNG {
   /// Gets the function returning the next 32-bit integer by this RNG
   NextIntFunction build([int? seed]) {
     switch (this) {
