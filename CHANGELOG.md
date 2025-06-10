@@ -1,6 +1,6 @@
 # 2.0.0
 
-- ![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)]
+- ![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)
 - Support for random number generator based on sm3: `RNG.sm3`
 - Improves documentation
 
