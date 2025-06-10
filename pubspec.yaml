@@ -15,7 +15,7 @@ platforms:
   windows:
 
 dependencies:
-  hashlib_codecs: ^2.6.0
+  hashlib_codecs: ^3.0.0
 
 dev_dependencies:
   lints: any

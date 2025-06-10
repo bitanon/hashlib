@@ -2,6 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 /// Implementations of fast and error resilient codecs
-library hashlib_codecs;
+library;
 
 export 'package:hashlib_codecs/hashlib_codecs.dart';

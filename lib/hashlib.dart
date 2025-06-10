@@ -2,6 +2,6 @@
 // All rights reserved. Check LICENSE file for details.
 
 /// Secure hash algorithms in pure dart.
-library hashlib;
+library;
 
 export 'src/hashlib.dart';
