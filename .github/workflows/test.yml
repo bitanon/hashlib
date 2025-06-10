@@ -13,7 +13,7 @@ jobs:
   test:
     strategy:
       matrix:
-        sdk: ['stable', '2.14', 'beta']
+        sdk: ['stable', '2.19', 'beta']
         platform: ['vm', 'node']
     runs-on: ubuntu-latest
     steps:

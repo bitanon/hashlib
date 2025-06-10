@@ -40,7 +40,7 @@ class Argon2 extends KeyDerivatorBase {
   final Argon2Context _ctx;
 
   @override
-  String get name => _ctx.typeName;
+  String get name => _ctx.type.name;
 
   /// Argon2 Hash Type
   Argon2Type get type => _ctx.type;
