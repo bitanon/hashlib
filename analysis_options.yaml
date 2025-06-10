@@ -12,13 +12,13 @@ linter:
     - only_throw_errors
     - comment_references
     - library_annotations
-    - invalid_case_patterns
     - combinators_ordering
     - always_declare_return_types
     - one_member_abstracts
     - cancel_subscriptions
     - avoid_unused_constructor_parameters
-    - strict_top_level_inference
+    # - invalid_case_patterns
+    # - strict_top_level_inference
 
 analyzer:
   exclude:
