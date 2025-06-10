@@ -38,8 +38,8 @@ import 'xxhash.dart' as xxhash;
 IOSink sink = stdout;
 RandomAccessFile? raf;
 
-void dump(message) {
-  raf?.writeStringSync(message + '\n');
+void dump(String message) {
+  raf?.writeStringSync('$message\n');
   stdout.writeln(message);
 }
 

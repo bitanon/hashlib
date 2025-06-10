@@ -18,6 +18,7 @@ linter:
     - one_member_abstracts
     - cancel_subscriptions
     - avoid_unused_constructor_parameters
+    - strict_top_level_inference
 
 analyzer:
   exclude:

@@ -9,7 +9,7 @@ import 'package:hashlib/src/uuid.dart';
 import 'package:test/test.dart';
 
 @pragma('vm:entry-point')
-void runIsolate(inp) {
+void runIsolate(dynamic inp) {
   final port = inp[0] as SendPort;
   switch (inp[1] as String) {
     case 'v1':
