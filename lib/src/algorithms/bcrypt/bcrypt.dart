@@ -8,11 +8,12 @@ import 'package:hashlib/src/algorithms/bcrypt/common.dart';
 import 'package:hashlib/src/algorithms/bcrypt/security.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
 
+/// Implementation for the bcrypt key generator
 class Bcrypt extends KeyDerivatorBase {
   final BcryptContext _ctx;
 
   @override
-  String get name => 'Bcrypt/${_ctx.versioName}';
+  String get name => 'Bcrypt/${_ctx.version.name}';
 
   @override
   final int derivedKeyLength = 23;

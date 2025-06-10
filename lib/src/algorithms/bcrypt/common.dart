@@ -8,56 +8,51 @@ import 'package:hashlib/src/algorithms/bcrypt/bcrypt.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/random.dart';
 
+/// The [Bcrypt] algorithm version
 enum BcryptVersion {
   /// This is a revised version of original v2 with UTF-8 character support
   /// and inclusion of the null terminator with the password.
-  $2a,
+  $2a._('2a'),
 
   /// This is the bug-fixed version of OpenBSD implementation of bcrypt, which
   /// fixes the support for password longer than 255 characters.
-  $2b,
+  $2b._('2b'),
 
   /// This was introduced by PHP `crypt_blowfish` implementation to mark hashes
   /// generated with a bug in their implementation.
-  $2x,
+  $2x._('2x'),
 
   /// This was introduced by PHP `crypt_blowfish` implementation to mark hashes
   /// generated after fixing the bug in their implementation.
-  $2y,
-}
+  $2y._('2y');
 
-String _versionToName(BcryptVersion version) {
-  switch (version) {
-    case BcryptVersion.$2a:
-      return '2a';
-    case BcryptVersion.$2b:
-      return '2b';
-    case BcryptVersion.$2x:
-      return '2x';
-    case BcryptVersion.$2y:
-      return '2y';
+  /// The name of this version
+  final String name;
+
+  const BcryptVersion._(this.name);
+
+  /// Gets the version from string name
+  static BcryptVersion fromName(String name) {
+    switch (name) {
+      case '2a':
+        return BcryptVersion.$2a;
+      case '2b':
+        return BcryptVersion.$2b;
+      case '2x':
+        return BcryptVersion.$2x;
+      case '2y':
+        return BcryptVersion.$2y;
+      default:
+        throw FormatException('Invalid version');
+    }
   }
 }
 
-BcryptVersion _nameToVersion(String name) {
-  switch (name) {
-    case '2a':
-      return BcryptVersion.$2a;
-    case '2b':
-      return BcryptVersion.$2b;
-    case '2x':
-      return BcryptVersion.$2x;
-    case '2y':
-      return BcryptVersion.$2y;
-    default:
-      throw FormatException('Invalid version');
-  }
-}
-
+/// The HashDigest for Bcrypt with [BcryptContext]
 class BcryptHashDigest extends HashDigest {
   final BcryptContext ctx;
 
-  const BcryptHashDigest(this.ctx, Uint8List bytes) : super(bytes);
+  const BcryptHashDigest(this.ctx, super.bytes);
 
   @override
   String toString() => encoded();
@@ -83,13 +78,10 @@ class BcryptContext {
     required this.cost,
   });
 
-  /// Ger version name
-  String get versioName => _versionToName(version);
-
   /// Creates an [BcryptContext] instance from encoded string.
   ///
   /// Parameters:
-  /// - [version] : The [BcryptVersion] to use. Default [BcryptVersion.$2b].
+  /// - [version] : The BcryptVersion to use. Default `BcryptVersion.$2b`.
   /// - [salt] : An uniquely and randomly generated string.
   /// - [cost] : Number of rounds in terms of power of 2. 0 < [cost] < 31.
   factory BcryptContext({
@@ -120,7 +112,7 @@ class BcryptContext {
   /// The encoded string may look like this:
   /// `$2a$12$WApznUOJfkEGSmYRfnkrPOr466oFDCaj4b6HY3EXGvfxm43seyhgC`
   factory BcryptContext.fromEncoded(CryptData data) {
-    var version = _nameToVersion(data.id);
+    var version = BcryptVersion.fromName(data.id);
     var cost = int.tryParse(data.salt ?? '0');
     if (cost == null) {
       throw FormatException('Invalid cost');
@@ -150,7 +142,7 @@ class BcryptContext {
       hash += toBase64(hashBytes, codec: Base64Codec.bcrypt);
     }
     return toCrypt(
-      CryptDataBuilder(_versionToName(version))
+      CryptDataBuilder(version.name)
           .salt('$cost'.padLeft(2, '0'))
           .hash(hash)
           .build(),

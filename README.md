@@ -3,7 +3,7 @@
 [![plugin version](https://img.shields.io/pub/v/hashlib?label=pub)](https://pub.dev/packages/hashlib)
 [![test](https://github.com/bitanon/hashlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/hashlib/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bitanon/hashlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/hashlib)
-[![dart support](https://img.shields.io/badge/dart-%3e%3d%202.17.0-39f?logo=dart)](https://dart.dev/guides/whats-new#may-11-2022-2-17-release)
+[![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#may-11-2022-2-17-release)
 [![likes](https://img.shields.io/pub/likes/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 [![pub points](https://img.shields.io/pub/points/hashlib?logo=dart&color=teal)](https://pub.dev/packages/hashlib/score)
 [![Pub Monthly Downloads](https://img.shields.io/pub/dm/hashlib)](https://pub.dev/packages/hashlib/score)
@@ -96,13 +96,13 @@ Accessible through `uuid`
 - v7
 - v8
 
-## Demo
+<!-- ## Demo
 
 A demo application is available in Google Play Store featuring the capabilities of this package.
 
 <a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="192px" /></a>
 
-<a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt="demo app preview" src="https://raw.githubusercontent.com/bitanon/hashlib_demo/master/images/demo.gif" height="640px"/></a>
+<a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt="demo app preview" src="https://raw.githubusercontent.com/bitanon/hashlib_demo/master/images/demo.gif" height="640px"/></a> -->
 
 ## Getting Started
 

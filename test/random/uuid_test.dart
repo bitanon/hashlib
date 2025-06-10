@@ -291,7 +291,7 @@ void main() {
       expect(Namespace.max.value, matcher);
     });
     test('time', () {
-      expect(Namespace.time.value, matcher);
+      expect(Namespace.time, matcher);
     });
   });
 }

@@ -32,7 +32,7 @@ class HashlibRandom {
   factory HashlibRandom(RNG generator, {int? seed}) =>
       HashlibRandom.custom(generator.build(seed));
 
-  /// Creates an instance based on [RNG.secure] generator with
+  /// Creates an instance based on `RNG.secure` generator with
   /// optional [seed] value.
   factory HashlibRandom.secure({int? seed}) =>
       HashlibRandom.custom(RNG.secure.build(seed));
