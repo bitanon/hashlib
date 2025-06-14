@@ -4,24 +4,41 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    paths: ['**.dart', '**.yaml', '**.yml']
+    paths:
+      - lib/**
+      - test/**
+      - pubspec.yaml
+      - dart_test.yaml
+      - analysis_options.yaml
+      - .github/workflows/test.yml
   pull_request:
     branches: [master]
-    paths: ['**.dart', '**.yaml', '**.yml']
+    paths:
+      - lib/**
+      - test/**
+      - pubspec.yaml
+      - dart_test.yaml
+      - analysis_options.yaml
+      - .github/workflows/test.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['stable', '2.19', 'beta']
-        platform: ['vm', 'node']
-    runs-on: ${{ matrix.os }}
+  lint:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
         with:
-          sdk: ${{ matrix.sdk }}
+          path: |
+            ~/.pub-cache
+            .dart_tool/package_config.json
+          key: ubuntu-lint-${{ hashFiles('**/pubspec.lock') }}
 
       - name: Install dependencies
         run: dart pub get
@@ -32,7 +49,39 @@ jobs:
       - name: Analyze project source
         run: dart analyze --fatal-infos
 
-      - name: Text on ${{ matrix.platform }}
+  test:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: ['stable', '2.19', 'beta']
+        platform: ['vm', 'node']
+        exclude:
+          # Only test beta on Ubuntu, skip macOS/Windows for beta
+          - sdk: 'beta'
+            os: macos-latest
+          - sdk: 'beta'
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool/package_config.json
+          key: ${{ runner.os }}-test-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Test on ${{ matrix.platform }}
         run: dart test -p ${{ matrix.platform }}
 
   pana:
