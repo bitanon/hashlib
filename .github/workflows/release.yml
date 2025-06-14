@@ -6,8 +6,22 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tag version matches pubspec.yaml
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{ print $2 }' | tr -d '[:space:]')
+          if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match pubspec.yaml version ($PUBSPEC_VERSION)"
+            exit 1
+          fi
+
   test:
-    uses: ./.github/workflows/test.yml
+    needs: version
+    uses: ./.github/workflows/release-test.yml
 
   publish:
     if: github.repository == 'bitanon/hashlib'
@@ -21,15 +35,6 @@ jobs:
 
       - name: Install dependencies
         run: dart pub get
-
-      - name: Check tag version matches pubspec.yaml
-        run: |
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{ print $2 }')
-          if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
-            echo "Tag version ($TAG_VERSION) does not match pubspec.yaml version ($PUBSPEC_VERSION)"
-            exit 1
-          fi
 
       - name: Publish - dry run
         run: dart pub publish --dry-run
