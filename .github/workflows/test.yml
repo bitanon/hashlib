@@ -3,13 +3,32 @@ name: Test
 on:
   workflow_dispatch:
   push:
-    paths: ['**.dart', '**.yaml', '**.yml']
+    branches: [v1]
+    paths:
+      - lib/**
+      - test/**
+      - pubspec.yaml
+      - dart_test.yaml
+      - analysis_options.yaml
+      - .github/workflows/test.yml
   pull_request:
-    paths: ['**.dart', '**.yaml', '**.yml']
+    branches: [v1]
+    paths:
+      - lib/**
+      - test/**
+      - pubspec.yaml
+      - dart_test.yaml
+      - analysis_options.yaml
+      - .github/workflows/test.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         sdk: ['stable', '2.14', 'beta']
