@@ -41,3 +41,29 @@ jobs:
 
       - name: Publish to pub.dev
         run: dart pub publish -f
+
+  changelog:
+    if: github.repository == 'bitanon/hashlib'
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          awk '/^# /{if (p++) exit} p' CHANGELOG.md > RELEASE_NOTES.md
+
+      - name: Append changelog comparison link
+        run: |
+          CUR_TAG=${GITHUB_REF#refs/tags/v}
+          PREV_TAG=$(git tag --sort=v:refname | grep '^v[0-9]' | awk -v cur="$CUR_TAG" '{if($0==cur){exit}prev=$0}END{print prev}')
+          echo -e "\n**Full Changelog**: https://github.com/bitanon/hashlib_codecs/compare/${PREV_TAG}...${CUR_TAG}" >> RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
