@@ -23,26 +23,24 @@ const int _minAD = 1;
 const int _maxAD = 0x3FFFFFF;
 const int _defaultHashLength = 32;
 
+/// The Argon2 types
 enum Argon2Type {
   argon2d,
   argon2i,
   argon2id,
 }
 
-/// The Argon2 version
-enum Argon2Version {
-  v10,
-  v13,
-}
-
-String _typeToName(Argon2Type type) {
-  switch (type) {
-    case Argon2Type.argon2d:
-      return 'argon2d';
-    case Argon2Type.argon2i:
-      return 'argon2i';
-    case Argon2Type.argon2id:
-      return 'argon2id';
+extension Argon2TypeName on Argon2Type {
+  /// Name of this type
+  String get name {
+    switch (this) {
+      case Argon2Type.argon2d:
+        return 'argon2d';
+      case Argon2Type.argon2i:
+        return 'argon2i';
+      case Argon2Type.argon2id:
+        return 'argon2id';
+    }
   }
 }
 
@@ -55,8 +53,14 @@ Argon2Type _nameToType(String name) {
     case 'argon2id':
       return Argon2Type.argon2id;
     default:
-      throw ArgumentError('Invalid type');
+      throw ArgumentError('Unknown type');
   }
+}
+
+/// The Argon2 version
+enum Argon2Version {
+  v10,
+  v13,
 }
 
 Argon2Version _valueToVersion(int value) {
@@ -66,7 +70,7 @@ Argon2Version _valueToVersion(int value) {
     case 0x13:
       return Argon2Version.v13;
     default:
-      throw ArgumentError('Invalid version');
+      throw ArgumentError('Unknown version');
   }
 }
 
@@ -82,6 +86,7 @@ extension Argon2VersionValue on Argon2Version {
   }
 }
 
+/// The HashDigest for Argon2 with [Argon2Context]
 class Argon2HashDigest extends HashDigest {
   final Argon2Context ctx;
 
@@ -154,9 +159,6 @@ class Argon2Context {
     required this.personalization,
   }) : midSlice = slices ~/ 2;
 
-  /// Argon2 Hash Type name
-  String get typeName => _typeToName(type);
-
   /// Creates a context for Argon2 password hashing
   ///
   /// Required Parameters:
@@ -170,8 +172,8 @@ class Argon2Context {
   /// - [hashLength] Desired number of returned bytes. Default: 32.
   /// - [key] Additional key.
   /// - [personalization] Arbitrary additional data.
-  /// - [version] Algorithm version; Default: [Argon2Version.v13],
-  /// - [type] Argon2 type; Default: [Argon2Type.argon2id].
+  /// - [version] Algorithm version; Default: `Argon2Version.v13`,
+  /// - [type] Argon2 type; Default: `Argon2Type.argon2id`.
   factory Argon2Context({
     required int iterations,
     required int parallelism,
@@ -295,7 +297,7 @@ class Argon2Context {
   /// Gets the PHC-compliant string for this [Argon2HashDigest]
   String toEncoded(Uint8List hashBytes) {
     return toCrypt(
-      CryptDataBuilder(_typeToName(type))
+      CryptDataBuilder(type.name)
           .version('${version.value}')
           .param('m', memorySizeKB)
           .param('t', passes)

@@ -54,7 +54,7 @@ const int _t3 = _t2 + 2;
 const int _t4 = _t3 + 2;
 const int _t5 = _t4 + 2;
 
-/// The implementation is derived from [RFC6234][rfc6234] which follows the
+/// Implementation is derived from [RFC6234][rfc6234] which follows the
 /// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
 ///
 /// It uses 32-bit integers to accommodate 64-bit integer operations, designed

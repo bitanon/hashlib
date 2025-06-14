@@ -3,6 +3,8 @@
 
 import 'keccak/keccak.dart';
 
+/// Implementation of 224-bit hash generator based on [KeccakHash]
+/// with SHA3 padding.
 class SHA3d224Hash extends KeccakHash {
   SHA3d224Hash()
       : super(
@@ -11,6 +13,8 @@ class SHA3d224Hash extends KeccakHash {
         );
 }
 
+/// Implementation of 256-bit hash generator based on [KeccakHash]
+/// with SHA3 padding.
 class SHA3d256Hash extends KeccakHash {
   SHA3d256Hash()
       : super(
@@ -19,6 +23,8 @@ class SHA3d256Hash extends KeccakHash {
         );
 }
 
+/// Implementation of 384-bit hash generator based on [KeccakHash]
+/// with SHA3 padding.
 class SHA3d384Hash extends KeccakHash {
   SHA3d384Hash()
       : super(
@@ -27,6 +33,8 @@ class SHA3d384Hash extends KeccakHash {
         );
 }
 
+/// Implementation of 512-bit hash generator based on [KeccakHash]
+/// with SHA3 padding.
 class SHA3d512Hash extends KeccakHash {
   SHA3d512Hash()
       : super(

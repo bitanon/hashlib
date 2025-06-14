@@ -52,7 +52,7 @@ const _sigma = [
   [14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3], // round 11
 ];
 
-/// The implementation is derived from [RFC-7693][rfc] document for
+/// Implementation is derived from [RFC-7693][rfc] document for
 /// "The BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)".
 ///
 /// For reference, the official [blake2][blake2] implementation was followed.

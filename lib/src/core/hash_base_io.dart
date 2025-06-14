@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'hash_base.dart';
 import 'hash_digest.dart';
 
+/// Extends the base hash algorithm class with file IO support
 extension HashBaseFileSupport on HashBase {
   /// Converts the [input] file and returns a [HashDigest] asynchronously.
   ///

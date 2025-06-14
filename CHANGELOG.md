@@ -1,3 +1,8 @@
+# 1.21.3
+
+- Support for random number generator based on sm3: `RNG.sm3`
+- Improves documentation
+
 # 1.21.2
 
 - Updates README.md

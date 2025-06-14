@@ -3,6 +3,7 @@
 
 import 'keccak/keccak.dart';
 
+/// Implementation of 128-bit arbitrary hash generator based on [KeccakHash].
 class Shake128Hash extends KeccakHash {
   /// Create a SHAKE-128 hash generator with arbitrary output size.
   ///
@@ -18,6 +19,7 @@ class Shake128Hash extends KeccakHash {
         );
 }
 
+/// Implementation of 256-bit arbitrary hash generator based on [KeccakHash].
 class Shake256Hash extends KeccakHash {
   /// Create a SHAKE-256 hash generator with arbitrary output size.
   ///

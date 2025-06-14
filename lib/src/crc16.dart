@@ -9,6 +9,8 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// A CRC or cyclic redundancy check is code commonly used for error detection
 /// and correction of digital data. This generates a 16-bit number as output.
 ///
+/// This implementation uses IBM polynomial `0xA001`.
+///
 /// **WARNING: It should not be used for cryptographic purposes.**
 const HashBase crc16 = _CRC16();
 

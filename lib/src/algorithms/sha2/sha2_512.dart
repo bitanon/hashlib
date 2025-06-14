@@ -27,7 +27,7 @@ const List<int> _k = [
   0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2,
 ];
 
-/// The implementation is derived from [RFC6234][rfc6234] which follows the
+/// Implementation is derived from [RFC6234][rfc6234] which follows the
 /// [FIPS 180-4][fips180] standard for SHA and SHA-based HMAC and HKDF.
 ///
 /// [rfc6234]: https://www.ietf.org/rfc/rfc6234.html

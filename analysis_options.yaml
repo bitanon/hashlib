@@ -10,14 +10,15 @@ linter:
   rules:
     - camel_case_types
     - only_throw_errors
-    - comment_references
-    - library_annotations
-    - invalid_case_patterns
-    - combinators_ordering
     - always_declare_return_types
     - one_member_abstracts
     - cancel_subscriptions
     - avoid_unused_constructor_parameters
+    # - comment_references
+    # - library_annotations
+    # - combinators_ordering
+    # - invalid_case_patterns
+    # - strict_top_level_inference
 
 analyzer:
   exclude:

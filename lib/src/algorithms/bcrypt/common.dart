@@ -8,6 +8,7 @@ import 'package:hashlib/src/algorithms/bcrypt/bcrypt.dart';
 import 'package:hashlib/src/core/hash_digest.dart';
 import 'package:hashlib/src/random.dart';
 
+/// The [Bcrypt] algorithm version
 enum BcryptVersion {
   /// This is a revised version of original v2 with UTF-8 character support
   /// and inclusion of the null terminator with the password.
@@ -26,16 +27,19 @@ enum BcryptVersion {
   $2y,
 }
 
-String _versionToName(BcryptVersion version) {
-  switch (version) {
-    case BcryptVersion.$2a:
-      return '2a';
-    case BcryptVersion.$2b:
-      return '2b';
-    case BcryptVersion.$2x:
-      return '2x';
-    case BcryptVersion.$2y:
-      return '2y';
+extension BcryptVersionName on BcryptVersion {
+  /// The name of this version
+  String get name {
+    switch (this) {
+      case BcryptVersion.$2a:
+        return '2a';
+      case BcryptVersion.$2b:
+        return '2b';
+      case BcryptVersion.$2x:
+        return '2x';
+      case BcryptVersion.$2y:
+        return '2y';
+    }
   }
 }
 
@@ -54,6 +58,7 @@ BcryptVersion _nameToVersion(String name) {
   }
 }
 
+/// The HashDigest for Bcrypt with [BcryptContext]
 class BcryptHashDigest extends HashDigest {
   final BcryptContext ctx;
 
@@ -83,13 +88,10 @@ class BcryptContext {
     required this.cost,
   });
 
-  /// Ger version name
-  String get versioName => _versionToName(version);
-
   /// Creates an [BcryptContext] instance from encoded string.
   ///
   /// Parameters:
-  /// - [version] : The [BcryptVersion] to use. Default [BcryptVersion.$2b].
+  /// - [version] : The BcryptVersion to use. Default `BcryptVersion.$2b`.
   /// - [salt] : An uniquely and randomly generated string.
   /// - [cost] : Number of rounds in terms of power of 2. 0 < [cost] < 31.
   factory BcryptContext({
@@ -150,7 +152,7 @@ class BcryptContext {
       hash += toBase64(hashBytes, codec: Base64Codec.bcrypt);
     }
     return toCrypt(
-      CryptDataBuilder(_versionToName(version))
+      CryptDataBuilder(version.name)
           .salt('$cost'.padLeft(2, '0'))
           .hash(hash)
           .build(),
