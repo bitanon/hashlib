@@ -7,6 +7,7 @@ on:
     paths:
       - lib/**
       - test/**
+      - test_integration/**
       - pubspec.yaml
       - dart_test.yaml
       - analysis_options.yaml
@@ -16,6 +17,7 @@ on:
     paths:
       - lib/**
       - test/**
+      - test_integration/**
       - pubspec.yaml
       - dart_test.yaml
       - analysis_options.yaml
@@ -38,7 +40,7 @@ jobs:
           path: |
             ~/.pub-cache
             .dart_tool/package_config.json
-          key: ubuntu-lint-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-test-${{ hashFiles('**/pubspec.lock') }}
 
       - name: Install dependencies
         run: dart pub get
@@ -58,10 +60,19 @@ jobs:
         sdk: ['stable', '2.19', 'beta']
         platform: ['vm', 'node']
         exclude:
-          # Only test beta on Ubuntu, skip macOS/Windows for beta
+          # skip test for beta
           - sdk: 'beta'
             os: macos-latest
           - sdk: 'beta'
+            os: windows-latest
+          - sdk: 'beta'
+            platform: 'node'
+          # Skip node platform
+          - platform: 'node'
+            sdk: '2.19'
+            os: macos-latest
+          - platform: 'node'
+            sdk: '2.19'
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -81,8 +92,42 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
-      - name: Test on ${{ matrix.platform }}
+      - name: Run tests
         run: dart test -p ${{ matrix.platform }}
+
+  integration:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: ['stable', '2.19', 'beta']
+        exclude:
+          # skip test on macOS/Windows for beta
+          - sdk: 'beta'
+            os: macos-latest
+          - sdk: 'beta'
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool/package_config.json
+          key: ${{ runner.os }}-test-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Run tests
+        run: |
+          cd test_integration
+          dart pub get
+          dart run main.dart
 
   pana:
     if: github.repository == 'bitanon/hashlib'
