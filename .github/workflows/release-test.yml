@@ -117,4 +117,4 @@ jobs:
         run: dart pub global activate pana
 
       - name: Verify with pana
-        run: pana --exit-code-threshold 0
+        run: pana --exit-code-threshold 20

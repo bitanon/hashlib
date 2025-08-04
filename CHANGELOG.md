@@ -1,3 +1,8 @@
+# 1.22.0
+
+- Enhances the CRCs with custom polynomial support.
+- Reduces global variables to optimize runtime memory.
+
 # 1.21.3
 
 - Support for random number generator based on sm3: `RNG.sm3`
