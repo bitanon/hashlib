@@ -72,9 +72,23 @@ void main() {
       expect(sink.closed, isTrue);
     });
 
+    test('CRC64Params.hex', () {
+      var params = CRC64Params.hex(
+        poly: '42F0E1EBA9EA3693',
+        seed: 'FFFFFFFFFFFFFFFF',
+        xorOut: 'FFFFFFFFFFFFFFFF',
+      );
+      expect(params.high, 0x42F0E1EB);
+      expect(params.low, 0xA9EA3693);
+      expect(params.seedHigh, 0xFFFFFFFF);
+      expect(params.seedLow, 0xFFFFFFFF);
+      expect(params.xorOutHigh, 0xFFFFFFFF);
+      expect(params.xorOutLow, 0xFFFFFFFF);
+    });
+
     for (var e in known.entries) {
       test('check "${e.key.name}"', () {
-        expect(crc64sum("123456789", polynomial: e.key), e.value);
+        expect(crc64sum("123456789", params: e.key), e.value);
       });
     }
   });

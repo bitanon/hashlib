@@ -19,21 +19,17 @@ const crc32 = CRC32(CRC32Params.ieee);
 
 /// CRC-32 code generator
 class CRC32 extends HashBase {
-  final CRC32Params polynomial;
+  final CRC32Params params;
 
   /// Create a instance for generating CRC-32 hashes
-  ///
-  /// Parameters:
-  /// - [polynomial]: 32-bit polynomial representation
-  const CRC32(this.polynomial);
+  const CRC32(this.params);
 
   @override
-  String get name => "CRC-32/${polynomial.name}";
+  String get name => "CRC-32/${params.name}";
 
   @override
-  CRC32Hash createSink() => polynomial.reversed
-      ? CRC32ReverseHash(polynomial)
-      : CRC32NormalHash(polynomial);
+  CRC32Hash createSink() =>
+      params.reversed ? CRC32ReverseHash(params) : CRC32NormalHash(params);
 
   /// Gets the CRC-32 code for a String
   ///
@@ -50,10 +46,10 @@ class CRC32 extends HashBase {
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-/// - The [polynomial] is the Polynomial to use. Default: [CRC32Params.ieee]
+/// - The [params] is the parameters to use. Default: [CRC32Params.ieee]
 int crc32code(
   String input, {
   Encoding? encoding,
-  CRC32Params polynomial = CRC32Params.ieee,
+  CRC32Params params = CRC32Params.ieee,
 }) =>
-    CRC32(polynomial).code(input, encoding);
+    CRC32(params).code(input, encoding);

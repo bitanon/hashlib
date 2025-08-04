@@ -97,24 +97,12 @@ class CRC32Params {
     this.xorOut = 0,
   ]);
 
-  factory CRC32Params.alias(
-    String name,
-    CRC32Params alias,
-  ) =>
-      CRC32Params._(
-        name,
-        alias.poly,
-        alias.seed,
-        alias.reversed,
-        alias.xorOut,
-      );
-
   /// Create a custom polynomial for CRC-32
   ///
   /// Parameters:
   /// - [seed]: initial counter to start from
   /// - [xorOut]: the value to xor with the final output
-  /// - [reversed]: to use reverse / reflected polynomial and input
+  /// - [reversed]: to use reversed or reflected polynomial and input
   CRC32Params(
     this.poly, {
     this.seed = 0,

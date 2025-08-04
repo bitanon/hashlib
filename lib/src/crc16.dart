@@ -17,21 +17,17 @@ const crc16 = CRC16(CRC16Params.ibm);
 
 /// CRC-16 code generator
 class CRC16 extends HashBase {
-  final CRC16Params polynomial;
+  final CRC16Params params;
 
   /// Create a instance for generating CRC-16 hashes
-  ///
-  /// Parameters:
-  /// - [polynomial]: 16-bit polynomial representation
-  const CRC16(this.polynomial);
+  const CRC16(this.params);
 
   @override
-  String get name => "CRC-16/${polynomial.name}";
+  String get name => "CRC-16/${params.name}";
 
   @override
-  CRC16Hash createSink() => polynomial.reversed
-      ? CRC16ReverseHash(polynomial)
-      : CRC16NormalHash(polynomial);
+  CRC16Hash createSink() =>
+      params.reversed ? CRC16ReverseHash(params) : CRC16NormalHash(params);
 
   /// Gets the CRC-16 code for a String
   ///
@@ -47,10 +43,10 @@ class CRC16 extends HashBase {
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-/// - The [polynomial] is the Polynomial to use. Default: [CRC16Params.ansi]
+/// - The [params] is the parameters to use. Default: [CRC16Params.ansi]
 int crc16code(
   String input, {
   Encoding? encoding,
-  CRC16Params polynomial = CRC16Params.ansi,
+  CRC16Params params = CRC16Params.ansi,
 }) =>
-    CRC16(polynomial).code(input, encoding);
+    CRC16(params).code(input, encoding);

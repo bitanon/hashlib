@@ -19,21 +19,17 @@ const crc64 = CRC64(CRC64Params.iso);
 
 /// CRC-64 code generator
 class CRC64 extends HashBase {
-  final CRC64Params polynomial;
+  final CRC64Params params;
 
   /// Create a instance for generating CRC-64 hashes
-  ///
-  /// Parameters:
-  /// - [polynomial]: 64-bit polynomial representation
-  const CRC64([this.polynomial = CRC64Params.iso]);
+  const CRC64([this.params = CRC64Params.iso]);
 
   @override
-  String get name => "CRC-64/${polynomial.name}";
+  String get name => "CRC-64/${params.name}";
 
   @override
-  CRC64Hash createSink() => polynomial.reversed
-      ? CRC64ReverseHash(polynomial)
-      : CRC64NormalHash(polynomial);
+  CRC64Hash createSink() =>
+      params.reversed ? CRC64ReverseHash(params) : CRC64NormalHash(params);
 
   /// Gets the CRC-64 code for a String
   ///
@@ -59,23 +55,23 @@ class CRC64 extends HashBase {
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-/// - The [polynomial] is the Polynomial to use. Default: [CRC64Params.iso]
+/// - The [params] is the parameters to use. Default: [CRC64Params.iso]
 int crc64code(
   String input, {
   Encoding? encoding,
-  CRC64Params polynomial = CRC64Params.iso,
+  CRC64Params params = CRC64Params.iso,
 }) =>
-    CRC64(polynomial).code(input, encoding);
+    CRC64(params).code(input, encoding);
 
 /// Gets the CRC-64 hash in hexadecimal.
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-/// - The [polynomial] is the Polynomial to use. Default: [CRC64Params.iso]
+/// - The [params] is the parameters to use. Default: [CRC64Params.iso]
 String crc64sum(
   String input, {
   Encoding? encoding,
-  CRC64Params polynomial = CRC64Params.iso,
+  CRC64Params params = CRC64Params.iso,
 }) =>
-    CRC64(polynomial).checksum(input, encoding);
+    CRC64(params).checksum(input, encoding);

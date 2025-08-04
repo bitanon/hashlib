@@ -135,7 +135,7 @@ class CRC16Params {
   /// Parameters:
   /// - [seed]: initial counter to start from
   /// - [xorOut]: the value to xor with the final output
-  /// - [reversed]: to use reverse / reflected polynomial and input
+  /// - [reversed]: to use reversed or reflected polynomial and input
   CRC16Params(
     this.poly, {
     this.seed = 0,

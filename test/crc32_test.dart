@@ -72,7 +72,7 @@ void main() {
 
     for (var e in known.entries) {
       test('check "${e.key.name}"', () {
-        expect(crc32code("123456789", polynomial: e.key), e.value);
+        expect(crc32code("123456789", params: e.key), e.value);
       });
     }
   });

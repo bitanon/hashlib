@@ -86,7 +86,7 @@ class CRC64Params {
   /// Parameters:
   /// - [seed]: initial counter to start from
   /// - [xorOut]: the value to xor with the final output
-  /// - [reversed]: to use reverse / reflected polynomial and input
+  /// - [reversed]: to use reversed or reflected polynomial and input
   CRC64Params(
     int poly, {
     this.reversed = false,
@@ -104,8 +104,11 @@ class CRC64Params {
   ///
   /// Parameters:
   /// - [poly]: the polynomial in hexadecimal (MSB first)
-  factory CRC64Params.hex(
-    String poly, {
+  /// - [seed]: initial counter to start from (MSB first)
+  /// - [xorOut]: the value to xor with the final output (MSB first)
+  /// - [reversed]: to use reversed or reflected polynomial and input
+  factory CRC64Params.hex({
+    required String poly,
     bool reversed = false,
     String seed = "0000000000000000",
     String xorOut = "0000000000000000",
