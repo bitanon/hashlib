@@ -5,14 +5,12 @@ import 'dart:math' show Random;
 
 const int _mask32 = 0xFFFFFFFF;
 
-final _secure = Random.secure();
-
 /// Returns a secure random generator
 @pragma('vm:prefer-inline')
-Random secureRandom() => _secure;
+Random secureRandom() => Random.secure();
 
 /// Generates a random seed
 @pragma('vm:prefer-inline')
 int $generateSeed() =>
     (DateTime.now().microsecondsSinceEpoch & _mask32) ^
-    _secure.nextInt(_mask32);
+    Random.secure().nextInt(_mask32);

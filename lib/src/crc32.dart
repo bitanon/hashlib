@@ -6,6 +6,9 @@ import 'dart:convert';
 import 'package:hashlib/src/algorithms/crc/crc32.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
+export 'package:hashlib/src/algorithms/crc/crc32.dart'
+    show CRC32Hash, CRC32Params;
+
 /// A CRC-32 code generator with **IEEE** 802.3 CRC-32 polynomial.
 ///
 /// A CRC or cyclic redundancy check is code commonly used for error detection
@@ -14,23 +17,41 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// This implementation uses IEEE 802.3 CRC-32 polynomial `0xEDB88320`.
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
-const HashBase crc32 = _CRC32();
+const crc32 = CRC32(CRC32Params.ieee);
 
-class _CRC32 extends HashBase {
-  const _CRC32();
+/// CRC-32 code generator
+class CRC32 extends HashBase {
+  final CRC32Params params;
+
+  /// Create a instance for generating CRC-32 hashes
+  const CRC32(this.params);
 
   @override
-  final String name = 'CRC-32';
+  String get name => "CRC-32/${params.name}";
 
   @override
-  CRC32Hash createSink() => CRC32Hash();
+  CRC32Hash createSink() =>
+      params.reversed ? CRC32ReverseHash(params) : CRC32NormalHash(params);
+
+  /// Gets the CRC-32 code for a String
+  ///
+  /// Parameters:
+  /// - [input] is the string to hash
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  @pragma('vm:prefer-inline')
+  int code(String input, [Encoding? encoding]) =>
+      string(input, encoding).number();
 }
 
-/// Gets the CRC-32 value of a String
+/// Gets the CRC-32 value.
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-int crc32code(String input, [Encoding? encoding]) {
-  return crc32.string(input, encoding).number();
-}
+/// - The [params] is the parameters to use. Default: [CRC32Params.ieee]
+int crc32code(
+  String input, {
+  Encoding? encoding,
+  CRC32Params params = CRC32Params.ieee,
+}) =>
+    CRC32(params).code(input, encoding);

@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tag version matches pubspec.yaml
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{ print $2 }' | tr -d '[:space:]')
+          if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match pubspec.yaml version ($PUBSPEC_VERSION)"
+            exit 1
+          fi
+
+  test:
+    needs: version
+    uses: ./.github/workflows/release-test.yml
+
+  publish:
+    if: github.repository == 'bitanon/hashlib'
+    needs: test
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Publish - dry run
+        run: dart pub publish --dry-run
+
+      - name: Publish to pub.dev
+        run: dart pub publish -f
+
+  changelog:
+    if: github.repository == 'bitanon/hashlib'
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          awk 'BEGIN{p=0} /^# / {if(p++) exit; next} p' CHANGELOG.md | awk 'NF' > RELEASE_NOTES.md
+ 
+      - name: Append changelog comparison link
+        run: |
+          git fetch --tags
+          CUR_TAG=${GITHUB_REF#refs/tags/v}
+          PREV_TAG=$(git tag --sort=-v:refname | grep '^v[0-9]' | grep -A1 "^v$CUR_TAG" | tail -n1)
+          echo -e "\n**Full Changelog**: https://github.com/bitanon/hashlib/compare/${PREV_TAG}...${CUR_TAG}" >> RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Version ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

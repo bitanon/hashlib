@@ -1,31 +1,8 @@
-name: Test
+name: Test for Release
 
 on:
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches: [v1]
-    paths:
-      - lib/**
-      - test/**
-      - test_integration/**
-      - pubspec.yaml
-      - dart_test.yaml
-      - analysis_options.yaml
-      - .github/workflows/test.yml
-  pull_request:
-    branches: [v1]
-    paths:
-      - lib/**
-      - test/**
-      - test_integration/**
-      - pubspec.yaml
-      - dart_test.yaml
-      - analysis_options.yaml
-      - .github/workflows/test.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   lint:
@@ -56,9 +33,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         sdk: ['stable', '2.14', 'beta']
         platform: ['vm', 'node']
+        exclude:
+          # skip test for beta
+          - sdk: 'beta'
+            os: macos-latest
+          - sdk: 'beta'
+            os: windows-latest
+          - sdk: 'beta'
+            platform: 'node'
+          # Skip node platform
+          - platform: 'node'
+            sdk: '2.14'
+            os: macos-latest
+          - platform: 'node'
+            sdk: '2.14'
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +78,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['stable', '2.14']
+        sdk: ['stable', '2.14', 'beta']
+        exclude:
+          # skip test on macOS/Windows for beta
+          - sdk: 'beta'
+            os: macos-latest
+          - sdk: 'beta'
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -108,31 +106,15 @@ jobs:
           dart pub get
           dart run main.dart
 
-  coverage:
+  pana:
     if: github.repository == 'bitanon/hashlib'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
 
-      - name: Install global packages
-        run: |
-          dart pub global activate coverage
-          dart pub global activate cobertura
-          dart pub global activate junitreport
+      - name: Install pana
+        run: dart pub global activate pana
 
-      - name: Generate coverage
-        run: bash ./scripts/coverage.sh
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage/cobertura.xml
-
-      - name: Upload test results
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage/junit.xml
+      - name: Verify with pana
+        run: pana --exit-code-threshold 0
