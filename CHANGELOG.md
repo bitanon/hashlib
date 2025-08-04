@@ -1,3 +1,9 @@
+# 2.1.0
+
+- Enhances the CRCs with custom polynomial support.
+- Reduces global variables to optimize runtime memory.
+- Removes deprecated utilities: `src/core/utils.dart`.
+
 # 2.0.0
 
 - ![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)
