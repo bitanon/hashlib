@@ -3,10 +3,29 @@
 
 import 'package:hashlib/hashlib.dart';
 
-import 'utils.dart';
+const int _zero = 48;
+const int _nine = 57;
+const int _smallA = 97;
+const int _smallZ = 122;
+const int _bigA = 65;
+const int _bigZ = 90;
 
 final _hash = <String, HashBase>{};
 final _blockHash = <String, BlockHashBase>{};
+
+/// Transform [value] to uppercase and keeps only letters and digits.
+@Deprecated('It will be removed in 2.0.0')
+String normalizeName(String value) {
+  List<int> normal = [];
+  for (int c in value.codeUnits) {
+    if ((c >= _zero && c <= _nine) || (c >= _bigA && c <= _bigZ)) {
+      normal.add(c);
+    } else if (c >= _smallA && c <= _smallZ) {
+      normal.add(c - _smallA + _bigA);
+    }
+  }
+  return String.fromCharCodes(normal);
+}
 
 @pragma('vm:prefer-inline')
 String _norm(String name) =>

@@ -8,10 +8,8 @@ const int _mask32 = 0xFFFFFFFF;
 
 int _seedCounter = Zone.current.hashCode;
 
-final _secure = Random($generateSeed());
-
 /// Returns a secure random generator in JS runtime
-Random secureRandom() => _secure;
+Random secureRandom() => Random($generateSeed());
 
 /// Generates a random seed in JS runtime
 int $generateSeed() {
