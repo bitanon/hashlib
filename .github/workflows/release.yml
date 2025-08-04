@@ -51,19 +51,20 @@ jobs:
 
       - name: Extract release notes from CHANGELOG.md
         run: |
-          awk '/^# /{if (p++) exit} p' CHANGELOG.md > RELEASE_NOTES.md
-
+          awk 'BEGIN{p=0} /^# / {if(p++) exit; next} p' CHANGELOG.md | awk 'NF' > RELEASE_NOTES.md
+ 
       - name: Append changelog comparison link
         run: |
+          git fetch --tags
           CUR_TAG=${GITHUB_REF#refs/tags/v}
-          PREV_TAG=$(git tag --sort=v:refname | grep '^v[0-9]' | awk -v cur="$CUR_TAG" '{if($0==cur){exit}prev=$0}END{print prev}')
-          echo -e "\n**Full Changelog**: https://github.com/bitanon/hashlib_codecs/compare/${PREV_TAG}...${CUR_TAG}" >> RELEASE_NOTES.md
+          PREV_TAG=$(git tag --sort=-v:refname | grep '^v[0-9]' | grep -A1 "^v$CUR_TAG" | tail -n1)
+          echo -e "\n**Full Changelog**: https://github.com/bitanon/hashlib/compare/${PREV_TAG}...${CUR_TAG}" >> RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          name: Version ${{ github.ref_name }}
           body_path: RELEASE_NOTES.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
