@@ -6,40 +6,76 @@ import 'dart:convert';
 import 'package:hashlib/src/algorithms/crc/crc64.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
+export 'package:hashlib/src/algorithms/crc/crc64.dart'
+    show CRC64Hash, CRC64Params;
+
 /// A CRC-64 code generator with **ISO** CRC-64 polynomial.
 ///
 /// A CRC or cyclic redundancy check is code commonly used for error detection
 /// and correction of digital data. This generates a 64-bit number as output.
 ///
-/// This implementation uses ISO polynomial `0xD800000000000000`.
-///
 /// **WARNING: It should not be used for cryptographic purposes.**
-const HashBase crc64 = _CRC64();
+const crc64 = CRC64(CRC64Params.iso);
 
-class _CRC64 extends HashBase {
-  const _CRC64();
+/// CRC-64 code generator
+class CRC64 extends HashBase {
+  final CRC64Params polynomial;
+
+  /// Create a instance for generating CRC-64 hashes
+  ///
+  /// Parameters:
+  /// - [polynomial]: 64-bit polynomial representation
+  const CRC64([this.polynomial = CRC64Params.iso]);
 
   @override
-  final String name = 'CRC-64';
+  String get name => "CRC-64/${polynomial.name}";
 
   @override
-  CRC64Hash createSink() => CRC64Hash();
+  CRC64Hash createSink() => polynomial.reversed
+      ? CRC64ReverseHash(polynomial)
+      : CRC64NormalHash(polynomial);
+
+  /// Gets the CRC-64 code for a String
+  ///
+  /// Parameters:
+  /// - [input] is the string to hash
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  @pragma('vm:prefer-inline')
+  int code(String input, [Encoding? encoding]) =>
+      string(input, encoding).number();
+
+  /// Gets the CRC-64 checksum for a String
+  ///
+  /// Parameters:
+  /// - [input] is the string to hash
+  /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
+  @pragma('vm:prefer-inline')
+  String checksum(String input, [Encoding? encoding]) =>
+      string(input, encoding).hex();
 }
 
-/// Gets the CRC-64 value of a String.
+/// Gets the CRC-64 value.
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-int crc64code(String input, [Encoding? encoding]) {
-  return crc64.string(input, encoding).number();
-}
+/// - The [polynomial] is the Polynomial to use. Default: [CRC64Params.iso]
+int crc64code(
+  String input, {
+  Encoding? encoding,
+  CRC64Params polynomial = CRC64Params.iso,
+}) =>
+    CRC64(polynomial).code(input, encoding);
 
-/// Gets the CRC-64 hash of a String in hexadecimal.
+/// Gets the CRC-64 hash in hexadecimal.
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-String crc64sum(String input, [Encoding? encoding]) {
-  return crc64.string(input, encoding).hex();
-}
+/// - The [polynomial] is the Polynomial to use. Default: [CRC64Params.iso]
+String crc64sum(
+  String input, {
+  Encoding? encoding,
+  CRC64Params polynomial = CRC64Params.iso,
+}) =>
+    CRC64(polynomial).checksum(input, encoding);
