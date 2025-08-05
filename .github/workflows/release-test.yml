@@ -37,20 +37,17 @@ jobs:
         sdk: ['stable', '2.14', 'beta']
         platform: ['vm', 'node']
         exclude:
-          # skip test for beta
-          - sdk: 'beta'
-            os: macos-latest
-          - sdk: 'beta'
-            os: windows-latest
           - sdk: 'beta'
             platform: 'node'
-          # Skip node platform
-          - platform: 'node'
+          - os: windows-latest
+            sdk: 'beta'
+          - os: windows-latest
             sdk: '2.14'
-            os: macos-latest
-          - platform: 'node'
+            platform: 'node'
+          - os: macos-latest
+            sdk: 'beta'
+          - os: macos-latest 
             sdk: '2.14'
-            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
