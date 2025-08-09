@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-export 'alder32.dart';
+export 'adler32.dart';
 export 'argon2.dart';
 export 'bcrypt.dart';
 export 'blake2b.dart';

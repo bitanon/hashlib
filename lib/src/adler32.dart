@@ -3,7 +3,7 @@
 
 import 'dart:convert';
 
-import 'package:hashlib/src/algorithms/alder32.dart';
+import 'package:hashlib/src/algorithms/adler32.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
 /// [Adler-32][wiki] is composed of two sums accumulated per byte.
@@ -19,23 +19,23 @@ import 'package:hashlib/src/core/hash_base.dart';
 /// [wiki]: https://en.wikipedia.org/wiki/Adler-32
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
-const HashBase alder32 = _Alder32();
+const HashBase adler32 = _Adler32();
 
-class _Alder32 extends HashBase {
-  const _Alder32();
+class _Adler32 extends HashBase {
+  const _Adler32();
 
   @override
   final String name = 'ALDER-32';
 
   @override
-  Alder32Hash createSink() => Alder32Hash();
+  Adler32Hash createSink() => Adler32Hash();
 }
 
-/// Gets the Alder-32 value of a String
+/// Gets the Adler-32 value of a String
 ///
 /// Parameters:
 /// - [input] is the string to hash
 /// - The [encoding] is the encoding to use. Default is `input.codeUnits`
-int alder32code(String input, [Encoding? encoding]) {
-  return alder32.string(input, encoding).number();
+int adler32code(String input, [Encoding? encoding]) {
+  return adler32.string(input, encoding).number();
 }

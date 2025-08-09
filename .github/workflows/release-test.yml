@@ -37,14 +37,12 @@ jobs:
         sdk: ['stable', '2.19', 'beta']
         platform: ['vm', 'node']
         exclude:
-          # skip test for beta
           - sdk: 'beta'
             os: macos-latest
           - sdk: 'beta'
             os: windows-latest
-          - sdk: 'beta'
-            platform: 'node'
-          # Skip node platform
+          - platform: 'node'
+            sdk: 'beta'
           - platform: 'node'
             sdk: '2.19'
             os: macos-latest
