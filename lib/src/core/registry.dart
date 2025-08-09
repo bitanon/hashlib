@@ -17,7 +17,7 @@ void _buildRegistry() {
   if (_hash.isNotEmpty) return;
 
   _hash.addAll({
-    _norm(alder32.name): alder32,
+    _norm(adler32.name): adler32,
     _norm(crc16.name): crc16,
     _norm(crc32.name): crc32,
     _norm(crc64.name): crc64,

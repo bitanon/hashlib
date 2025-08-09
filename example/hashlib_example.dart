@@ -17,7 +17,7 @@ void main() {
   // Example of hash-code generations
   print('XXH32 => ${xxh32code(text)}');
   print('CRC32 => ${crc32code(text)}');
-  print('Alder32 => ${alder32code(text)}');
+  print('Adler32 => ${adler32code(text)}');
   print('CRC16 => ${crc16code(text)}');
   print('');
 
@@ -48,7 +48,7 @@ void main() {
   print('SHAKE-256 => ${shake256.of(20).string(text)}');
   print('BLAKE2s-256 => ${blake2s256.string(text)}');
   print('BLAKE2b-512 => ${blake2b512.string(text)}');
-  print('SM3] => ${sm3.string(text)}');
+  print('SM3 => ${sm3.string(text)}');
   print('');
 
   // Examples of MAC generations

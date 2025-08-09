@@ -46,7 +46,7 @@ jobs:
             platform: 'node'
           - os: macos-latest
             sdk: 'beta'
-          - os: macos-latest 
+          - os: macos-latest
             sdk: '2.14'
     runs-on: ${{ matrix.os }}
     steps:

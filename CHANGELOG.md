@@ -1,3 +1,7 @@
+# 1.23.0
+
+- Fixes typo: Alder is renamed to Adler
+
 # 1.22.0
 
 - Enhances the CRCs with custom polynomial support.
@@ -314,7 +318,7 @@
 - Adds `PBKDF2` key derivator.
 - Adds extension to `HMAC` to create `PBKDF2` instance.
 - Define `MACHashBase` and `MACSinkBase` for Message Authentication Code generators.
-- Reset features for `crc16`, `crc32`, `crc64`, `alder32`, and `hmac` internal sinks.
+- Reset features for `crc16`, `crc32`, `crc64`, `adler32`, and `hmac` internal sinks.
 - Enhance `blake2b` and `blake2s` for MAC generation
 - **Breaking change**:
   - Accept number of bytes instead of bits for `Blake2b` and `Blake2s`
@@ -384,7 +388,7 @@
   - `crc16`
   - `crc32`
   - `crc64`
-  - `alder32`
+  - `adler32`
 
 # 1.1.0
 

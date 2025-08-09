@@ -5,16 +5,16 @@ import 'dart:typed_data';
 
 import 'package:hashlib/src/core/hash_base.dart';
 
-const int _alder32Mod = 65521;
+const int _adler32Mod = 65521;
 
 /// This implementation is derived from the [ ZLIB Compressed Data Format
 /// Specification version 3.3 ][rfc]
 ///
 /// [rfc]: https://www.ietf.org/rfc/rfc1950.html
-class Alder32Hash extends HashDigestSink {
+class Adler32Hash extends HashDigestSink {
   int a = 1, b = 0;
 
-  Alder32Hash();
+  Adler32Hash();
 
   @override
   final int hashLength = 4;
@@ -29,8 +29,8 @@ class Alder32Hash extends HashDigestSink {
   @override
   void $process(List<int> chunk, int start, int end) {
     for (; start < end; start++) {
-      a = (a + chunk[start]) % _alder32Mod;
-      b = (b + a) % _alder32Mod;
+      a = (a + chunk[start]) % _adler32Mod;
+      b = (b + a) % _adler32Mod;
     }
   }
 
