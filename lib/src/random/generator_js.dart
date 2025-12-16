@@ -1,24 +1,69 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:async';
 import 'dart:math' show Random;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+import 'dart:typed_data' show ByteData, Uint8List;
 
 const int _mask32 = 0xFFFFFFFF;
 
-int _seedCounter = Zone.current.hashCode;
+@JS()
+external JSObject require(String id);
+
+@JS()
+@staticInterop
+class NodeCrypto {
+  static void randomFillSync(JSArrayBuffer buf) =>
+      require('crypto').callMethod('randomFillSync'.toJS, buf);
+}
+
+class NodeRandom implements Random {
+  @override
+  bool nextBool() => nextInt(2) == 1;
+
+  @override
+  double nextDouble() {
+    final int a = nextInt(1 << 26); // 26 bits
+    final int b = nextInt(1 << 27); // 27 bits
+    return ((a << 27) + b) / (1 << 53); // 26 + 27 = 53 bits
+  }
+
+  @override
+  int nextInt(int max) {
+    // Generate 32-bit unsigned random values and use rejection sampling
+    // to avoid modulo bias.
+    const int maxUint = _mask32 + 1; // (1 << 32)
+    if (max < 1 || max > maxUint) {
+      throw RangeError.range(
+          max, 1, maxUint, 'max', 'max must be <= (1 << 32)');
+    }
+
+    final Uint8List list = Uint8List(4);
+    final int rejectionLimit = maxUint - (maxUint % max);
+
+    int v = rejectionLimit;
+    while (v >= rejectionLimit) {
+      NodeCrypto.randomFillSync(list.buffer.toJS);
+      v = ByteData.sublistView(list).getUint32(0);
+    }
+    return v % max;
+  }
+}
 
 /// Returns a secure random generator in JS runtime
-Random secureRandom() => Random($generateSeed());
-
-/// Generates a random seed in JS runtime
-int $generateSeed() {
-  int code = DateTime.now().millisecondsSinceEpoch;
-  code -= _seedCounter++;
-  if (code.bitLength & 1 == 1) {
-    code *= ~code;
+Random secureRandom() {
+  try {
+    return Random.secure();
+  } catch (e) {
+    // For Node.js with dart2js compiler, the following error is expected.
+    if (e.runtimeType.toString() == 'UnknownJsTypeError') {
+      // This error is internal to 'dart:_js_helper'.
+      return NodeRandom();
+    }
+    rethrow;
   }
-  code ^= ~_seedCounter << 5;
-  _seedCounter += code & 7;
-  return code & _mask32;
 }
+
+/// Generates a random seed
+int $generateSeed() => secureRandom().nextInt(_mask32);
