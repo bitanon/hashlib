@@ -14,8 +14,8 @@ external JSObject require(String id);
 @JS()
 @staticInterop
 class NodeCrypto {
-  static void randomFillSync(JSArrayBuffer buf) =>
-      require('crypto').callMethod('randomFillSync'.toJS, buf);
+  static void randomFillSync(JSTypedArray buffer) =>
+      require('crypto').callMethod('randomFillSync'.toJS, buffer);
 }
 
 class NodeRandom implements Random {
@@ -44,7 +44,7 @@ class NodeRandom implements Random {
 
     int v = rejectionLimit;
     while (v >= rejectionLimit) {
-      NodeCrypto.randomFillSync(list.buffer.toJS);
+      NodeCrypto.randomFillSync(list.toJS);
       v = ByteData.sublistView(list).getUint32(0);
     }
     return v % max;
