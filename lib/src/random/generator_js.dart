@@ -3,8 +3,6 @@
 
 import 'dart:math' show Random;
 import 'dart:js_interop';
-import 'dart:js_interop_unsafe';
-import 'dart:typed_data' show ByteData, Uint8List;
 
 const int _mask32 = 0xFFFFFFFF;
 
@@ -13,12 +11,23 @@ external JSObject require(String id);
 
 @JS()
 @staticInterop
-class NodeCrypto {
-  static void randomFillSync(JSTypedArray buffer) =>
-      require('crypto').callMethod('randomFillSync'.toJS, buffer);
+class Buffer {}
+
+extension BufferExt on Buffer {
+  external int readUInt32LE(int offset);
+}
+
+@JS()
+@staticInterop
+class Crypto {}
+
+extension CryptoExt on Crypto {
+  external Buffer randomBytes(int size);
 }
 
 class NodeRandom implements Random {
+  final Crypto _crypto = require('crypto') as Crypto;
+
   @override
   bool nextBool() => nextInt(2) == 1;
 
@@ -26,7 +35,7 @@ class NodeRandom implements Random {
   double nextDouble() {
     final int a = nextInt(1 << 26); // 26 bits
     final int b = nextInt(1 << 27); // 27 bits
-    return ((a << 27) + b) / (1 << 53); // 26 + 27 = 53 bits
+    return ((a << 27) + b) / (1 << 53); // 26 + 27 = 53 bits (JS limit)
   }
 
   @override
@@ -39,13 +48,11 @@ class NodeRandom implements Random {
           max, 1, maxUint, 'max', 'max must be <= (1 << 32)');
     }
 
-    final Uint8List list = Uint8List(4);
     final int rejectionLimit = maxUint - (maxUint % max);
 
     int v = rejectionLimit;
     while (v >= rejectionLimit) {
-      NodeCrypto.randomFillSync(list.toJS);
-      v = ByteData.sublistView(list).getUint32(0);
+      v = _crypto.randomBytes(4).readUInt32LE(0);
     }
     return v % max;
   }
