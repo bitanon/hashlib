@@ -11,23 +11,13 @@ external JSObject require(String id);
 
 @JS()
 @staticInterop
-class Buffer {}
-
-extension BufferExt on Buffer {
-  external int readUInt32LE(int offset);
-}
-
-@JS()
-@staticInterop
 class Crypto {}
 
-extension CryptoExt on Crypto {
-  external Buffer randomBytes(int size);
+extension on Crypto {
+  external int randomInt(int max);
 }
 
 class NodeRandom implements Random {
-  final Crypto _crypto = require('crypto') as Crypto;
-
   @override
   bool nextBool() => nextInt(2) == 1;
 
@@ -40,21 +30,11 @@ class NodeRandom implements Random {
 
   @override
   int nextInt(int max) {
-    // Generate 32-bit unsigned random values and use rejection sampling
-    // to avoid modulo bias.
-    const int maxUint = _mask32 + 1; // (1 << 32)
-    if (max < 1 || max > maxUint) {
+    if (max < 1 || max > _mask32 + 1) {
       throw RangeError.range(
-          max, 1, maxUint, 'max', 'max must be <= (1 << 32)');
+          max, 1, _mask32 + 1, 'max', 'max must be <= (1 << 32)');
     }
-
-    final int rejectionLimit = maxUint - (maxUint % max);
-
-    int v = rejectionLimit;
-    while (v >= rejectionLimit) {
-      v = _crypto.randomBytes(4).readUInt32LE(0);
-    }
-    return v % max;
+    return (require('crypto') as Crypto).randomInt(max);
   }
 }
 
