@@ -7,15 +7,15 @@ import 'dart:js_interop';
 const int _mask32 = 0xFFFFFFFF;
 
 @JS()
-external JSObject require(String id);
-
-@JS()
 @staticInterop
 class Crypto {}
 
 extension on Crypto {
-  external int randomInt(int max);
+  external int randomInt(final int max);
 }
+
+@JS()
+external Crypto require(final String id);
 
 class NodeRandom implements Random {
   @override
@@ -29,12 +29,12 @@ class NodeRandom implements Random {
   }
 
   @override
-  int nextInt(int max) {
+  int nextInt(final int max) {
     if (max < 1 || max > _mask32 + 1) {
       throw RangeError.range(
           max, 1, _mask32 + 1, 'max', 'max must be <= (1 << 32)');
     }
-    return (require('crypto') as Crypto).randomInt(max);
+    return require('crypto').randomInt(max);
   }
 }
 
