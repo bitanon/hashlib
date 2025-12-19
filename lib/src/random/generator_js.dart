@@ -1,18 +1,31 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:js_interop_unsafe';
 import 'dart:math' show Random;
 import 'dart:js_interop';
 
 const int _mask32 = 0xFFFFFFFF;
 
-@JS('process')
-external JSObject? get _process;
+@JS()
+@staticInterop
+class Process {}
 
-bool get _isNodeJS => ((_process?.getProperty('versions'.toJS) as JSObject?)
-        ?.getProperty('node'.toJS))
-    .isDefinedAndNotNull;
+@JS()
+@staticInterop
+class Versions {}
+
+@JS('process')
+external Process? get _process;
+
+extension on Process {
+  external Versions? get versions;
+}
+
+extension on Versions {
+  external JSAny get node;
+}
+
+bool get _isNodeJS => (_process?.versions)?.node != null;
 
 @JS()
 @staticInterop
