@@ -34,13 +34,13 @@ enum RNG {
       case RNG.keccak:
         return _keccakGenerateor(seed);
       case RNG.sha256:
-        return _hashGenerateor(SHA256Hash(), seed);
+        return _hashGenerator(SHA256Hash(), seed);
       case RNG.md5:
-        return _hashGenerateor(MD4Hash(), seed);
+        return _hashGenerator(MD4Hash(), seed);
       case RNG.xxh64:
-        return _hashGenerateor(XXHash64Sink(111), seed);
+        return _hashGenerator(XXHash64Sink(111), seed);
       case RNG.sm3:
-        return _hashGenerateor(SM3Hash(), seed);
+        return _hashGenerator(SM3Hash(), seed);
       case RNG.system:
         return _systemGenerator(seed);
       case RNG.secure:
@@ -115,7 +115,7 @@ NextIntFunction _keccakGenerateor([int? seed]) {
 }
 
 /// Returns a iterable of 32-bit integers generated from the [sink].
-NextIntFunction _hashGenerateor(
+NextIntFunction _hashGenerator(
   HashDigestSink sink, [
   int? seed,
 ]) {

@@ -1,24 +1,70 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:async';
 import 'dart:math' show Random;
+import 'dart:js_interop';
 
 const int _mask32 = 0xFFFFFFFF;
 
-int _seedCounter = Zone.current.hashCode;
+const bool isDart2JS = bool.fromEnvironment('dart.tool.dart2js');
+
+@JS()
+@staticInterop
+class Process {}
+
+@JS()
+@staticInterop
+class Versions {}
+
+@JS('process')
+external Process? get _process;
+
+extension on Process {
+  external Versions? get versions;
+}
+
+extension on Versions {
+  external JSAny get node;
+}
+
+bool get isNodeDart2JS => _process?.versions?.node != null && isDart2JS;
+
+@JS()
+@staticInterop
+class Crypto {}
+
+extension on Crypto {
+  external int randomInt(final int max);
+}
+
+@JS()
+external Crypto require(final String id);
+
+/// For Node.js environment + dart2js compiler
+class NodeRandom implements Random {
+  @override
+  int nextInt(final int max) {
+    if (max < 1 || max > _mask32 + 1) {
+      throw RangeError.range(
+          max, 1, _mask32 + 1, 'max', 'max must be <= (1 << 32)');
+    }
+    return require('crypto').randomInt(max);
+  }
+
+  @override
+  double nextDouble() {
+    final int first26Bits = nextInt(1 << 26);
+    final int next27Bits = nextInt(1 << 27);
+    final int random53Bits = (first26Bits << 27) + next27Bits; // JS int limit
+    return random53Bits / (1 << 53);
+  }
+
+  @override
+  bool nextBool() => nextInt(2) == 1;
+}
 
 /// Returns a secure random generator in JS runtime
-Random secureRandom() => Random($generateSeed());
+Random secureRandom() => isNodeDart2JS ? NodeRandom() : Random.secure();
 
-/// Generates a random seed in JS runtime
-int $generateSeed() {
-  int code = DateTime.now().millisecondsSinceEpoch;
-  code -= _seedCounter++;
-  if (code.bitLength & 1 == 1) {
-    code *= ~code;
-  }
-  code ^= ~_seedCounter << 5;
-  _seedCounter += code & 7;
-  return code & _mask32;
-}
+/// Generates a random seed
+int $generateSeed() => secureRandom().nextInt(_mask32);

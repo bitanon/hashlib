@@ -11,6 +11,4 @@ Random secureRandom() => Random.secure();
 
 /// Generates a random seed
 @pragma('vm:prefer-inline')
-int $generateSeed() =>
-    (DateTime.now().microsecondsSinceEpoch & _mask32) ^
-    Random.secure().nextInt(_mask32);
+int $generateSeed() => Random.secure().nextInt(_mask32);
