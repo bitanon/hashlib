@@ -11,8 +11,12 @@ import 'package:hashlib/src/algorithms/sm3.dart';
 import 'package:hashlib/src/algorithms/xxh64/xxh64.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
-import 'generator_vm.dart' if (dart.library.js) 'generator_js.dart';
-export 'generator_vm.dart' if (dart.library.js) 'generator_js.dart';
+import 'generator_vm.dart'
+    if (dart.library.html) 'generator_vm.dart'
+    if (dart.library.js) 'generator_js.dart';
+export 'generator_vm.dart'
+    if (dart.library.html) 'generator_vm.dart'
+    if (dart.library.js) 'generator_js.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 

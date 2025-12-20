@@ -1,54 +1,22 @@
-// Copyright (c) 2024, Sudipto Chandra
+// Copyright (c) 2025, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:math' show Random;
-import 'dart:js_interop';
+
+import 'generator_js_legacy.dart'
+    if (dart.library.js_interop) 'generator_js_interop.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
-const bool isDart2JS = bool.fromEnvironment('dart.tool.dart2js');
-
-@JS()
-@staticInterop
-class Process {}
-
-@JS()
-@staticInterop
-class Versions {}
-
-@JS('process')
-external Process? get _process;
-
-extension on Process {
-  external Versions? get versions;
-}
-
-extension on Versions {
-  external JSAny get node;
-}
-
-bool get isNodeDart2JS => _process?.versions?.node != null && isDart2JS;
-
-@JS()
-@staticInterop
-class Crypto {}
-
-extension on Crypto {
-  external int randomInt(final int max);
-}
-
-@JS()
-external Crypto require(final String id);
-
 /// For Node.js environment + dart2js compiler
-class NodeRandom implements Random {
+class NodeRandom extends CryptoRandom implements Random {
   @override
   int nextInt(final int max) {
     if (max < 1 || max > _mask32 + 1) {
       throw RangeError.range(
           max, 1, _mask32 + 1, 'max', 'max must be <= (1 << 32)');
     }
-    return require('crypto').randomInt(max);
+    return cryptoRandomInt(max);
   }
 
   @override
@@ -64,7 +32,7 @@ class NodeRandom implements Random {
 }
 
 /// Returns a secure random generator in JS runtime
-Random secureRandom() => isNodeDart2JS ? NodeRandom() : Random.secure();
+Random secureRandom() => NodeRandom();
 
 /// Generates a random seed
 int $generateSeed() => secureRandom().nextInt(_mask32);
