@@ -57,6 +57,7 @@ jobs:
         run: |
           git fetch --tags
           CUR_TAG=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=${CUR_TAG}" >> $GITHUB_ENV
           PREV_TAG=$(git tag --sort=-v:refname | grep '^v[0-9]' | grep -A1 "^v$CUR_TAG" | tail -n1)
           echo -e "\n**Full Changelog**: https://github.com/bitanon/hashlib/compare/${PREV_TAG}...v${CUR_TAG}" >> RELEASE_NOTES.md
 
@@ -64,7 +65,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Version ${GITHUB_REF#refs/tags/v}
+          name: Version ${{ env.VERSION }}
           body_path: RELEASE_NOTES.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

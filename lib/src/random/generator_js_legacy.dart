@@ -4,7 +4,7 @@
 // Dart v2.19 compatible version
 // Works with dart2js in a Node.js runtime (where `require` exists).
 
-// ignore_for_file: deprecated_member_use, depend_on_referenced_packages
+// ignore_for_file: deprecated_member_use
 
 import 'dart:js' as js;
 

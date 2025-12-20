@@ -27,6 +27,14 @@
 - Support for random number generator based on sm3: `RNG.sm3`
 - Improves documentation
 
+# 1.24.0
+
+- Includes changes from v2.3.0 in `v1` branch to support Dart SDK 2.14+
+
+# 1.23.0
+
+- Includes changes from v2.2.0 in `v1` branch to support Dart SDK 2.14+
+
 # 1.21.2
 
 - Updates README.md
