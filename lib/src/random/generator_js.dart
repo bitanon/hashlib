@@ -1,24 +1,38 @@
-// Copyright (c) 2024, Sudipto Chandra
+// Copyright (c) 2025, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:async';
 import 'dart:math' show Random;
+
+import 'generator_js_legacy.dart'
+    if (dart.library.js_interop) 'generator_js_interop.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 
-int _seedCounter = Zone.current.hashCode;
+/// For Node.js environment + dart2js compiler
+class NodeRandom extends CryptoRandom implements Random {
+  @override
+  int nextInt(final int max) {
+    if (max < 1 || max > _mask32 + 1) {
+      throw RangeError.range(
+          max, 1, _mask32 + 1, 'max', 'max must be <= (1 << 32)');
+    }
+    return cryptoRandomInt(max);
+  }
+
+  @override
+  double nextDouble() {
+    final int first26Bits = nextInt(1 << 26);
+    final int next27Bits = nextInt(1 << 27);
+    final int random53Bits = (first26Bits << 27) + next27Bits; // JS int limit
+    return random53Bits / (1 << 53);
+  }
+
+  @override
+  bool nextBool() => nextInt(2) == 1;
+}
 
 /// Returns a secure random generator in JS runtime
-Random secureRandom() => Random($generateSeed());
+Random secureRandom() => NodeRandom();
 
-/// Generates a random seed in JS runtime
-int $generateSeed() {
-  int code = DateTime.now().millisecondsSinceEpoch;
-  code -= _seedCounter++;
-  if (code.bitLength & 1 == 1) {
-    code *= ~code;
-  }
-  code ^= ~_seedCounter << 5;
-  _seedCounter += code & 7;
-  return code & _mask32;
-}
+/// Generates a random seed
+int $generateSeed() => secureRandom().nextInt(_mask32);

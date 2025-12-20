@@ -4,6 +4,7 @@
 .packages
 
 # Conventional directory for outputs.
+dart-*/
 build/
 doc/
 coverage/
