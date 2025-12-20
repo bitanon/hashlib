@@ -1,3 +1,16 @@
+# 2.3.0
+
+- generator_vm.dart
+  - Avoid mixing predictable datetime output with CSPRNG output.
+- generator_js.dart
+  - Avoid mixing predictable datetime output with CSPRNG output.
+  - Added `NodeRandom` as an implementation of `Random` for NodeJS.
+  - `nextInt(max)` draws 32-bit values from Node crypto, supports max ∈ [1, 2^32].
+  - `secureRandom()` uses `Random.secure()` for web browsers, and `NodeRandom` for Node.js.
+  - `$generateSeed()` delegates to `secureRandom()`.
+- generators.dart
+  - Fixed spelling of `_hashGenerator`
+
 # 2.2.0
 
 - Fixes typo: Alder is renamed to Adler
