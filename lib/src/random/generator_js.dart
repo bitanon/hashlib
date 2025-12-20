@@ -6,6 +6,8 @@ import 'dart:js_interop';
 
 const int _mask32 = 0xFFFFFFFF;
 
+const bool isWASM = bool.fromEnvironment('dart.tool.dart2wasm');
+
 @JS()
 @staticInterop
 class Process {}
@@ -25,7 +27,7 @@ extension on Versions {
   external JSAny get node;
 }
 
-bool get _isNodeJS => (_process?.versions)?.node != null;
+bool get isNodeDart2JS => _process?.versions?.node != null && !isWASM;
 
 @JS()
 @staticInterop
@@ -62,7 +64,7 @@ class NodeRandom implements Random {
 }
 
 /// Returns a secure random generator in JS runtime
-Random secureRandom() => _isNodeJS ? NodeRandom() : Random.secure();
+Random secureRandom() => isNodeDart2JS ? NodeRandom() : Random.secure();
 
 /// Generates a random seed
 int $generateSeed() => secureRandom().nextInt(_mask32);
