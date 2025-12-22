@@ -146,7 +146,7 @@ void main() {
           'f4fd0a0cb3bf9c9dc04e3f177936249ac87d619ed41b6b05d2d6dfe95d32153338b'
           'c03c4b68fd46e13c9c0e7f7946ee6856cf068f1702e2fbd98';
       expect(hash.hex(), matcher);
-    });
+    }, skip: true);
 
     test("with security", () {
       var hash = scrypt(

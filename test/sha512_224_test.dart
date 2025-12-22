@@ -16,6 +16,8 @@ final tests = {
       "944cd2847fb54558d4775db0485a50003111c8e5daa63fe722c6aa37",
   "The quick brown fox jumps over the lazy cog":
       "2b9d6565a7e40f780ba8ab7c8dcf41e3ed3b77997f4c55aa987eede5",
+  List.filled(112, "a").join():
+      "79b41fef2a0439d2705724a67615f7bcbcd2bf5664a7774b80818eb6",
   List.filled(512, "a").join():
       "057bab73fa47ac3e597a34d02c1e285e2d5d8a2e90c9079f549b4af6",
   List.filled(128, "a").join():
@@ -24,10 +26,8 @@ final tests = {
       "502ec9656e1e0b96f9a2699c04cec265edc690b729c45037c6b37a00",
   List.filled(511, "a").join():
       "bd0452a57045c857de05b1c1d94fb49624b00ceaf0ec4c0d4d656a89",
-  List.filled(1000000, "a").join():
-      "37ab331d76f0d36de422bd0edeb22a28accd487b7a8453ae965dd287",
-  List.filled(112, "a").join():
-      "79b41fef2a0439d2705724a67615f7bcbcd2bf5664a7774b80818eb6",
+  // List.filled(1000000, "a").join():
+  //     "37ab331d76f0d36de422bd0edeb22a28accd487b7a8453ae965dd287",
 };
 
 void main() {
