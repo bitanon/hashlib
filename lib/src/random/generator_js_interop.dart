@@ -5,14 +5,6 @@ import 'dart:js_interop';
 
 @JS()
 @staticInterop
-class Process {}
-
-@JS()
-@staticInterop
-class Versions {}
-
-@JS()
-@staticInterop
 class Crypto {}
 
 extension on Crypto {
