@@ -1,5 +1,6 @@
 # These are supported funding model platforms
 
+custom: ['https://paypal.me/bitan0n']
 github: # [dipu-bd]
 patreon: # Replace with a single Patreon username
 open_collective: # Replace with a single Open Collective username
@@ -10,6 +11,3 @@ liberapay: # Replace with a single Liberapay username
 issuehunt: # Replace with a single IssueHunt username
 otechie: # Replace with a single Otechie username
 lfx_crowdfunding: # Replace with a single LFX Crowdfunding project-name e.g., cloud-foundry
-custom: [
-  'https://paypal.me/sd1pu'
-]
