@@ -1,3 +1,7 @@
+# 2.3.1
+
+- Updates pubspec.yaml
+
 # 2.3.0
 
 - generator_vm.dart
