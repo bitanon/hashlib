@@ -1,7 +1,7 @@
 name: hashlib
 description: Secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
 homepage: https://github.com/bitanon/hashlib
-version: 2.3.1
+version: 2.3.2
 
 environment:
   sdk: '>=2.19.0 <4.0.0'
@@ -15,7 +15,7 @@ platforms:
   windows:
 
 dependencies:
-  hashlib_codecs: ^3.0.1
+  hashlib_codecs: ^3.1.0
 
 dev_dependencies:
   lints: any

@@ -1,6 +1,6 @@
-# 2.3.1
+# 2.3.2
 
-- Updates pubspec.yaml
+- Update hashlib_codecs dependency to 3.1.0
 
 # 2.3.0
 
