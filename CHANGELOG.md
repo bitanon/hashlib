@@ -1,6 +1,7 @@
-# 2.3.2
+# 2.3.3
 
-- Update hashlib_codecs dependency to 3.1.0
+- Update `hashlib_codecs` dependency to 3.1.1
+- Refactor `HashDigest` class to extend `ByteCollector`.
 
 # 2.3.0
 
