@@ -1,6 +1,7 @@
 # hashlib
 
-[![plugin version](https://img.shields.io/pub/v/hashlib?label=pub)](https://pub.dev/packages/hashlib)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bitanon/hashlib)
+[![plugin version](https://img.shields.io/pub/v/hashlib?label=pub.dev)](https://pub.dev/packages/hashlib)
 [![test](https://github.com/bitanon/hashlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/hashlib/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bitanon/hashlib/branch/master/graph/badge.svg?token=PYVMZWSQNU)](https://codecov.io/gh/bitanon/hashlib)
 [![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#may-11-2022-2-17-release)
