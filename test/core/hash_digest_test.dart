@@ -102,13 +102,13 @@ void main() {
     });
 
     test('hashCode returns correct hash code', () {
-      expect(digest.hashCode, equals(bytes.hashCode));
+      expect(digest.hashCode, equals(Object.hashAll(bytes)));
     });
 
     test('equality check compares correctly', () {
       expect(digest == digest, isTrue);
       expect(digest == HashDigest(bytes), isTrue);
-      expect(digest == HashDigest(Uint8List.fromList([...bytes])), isFalse);
+      expect(digest == HashDigest(Uint8List.fromList([...bytes])), isTrue);
     });
 
     test('isEqual returns true for equal digests', () {

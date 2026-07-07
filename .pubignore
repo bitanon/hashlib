@@ -1,4 +1,5 @@
 /test
+/test_integration
 /coverage
 /benchmark
 /doc
@@ -6,3 +7,6 @@
 /scripts
 /.github
 /dart-*
+/.claude
+AGENTS.md
+CLAUDE.md
