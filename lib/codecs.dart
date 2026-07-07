@@ -4,4 +4,4 @@
 /// Implementations of fast and error resilient codecs
 library;
 
-export 'package:hashlib_codecs/hashlib_codecs.dart';
+export 'package:convertlib/convertlib.dart';

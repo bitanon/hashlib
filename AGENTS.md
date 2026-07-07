@@ -12,16 +12,16 @@ performance**. When they conflict with elegance, they win.
 It is the middle package of a three-package family by the same maintainer:
 
 ```
-hashlib_codecs  →  hashlib (this repo)  →  cipherlib
+convertlib  →  hashlib (this repo)  →  cipherlib
 ```
 
-The siblings live at `github.com/bitanon/hashlib_codecs` and
+The siblings live at `github.com/bitanon/convertlib` and
 `github.com/bitanon/cipherlib`. They are often checked out next to this repo
-(`../hashlib_codecs`, `../cipherlib`), but never assume: when a task needs
+(`../convertlib`, `../cipherlib`), but never assume: when a task needs
 one, locate the checkout first, and if there is none, ask or clone.
 
 Inter-package dependencies are **hosted on pub.dev, never path deps**. Local
-edits to `hashlib_codecs` are invisible here until published *and* the caret
+edits to `convertlib` are invisible here until published *and* the caret
 constraint in `pubspec.yaml` is bumped. See "Cross-repo changes" at the end.
 
 ## Six ground rules (never violate)
@@ -33,7 +33,7 @@ constraint in `pubspec.yaml` is bumped. See "Cross-repo changes" at the end.
 2. **Web/JS is a first-class platform.** JavaScript has no 64-bit integers.
    Any 64-bit arithmetic must ship a `_32bit` twin selected by conditional
    import (details below). `dart test -p node` is the proof.
-3. **Zero runtime dependencies except `hashlib_codecs`.** Adding any other
+3. **Zero runtime dependencies except `convertlib`.** Adding any other
    runtime dependency is a maintainer decision, not yours.
 4. **Everything exported is frozen API** — including `$`-prefixed members
    (`$process`, `$update`, `$finalize`) and even misspellings
@@ -53,7 +53,7 @@ constraint in `pubspec.yaml` is bumped. See "Cross-repo changes" at the end.
 
 ```
 lib/hashlib.dart              Barrel → lib/src/hashlib.dart (the real aggregator)
-lib/codecs.dart               Re-exports package:hashlib_codecs verbatim
+lib/codecs.dart               Re-exports package:convertlib verbatim
 lib/random.dart               Barrel → src/random.dart + src/uuid.dart
 lib/src/<algo>.dart           PUBLIC WRAPPER: const instance, `<algo>sum()`
                               helpers, doc comments (e.g. sha256.dart)
@@ -63,7 +63,7 @@ lib/src/core/                 Abstractions: HashBase, HashDigestSink,
                               BlockHashBase/BlockHashSink (block_hash.dart),
                               MACHash* (mac_base.dart), KeyDerivatorBase
                               (kdf_base.dart), HashDigest (extends
-                              ByteCollector from hashlib_codecs)
+                              ByteCollector from convertlib)
 lib/src/random/               RNG + UUID, platform-split (generator_vm/_js)
 test/<algo>_test.dart         Known-answer tests, one file per algorithm
 test/compare/                 Differential tests vs crypto/pointycastle/hash
@@ -264,7 +264,7 @@ that task.
    removal: add the entry for completeness, but never build features on it.*
 
 9. **Assuming the sibling repos are path-linked.** You'll edit
-   `hashlib_codecs` locally and expect hashlib's tests to see it.
+   `convertlib` locally and expect hashlib's tests to see it.
    *Rule: they won't. Dependencies are hosted. For local experiments you may
    add a temporary `dependency_overrides:` with a path — but it must never be
    committed, and the real fix ships via the publish chain (see Cross-repo
@@ -398,19 +398,19 @@ any `v*` tag, force-push, deleting tests, weakening lints, committing
 report the exact command and output, and state your best hypothesis. Do not
 paper over it (retry-until-green, skip-tag it, or widen a tolerance).
 
-## Cross-repo changes (hashlib_codecs → hashlib → cipherlib)
+## Cross-repo changes (convertlib → hashlib → cipherlib)
 
 When a change spans packages, the only path is the publish chain, in
 dependency order. For each hop: implement + full local gate → maintainer
 publishes (version bump, changelog, tag) → downstream repo bumps the caret
-constraint (`hashlib_codecs: ^X.Y.Z` here; `hashlib: ^X.Y.Z` in cipherlib),
+constraint (`convertlib: ^X.Y.Z` here; `hashlib: ^X.Y.Z` in cipherlib),
 runs `dart pub get`, adapts code, gets its own changelog entry ("Update
-`hashlib_codecs` dependency to X.Y.Z"), and is released in turn.
+`convertlib` dependency to X.Y.Z"), and is released in turn.
 
 For local development ahead of a publish, a temporary path
 `dependency_overrides:` is acceptable **in the working tree only** — it must
 be removed before commit (CI and pana will not tolerate it).
 
-Repo differences to remember: hashlib and hashlib_codecs use branch `master`;
+Repo differences to remember: hashlib and convertlib use branch `master`;
 cipherlib uses `main`. cipherlib has its own agent guide (`AGENTS.md`) —
 follow it when working there. hashlib is the only one testing on `chrome`.

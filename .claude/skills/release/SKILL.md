@@ -1,6 +1,6 @@
 ---
 name: release
-description: Prepare a hashlib release — changelog section, version bump, release-grade verification, bump commit — and hand the tag push to the maintainer. Also orchestrates the cross-repo cascade (hashlib_codecs → hashlib → cipherlib).
+description: Prepare a hashlib release — changelog section, version bump, release-grade verification, bump commit — and hand the tag push to the maintainer. Also orchestrates the cross-repo cascade (convertlib → hashlib → cipherlib).
 argument-hint: "[X.Y.Z | patch | minor | major]"
 disable-model-invocation: true
 ---
@@ -43,7 +43,7 @@ Add a new section at the very top, matching house style exactly:
 
 - New hash algorithm: `foo` #NN
 - Fix `Bar` finalization on empty input.
-- Update `hashlib_codecs` dependency to A.B.C
+- Update `convertlib` dependency to A.B.C
 ```
 
 Rules: H1 `# X.Y.Z` (no "v", no date); `-` bullets, imperative, capitalized;
@@ -57,8 +57,8 @@ churn (CI tweaks, test refactors) is omitted.
 ## Step 3 — pubspec.yaml
 
 - Set `version: X.Y.Z`.
-- If this release exists to pick up a new `hashlib_codecs`, bump the caret
-  (`hashlib_codecs: ^A.B.C`) and run `dart pub get`.
+- If this release exists to pick up a new `convertlib`, bump the caret
+  (`convertlib: ^A.B.C`) and run `dart pub get`.
 
 ## Step 4 — Release-grade verification (all must pass)
 
@@ -100,7 +100,7 @@ git add pubspec.yaml CHANGELOG.md
 git commit -m "Bump version to X.Y.Z"
 ```
 
-(Include `and update hashlib_codecs dependency to A.B.C` in the message when
+(Include `and update convertlib dependency to A.B.C` in the message when
 that applies — see `git log` for precedent.)
 
 ## Step 6 — Hand off the trigger
@@ -119,17 +119,17 @@ watch the pipeline: `gh run watch` (or `gh run list --workflow=release.yml
 
 ## Cross-repo cascade
 
-When the change originates in `hashlib_codecs` (branch `master`) or must
+When the change originates in `convertlib` (branch `master`) or must
 reach `cipherlib` (branch `main` — and note it has its own AGENTS.md). Locate
-the sibling checkout first — try `../hashlib_codecs` / `../cipherlib` relative
+the sibling checkout first — try `../convertlib` / `../cipherlib` relative
 to this repo, else search or ask; clone from `github.com/bitanon/<name>` if
 absent:
 
-1. Release `hashlib_codecs` first (same procedure; same workflow files).
+1. Release `convertlib` first (same procedure; same workflow files).
 2. Wait until the new version is live:
-   `curl -s https://pub.dev/api/packages/hashlib_codecs | jq -r .latest.version`
-3. In hashlib: bump `hashlib_codecs: ^A.B.C`, `dart pub get`, adapt code,
-   changelog entry `- Update \`hashlib_codecs\` dependency to A.B.C`,
+   `curl -s https://pub.dev/api/packages/convertlib | jq -r .latest.version`
+3. In hashlib: bump `convertlib: ^A.B.C`, `dart pub get`, adapt code,
+   changelog entry `- Update \`convertlib\` dependency to A.B.C`,
    release hashlib.
 4. In cipherlib: bump `hashlib: ^X.Y.Z`, same drill.
 

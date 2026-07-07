@@ -1,3 +1,7 @@
+# 2.4.1
+
+- Replace the `hashlib_codecs` dependency with its renamed successor `convertlib` (`^3.4.0`). The `hashlib` public API, including `package:hashlib/codecs.dart`, is unchanged.
+
 # 2.4.0
 
 - Fix `CRC64Params` splitting of 64-bit `poly`, `seed`, and `xorOut` values in the custom polynomial constructor.

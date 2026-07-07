@@ -30,7 +30,7 @@ Reports we want to see include:
 - Incorrect cryptographic behavior, side-channel or constant-time issues in the library implementation (when applicable to the Dart/VM/JS runtimes in scope of this project).
 - Bugs in message authentication (e.g. HMAC, Poly1305 tag handling) or password hashing / key derivation (e.g. Argon2, bcrypt, scrypt, PBKDF2) that affect security.
 - Weaknesses in the secure random number generators or UUID generation that affect unpredictability.
-- **Dependency**: critical issues solely in the [`hashlib_codecs`](https://pub.dev/packages/hashlib_codecs) package should be reported to that project; you may still notify us if you believe we need a version bound or our integration is wrong.
+- **Dependency**: critical issues solely in the [`convertlib`](https://pub.dev/packages/convertlib) package should be reported to that project; you may still notify us if you believe we need a version bound or our integration is wrong.
 
 ## Scope (out of scope or lower priority)
 

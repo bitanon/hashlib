@@ -1,32 +1,97 @@
 # hashlib
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bitanon/hashlib)
-[![plugin version](https://img.shields.io/pub/v/hashlib?label=pub.dev)](https://pub.dev/packages/hashlib)
-[![test](https://github.com/bitanon/hashlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/hashlib/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/bitanon/hashlib/branch/master/graph/badge.svg?token=PYVMZWSQNU)](https://codecov.io/gh/bitanon/hashlib)
-[![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#may-11-2022-2-17-release)
+[![package version](https://img.shields.io/pub/v/hashlib?label=pub.dev)](https://pub.dev/packages/hashlib)
+[![dart support](https://img.shields.io/badge/dart-%3E%3D%202.19.0-0175C2?logo=dart&logoColor=white)](https://dart.dev/guides/whats-new)
 [![likes](https://img.shields.io/pub/likes/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 [![pub points](https://img.shields.io/pub/points/hashlib?logo=dart&color=teal)](https://pub.dev/packages/hashlib/score)
-[![Pub Monthly Downloads](https://img.shields.io/pub/dm/hashlib)](https://pub.dev/packages/hashlib/score)
+[![monthly downloads](https://img.shields.io/pub/dm/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
+[![codecov](https://codecov.io/gh/bitanon/hashlib/branch/master/graph/badge.svg?token=PYVMZWSQNU)](https://codecov.io/gh/bitanon/hashlib)
+[![Test](https://github.com/bitanon/hashlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/hashlib/actions/workflows/test.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bitanon/hashlib)
 
-This library contains implementations of secure hash functions, checksum generators, and key derivation algorithms optimized for Dart.
+A pure-Dart library of secure hash functions, checksums, MACs, key-derivation
+functions, OTP generators, and secure random — a broad, fast, dependency-light
+toolbox that runs everywhere Dart does.
 
-## Dependencies
+`hashlib` is the middle layer of a three-package family:
 
-There is only 1 dependency used by this package:
+[![convertlib](https://img.shields.io/badge/convertlib-informational?style=for-the-badge&logo=dart)](https://pub.dev/packages/convertlib) &rarr; [![hashlib](https://img.shields.io/badge/hashlib-success?style=for-the-badge&logo=dart)](https://pub.dev/packages/hashlib) &rarr; [![cipherlib](https://img.shields.io/badge/cipherlib-blue?style=for-the-badge&logo=dart)](https://pub.dev/packages/cipherlib)
 
-- [hashlib_codecs](https://pub.dev/packages/hashlib_codecs)
+It builds on `convertlib` for hex, Base32/Base64, and UTF-8 conversion, and
+that is its only runtime dependency.
 
-## Features
+## Highlights
 
-### Block Hash Algorithms
+- **Runs on every platform**: pure Dart with no native code or FFI, so the same
+  library works everywhere Dart does — the VM, Flutter (Android, iOS, Windows,
+  macOS, Linux), and the web (dart2js and dart2wasm).
+- **Batteries included**: over a dozen hash families (MD, SHA-1, SHA-2, SHA-3,
+  SHAKE, Keccak, BLAKE2, RIPEMD, SM3, xxHash), checksums (CRC, Adler-32), MACs
+  (HMAC, Poly1305), password KDFs (Argon2, scrypt, bcrypt, PBKDF2), TOTP/HOTP,
+  and RNG/UUID generators.
+- **One-shot or streaming**: hash a `String` or byte buffer in a single call,
+  or feed data incrementally through a reusable sink for large or chunked input.
+- **Password-grade KDFs**: Argon2id, scrypt, bcrypt, and PBKDF2 with named
+  `security` presets that make the cost/latency trade-off explicit.
+- **Fast**: consistently outruns `crypto`, `PointyCastle`, and `hash`, see the
+  [benchmarks](#benchmarks) below.
+- **Codecs and secure random built in**: companion `codecs` and `random`
+  libraries ship in the same package.
+
+## Install
+
+```yaml
+dependencies:
+  hashlib: ^2.4.1
+```
+
+or run `dart pub add hashlib`. A single import exposes every algorithm:
+
+```dart
+import 'package:hashlib/hashlib.dart';
+```
+
+Two companion libraries pair well with it — `codecs` for hex/Base/UTF-8
+conversion (re-exported from `convertlib`) and `random` for secure random bytes,
+numbers, and UUIDs:
+
+```dart
+import 'package:hashlib/codecs.dart'; // toHex, fromHex, toBase64, toUtf8
+import 'package:hashlib/random.dart'; // randomBytes, uuid, HashlibRandom
+```
+
+Full API reference:
+[hashlib library](https://pub.dev/documentation/hashlib/latest/).
+
+## Quickstart
+
+Compute a digest of a string in one call, and derive an HMAC from any hash by
+attaching a key:
+
+```dart
+import 'package:hashlib/hashlib.dart';
+
+void main() {
+  final text = 'Happy Hashing!';
+
+  // One-shot hex digest
+  print(sha256.string(text));
+
+  // Keyed HMAC-SHA256
+  print(sha256.hmac.byString('password').string(text));
+}
+```
+
+## Supported algorithms
+
+### Block hash algorithms
 
 | Algorithm   | Available methods                                                  |        Source        |
-| ----------- | ------------------------------------------------------------------ | :------------------: |
-| MD2         | `md2` , `md2sum`                                                   |       RFC-1319       |
+| ----------- | ----------------------------------------------------------------- | :------------------: |
+| MD2         | `md2`, `md2sum`                                                    |       RFC-1319       |
 | MD4         | `md4`, `md4sum`                                                    |       RFC-1320       |
-| MD5         | `md5` , `md5sum`                                                   |       RFC-1321       |
-| SHA-1       | `sha1` , `sha1sum`                                                 |       RFC-3174       |
+| MD5         | `md5`, `md5sum`                                                    |       RFC-1321       |
+| SHA-1       | `sha1`, `sha1sum`                                                  |       RFC-3174       |
 | SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` |       RFC-6234       |
 | SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     |       FIPS-202       |
 | SHAKE-128   | `Shake128`, `shake128`, `shake128_128`, `shake128_256`             |       FIPS-202       |
@@ -34,95 +99,79 @@ There is only 1 dependency used by this package:
 | Keccak      | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 |     Team Keccak      |
 | Blake2b     | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             |       RFC-7693       |
 | Blake2s     | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             |       RFC-7693       |
-| xxHash-32   | `XXHash32`,`xxh32`,`xxh32code`                                     |       Cyan4973       |
-| xxHash-64   | `XXHash64`,`xxh64`,`xxh64code`                                     |       Cyan4973       |
+| xxHash-32   | `XXHash32`, `xxh32`, `xxh32code`                                   |       Cyan4973       |
+| xxHash-64   | `XXHash64`, `xxh64`, `xxh64code`                                   |       Cyan4973       |
 | xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         |       Cyan4973       |
 | xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   |       Cyan4973       |
 | RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | ISO/IEC 10118-3:2018 |
-| SM3         | `sm3` , `sm3sum`                                                   |   GB/T 32905-2016    |
+| SM3         | `sm3`, `sm3sum`                                                    |   GB/T 32905-2016    |
 
 > **Note**: `XXHash64`, `XXH3`, and `XXH128` are not supported on the web
 > platform. They throw `UnimplementedError` when used there.
 
-### Password / Key Derivation Algorithms
+### Password / key derivation algorithms
 
-| Algorithm | Available methods                                                | Source   |
-| --------- | ---------------------------------------------------------------- | -------- |
-| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id`, `argon2Verify`       | RFC-9106 |
-| PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`                                   | RFC-8081 |
-| scrypt    | `Scrypt`, `scrypt`,                                              | RFC-7914 |
-| bcrypt    | `Bcrypt`, `bcrypt`, `bcryptSalt`, `bcryptVerify`, `bcryptDigest` |          |
+| Algorithm | Available methods                                               |  Source  |
+| --------- | -------------------------------------------------------------- | -------- |
+| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id`, `argon2Verify`     | RFC-9106 |
+| PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`                                 | RFC-8081 |
+| scrypt    | `Scrypt`, `scrypt`                                             | RFC-7914 |
+| bcrypt    | `Bcrypt`, `bcrypt`, `bcryptSalt`, `bcryptVerify`, `bcryptDigest` |         |
 
-### Message Authentication Code (MAC) Generators
+### Message authentication codes (MAC)
 
-| Algorithms | Available methods                      | Source   |
-| ---------- | -------------------------------------- | -------- |
-| HMAC       | `HMAC`, `#.hmac`                       | RFC-2104 |
-| Poly1305   | `Poly1305`, `poly1305`, `poly1305auth` | RFC-8439 |
+| Algorithm | Available methods                      |  Source  |
+| --------- | -------------------------------------- | -------- |
+| HMAC      | `HMAC`, `#.hmac`                       | RFC-2104 |
+| Poly1305  | `Poly1305`, `poly1305`, `poly1305auth` | RFC-8439 |
 
-### OTP generation for 2FA
+### One-time passwords (2FA)
 
-| Algorithms | Available methods | Source   |
-| ---------- | ----------------- | -------- |
-| HOTP       | `HOTP`            | RFC-4226 |
-| TOTP       | `TOTP`            | RFC-6238 |
+| Algorithm | Available methods |  Source  |
+| --------- | ----------------- | -------- |
+| HOTP      | `HOTP`            | RFC-4226 |
+| TOTP      | `TOTP`            | RFC-6238 |
 
-### Other Hash Algorithms
+### Checksums
 
-| Algorithms | Available methods         | Source    |
-| ---------- | ------------------------- | --------- |
-| CRC        | `crc16`, `crc32`, `crc64` | Wikipedia |
-| Adler32    | `adler32`                 | Wikipedia |
+| Algorithm | Available methods         |  Source   |
+| --------- | ------------------------- | --------- |
+| CRC       | `crc16`, `crc32`, `crc64` | Wikipedia |
+| Adler-32  | `adler32`                 | Wikipedia |
 
-### Random Algorithm
+### Random and UUID
 
-#### Random number generators
+The `random` library provides random number generators through `HashlibRandom`
+(`secure`, `system`, `keccak`, `sha256`, `md5`, `xxh64`, `sm3`), plus helpers
+like `randomBytes`, `randomNumbers`, and `randomString`. UUID versions v1, v3,
+v4, v5, v6, v7, and v8 are available through `uuid`.
 
-Accessible through `HashlibRandom`:
+## Security notes
 
-- secure
-- system
-- keccak
-- sha256
-- md5
-- xxh64
-- sm3
+- **Hash passwords with a KDF, not a bare hash.** Store `argon2id` (or `scrypt`
+  / `bcrypt`) output with an appropriate `security` preset — never a plain
+  `sha256` of a password — and check it with `argon2Verify` / `bcryptVerify`.
+- **Compare digests in constant time.** Use `HashDigest.isEqual` when verifying
+  MACs and digests instead of `==` or a manual byte loop, to avoid leaking
+  information through timing.
+- **Legacy algorithms are for compatibility only.** MD2, MD4, MD5, and SHA-1
+  are cryptographically broken; use them only for interop or non-security
+  checksums, and prefer SHA-256, SHA-3, or BLAKE2 for new work.
+- **Non-cryptographic hashes.** CRC, Adler-32, and the xxHash family are fast
+  integrity and lookup hashes, not secure against adversaries — do not use them
+  where collision or preimage resistance matters.
+- **Runtime timing.** Pure-Dart execution (JIT, AOT, dart2js) is not guaranteed
+  to run in constant time; weigh the deployment environment before relying on it
+  in side-channel-sensitive settings.
 
-#### UUID generators
+## Recipes
 
-Accessible through `uuid`
+Runnable programs for every snippet below live in the
+[example](https://github.com/bitanon/hashlib/tree/master/example) folder.
 
-- v1
-- v3
-- v4
-- v5
-- v6
-- v7
-- v8
+### Hashing, checksums, MAC, and OTP
 
-<!-- ## Demo
-
-A demo application is available in Google Play Store featuring the capabilities of this package.
-
-<a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="192px" /></a>
-
-<a href='https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt="demo app preview" src="https://raw.githubusercontent.com/bitanon/hashlib_demo/master/images/demo.gif" height="640px"/></a> -->
-
-## Getting Started
-
-The following import will give you access to all of the algorithms in this package.
-
-```dart
-import 'package:hashlib/hashlib.dart' as hashlib;
-```
-
-Check the [API Reference](https://pub.dev/documentation/hashlib/latest/) for details.
-
-## Usage
-
-Examples can be found inside the `example` folder.
-
-### Hashlib Example
+<!-- file: example/hashlib_example.dart -->
 
 ```dart
 import 'package:hashlib/codecs.dart';
@@ -197,7 +246,11 @@ void main() {
 }
 ```
 
-### Key Generation Example
+<!-- file: example/hashlib_example.dart -->
+
+### Password and key derivation
+
+<!-- file: example/keygen_example.dart -->
 
 ```dart
 import 'package:hashlib/hashlib.dart';
@@ -237,7 +290,11 @@ void main() {
 }
 ```
 
-### Random Example
+<!-- file: example/keygen_example.dart -->
+
+### Secure random and UUID
+
+<!-- file: example/random_example.dart -->
 
 ```dart
 import 'package:hashlib/codecs.dart';
@@ -262,9 +319,11 @@ void main() {
 }
 ```
 
-# Benchmarks
+<!-- file: example/random_example.dart -->
 
-Libraries:
+## Benchmarks
+
+Measured against other pure-Dart hash libraries:
 
 - **Hashlib** : https://pub.dev/packages/hashlib
 - **Crypto** : https://pub.dev/packages/crypto
@@ -372,7 +431,7 @@ With 10B message (100000 iterations):
 
 <hr/>
 
-Key derivator algorithm benchmarks on different security parameters:
+Key derivator benchmarks on different security parameters:
 
 | Algorithms | little   | moderate  | good       | strong      |
 | ---------- | -------- | --------- | ---------- | ----------- |
