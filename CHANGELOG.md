@@ -1,3 +1,12 @@
+# 2.4.0
+
+- Fix `CRC64Params` splitting of 64-bit `poly`, `seed`, and `xorOut` values in the custom polynomial constructor.
+- New method `stringStream` in `HashBase`. Deprecates the misspelled `stringStraem`.
+- Documents that `XXHash64`, `XXH3`, and `XXH128` are not supported on the web platform.
+- Updates the removal target of the deprecated `HashRegistry` and `BlockHashRegistry` to 4.0.0.
+- Update `hashlib_codecs` dependency to 3.3.1
+- Adds a security policy: `SECURITY.md`
+
 # 2.3.4
 
 - Update `hashlib_codecs` dependency to 3.1.2

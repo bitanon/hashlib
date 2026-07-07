@@ -41,6 +41,9 @@ There is only 1 dependency used by this package:
 | RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | ISO/IEC 10118-3:2018 |
 | SM3         | `sm3` , `sm3sum`                                                   |   GB/T 32905-2016    |
 
+> **Note**: `XXHash64`, `XXH3`, and `XXH128` are not supported on the web
+> platform. They throw `UnimplementedError` when used there.
+
 ### Password / Key Derivation Algorithms
 
 | Algorithm | Available methods                                                | Source   |

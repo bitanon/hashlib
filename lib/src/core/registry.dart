@@ -14,7 +14,7 @@ final _hash = <String, HashBase>{};
 final _blockHash = <String, BlockHashBase>{};
 
 /// Transform [value] to uppercase and keeps only letters and digits.
-@Deprecated('It will be removed in 2.0.0')
+@Deprecated('It will be removed in 4.0.0')
 String normalizeName(String value) {
   List<int> normal = [];
   for (int c in value.codeUnits) {
@@ -104,7 +104,7 @@ void _buildRegistry() {
 }
 
 /// A registry to find a block hash algorithm by name
-@Deprecated('It will be removed in 2.0.0')
+@Deprecated('It will be removed in 4.0.0')
 class BlockHashRegistry {
   /// Find a [BlockHashBase] algorithm given a string name
   static BlockHashBase? lookup(String name) {
@@ -121,7 +121,7 @@ class BlockHashRegistry {
 }
 
 /// A registry to find a hash algorithm by name
-@Deprecated('It will be removed in 2.0.0')
+@Deprecated('It will be removed in 4.0.0')
 class HashRegistry {
   /// Find a [HashBase] algorithm given a string name
   static HashBase? lookup(String name) {

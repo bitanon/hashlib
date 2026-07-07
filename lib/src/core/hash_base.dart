@@ -152,7 +152,7 @@ abstract class HashBase<T extends HashDigestSink>
   /// Consumes the entire [stream] of string and generates a [HashDigest].
   ///
   /// If [encoding] is not specified, the [String.codeUnits] are used.
-  Future<HashDigest> stringStraem(
+  Future<HashDigest> stringStream(
     Stream<String> stream, [
     Encoding? encoding,
   ]) {
@@ -162,6 +162,16 @@ abstract class HashBase<T extends HashDigestSink>
       return bind(stream.transform(encoding.encoder)).first;
     }
   }
+
+  /// Consumes the entire [stream] of string and generates a [HashDigest].
+  ///
+  /// If [encoding] is not specified, the [String.codeUnits] are used.
+  @Deprecated('Use stringStream instead')
+  Future<HashDigest> stringStraem(
+    Stream<String> stream, [
+    Encoding? encoding,
+  ]) =>
+      stringStream(stream, encoding);
 
   @override
   StreamTransformer<RS, RT> cast<RS, RT>() {

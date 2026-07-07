@@ -19,6 +19,9 @@ const XXHash64 xxh64 = XXHash64(0);
 ///
 /// [wiki]: https://github.com/Cyan4973/xxHash/wiki/Collision-ratio-comparison
 ///
+/// **Note: XXHash64 is not supported on the web platform. Any usage there
+/// will throw an [UnimplementedError].**
+///
 /// **WARNING: It should not be used for cryptographic purposes.**
 class XXHash64 extends BlockHashBase {
   final int seed;

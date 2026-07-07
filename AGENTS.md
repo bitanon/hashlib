@@ -215,7 +215,10 @@ that task.
    the equivalent change in both, then run `dart test -p vm` AND
    `dart test -p node` before claiming success. Note: their vector tests are
    tagged `vm-only`, so also sanity-check via a compare/round-trip test or a
-   quick script on node.*
+   quick script on node. Exception: the `_32bit` files of xxh64/xxh3/xxh128
+   are intentional stubs that throw `UnimplementedError` — the xxHash-64
+   family is unsupported on web by design (`test/xxh_web_test.dart` locks
+   this in).*
 
 3. **"Improving" a public name.** `stringStraem` is misspelled and
    `test/fixures/` too. You'll want to fix them.

@@ -72,6 +72,35 @@ void main() {
       expect(sink.closed, isTrue);
     });
 
+    test('custom int polynomial on small values', () {
+      final params = CRC64Params(0x1B, reversed: true);
+      expect(params.high, 0);
+      expect(params.low, 0x1B);
+      expect(crc64sum("123456789", params: params), known[CRC64Params.iso]);
+    });
+
+    test('custom int polynomial matches predefined ECMA-182', () {
+      final params = CRC64Params((0x42F0E1EB << 32) | 0xA9EA3693);
+      expect(params.high, 0x42F0E1EB);
+      expect(params.low, 0xA9EA3693);
+      expect(crc64sum("123456789", params: params), known[CRC64Params.ecma]);
+    }, tags: ['vm-only']);
+
+    test('custom int polynomial with seed and xorOut matches XZ', () {
+      final ones = (0xFFFFFFFF << 32) | 0xFFFFFFFF;
+      final params = CRC64Params(
+        (0x42F0E1EB << 32) | 0xA9EA3693,
+        reversed: true,
+        seed: ones,
+        xorOut: ones,
+      );
+      expect(params.seedHigh, 0xFFFFFFFF);
+      expect(params.seedLow, 0xFFFFFFFF);
+      expect(params.xorOutHigh, 0xFFFFFFFF);
+      expect(params.xorOutLow, 0xFFFFFFFF);
+      expect(crc64sum("123456789", params: params), known[CRC64Params.xz]);
+    }, tags: ['vm-only']);
+
     test('CRC64Params.hex', () {
       var params = CRC64Params.hex(
         poly: '42F0E1EBA9EA3693',

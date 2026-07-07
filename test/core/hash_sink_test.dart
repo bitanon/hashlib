@@ -77,7 +77,7 @@ void main() {
     test('stringStream method with default encoding', () async {
       final hash = TestHashBase();
       final stream = Stream.fromIterable(['hello', 'world']);
-      final digest = await hash.stringStraem(stream);
+      final digest = await hash.stringStream(stream);
       expect(
           digest.bytes,
           equals(
@@ -87,11 +87,22 @@ void main() {
     test('stringStream method with custom encoding', () async {
       final hash = TestHashBase();
       final stream = Stream.fromIterable(['hello', 'world']);
-      final digest = await hash.stringStraem(stream, utf8);
+      final digest = await hash.stringStream(stream, utf8);
       expect(
           digest.bytes,
           equals(List.filled(
               16, utf8.encode('helloworld').reduce((a, b) => a ^ b))));
+    });
+
+    test('deprecated stringStraem delegates to stringStream', () async {
+      final hash = TestHashBase();
+      final stream = Stream.fromIterable(['hello', 'world']);
+      // ignore: deprecated_member_use_from_same_package
+      final digest = await hash.stringStraem(stream);
+      expect(
+          digest.bytes,
+          equals(
+              List.filled(16, 'helloworld'.codeUnits.reduce((a, b) => a ^ b))));
     });
 
     test('cast throws error', () {

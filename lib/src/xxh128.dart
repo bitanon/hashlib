@@ -25,6 +25,9 @@ const XXH128 xxh3_128 = xxh128;
 ///
 /// [wiki]: https://github.com/Cyan4973/xxHash/wiki/Collision-ratio-comparison
 ///
+/// **Note: XXH128 is not supported on the web platform. Any usage there
+/// will throw an [UnimplementedError].**
+///
 /// **WARNING: It should not be used for cryptographic purposes.**
 class XXH128 extends BlockHashBase {
   final int seed;

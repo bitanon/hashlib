@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:hashlib/codecs.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
-const int _pow32 = 2 ^ 32;
+const int _pow32 = 0x100000000;
 const int _mask32 = 0xFFFFFFFF;
 
 /// Predefined polynomials for CRC-64.
@@ -49,22 +49,22 @@ class CRC64Params {
   /// Polynomial name
   final String name;
 
-  /// Most significant 32-bytes of polynomial (first 32)
+  /// Most significant 32 bits of polynomial (first 32)
   final int high;
 
-  /// Least significant 32-bytes of polynomial (last 32)
+  /// Least significant 32 bits of polynomial (last 32)
   final int low;
 
-  /// Initial CRC (most significant 32-bytes)
+  /// Initial CRC (most significant 32 bits)
   final int seedHigh;
 
-  /// Initial CRC (least significant 32-bytes)
+  /// Initial CRC (least significant 32 bits)
   final int seedLow;
 
-  /// Output XOR value (least significant 32-bytes)
+  /// Output XOR value (most significant 32 bits)
   final int xorOutHigh;
 
-  /// Output XOR value (most significant 32-bytes)
+  /// Output XOR value (least significant 32 bits)
   final int xorOutLow;
 
   /// To use the reverse of the polynomial
@@ -87,18 +87,31 @@ class CRC64Params {
   /// - [seed]: initial counter to start from
   /// - [xorOut]: the value to xor with the final output
   /// - [reversed]: to use reversed or reflected polynomial and input
+  ///
+  /// **Note**: On the web platform, integers are limited to 53 bits. Use
+  /// [CRC64Params.hex] to pass full 64-bit values there.
   CRC64Params(
     int poly, {
     this.reversed = false,
     int seed = 0,
     int xorOut = 0,
-  })  : high = poly ~/ _pow32,
-        low = poly % _pow32,
-        seedHigh = seed ~/ _pow32,
-        seedLow = seed % _pow32,
-        xorOutHigh = xorOut ~/ _pow32,
-        xorOutLow = xorOut % _pow32,
+  })  : high = _upper32(poly),
+        low = _lower32(poly),
+        seedHigh = _upper32(seed),
+        seedLow = _lower32(seed),
+        xorOutHigh = _upper32(xorOut),
+        xorOutLow = _lower32(xorOut),
         name = poly.toRadixString(16);
+
+  /// The least significant 32 bits of [value]
+  static int _lower32(int value) => value.toUnsigned(32);
+
+  /// The most significant 32 bits of a 64-bit [value].
+  ///
+  /// Avoids shift operators, which are truncated to 32 bits on the web, and
+  /// plain division, which rounds towards zero for negative values.
+  static int _upper32(int value) =>
+      ((value - value.toUnsigned(32)) ~/ _pow32).toUnsigned(32);
 
   /// Create a custom polynomial from hexadecimal
   ///
