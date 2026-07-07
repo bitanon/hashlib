@@ -24,7 +24,12 @@ abstract class MACHashBase<T extends HashDigestSink> implements HashBase<T> {
       convert(message).isEqual(tag);
 }
 
+/// Base class for a keyed Message-Authentication-Code (MAC) algorithm.
+///
+/// A [MACHash] describes the algorithm; call [by] (or [byString]) with a key
+/// to obtain a [MACHashBase] instance that can sign and verify messages.
 abstract class MACHash<T extends HashDigestSink> {
+  /// Const constructor for subclasses and const instances.
   const MACHash();
 
   /// The name of this algorithm

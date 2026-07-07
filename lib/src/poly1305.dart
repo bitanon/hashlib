@@ -76,6 +76,8 @@ const poly1305 = _Poly1305();
 
 /// Poly1305 MAC generator with a custom 16 or 32-byte long keypair.
 class Poly1305 extends HashBase<Poly1305Sink> with MACHashBase<Poly1305Sink> {
+  /// The 16 or 32-byte authentication keypair. The first 16 bytes are the
+  /// secret key `r`; the optional last 16 bytes are the signing key `s`.
   final Uint8List keypair;
 
   @override

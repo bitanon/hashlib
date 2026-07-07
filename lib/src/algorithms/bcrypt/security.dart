@@ -5,11 +5,17 @@ import 'bcrypt.dart';
 
 /// This contains some recommended parameters for [Bcrypt] algorithm.
 class BcryptSecurity {
+  /// A descriptive name for this security profile.
   final String name;
 
   /// The number of rounds in terms of power of 2.
   final int nb;
 
+  /// Creates a custom [BcryptSecurity] profile.
+  ///
+  /// Parameters:
+  /// - [name] is a descriptive name for this profile.
+  /// - [nb] is the cost factor as a power of 2 (i.e. `2^nb` rounds).
   const BcryptSecurity(
     this.name, {
     required this.nb,

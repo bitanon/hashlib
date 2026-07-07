@@ -21,6 +21,7 @@ const XXHash32 xxh32 = XXHash32(0);
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
 class XXHash32 extends BlockHashBase {
+  /// The 32-bit seed mixed into the hash.
   final int seed;
 
   /// Creates a new instance of [XXHash32].

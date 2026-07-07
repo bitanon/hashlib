@@ -7,6 +7,7 @@ import 'package:hashlib/src/core/hash_base.dart';
 
 /// Base class used by block hash algorithms
 abstract class BlockHashBase<T extends BlockHashSink> extends HashBase<T> {
+  /// Const constructor for subclasses and const algorithm instances.
   const BlockHashBase();
 }
 

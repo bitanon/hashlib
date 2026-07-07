@@ -19,6 +19,7 @@ const crc32 = CRC32(CRC32Params.ieee);
 
 /// CRC-32 code generator
 class CRC32 extends HashBase {
+  /// The polynomial parameters defining this CRC-32 variant.
   final CRC32Params params;
 
   /// Create a instance for generating CRC-32 hashes

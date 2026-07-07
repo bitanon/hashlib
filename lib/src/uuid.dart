@@ -26,12 +26,27 @@ const _v8 = UUIDv8();
 /// [rfc]: https://www.ietf.org/rfc/rfc9562.html
 const uuid = _UUID();
 
+/// Predefined UUID namespaces defined by [RFC-9562][rfc], for use as the
+/// `namespace` argument of the name-based UUID versions (`uuid.v3`, `uuid.v5`).
+///
+/// [rfc]: https://www.ietf.org/rfc/rfc9562.html
 enum Namespace {
+  /// The namespace for fully-qualified domain names.
   dns._('6ba7b810-9dad-11d1-80b4-00c04fd430c8'),
+
+  /// The namespace for URLs.
   url._('6ba7b811-9dad-11d1-80b4-00c04fd430c8'),
+
+  /// The namespace for ISO Object Identifiers (OIDs).
   oid._('6ba7b812-9dad-11d1-80b4-00c04fd430c8'),
+
+  /// The namespace for X.500 Distinguished Names (DNs).
   x500._('6ba7b814-9dad-11d1-80b4-00c04fd430c8'),
+
+  /// The special Nil UUID, with all bits set to zero.
   nil._('00000000-0000-0000-0000-000000000000'),
+
+  /// The special Max UUID, with all bits set to one.
   max._('ffffffff-ffff-ffff-ffff-ffffffffffff');
 
   /// The string value of this namespace
@@ -39,6 +54,7 @@ enum Namespace {
 
   const Namespace._(this.value);
 
+  /// Generates a fresh time-based (version 6) UUID string.
   static String get time => _v6.generate();
 }
 

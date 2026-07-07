@@ -62,9 +62,14 @@ const _sigma = [
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
 class Blake2bHash extends BlockHashSink implements MACSinkBase {
+  /// The optional secret key used for keyed hashing (MAC).
   final List<int>? key;
   late int _s0, _s1, _s2, _s3, _s4, _s5, _s6, _s7;
+
+  /// The internal hash state vector.
   final Uint64List state = Uint64List(_seed.length);
+
+  /// The [buffer] viewed as a list of 64-bit words.
   late final Uint64List qbuffer = Uint64List.view(buffer.buffer);
 
   @override

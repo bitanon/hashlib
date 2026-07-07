@@ -12,6 +12,7 @@ import 'package:hashlib/src/sha1.dart';
 ///
 /// [rfc6238]: https://www.ietf.org/rfc/rfc6238.html
 class TOTP extends HOTP {
+  /// The time interval for which each generated OTP is valid.
   final Duration period;
   int _timeDelta = 0;
   final int _periodMS;

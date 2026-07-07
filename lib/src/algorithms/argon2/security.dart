@@ -9,6 +9,7 @@ import 'argon2.dart';
 /// It is best to try out different combinations of these values to achieve the
 /// desired runtime on a target machine.
 class Argon2Security {
+  /// A descriptive name for this security profile.
   final String name;
 
   /// The amount of memory to use in KB. The more the better, but slower.
@@ -26,6 +27,15 @@ class Argon2Security {
   /// The version of the algorithm
   final Argon2Version version;
 
+  /// Creates a custom [Argon2Security] profile.
+  ///
+  /// Parameters:
+  /// - [name] is a descriptive name for this profile.
+  /// - [m] is the amount of memory to use in KB.
+  /// - [p] is the number of threads or lanes to use.
+  /// - [t] is the number of iterations.
+  /// - [type] is the [Argon2Type] variant. Default: [Argon2Type.argon2id].
+  /// - [version] is the [Argon2Version]. Default: [Argon2Version.v13].
   const Argon2Security(
     this.name, {
     required this.m,

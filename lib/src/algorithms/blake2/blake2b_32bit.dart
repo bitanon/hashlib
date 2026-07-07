@@ -98,10 +98,13 @@ const int _w15 = _w14 + 2;
 /// [rfc]: https://www.ietf.org/rfc/rfc7693.html
 /// [blake2]: https://github.com/BLAKE2/BLAKE2/blob/master/ref/blake2b-ref.c
 class Blake2bHash extends BlockHashSink implements MACSinkBase {
+  /// The optional secret key used for keyed hashing (MAC).
   final List<int>? key;
   late int _s0, _s1, _s2, _s3, _s4, _s5, _s6, _s7;
   late int _s8, _s9, _s10, _s11, _s12, _s13, _s14, _s15;
   final Uint32List _var = Uint32List(_w15 + 2);
+
+  /// The internal hash state vector.
   final Uint32List state = Uint32List(_seed.length);
 
   @override

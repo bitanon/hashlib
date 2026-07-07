@@ -74,8 +74,10 @@ enum Argon2Version {
 
 /// The HashDigest for Argon2 with [Argon2Context]
 class Argon2HashDigest extends HashDigest {
+  /// The Argon2 configuration that produced this digest.
   final Argon2Context ctx;
 
+  /// Creates an [Argon2HashDigest] from the [ctx] and the raw output [bytes].
   const Argon2HashDigest(this.ctx, super.bytes);
 
   @override

@@ -24,6 +24,7 @@ const XXHash64 xxh64 = XXHash64(0);
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
 class XXHash64 extends BlockHashBase {
+  /// The 64-bit seed mixed into the hash.
   final int seed;
 
   /// Creates a new instance of [XXHash64].

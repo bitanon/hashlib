@@ -12,9 +12,19 @@
 abstract class OTPAuth {
   /// The number of digits in the generated OTP
   final int digits;
+
+  /// An optional label identifying the account this OTP is for.
   final String? label;
+
+  /// An optional name of the provider or service that issued this OTP.
   final String? issuer;
 
+  /// Creates an [OTPAuth] with the given number of [digits].
+  ///
+  /// Parameters:
+  /// - [digits] is the number of digits in the generated OTP (must be >= 4).
+  /// - [label] optionally identifies the account.
+  /// - [issuer] optionally names the issuing provider or service.
   const OTPAuth(
     this.digits, {
     this.label,

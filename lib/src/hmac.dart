@@ -34,6 +34,9 @@ class HMAC<T extends BlockHashBase> extends MACHash<HMACSink<T>> {
   /// The algorithm for the MAC generation
   final T algo;
 
+  /// Creates an [HMAC] instance builder for the given block hash [algo].
+  ///
+  /// Call [by] or [byString] with a key to obtain a usable MAC instance.
   const HMAC(this.algo);
 
   @override

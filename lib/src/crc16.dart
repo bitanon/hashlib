@@ -17,6 +17,7 @@ const crc16 = CRC16(CRC16Params.ibm);
 
 /// CRC-16 code generator
 class CRC16 extends HashBase {
+  /// The polynomial parameters defining this CRC-16 variant.
   final CRC16Params params;
 
   /// Create a instance for generating CRC-16 hashes

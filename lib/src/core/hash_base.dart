@@ -12,6 +12,7 @@ export 'hash_base_stub.dart' if (dart.library.io) 'hash_base_io.dart';
 /// This sink allows adding arbitrary length byte arrays
 /// and produces a [HashDigest] on [close].
 abstract class HashDigestSink implements Sink<List<int>> {
+  /// Creates a new hash-digest sink in its initial state.
   HashDigestSink();
 
   /// The flag tracking if the [digest] is called once.
@@ -68,6 +69,7 @@ abstract class HashDigestSink implements Sink<List<int>> {
 /// types of data source.
 abstract class HashBase<T extends HashDigestSink>
     implements StreamTransformer<List<int>, HashDigest> {
+  /// Const constructor for subclasses and const algorithm instances.
   const HashBase();
 
   /// The name of this algorithm

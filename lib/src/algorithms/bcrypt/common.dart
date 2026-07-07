@@ -50,8 +50,10 @@ enum BcryptVersion {
 
 /// The HashDigest for Bcrypt with [BcryptContext]
 class BcryptHashDigest extends HashDigest {
+  /// The Bcrypt configuration that produced this digest.
   final BcryptContext ctx;
 
+  /// Creates a [BcryptHashDigest] from the [ctx] and the raw output [bytes].
   const BcryptHashDigest(this.ctx, super.bytes);
 
   @override

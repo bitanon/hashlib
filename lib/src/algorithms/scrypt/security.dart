@@ -9,6 +9,7 @@ import 'scrypt.dart';
 /// It is best to try out different combinations of these values to achieve the
 /// desired runtime on a target machine.
 class ScryptSecurity {
+  /// A descriptive name for this security profile.
   final String name;
 
   /// The size of a single block in bytes
@@ -20,6 +21,13 @@ class ScryptSecurity {
   /// The parallelization parameter. [p] <= (2^32 - 1) / (128 * [r])
   final int p;
 
+  /// Creates a custom [ScryptSecurity] profile.
+  ///
+  /// Parameters:
+  /// - [name] is a descriptive name for this profile.
+  /// - [N] is the CPU/Memory cost parameter (a power of 2).
+  /// - [r] is the block size in bytes.
+  /// - [p] is the parallelization parameter.
   const ScryptSecurity(
     this.name, {
     required this.N,

@@ -18,29 +18,56 @@ const int _mask32 = 0xFFFFFFFF;
 /// - https://github.com/emn178/js-crc/blob/master/src/models.js
 class CRC64Params {
   /// Defined in ISO 3309 (HDLC), Swiss-Prot/TrEMBL.
+  ///
+  /// Polynomial `0x000000000000001B` (reflected). Check value: `0x46A5A9388A5BEFFE`.
   static const iso = CRC64Params._("ISO-HDLC", 0x00000000, 0x0000001B, true,
-      0x00000000, 0x00000000, 0x00000000, 0x00000000); // 46a5a9388a5beffe
+      0x00000000, 0x00000000, 0x00000000, 0x00000000);
 
   /// Defined in ECMA-182 p. 51, XZ Utils.
+  ///
+  /// Polynomial `0x42F0E1EBA9EA3693`. Check value: `0x6C40DF5F0B497347`.
   static const ecma = CRC64Params._("ECMA-182", 0x42F0E1EB, 0xA9EA3693, false,
-      0x00000000, 0x00000000, 0x00000000, 0x00000000); // b90956c775a41001
+      0x00000000, 0x00000000, 0x00000000, 0x00000000);
 
+  /// `CRC-64/GO-ISO` with polynomial `0x000000000000001B` (reflected).
+  /// Check value: `0xB90956C775A41001`.
   static const goIso = CRC64Params._("GO-ISO", 0x00000000, 0x0000001B, true,
-      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF); // 46a5a9388a5beffe
+      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+
+  /// `CRC-64/GO-ECMA` with polynomial `0x42F0E1EBA9EA3693` (reflected).
+  /// Check value: `0x995DC9BBDF1939FA`.
   static const goEcma = CRC64Params._("GO-ECMA", 0x42F0E1EB, 0xA9EA3693, true,
-      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF); // 995dc9bbdf1939fa
+      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+
+  /// `CRC-64/MS` with polynomial `0x259C84CBA6426349` (reflected).
+  /// Check value: `0x75D4B74F024ECEEA`.
   static const ms = CRC64Params._("MS", 0x259C84CB, 0xA6426349, true,
-      0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000); // 75d4b74f024eceea
+      0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000);
+
+  /// `CRC-64/NVME` with polynomial `0xAD93D23594C93659` (reflected).
+  /// Check value: `0xAE8B14860A799888`.
   static const nvme = CRC64Params._("NVME", 0xAD93D235, 0x94C93659, true,
-      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF); // ae8b14860a799888
+      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+
+  /// `CRC-64/Redis` with polynomial `0xAD93D23594C935A9` (reflected).
+  /// Check value: `0xE9C6D914C4B8D9CA`.
   static const redis = CRC64Params._("Redis", 0xAD93D235, 0x94C935A9, true,
-      0x00000000, 0x00000000, 0x00000000, 0x00000000); // e9c6d914c4b8d9ca
+      0x00000000, 0x00000000, 0x00000000, 0x00000000);
+
+  /// `CRC-64/WE` with polynomial `0x42F0E1EBA9EA3693`.
+  /// Check value: `0x62EC59E3F1A4F00A`.
   static const we = CRC64Params._("WE", 0x42F0E1EB, 0xA9EA3693, false,
-      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF); // 62ec59e3f1a4f00a
+      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+
+  /// `CRC-64/XZ` with polynomial `0x42F0E1EBA9EA3693` (reflected).
+  /// Check value: `0x995DC9BBDF1939FA`.
   static const xz = CRC64Params._("XZ", 0x42F0E1EB, 0xA9EA3693, true,
-      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF); // 995dc9bbdf1939fa
+      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+
+  /// `CRC-64/Jones` with polynomial `0xAD93D23594C935A9` (reflected).
+  /// Check value: `0xCAA717168609F281`.
   static const jones = CRC64Params._("Jones", 0xAD93D235, 0x94C935A9, true,
-      0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000); // caa717168609f281
+      0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000);
 
   //--------------------------------------------------------------------------
   // Implementation
@@ -150,12 +177,26 @@ class CRC64Params {
 
 /// A CRC-64 code generator with a polynomial.
 abstract class CRC64Hash extends HashDigestSink {
+  /// The most significant 32 bits of the generator polynomial.
   final int polyHigh;
+
+  /// The least significant 32 bits of the generator polynomial.
   final int polyLow;
+
+  /// The most significant 32 bits of the initial CRC register value.
   final int seedHigh;
+
+  /// The least significant 32 bits of the initial CRC register value.
   final int seedLow;
+
+  /// The most significant 32 bits of the output XOR value.
   final int xorOutHigh;
+
+  /// The least significant 32 bits of the output XOR value.
   final int xorOutLow;
+
+  /// The precomputed lookup table for byte-wise processing (two 32-bit words
+  /// per entry).
   final table = Uint32List(512);
 
   int _high, _low;

@@ -13,6 +13,7 @@ import 'pbkdf2.dart';
 
 /// This contains some recommended parameters for [PBKDF2] algorithm.
 class PBKDF2Security {
+  /// A descriptive name for this security profile.
   final String name;
 
   /// The number of iterations
@@ -24,6 +25,13 @@ class PBKDF2Security {
   /// The underlying algorithm
   final MACHash mac;
 
+  /// Creates a custom [PBKDF2Security] profile.
+  ///
+  /// Parameters:
+  /// - [name] is a descriptive name for this profile.
+  /// - [c] is the number of iterations.
+  /// - [mac] is the underlying [MACHash] (e.g. an HMAC instance).
+  /// - [dklen] is the length of the derived key in bytes.
   const PBKDF2Security(
     this.name, {
     required this.c,

@@ -19,6 +19,7 @@ const crc64 = CRC64(CRC64Params.iso);
 
 /// CRC-64 code generator
 class CRC64 extends HashBase {
+  /// The polynomial parameters defining this CRC-64 variant.
   final CRC64Params params;
 
   /// Create a instance for generating CRC-64 hashes

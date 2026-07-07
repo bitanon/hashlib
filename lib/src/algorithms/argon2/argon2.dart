@@ -84,6 +84,18 @@ class Argon2 extends KeyDerivatorBase {
 
   const Argon2._(this._ctx);
 
+  /// Creates an [Argon2] instance from the given configuration.
+  ///
+  /// Parameters:
+  /// - [type] is the [Argon2Type] variant. Default: [Argon2Type.argon2id].
+  /// - [version] is the [Argon2Version]. Default: [Argon2Version.v13].
+  /// - [parallelism] is the degree of parallelism (number of lanes).
+  /// - [memorySizeKB] is the amount of memory to use in kibibytes.
+  /// - [iterations] is the number of passes over the memory.
+  /// - [hashLength] is the desired number of output bytes.
+  /// - [salt] is the optional salt (nonce).
+  /// - [key] is the optional secret key.
+  /// - [personalization] is the optional associated data.
   factory Argon2({
     Argon2Type type = Argon2Type.argon2id,
     Argon2Version version = Argon2Version.v13,

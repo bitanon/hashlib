@@ -59,6 +59,7 @@ class _Shake128Builder {
 /// [sponge]: https://en.wikipedia.org/wiki/Sponge_function
 /// [fips202]: https://csrc.nist.gov/publications/detail/fips/202/final
 class Shake128 extends BlockHashBase {
+  /// The length of the output digest in bytes.
   final int outputSizeInBytes;
 
   /// Creates an instance to generate arbitrary size hash using SHAKE-128

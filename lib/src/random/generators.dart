@@ -20,6 +20,7 @@ export 'generator_vm.dart'
 
 const int _mask32 = 0xFFFFFFFF;
 
+/// A function that returns the next 32-bit random integer.
 typedef NextIntFunction = int Function();
 
 /// Available Random Number Generators

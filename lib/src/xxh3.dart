@@ -30,7 +30,10 @@ const XXH3 xxh3_64 = xxh3;
 ///
 /// **WARNING: It should not be used for cryptographic purposes.**
 class XXH3 extends BlockHashBase {
+  /// The 64-bit seed mixed into the hash. Ignored when a [secret] is given.
   final int seed;
+
+  /// The optional secret bytes (at least 136 bytes) used instead of a [seed].
   final List<int>? secret;
 
   /// Creates a new instance of [XXH3].
