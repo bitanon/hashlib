@@ -73,6 +73,30 @@ jobs:
       - name: Run tests
         run: dart test -p ${{ matrix.platform }}
 
+  # dart2wasm needs a browser host; ubuntu-latest runners ship Chrome.
+  wasm:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Cache dependencies
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool/package_config.json
+          key: ${{ runner.os }}-test-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests (dart2wasm on Chrome)
+        run: dart test -P wasm
+
   integration:
     needs: lint
     strategy:
