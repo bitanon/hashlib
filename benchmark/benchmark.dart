@@ -129,8 +129,6 @@ void measureTable(
   dump('</thead>');
   dump('<tbody>');
 
-  int bestRuns = 0;
-  int totalRuns = 0;
   for (var name in maps.first.keys) {
     // measure every (library, column) and find the fastest library per column
     var results = <List<Score>>[];
@@ -160,10 +158,6 @@ void measureTable(
         var mine = results[ci].first.speed;
         var cell = formatCell(results[ci][li], best[ci], mine, li == 0);
         dump('    <td>$cell</td>');
-        totalRuns++;
-        if (best[ci] == mine) {
-          bestRuns++;
-        }
       }
       dump('  </tr>');
     }
@@ -171,7 +165,6 @@ void measureTable(
   dump('</tbody>');
   dump('</table>');
   dump('');
-  dump('> This package comes on top $bestRuns out of $totalRuns times.');
 }
 
 // ---------------------------------------------------------------------

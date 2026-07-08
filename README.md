@@ -86,58 +86,58 @@ void main() {
 
 ### Block hash algorithms
 
-| Algorithm   | Available methods                                                  |        Source        |
-| ----------- | ----------------------------------------------------------------- | :------------------: |
-| MD2         | `md2`, `md2sum`                                                    |       RFC-1319       |
-| MD4         | `md4`, `md4sum`                                                    |       RFC-1320       |
-| MD5         | `md5`, `md5sum`                                                    |       RFC-1321       |
-| SHA-1       | `sha1`, `sha1sum`                                                  |       RFC-3174       |
-| SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` |       RFC-6234       |
-| SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     |       FIPS-202       |
-| SHAKE-128   | `Shake128`, `shake128`, `shake128_128`, `shake128_256`             |       FIPS-202       |
-| SHAKE-256   | `Shake256`, `shake256`, `shake256_256`, `shake256_512`             |       FIPS-202       |
-| Keccak      | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 |     Team Keccak      |
-| Blake2b     | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             |       RFC-7693       |
-| Blake2s     | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             |       RFC-7693       |
-| xxHash-32   | `XXHash32`, `xxh32`, `xxh32code`                                   |       Cyan4973       |
-| xxHash-64   | `XXHash64`, `xxh64`, `xxh64code`                                   |       Cyan4973       |
-| xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         |       Cyan4973       |
-| xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   |       Cyan4973       |
-| RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | ISO/IEC 10118-3:2018 |
-| SM3         | `sm3`, `sm3sum`                                                    |   GB/T 32905-2016    |
+| Algorithm   | Available methods                                                  |         Source         |
+| ----------- | ------------------------------------------------------------------ | :--------------------: |
+| MD2         | `md2`, `md2sum`                                                    |       [RFC-1319]       |
+| MD4         | `md4`, `md4sum`                                                    |       [RFC-1320]       |
+| MD5         | `md5`, `md5sum`                                                    |       [RFC-1321]       |
+| SHA-1       | `sha1`, `sha1sum`                                                  |       [RFC-3174]       |
+| SHA-2       | `sha224`, `sha256`, `sha384`, `sha512`, `sha512t224`, `sha512t256` |       [RFC-6234]       |
+| SHA-3       | `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`                     |       [FIPS-202]       |
+| SHAKE-128   | `Shake128`, `shake128`, `shake128_128`, `shake128_256`             |       [FIPS-202]       |
+| SHAKE-256   | `Shake256`, `shake256`, `shake256_256`, `shake256_512`             |       [FIPS-202]       |
+| Keccak      | `keccak224`, `keccak256`, `keccak384`, `keccak512`                 |     [Team Keccak]      |
+| Blake2b     | `blake2b160`, `blake2b256`, `blake2b384`, `blake2b512`             |       [RFC-7693]       |
+| Blake2s     | `blake2s128`, `blake2s160`, `blake2s224`, `blake2s256`             |       [RFC-7693]       |
+| xxHash-32   | `XXHash32`, `xxh32`, `xxh32code`                                   |       [Cyan4973]       |
+| xxHash-64   | `XXHash64`, `xxh64`, `xxh64code`                                   |       [Cyan4973]       |
+| xxHash3-64  | `XXH3`, `xxh3`, `xxh3code`                                         |       [Cyan4973]       |
+| xxHash3-128 | `XXH128`, `xxh128`, `xxh128code`                                   |       [Cyan4973]       |
+| RIPEMD      | `ripemd128`, `ripemd256`, `ripemd160`, `ripemd320`                 | [ISO/IEC 10118-3:2018] |
+| SM3         | `sm3`, `sm3sum`                                                    |   [GB/T 32905-2016]    |
 
 > **Note**: `XXHash64`, `XXH3`, and `XXH128` are not supported on the web
 > platform. They throw `UnimplementedError` when used there.
 
 ### Password / key derivation algorithms
 
-| Algorithm | Available methods                                               |  Source  |
-| --------- | -------------------------------------------------------------- | -------- |
-| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id`, `argon2Verify`     | RFC-9106 |
-| PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`                                 | RFC-8081 |
-| scrypt    | `Scrypt`, `scrypt`                                             | RFC-7914 |
-| bcrypt    | `Bcrypt`, `bcrypt`, `bcryptSalt`, `bcryptVerify`, `bcryptDigest` |         |
+| Algorithm | Available methods                                                | Source     |
+| --------- | ---------------------------------------------------------------- | ---------- |
+| Argon2    | `Argon2`, `argon2d`, `argon2i`, `argon2id`, `argon2Verify`       | [RFC-9106] |
+| PBKDF2    | `PBKDF2`, `pbkdf2`, `#.pbkdf2`                                   | [RFC-8081] |
+| scrypt    | `Scrypt`, `scrypt`                                               | [RFC-7914] |
+| bcrypt    | `Bcrypt`, `bcrypt`, `bcryptSalt`, `bcryptVerify`, `bcryptDigest` |            |
 
 ### Message authentication codes (MAC)
 
-| Algorithm | Available methods                      |  Source  |
-| --------- | -------------------------------------- | -------- |
-| HMAC      | `HMAC`, `#.hmac`                       | RFC-2104 |
-| Poly1305  | `Poly1305`, `poly1305`, `poly1305auth` | RFC-8439 |
+| Algorithm | Available methods                      | Source     |
+| --------- | -------------------------------------- | ---------- |
+| HMAC      | `HMAC`, `#.hmac`                       | [RFC-2104] |
+| Poly1305  | `Poly1305`, `poly1305`, `poly1305auth` | [RFC-8439] |
 
 ### One-time passwords (2FA)
 
-| Algorithm | Available methods |  Source  |
-| --------- | ----------------- | -------- |
-| HOTP      | `HOTP`            | RFC-4226 |
-| TOTP      | `TOTP`            | RFC-6238 |
+| Algorithm | Available methods | Source     |
+| --------- | ----------------- | ---------- |
+| HOTP      | `HOTP`            | [RFC-4226] |
+| TOTP      | `TOTP`            | [RFC-6238] |
 
 ### Checksums
 
-| Algorithm | Available methods         |  Source   |
-| --------- | ------------------------- | --------- |
-| CRC       | `crc16`, `crc32`, `crc64` | Wikipedia |
-| Adler-32  | `adler32`                 | Wikipedia |
+| Algorithm | Available methods         | Source             |
+| --------- | ------------------------- | ------------------ |
+| CRC       | `crc16`, `crc32`, `crc64` | [Wikipedia][crc]   |
+| Adler-32  | `adler32`                 | [Wikipedia][adler] |
 
 ### Random and UUID
 
@@ -145,6 +145,29 @@ The `random` library provides random number generators through `HashlibRandom`
 (`secure`, `system`, `keccak`, `sha256`, `md5`, `xxh64`, `sm3`), plus helpers
 like `randomBytes`, `randomNumbers`, and `randomString`. UUID versions v1, v3,
 v4, v5, v6, v7, and v8 are available through `uuid`.
+
+<!-- Sources referenced in the tables above -->
+
+[RFC-1319]: https://datatracker.ietf.org/doc/html/rfc1319
+[RFC-1320]: https://datatracker.ietf.org/doc/html/rfc1320
+[RFC-1321]: https://datatracker.ietf.org/doc/html/rfc1321
+[RFC-3174]: https://datatracker.ietf.org/doc/html/rfc3174
+[RFC-6234]: https://datatracker.ietf.org/doc/html/rfc6234
+[FIPS-202]: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
+[Team Keccak]: https://keccak.team/
+[RFC-7693]: https://datatracker.ietf.org/doc/html/rfc7693
+[Cyan4973]: https://github.com/Cyan4973/xxHash
+[ISO/IEC 10118-3:2018]: https://www.iso.org/standard/67116.html
+[GB/T 32905-2016]: https://www.codeofchina.com/standard/GBT32905-2016.html
+[RFC-9106]: https://datatracker.ietf.org/doc/html/rfc9106
+[RFC-8081]: https://datatracker.ietf.org/doc/html/rfc8081
+[RFC-7914]: https://datatracker.ietf.org/doc/html/rfc7914
+[RFC-2104]: https://datatracker.ietf.org/doc/html/rfc2104
+[RFC-8439]: https://datatracker.ietf.org/doc/html/rfc8439
+[RFC-4226]: https://datatracker.ietf.org/doc/html/rfc4226
+[RFC-6238]: https://datatracker.ietf.org/doc/html/rfc6238
+[crc]: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
+[adler]: https://en.wikipedia.org/wiki/Adler-32
 
 ## Security notes
 
