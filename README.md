@@ -1,6 +1,6 @@
 # hashlib
 
-[![package version](https://img.shields.io/pub/v/hashlib?label=pub.dev)](https://pub.dev/packages/hashlib)
+[![package version](https://img.shields.io/pub/v/hashlib?label=pub)](https://pub.dev/packages/hashlib)
 [![dart support](https://img.shields.io/badge/dart-%3E%3D%202.19.0-0175C2?logo=dart&logoColor=white)](https://dart.dev/guides/whats-new)
 [![likes](https://img.shields.io/pub/likes/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 [![pub points](https://img.shields.io/pub/points/hashlib?logo=dart&color=teal)](https://pub.dev/packages/hashlib/score)
