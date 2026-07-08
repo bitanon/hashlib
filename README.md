@@ -4,7 +4,6 @@
 [![dart support](https://img.shields.io/badge/dart-%3E%3D%202.19.0-0175C2?logo=dart&logoColor=white)](https://dart.dev/guides/whats-new)
 [![likes](https://img.shields.io/pub/likes/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 [![pub points](https://img.shields.io/pub/points/hashlib?logo=dart&color=teal)](https://pub.dev/packages/hashlib/score)
-[![monthly downloads](https://img.shields.io/pub/dm/hashlib?logo=dart)](https://pub.dev/packages/hashlib/score)
 [![codecov](https://codecov.io/gh/bitanon/hashlib/branch/master/graph/badge.svg?token=PYVMZWSQNU)](https://codecov.io/gh/bitanon/hashlib)
 [![Test](https://github.com/bitanon/hashlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/hashlib/actions/workflows/test.yml)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bitanon/hashlib)
