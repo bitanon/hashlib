@@ -41,7 +41,7 @@ that is its only runtime dependency.
 
 ```yaml
 dependencies:
-  hashlib: ^2.4.1
+  hashlib: ^2.4.2
 ```
 
 or run `dart pub add hashlib`. A single import exposes every algorithm:

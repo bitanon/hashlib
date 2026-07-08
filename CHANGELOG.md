@@ -1,3 +1,7 @@
+# 2.4.2
+
+- Bump `convertlib` to `^3.5.1`
+
 # 2.4.1
 
 - Replace the `hashlib_codecs` dependency with its renamed successor `convertlib` (`^3.5.0`).
