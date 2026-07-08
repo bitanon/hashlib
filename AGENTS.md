@@ -175,8 +175,8 @@ that task.
   against `crypto`/`pointycastle`/`hash` over random inputs of lengths 0–99,
   when any of those packages implements it.
 - Tags: `@Tags(['vm-only'])` (preceded by `// ignore: library_annotations`)
-  for anything using `dart:io`, file fixtures, or heavy fuzzing; `skip-vm`
-  for web-only behavior. Large/slow vectors (million-'a') are `skip: true`.
+  for anything using `dart:io`, file fixtures, or heavy fuzzing; `node-only`
+  for dart2js-only behavior. Large/slow vectors (million-'a') are `skip: true`.
 - `allow_duplicate_test_names: false` is enforced; per-test timeout is 1m
   (override per-file where needed, see `test/random/`).
 

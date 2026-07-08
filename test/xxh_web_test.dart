@@ -2,7 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 // ignore: library_annotations
-@Tags(['skip-vm'])
+@Tags(['node-only'])
 
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';

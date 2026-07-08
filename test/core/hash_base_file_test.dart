@@ -4,7 +4,7 @@
 // ignore_for_file: library_annotations
 // ignore_for_file: always_declare_return_types
 
-@Tags(['skip-vm'])
+@Tags(['node-only'])
 
 import 'package:hashlib/hashlib.dart';
 import 'package:test/test.dart';

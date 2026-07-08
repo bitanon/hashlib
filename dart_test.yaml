@@ -12,10 +12,11 @@ tags:
     on_platform:
       vm:
         skip: false
-  skip-vm:
+  node-only:
+    skip: true
     on_platform:
-      vm:
-        skip: true
+      node:
+        skip: false
 
 presets:
   # Runs the web-safe suite through the dart2wasm compiler on Chrome. Chrome is
