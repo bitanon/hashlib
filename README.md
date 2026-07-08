@@ -392,128 +392,487 @@ void main() {
 ```
 
 <!-- file: example/random_example.dart -->
-
 ## Benchmarks
 
-Measured against other pure-Dart hash libraries:
+### Libraries
 
 - **Hashlib** : https://pub.dev/packages/hashlib
 - **Crypto** : https://pub.dev/packages/crypto
 - **PointyCastle** : https://pub.dev/packages/pointycastle
 - **Hash** : https://pub.dev/packages/hash
 
-<hr/>
+### Hash Functions
 
-With 5MB message (10 iterations):
+<table>
+<thead>
+  <tr>
+    <th>Algorithm</th>
+    <th>Library</th>
+    <th>5MB message</th>
+    <th>1KB message</th>
+    <th>10B message</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="2">MD4</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.72 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.64 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>285 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>████████░░░░░░░░</code> <br> <small>888 Mbps &#128315;1.94x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>846 Mbps &#128315;1.94x</small></td>
+    <td><code>█████████░░░░░░░</code> <br> <small>163 Mbps &#128315;1.75x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="4">MD5</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.47 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.32 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>216 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>███████████████░</code> <br> <small>1.38 Gbps &#128315;1.06x</small></td>
+    <td><code>████████████████</code> <br> <small>1.29 Gbps &#128315;1.03x</small></td>
+    <td><code>███████████████░</code> <br> <small>205 Mbps &#128315;1.05x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>██████████░░░░░░</code> <br> <small>952 Mbps &#128315;1.55x</small></td>
+    <td><code>███████████░░░░░</code> <br> <small>904 Mbps &#128315;1.47x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>69.73 Mbps &#128315;3.1x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>████████░░░░░░░░</code> <br> <small>737 Mbps &#128315;2x</small></td>
+    <td><code>█████████░░░░░░░</code> <br> <small>705 Mbps &#128315;1.88x</small></td>
+    <td><code>█████████░░░░░░░</code> <br> <small>125 Mbps &#128315;1.73x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="3">HMAC(MD5)</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.4 Gbps</b> &#127775;</small></td>
+    <td><code>██████████████░░</code> <br> <small>987 Mbps </small></td>
+    <td><code>████████████░░░░</code> <br> <small>43.81 Mbps </small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>████████████████</code> <br> <small>1.37 Gbps &#128315;1.02x</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.1 Gbps</b> &#128314;1.12x</small></td>
+    <td><code>████████████████</code> <br> <small><b>56.83 Mbps</b> &#128314;1.3x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>██████████░░░░░░</code> <br> <small>898 Mbps &#128315;1.56x</small></td>
+    <td><code>██████████░░░░░░</code> <br> <small>666 Mbps &#128315;1.48x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>19.44 Mbps &#128315;2.25x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="4">SHA-1</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.26 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.16 Gbps</b> &#127775;</small></td>
+    <td><code>███████████████░</code> <br> <small>153 Mbps </small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>██████████████░░</code> <br> <small>1.11 Gbps &#128315;1.13x</small></td>
+    <td><code>███████████████░</code> <br> <small>1.08 Gbps &#128315;1.07x</small></td>
+    <td><code>████████████████</code> <br> <small><b>167 Mbps</b> &#128314;1.09x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>██████░░░░░░░░░░</code> <br> <small>478 Mbps &#128315;2.64x</small></td>
+    <td><code>██████░░░░░░░░░░</code> <br> <small>464 Mbps &#128315;2.49x</small></td>
+    <td><code>███████░░░░░░░░░</code> <br> <small>75.97 Mbps &#128315;2.01x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>███████░░░░░░░░░</code> <br> <small>533 Mbps &#128315;2.36x</small></td>
+    <td><code>███████░░░░░░░░░</code> <br> <small>524 Mbps &#128315;2.21x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>54 Mbps &#128315;2.83x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">HMAC(SHA-1)</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.27 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small>805 Mbps </small></td>
+    <td><code>█████████████░░░</code> <br> <small>21.93 Mbps </small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>██████████████░░</code> <br> <small>1.11 Gbps &#128315;1.15x</small></td>
+    <td><code>████████████████</code> <br> <small><b>812 Mbps</b> &#128314;1.01x</small></td>
+    <td><code>████████████████</code> <br> <small><b>26.82 Mbps</b> &#128314;1.22x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="4">SHA-224</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.02 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>868 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>120 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>██████████████░░</code> <br> <small>913 Mbps &#128315;1.12x</small></td>
+    <td><code>███████████████░</code> <br> <small>838 Mbps &#128315;1.04x</small></td>
+    <td><code>████████████████</code> <br> <small>118 Mbps &#128315;1.01x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>245 Mbps &#128315;4.19x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>228 Mbps &#128315;3.81x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>29.68 Mbps &#128315;4.05x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>███░░░░░░░░░░░░░</code> <br> <small>219 Mbps &#128315;4.68x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>222 Mbps &#128315;3.91x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>36.69 Mbps &#128315;3.27x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="4">SHA-256</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.03 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>941 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small>121 Mbps </small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>███████████████░</code> <br> <small>944 Mbps &#128315;1.09x</small></td>
+    <td><code>███████████████░</code> <br> <small>864 Mbps &#128315;1.09x</small></td>
+    <td><code>████████████████</code> <br> <small><b>123 Mbps</b> &#128314;1.02x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>243 Mbps &#128315;4.22x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>224 Mbps &#128315;4.21x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>30.65 Mbps &#128315;3.94x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>235 Mbps &#128315;4.36x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>220 Mbps &#128315;4.28x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>36.27 Mbps &#128315;3.33x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">HMAC(SHA-256)</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.04 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small>651 Mbps </small></td>
+    <td><code>██████████████░░</code> <br> <small>17.88 Mbps </small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>███████████████░</code> <br> <small>942 Mbps &#128315;1.1x</small></td>
+    <td><code>████████████████</code> <br> <small><b>651 Mbps</b> &#128314;1x</small></td>
+    <td><code>████████████████</code> <br> <small><b>20.2 Mbps</b> &#128314;1.13x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="4">SHA-384</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.96 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.65 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>105 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>654 Mbps &#128315;3x</small></td>
+    <td><code>██████░░░░░░░░░░</code> <br> <small>591 Mbps &#128315;2.8x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>51.35 Mbps &#128315;2.05x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>172 Mbps &#128315;11.43x</small></td>
+    <td><code>██░░░░░░░░░░░░░░</code> <br> <small>161 Mbps &#128315;10.27x</small></td>
+    <td><code>██░░░░░░░░░░░░░░</code> <br> <small>14.32 Mbps &#128315;7.36x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>50.49 Mbps &#128315;38.88x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>44.81 Mbps &#128315;36.9x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>3.86 Mbps &#128315;27.28x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="4">SHA-512</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.97 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.64 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>102 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>crypto</td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>655 Mbps &#128315;3x</small></td>
+    <td><code>██████░░░░░░░░░░</code> <br> <small>590 Mbps &#128315;2.78x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>50.24 Mbps &#128315;2.04x</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>173 Mbps &#128315;11.36x</small></td>
+    <td><code>██░░░░░░░░░░░░░░</code> <br> <small>160 Mbps &#128315;10.23x</small></td>
+    <td><code>██░░░░░░░░░░░░░░</code> <br> <small>14.37 Mbps &#128315;7.13x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>49.25 Mbps &#128315;39.91x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>43.61 Mbps &#128315;37.58x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>3.75 Mbps &#128315;27.33x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">SHA3-224</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.03 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>913 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>116 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>31.33 Mbps &#128315;32.73x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>27.45 Mbps &#128315;33.25x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.13 Mbps &#128315;54.28x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">SHA3-256</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.03 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>941 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>120 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>29.91 Mbps &#128315;34.28x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>27.96 Mbps &#128315;33.67x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.14 Mbps &#128315;56.1x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">SHA3-384</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.94 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.65 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>104 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>22.7 Mbps &#128315;85.4x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>22.47 Mbps &#128315;73.34x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.16 Mbps &#128315;47.82x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">SHA3-512</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.91 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.63 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>101 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>15.8 Mbps &#128315;121.05x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>14.79 Mbps &#128315;110.1x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.14 Mbps &#128315;47.04x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">RIPEMD-128</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.41 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.33 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>195 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>462 Mbps &#128315;3.05x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>438 Mbps &#128315;3.03x</small></td>
+    <td><code>██████░░░░░░░░░░</code> <br> <small>78.39 Mbps &#128315;2.48x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="3">RIPEMD-160</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>743 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>698 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>108 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>hash</td>
+    <td><code>████████░░░░░░░░</code> <br> <small>373 Mbps &#128315;1.99x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>359 Mbps &#128315;1.95x</small></td>
+    <td><code>██████░░░░░░░░░░</code> <br> <small>43.29 Mbps &#128315;2.48x</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>███████░░░░░░░░░</code> <br> <small>335 Mbps &#128315;2.22x</small></td>
+    <td><code>███████░░░░░░░░░</code> <br> <small>317 Mbps &#128315;2.2x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>54.48 Mbps &#128315;1.97x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">RIPEMD-256</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.56 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.44 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>220 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>468 Mbps &#128315;3.33x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>440 Mbps &#128315;3.29x</small></td>
+    <td><code>█████░░░░░░░░░░░</code> <br> <small>74.18 Mbps &#128315;2.97x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">RIPEMD-320</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>713 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>669 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>105 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>███████░░░░░░░░░</code> <br> <small>331 Mbps &#128315;2.15x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>314 Mbps &#128315;2.13x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>51.56 Mbps &#128315;2.03x</small></td>
+  </tr>
+  <tr>
+    <td>BLAKE-2s</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.69 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.67 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>203 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">BLAKE-2b</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>2.06 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>2.07 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>181 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>120 Mbps &#128315;17.09x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>119 Mbps &#128315;17.45x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>9.26 Mbps &#128315;19.56x</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Poly1305</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>4.59 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>4.48 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>595 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>1.18 Gbps &#128315;3.88x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>1.16 Gbps &#128315;3.87x</small></td>
+    <td><code>████████░░░░░░░░</code> <br> <small>310 Mbps &#128315;1.92x</small></td>
+  </tr>
+  <tr>
+    <td>XXH32</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>5.9 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>5.6 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>789 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>XXH64</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>3.63 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>3.3 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>639 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>XXH3</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.46 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.23 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>70.49 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>XXH128</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>1.43 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.21 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>68.5 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td rowspan="2">SM3</td>
+    <td>hashlib</td>
+    <td><code>████████████████</code> <br> <small><b>947 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>862 Mbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>136 Mbps</b> &#127775;</small></td>
+  </tr>
+  <tr>
+    <td>PointyCastle</td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>241 Mbps &#128315;3.93x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>228 Mbps &#128315;3.78x</small></td>
+    <td><code>████░░░░░░░░░░░░</code> <br> <small>37.31 Mbps &#128315;3.65x</small></td>
+  </tr>
+</tbody>
+</table>
 
-| Algorithms    | `hashlib`     | `PointyCastle`                 | `crypto`                    | `hash`                     |
-| ------------- | ------------- | ------------------------------ | --------------------------- | -------------------------- |
-| MD4           | **1.64 Gbps** | 352 Mbps <br> `4.66x slow`     |                             |                            |
-| MD5           | **1.45 Gbps** | 347 Mbps <br> `4.18x slow`     | 1.01 Gbps <br> `1.44x slow` | 651 Mbps <br> `2.23x slow` |
-| HMAC(MD5)     | **1.33 Gbps** |                                | 991 Mbps <br> `1.34x slow`  | 653 Mbps <br> `2.04x slow` |
-| SHA-1         | **1.27 Gbps** | 248 Mbps <br> `5.13x slow`     | 794 Mbps <br> `1.61x slow`  | 388 Mbps <br> `3.28x slow` |
-| HMAC(SHA-1)   | **1.28 Gbps** |                                | 793 Mbps <br> `1.61x slow`  |                            |
-| SHA-224       | **856 Mbps**  | 152 Mbps <br> `5.65x slow`     | 685 Mbps <br> `1.25x slow`  | 198 Mbps <br> `4.32x slow` |
-| SHA-256       | **859 Mbps**  | 151 Mbps <br> `5.67x slow`     | 686 Mbps <br> `1.25x slow`  | 198 Mbps <br> `4.35x slow` |
-| HMAC(SHA-256) | **858 Mbps**  |                                | 688 Mbps <br> `1.25x slow`  |                            |
-| SHA-384       | **1.36 Gbps** | 17.35 Mbps <br> `78.24x slow`  | 466 Mbps <br> `2.91x slow`  | 162 Mbps <br> `8.37x slow` |
-| SHA-512       | **1.36 Gbps** | 17.59 Mbps <br> `77.15x slow`  | 470 Mbps <br> `2.89x slow`  | 160 Mbps <br> `8.46x slow` |
-| SHA3-224      | **857 Mbps**  | 14.97 Mbps <br> `57.25x slow`  |                             |                            |
-| SHA3-256      | **857 Mbps**  | 14.17 Mbps <br> `60.48x slow`  |                             |                            |
-| SHA3-384      | **1.36 Gbps** | 10.85 Mbps <br> `125.22x slow` |                             |                            |
-| SHA3-512      | **1.37 Gbps** | 7.49 Mbps <br> `182.3x slow`   |                             |                            |
-| RIPEMD-128    | **1.79 Gbps** | 247 Mbps <br> `7.24x slow`     |                             |                            |
-| RIPEMD-160    | **698 Mbps**  | 174 Mbps <br> `4x slow`        |                             | 290 Mbps <br> `2.41x slow` |
-| RIPEMD-256    | **2 Gbps**    | 218 Mbps <br> `9.16x slow`     |                             |                            |
-| RIPEMD-320    | **684 Mbps**  | 161 Mbps <br> `4.26x slow`     |                             |                            |
-| BLAKE-2s      | **1.49 Gbps** |                                |                             |                            |
-| BLAKE-2b      | **1.53 Gbps** | 71.06 Mbps <br> `21.6x slow`   |                             |                            |
-| Poly1305      | **3.79 Gbps** | 362 Mbps <br> `10.48x slow`    |                             |                            |
-| XXH32         | **4.5 Gbps**  |                                |                             |                            |
-| XXH64         | **2.42 Gbps** |                                |                             |                            |
-| XXH3          | **976 Mbps**  |                                |                             |                            |
-| XXH128        | **1.03 Gbps** |                                |                             |                            |
-| SM3           | **751 Mbps**  | 135 Mbps <br> `5.57x slow`     |                             |                            |
+### Key Derivators
 
-<hr/>
+<table>
+<thead>
+  <tr>
+    <th>Algorithm</th>
+    <th>little</th>
+    <th>moderate</th>
+    <th>good</th>
+    <th>strong</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>scrypt</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>1.01 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>11.21 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>61.03 ms</small></td>
+    <td><code>████████████████</code> <br> <small>2033.95 ms</small></td>
+  </tr>
+  <tr>
+    <td>bcrypt</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.7 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>20.6 ms</small></td>
+    <td><code>██░░░░░░░░░░░░░░</code> <br> <small>331.8 ms</small></td>
+    <td><code>████████████████</code> <br> <small>2650.52 ms</small></td>
+  </tr>
+  <tr>
+    <td>pbkdf2</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>0.42 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>14.05 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>232.89 ms</small></td>
+    <td><code>████████████████</code> <br> <small>2777.65 ms</small></td>
+  </tr>
+  <tr>
+    <td>argon2i</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.37 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>14.86 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>192.95 ms</small></td>
+    <td><code>████████████████</code> <br> <small>2087.93 ms</small></td>
+  </tr>
+  <tr>
+    <td>argon2d</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.14 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>15.01 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>191.21 ms</small></td>
+    <td><code>████████████████</code> <br> <small>2094.69 ms</small></td>
+  </tr>
+  <tr>
+    <td>argon2id</td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>2.11 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>14.68 ms</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>192.04 ms</small></td>
+    <td><code>████████████████</code> <br> <small>2052.91 ms</small></td>
+  </tr>
+</tbody>
+</table>
 
-With 1KB message (5000 iterations):
-
-| Algorithms    | `hashlib`     | `PointyCastle`                 | `crypto`                   | `hash`                     |
-| ------------- | ------------- | ------------------------------ | -------------------------- | -------------------------- |
-| MD4           | **1.54 Gbps** | 576 Mbps <br> `2.67x slow`     |                            |                            |
-| MD5           | **1.37 Gbps** | 514 Mbps <br> `2.66x slow`     | 916 Mbps <br> `1.49x slow` | 643 Mbps <br> `2.12x slow` |
-| HMAC(MD5)     | **1 Gbps**    |                                | 735 Mbps <br> `1.36x slow` | 482 Mbps <br> `2.08x slow` |
-| SHA-1         | **1.16 Gbps** | 348 Mbps <br> `3.33x slow`     | 714 Mbps <br> `1.62x slow` | 371 Mbps <br> `3.12x slow` |
-| HMAC(SHA-1)   | **784 Mbps**  |                                | 505 Mbps <br> `1.55x slow` |                            |
-| SHA-224       | **780 Mbps**  | 177 Mbps <br> `4.41x slow`     | 616 Mbps <br> `1.27x slow` | 187 Mbps <br> `4.18x slow` |
-| SHA-256       | **784 Mbps**  | 175 Mbps <br> `4.48x slow`     | 615 Mbps <br> `1.27x slow` | 187 Mbps <br> `4.19x slow` |
-| HMAC(SHA-256) | **549 Mbps**  |                                | 433 Mbps <br> `1.27x slow` |                            |
-| SHA-384       | **1.13 Gbps** | 26.94 Mbps <br> `42.01x slow`  | 402 Mbps <br> `2.82x slow` | 169 Mbps <br> `6.71x slow` |
-| SHA-512       | **1.13 Gbps** | 27.88 Mbps <br> `40.48x slow`  | 402 Mbps <br> `2.81x slow` | 170 Mbps <br> `6.64x slow` |
-| SHA3-224      | **782 Mbps**  | 20.34 Mbps <br> `38.46x slow`  |                            |                            |
-| SHA3-256      | **783 Mbps**  | 20.55 Mbps <br> `38.11x slow`  |                            |                            |
-| SHA3-384      | **1.13 Gbps** | 16.25 Mbps <br> `69.21x slow`  |                            |                            |
-| SHA3-512      | **1.13 Gbps** | 10.89 Mbps <br> `103.51x slow` |                            |                            |
-| RIPEMD-128    | **1.62 Gbps** | 334 Mbps <br> `4.87x slow`     |                            |                            |
-| RIPEMD-160    | **642 Mbps**  | 207 Mbps <br> `3.1x slow`      |                            | 280 Mbps <br> `2.29x slow` |
-| RIPEMD-256    | **1.81 Gbps** | 339 Mbps <br> `5.34x slow`     |                            |                            |
-| RIPEMD-320    | **636 Mbps**  | 198 Mbps <br> `3.22x slow`     |                            |                            |
-| BLAKE-2s      | **1.43 Gbps** |                                |                            |                            |
-| BLAKE-2b      | **1.47 Gbps** | 95.76 Mbps <br> `15.38x slow`  |                            |                            |
-| Poly1305      | **3.33 Gbps** | 768 Mbps <br> `4.33x slow`     |                            |                            |
-| XXH32         | **4.12 Gbps** |                                |                            |                            |
-| XXH64         | **2.27 Gbps** |                                |                            |                            |
-| XXH3          | **784 Mbps**  |                                |                            |                            |
-| XXH128        | **825 Mbps**  |                                |                            |                            |
-| SM3           | **698 Mbps**  | 163 Mbps <br> `4.28x slow`     |                            |                            |
-
-<hr/>
-
-With 10B message (100000 iterations):
-
-| Algorithms    | `hashlib`      | `PointyCastle`               | `crypto`                     | `hash`                       |
-| ------------- | -------------- | ---------------------------- | ---------------------------- | ---------------------------- |
-| MD4           | **210 Mbps**   | 101 Mbps <br> `2.09x slow`   |                              |                              |
-| MD5           | **177 Mbps**   | 89.19 Mbps <br> `1.98x slow` | 92.89 Mbps <br> `1.9x slow`  | 52.25 Mbps <br> `3.38x slow` |
-| HMAC(MD5)     | **36.18 Mbps** |                              | 31.69 Mbps <br> `1.14x slow` | 14.23 Mbps <br> `2.54x slow` |
-| SHA-1         | **120 Mbps**   | 49.47 Mbps <br> `2.42x slow` | 69.51 Mbps <br> `1.72x slow` | 34.29 Mbps <br> `3.49x slow` |
-| HMAC(SHA-1)   | **19.64 Mbps** |                              | 14.71 Mbps <br> `1.34x slow` |                              |
-| SHA-224       | **88.2 Mbps**  | 26.95 Mbps <br> `3.27x slow` | 58.57 Mbps <br> `1.51x slow` | 21.69 Mbps <br> `4.07x slow` |
-| SHA-256       | **88.39 Mbps** | 27.12 Mbps <br> `3.26x slow` | 60.75 Mbps <br> `1.45x slow` | 22.48 Mbps <br> `3.93x slow` |
-| HMAC(SHA-256) | **14.35 Mbps** |                              | 12.45 Mbps <br> `1.15x slow` |                              |
-| SHA-384       | **65.18 Mbps** | 2.33 Mbps <br> `27.95x slow` | 26.99 Mbps <br> `2.42x slow` | 11.16 Mbps <br> `5.84x slow` |
-| SHA-512       | **64.21 Mbps** | 2.35 Mbps <br> `27.3x slow`  | 26.59 Mbps <br> `2.41x slow` | 11.39 Mbps <br> `5.64x slow` |
-| SHA3-224      | **88.02 Mbps** | 1.57 Mbps <br> `55.89x slow` |                              |                              |
-| SHA3-256      | **89.16 Mbps** | 1.56 Mbps <br> `57.23x slow` |                              |                              |
-| SHA3-384      | **64.5 Mbps**  | 1.57 Mbps <br> `41.07x slow` |                              |                              |
-| SHA3-512      | **63.11 Mbps** | 1.57 Mbps <br> `40.2x slow`  |                              |                              |
-| RIPEMD-128    | **177 Mbps**   | 58.35 Mbps <br> `3.03x slow` |                              |                              |
-| RIPEMD-160    | **86.81 Mbps** | 33.18 Mbps <br> `2.62x slow` |                              | 32.16 Mbps <br> `2.7x slow`  |
-| RIPEMD-256    | **180 Mbps**   | 53.17 Mbps <br> `3.39x slow` |                              |                              |
-| RIPEMD-320    | **85.18 Mbps** | 30.48 Mbps <br> `2.79x slow` |                              |                              |
-| BLAKE-2s      | **152 Mbps**   |                              |                              |                              |
-| BLAKE-2b      | **120 Mbps**   | 6.89 Mbps <br> `17.44x slow` |                              |                              |
-| Poly1305      | **269 Mbps**   | 167 Mbps <br> `1.61x slow`   |                              |                              |
-| XXH32         | **413 Mbps**   |                              |                              |                              |
-| XXH64         | **332 Mbps**   |                              |                              |                              |
-| XXH3          | **32.94 Mbps** |                              |                              |                              |
-| XXH128        | **33.16 Mbps** |                              |                              |                              |
-| SM3           | **93.33 Mbps** | 24.81 Mbps <br> `3.76x slow` |                              |                              |
-
-<hr/>
-
-Key derivator benchmarks on different security parameters:
-
-| Algorithms | little   | moderate  | good       | strong      |
-| ---------- | -------- | --------- | ---------- | ----------- |
-| scrypt     | 1.092 ms | 11.899 ms | 69.138 ms  | 2100.983 ms |
-| bcrypt     | 1.803 ms | 14.474 ms | 226.341 ms | 1811.425 ms |
-| pbkdf2     | 0.668 ms | 16.363 ms | 267.526 ms | 3211.098 ms |
-| argon2i    | 2.359 ms | 17.448 ms | 205.518 ms | 2375.301 ms |
-| argon2d    | 2.272 ms | 16.064 ms | 201.827 ms | 2374.41 ms  |
-| argon2id   | 2.306 ms | 16.38 ms  | 199.66 ms  | 2376.102 ms |
-
-> All benchmarks are done on _AMD Ryzen 7 5800X_ processor and _3200MHz_ RAM using compiled _exe_
+> All benchmarks are done on 36GB _Apple M3 Pro_ using compiled _exe_
 >
-> Dart SDK version: 3.7.0 (stable) (Wed Feb 5 04:53:58 2025 -0800) on "windows_x64"
+> Dart SDK version: 3.12.2 (stable) (Tue Jun 9 01:11:39 2026 -0700) on "macos_arm64"
+
+## License
+
+BSD 3-Clause License. See the [LICENSE](LICENSE) file for details. Issues and
+contributions are welcome at
+[github.com/bitanon/hashlib](https://github.com/bitanon/hashlib).

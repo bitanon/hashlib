@@ -1,6 +1,7 @@
 # 2.4.1
 
-- Replace the `hashlib_codecs` dependency with its renamed successor `convertlib` (`^3.4.0`). The `hashlib` public API, including `package:hashlib/codecs.dart`, is unchanged.
+- Replace the `hashlib_codecs` dependency with its renamed successor `convertlib` (`^3.5.0`).
+  The `hashlib` public API, including `package:hashlib/codecs.dart`, is unchanged.
 
 # 2.4.0
 
