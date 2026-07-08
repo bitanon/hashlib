@@ -164,6 +164,55 @@ v4, v5, v6, v7, and v8 are available through `uuid`.
   to run in constant time; weigh the deployment environment before relying on it
   in side-channel-sensitive settings.
 
+## Testing and reliability
+
+Correctness is the first-order goal of this library, and the test suite is built
+to enforce it. There are **700 test cases across 60+ files**` that runs after
+every change and before each release across **three platforms: the Dart VM,
+Node.js, and Chrome (WASM)**.
+
+Every algorithm is checked in several independent ways:
+
+- **Official known-answer vectors.** Digests are pinned against the published
+  test vectors from the relevant standard — RFCs, FIPS/NIST publications, and
+  each algorithm's reference implementation. Expected values are never invented;
+  each vector cites its source in the test file.
+- **Differential cross-validation.** For every algorithm that a mature,
+  independent Dart package also implements, the output is compared byte-for-byte
+  against [`crypto`][crypto] and [`pointycastle`][pointycastle] over hundreds
+  of random inputs. This currently covers MD2, MD4, MD5, SHA-1,
+  SHA-224/256/384/512, SHA-512/224, SHA-512/256, SHA3 (224–512), Keccak
+  (224–512), RIPEMD-128/160/256/320, BLAKE2b, SM3, and HMAC. A subtle
+  divergence in padding, endianness, or a block boundary would fail these tests
+  even if it slipped past a fixed vector.
+- **Boundary and edge coverage.** Inputs are exercised at the empty string,
+  single bytes, and lengths straddling each algorithm's internal block/rate
+  size (e.g. `block−1`, `block`, `block+1`, and multi-block messages) - the
+  exact places where length-encoding and padding bugs hide.
+- **Streaming equals one-shot.** Chunked/streamed input and the incremental
+  `Sink` API (including `reset()`, double-`close()`, and use-after-close) are
+  verified to produce identical digests to the one-shot path.
+- **Argument validation.** Invalid key, salt, digest, and parameter lengths are
+  asserted to throw typed errors rather than silently producing weak output.
+
+The algorithms compute exactly what their standards define,
+verified against official vectors and multiple independent
+implementations.
+Please still read the [Security notes](#security-notes) above:
+choose the right primitive for your threat model (a KDF for passwords, a
+cryptographic hash rather than a checksum where an adversary is involved),
+and note that pure-Dart execution makes no hard constant-time guarantee.
+
+You can reproduce all of this locally:
+
+```sh
+dart test              # vm, node, and chrome
+dart test -p vm        # fast, VM-only iteration
+```
+
+[crypto]: https://pub.dev/packages/crypto
+[pointycastle]: https://pub.dev/packages/pointycastle
+
 ## Recipes
 
 Runnable programs for every snippet below live in the
