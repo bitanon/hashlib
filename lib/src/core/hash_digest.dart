@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 /// This holds generated hash digest and provides utilities to extract it in
 /// multiple formats.

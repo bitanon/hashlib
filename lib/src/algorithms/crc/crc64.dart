@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/codecs.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:hashlib/src/core/hash_base.dart';
 
 const int _pow32 = 0x100000000;

@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib/codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 import 'generators.dart' show secureRandom;
 

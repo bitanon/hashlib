@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib/codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 import 'generators.dart' show secureRandom;
 

@@ -4,7 +4,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:hashlib/codecs.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:hashlib/src/algorithms/md5.dart';
 import 'package:hashlib/src/random.dart';
 

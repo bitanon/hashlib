@@ -1,0 +1,5 @@
+dartdoc:
+  # These libraries only re-export `package:convertlib`for single-import
+  # convenience. Their canonical documentation lives in those packages.
+  exclude:
+    - 'package:hashlib/codecs.dart'
