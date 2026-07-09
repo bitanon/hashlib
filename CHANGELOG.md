@@ -1,6 +1,12 @@
 # 2.4.3
 
-- Optimize Argon2 on the Web/JS platform by replacing `BigInt` arithmetic in the compression function with 32-bit integer math
+- Optimize Argon2 on the Web/JS platform by replacing `BigInt` arithmetic in
+  the compression function with 32-bit integer math.
+- Improve the benchmark harness (`benchmark/_base.dart`): it now reports the
+  median per-iteration time sampled across ~25ms batches instead of the
+  arithmetic mean, making results robust against GC pauses and keeping each
+  batch well above the coarsened web timer resolution. Benchmark tooling only;
+  no library code or output is affected.
 
 # 2.4.2
 

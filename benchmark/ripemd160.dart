@@ -9,55 +9,50 @@ import 'package:pointycastle/digests/ripemd160.dart' as pc;
 
 import '_base.dart';
 
-class HashlibBenchmark extends Benchmark {
-  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
+class HashlibBenchmark extends SyncBenchmark {
+  final List<int> input;
+  HashlibBenchmark(int size)
+      : input = List.filled(size, 0x3f),
+        super('hashlib', size);
 
   @override
-  void run() {
-    hashlib.ripemd160.convert(input).bytes;
+  dynamic run() {
+    return hashlib.ripemd160.convert(input).bytes;
   }
 }
 
-class HashBenchmark extends Benchmark {
-  HashBenchmark(int size, int iter) : super('hash', size, iter);
+class HashBenchmark extends SyncBenchmark {
+  final List<int> input;
+  HashBenchmark(int size)
+      : input = List.filled(size, 0x3f),
+        super('hash', size);
 
   @override
-  void run() {
-    hash.RIPEMD160().update(input).digest();
+  dynamic run() {
+    return hash.RIPEMD160().update(input).digest();
   }
 }
 
-class PointyCastleBenchmark extends Benchmark {
-  Uint8List _input = Uint8List(0);
-  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
+class PointyCastleBenchmark extends SyncBenchmark {
+  final Uint8List input;
+  PointyCastleBenchmark(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('PointyCastle', size);
 
   @override
-  void setup() {
-    super.setup();
-    _input = Uint8List.fromList(input);
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     final d = pc.RIPEMD160Digest();
-    d.process(_input);
+    return d.process(input);
   }
 }
 
-void main() {
+void main() async {
   print('--------- RIPEMD-160 ----------');
-  final conditions = [
-    [5 << 20, 10],
-    [1 << 10, 5000],
-    [10, 100000],
-  ];
-  for (var condition in conditions) {
-    int size = condition[0];
-    int iter = condition[1];
-    print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).measureDiff([
-      HashBenchmark(size, iter),
-      PointyCastleBenchmark(size, iter),
+  for (int size in [5 << 20, 1 << 10, 10]) {
+    print('---- message: ${formatSize(size)} ----');
+    await HashlibBenchmark(size).measureDiff([
+      HashBenchmark(size),
+      PointyCastleBenchmark(size),
     ]);
     print('');
   }

@@ -1,7 +1,6 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart' as hashlib;
@@ -9,47 +8,37 @@ import 'package:pointycastle/digests/md4.dart' as pc;
 
 import '_base.dart';
 
-Random random = Random();
-
-class HashlibBenchmark extends Benchmark {
-  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
+class HashlibBenchmark extends SyncBenchmark {
+  final List<int> input;
+  HashlibBenchmark(int size)
+      : input = List.filled(size, 0x3f),
+        super('hashlib', size);
 
   @override
-  void run() {
-    hashlib.md4.convert(input).bytes;
+  dynamic run() {
+    return hashlib.md4.convert(input).bytes;
   }
 }
 
-class PointyCastleBenchmark extends Benchmark {
-  Uint8List _input = Uint8List(0);
-  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
+class PointyCastleBenchmark extends SyncBenchmark {
+  final Uint8List input;
+  PointyCastleBenchmark(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('PointyCastle', size);
 
   @override
-  void setup() {
-    super.setup();
-    _input = Uint8List.fromList(input);
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     final d = pc.MD4Digest();
-    d.process(_input);
+    return d.process(input);
   }
 }
 
-void main() {
+void main() async {
   print('--------- MD4 ----------');
-  final conditions = [
-    [5 << 20, 10],
-    [1 << 10, 5000],
-    [10, 100000],
-  ];
-  for (var condition in conditions) {
-    int size = condition[0];
-    int iter = condition[1];
-    print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).measureDiff([
-      PointyCastleBenchmark(size, iter),
+  for (int size in [5 << 20, 1 << 10, 10]) {
+    print('---- message: ${formatSize(size)} ----');
+    await HashlibBenchmark(size).measureDiff([
+      PointyCastleBenchmark(size),
     ]);
     print('');
   }

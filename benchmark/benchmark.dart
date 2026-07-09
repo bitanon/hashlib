@@ -43,23 +43,132 @@ void dump(String message) {
 }
 
 // ---------------------------------------------------------------------
-// Measurement
+// Hash function benchmarks
 // ---------------------------------------------------------------------
 
-/// A single benchmark result: its throughput in bytes/second and the human
-/// readable form of that throughput.
-class Score {
-  final double speed;
-  final String speedString;
-  Score(this.speed, this.speedString);
+/// Every hash, HMAC and checksum group for a message of [size] bytes. In each
+/// group hashlib is listed first, so it is the baseline in a cell.
+Map<String, List<Benchmark>> buildHashFunctions(int size) {
+  return {
+    "MD4": [
+      md4.HashlibBenchmark(size),
+      md4.PointyCastleBenchmark(size),
+    ],
+    "MD5": [
+      md5.HashlibBenchmark(size),
+      md5.CryptoBenchmark(size),
+      md5.HashBenchmark(size),
+      md5.PointyCastleBenchmark(size),
+    ],
+    "HMAC(MD5)": [
+      md5_hmac.HashlibBenchmark(size),
+      md5_hmac.CryptoBenchmark(size),
+      md5_hmac.HashBenchmark(size),
+    ],
+    "SHA-1": [
+      sha1.HashlibBenchmark(size),
+      sha1.CryptoBenchmark(size),
+      sha1.PointyCastleBenchmark(size),
+      sha1.HashBenchmark(size),
+    ],
+    "HMAC(SHA-1)": [
+      sha1_hmac.HashlibBenchmark(size),
+      sha1_hmac.CryptoBenchmark(size),
+    ],
+    "SHA-224": [
+      sha224.HashlibBenchmark(size),
+      sha224.CryptoBenchmark(size),
+      sha224.HashBenchmark(size),
+      sha224.PointyCastleBenchmark(size),
+    ],
+    "SHA-256": [
+      sha256.HashlibBenchmark(size),
+      sha256.CryptoBenchmark(size),
+      sha256.HashBenchmark(size),
+      sha256.PointyCastleBenchmark(size),
+    ],
+    "HMAC(SHA-256)": [
+      sha256_hmac.HashlibBenchmark(size),
+      sha256_hmac.CryptoBenchmark(size),
+    ],
+    "SHA-384": [
+      sha384.HashlibBenchmark(size),
+      sha384.CryptoBenchmark(size),
+      sha384.HashBenchmark(size),
+      sha384.PointyCastleBenchmark(size),
+    ],
+    "SHA-512": [
+      sha512.HashlibBenchmark(size),
+      sha512.CryptoBenchmark(size),
+      sha512.HashBenchmark(size),
+      sha512.PointyCastleBenchmark(size),
+    ],
+    "SHA3-224": [
+      sha3_224.HashlibBenchmark(size),
+      sha3_224.PointyCastleBenchmark(size),
+    ],
+    "SHA3-256": [
+      sha3_256.HashlibBenchmark(size),
+      sha3_256.PointyCastleBenchmark(size),
+    ],
+    "SHA3-384": [
+      sha3_384.HashlibBenchmark(size),
+      sha3_384.PointyCastleBenchmark(size),
+    ],
+    "SHA3-512": [
+      sha3_512.HashlibBenchmark(size),
+      sha3_512.PointyCastleBenchmark(size),
+    ],
+    "RIPEMD-128": [
+      ripemd128.HashlibBenchmark(size),
+      ripemd128.PointyCastleBenchmark(size),
+    ],
+    "RIPEMD-160": [
+      ripemd160.HashlibBenchmark(size),
+      ripemd160.HashBenchmark(size),
+      ripemd160.PointyCastleBenchmark(size),
+    ],
+    "RIPEMD-256": [
+      ripemd256.HashlibBenchmark(size),
+      ripemd256.PointyCastleBenchmark(size),
+    ],
+    "RIPEMD-320": [
+      ripemd320.HashlibBenchmark(size),
+      ripemd320.PointyCastleBenchmark(size),
+    ],
+    "BLAKE-2s": [
+      blake2s.HashlibBenchmark(size),
+    ],
+    "BLAKE-2b": [
+      blake2b.HashlibBenchmark(size),
+      blake2b.PointyCastleBenchmark(size),
+    ],
+    "Poly1305": [
+      poly1305.HashlibBenchmark(size),
+      poly1305.PointyCastleBenchmark(size),
+    ],
+    "XXH32": [
+      xxhash.XXH32Benchmark(size, "hashlib"),
+    ],
+    "XXH64": [
+      xxhash.XXH64Benchmark(size, "hashlib"),
+    ],
+    "XXH3": [
+      xxhash.XXH3Benchmark(size, "hashlib"),
+    ],
+    "XXH128": [
+      xxhash.XXH128Benchmark(size, "hashlib"),
+    ],
+    "SM3": [
+      sm3.HashlibBenchmark(size),
+      sm3.PointyCastleBenchmark(size),
+    ],
+  };
 }
 
-/// Runs [benchmark] and converts its per-exercise runtime into a throughput.
-Score evaluate(Benchmark benchmark) {
-  var runtime = benchmark.measure();
-  var speed = 1e6 * benchmark.iter * benchmark.size / runtime;
-  return Score(speed, formatSpeed(speed));
-}
+// The message sizes used for the hash tables.
+final messageSizes = [5 << 20, 1 << 10, 10];
+String sizeHeader(int size) => '${formatSize(size)} message';
 
 // ---------------------------------------------------------------------
 // Helpers
@@ -79,7 +188,7 @@ String buildBar(double speed, double best, [int width = 16]) {
 /// Renders one benchmark cell: a proportional bar, the speed, a medal when it
 /// is the fastest ([best]) at this size, and for non-[baseline] rows, the speed
 /// ratio against hashlib's [mine].
-String formatCell(Score result, double best, double mine, bool baseline) {
+String formatCell(Measurement result, double best, double mine, bool baseline) {
   var icon = '';
 
   var speed = result.speedString;
@@ -111,10 +220,10 @@ String formatCell(Score result, double best, double mine, bool baseline) {
 /// the algorithm name spans its libraries with `rowspan` - with one data column
 /// per entry in [columns], built by [build] for that column index. hashlib is
 /// listed first in each row group and is the baseline for the ratios.
-void measureTable(
+Future<void> measureTable(
   List<String> columns,
   Map<String, List<Benchmark>> Function(int column) build,
-) {
+) async {
   var maps = [for (var i = 0; i < columns.length; i++) build(i)];
 
   dump('<table>');
@@ -131,13 +240,13 @@ void measureTable(
 
   for (var name in maps.first.keys) {
     // measure every (library, column) and find the fastest library per column
-    var results = <List<Score>>[];
+    var results = <List<Measurement>>[];
     var best = <double>[];
     for (var map in maps) {
-      var row = <Score>[];
+      var row = <Measurement>[];
       var top = 0.0;
       for (var benchmark in map[name]!) {
-        var result = evaluate(benchmark);
+        var result = await measure(benchmark);
         row.add(result);
         if (result.speed > top) top = result.speed;
       }
@@ -166,145 +275,12 @@ void measureTable(
   dump('</table>');
 }
 
-// ---------------------------------------------------------------------
-// Hash function benchmarks
-// ---------------------------------------------------------------------
-
-/// Every hash, HMAC and checksum group for a message of [size] bytes measured
-/// over [iter] iterations. In each group hashlib is listed first, so it is the
-/// baseline in a cell.
-Map<String, List<Benchmark>> buildHashFunctions(int size, int iter) {
-  return {
-    "MD4": [
-      md4.HashlibBenchmark(size, iter),
-      md4.PointyCastleBenchmark(size, iter),
-    ],
-    "MD5": [
-      md5.HashlibBenchmark(size, iter),
-      md5.CryptoBenchmark(size, iter),
-      md5.HashBenchmark(size, iter),
-      md5.PointyCastleBenchmark(size, iter),
-    ],
-    "HMAC(MD5)": [
-      md5_hmac.HashlibBenchmark(size, iter),
-      md5_hmac.CryptoBenchmark(size, iter),
-      md5_hmac.HashBenchmark(size, iter),
-    ],
-    "SHA-1": [
-      sha1.HashlibBenchmark(size, iter),
-      sha1.CryptoBenchmark(size, iter),
-      sha1.PointyCastleBenchmark(size, iter),
-      sha1.HashBenchmark(size, iter),
-    ],
-    "HMAC(SHA-1)": [
-      sha1_hmac.HashlibBenchmark(size, iter),
-      sha1_hmac.CryptoBenchmark(size, iter),
-    ],
-    "SHA-224": [
-      sha224.HashlibBenchmark(size, iter),
-      sha224.CryptoBenchmark(size, iter),
-      sha224.HashBenchmark(size, iter),
-      sha224.PointyCastleBenchmark(size, iter),
-    ],
-    "SHA-256": [
-      sha256.HashlibBenchmark(size, iter),
-      sha256.CryptoBenchmark(size, iter),
-      sha256.HashBenchmark(size, iter),
-      sha256.PointyCastleBenchmark(size, iter),
-    ],
-    "HMAC(SHA-256)": [
-      sha256_hmac.HashlibBenchmark(size, iter),
-      sha256_hmac.CryptoBenchmark(size, iter),
-    ],
-    "SHA-384": [
-      sha384.HashlibBenchmark(size, iter),
-      sha384.CryptoBenchmark(size, iter),
-      sha384.HashBenchmark(size, iter),
-      sha384.PointyCastleBenchmark(size, iter),
-    ],
-    "SHA-512": [
-      sha512.HashlibBenchmark(size, iter),
-      sha512.CryptoBenchmark(size, iter),
-      sha512.HashBenchmark(size, iter),
-      sha512.PointyCastleBenchmark(size, iter),
-    ],
-    "SHA3-224": [
-      sha3_224.HashlibBenchmark(size, iter),
-      sha3_224.PointyCastleBenchmark(size, iter),
-    ],
-    "SHA3-256": [
-      sha3_256.HashlibBenchmark(size, iter),
-      sha3_256.PointyCastleBenchmark(size, iter),
-    ],
-    "SHA3-384": [
-      sha3_384.HashlibBenchmark(size, iter),
-      sha3_384.PointyCastleBenchmark(size, iter),
-    ],
-    "SHA3-512": [
-      sha3_512.HashlibBenchmark(size, iter),
-      sha3_512.PointyCastleBenchmark(size, iter),
-    ],
-    "RIPEMD-128": [
-      ripemd128.HashlibBenchmark(size, iter),
-      ripemd128.PointyCastleBenchmark(size, iter),
-    ],
-    "RIPEMD-160": [
-      ripemd160.HashlibBenchmark(size, iter),
-      ripemd160.HashBenchmark(size, iter),
-      ripemd160.PointyCastleBenchmark(size, iter),
-    ],
-    "RIPEMD-256": [
-      ripemd256.HashlibBenchmark(size, iter),
-      ripemd256.PointyCastleBenchmark(size, iter),
-    ],
-    "RIPEMD-320": [
-      ripemd320.HashlibBenchmark(size, iter),
-      ripemd320.PointyCastleBenchmark(size, iter),
-    ],
-    "BLAKE-2s": [
-      blake2s.HashlibBenchmark(size, iter),
-    ],
-    "BLAKE-2b": [
-      blake2b.HashlibBenchmark(size, iter),
-      blake2b.PointyCastleBenchmark(size, iter),
-    ],
-    "Poly1305": [
-      poly1305.HashlibBenchmark(size, iter),
-      poly1305.PointyCastleBenchmark(size, iter),
-    ],
-    "XXH32": [
-      xxhash.XXH32Benchmark(size, iter, "hashlib"),
-    ],
-    "XXH64": [
-      xxhash.XXH64Benchmark(size, iter, "hashlib"),
-    ],
-    "XXH3": [
-      xxhash.XXH3Benchmark(size, iter, "hashlib"),
-    ],
-    "XXH128": [
-      xxhash.XXH128Benchmark(size, iter, "hashlib"),
-    ],
-    "SM3": [
-      sm3.HashlibBenchmark(size, iter),
-      sm3.PointyCastleBenchmark(size, iter),
-    ],
-  };
-}
-
-// The message sizes and per-size iteration counts used for the hash tables.
-final conditions = [
-  [5 << 20, 10],
-  [1 << 10, 5000],
-  [10, 100000],
-];
-String sizeHeader(List<int> condition) => '${formatSize(condition[0])} message';
-
-void measureHashFunctions() {
+Future<void> measureHashFunctions() async {
   dump('### Hash Functions');
   dump('');
-  measureTable(
-    [for (var condition in conditions) sizeHeader(condition)],
-    (i) => buildHashFunctions(conditions[i][0], conditions[i][1]),
+  await measureTable(
+    [for (var size in messageSizes) sizeHeader(size)],
+    (i) => buildHashFunctions(messageSizes[i]),
   );
   dump('');
 }
@@ -314,9 +290,10 @@ void measureHashFunctions() {
 // ---------------------------------------------------------------------
 
 /// Renders the key-derivator table. Rows are algorithms and columns are the
-/// security levels; each cell shows the average runtime with a bar scaled to
-/// the slowest level in that row, so the cost growth is visible at a glance.
-void measureKeyDerivation() {
+/// security levels; each cell shows the average runtime for that level. No bar
+/// or ratio is drawn: security levels are deliberate cost tiers and should not
+/// be judged by runtime alone.
+Future<void> measureKeyDerivation() async {
   dump('### Key Derivators');
   dump('');
 
@@ -374,13 +351,10 @@ void measureKeyDerivation() {
   for (var entry in algorithms.entries) {
     var instances = entry.value;
     var times = <String, double>{};
-    var slowest = 0.0;
     for (var name in names) {
       var item = instances[name];
       if (item != null) {
-        var ms = item.measure() / 1000;
-        times[name] = ms;
-        if (ms > slowest) slowest = ms;
+        times[name] = (await measure(item)).runtimeMillis;
       }
     }
     dump('  <tr>');
@@ -391,9 +365,7 @@ void measureKeyDerivation() {
         dump('    <td></td>');
         continue;
       }
-      var bar = buildBar(ms, slowest);
-      var text = '<small>${formatDecimal(ms)} ms</small>';
-      dump('    <td>$bar <br> $text</td>');
+      dump('    <td>${formatDecimal(ms)} ms</td>');
     }
     dump('  </tr>');
   }
@@ -418,7 +390,7 @@ void dumpHeaders() {
   dump('');
 }
 
-void main(List<String> args) {
+void main(List<String> args) async {
   if (args.isNotEmpty) {
     try {
       stdout.writeln('Opening output file: ${args[0]}');
@@ -432,10 +404,10 @@ void main(List<String> args) {
   dumpHeaders();
   raf?.flushSync();
 
-  measureHashFunctions();
+  await measureHashFunctions();
   raf?.flushSync();
 
-  measureKeyDerivation();
+  await measureKeyDerivation();
   raf?.flushSync();
 
   raf?.closeSync();

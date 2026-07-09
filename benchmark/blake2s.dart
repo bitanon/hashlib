@@ -1,35 +1,27 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:math';
-
 import 'package:hashlib/hashlib.dart' as hashlib;
 
 import '_base.dart';
 
-Random random = Random();
-
-class HashlibBenchmark extends Benchmark {
-  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
+class HashlibBenchmark extends SyncBenchmark {
+  final List<int> input;
+  HashlibBenchmark(int size)
+      : input = List.filled(size, 0x3f),
+        super('hashlib', size);
 
   @override
-  void run() {
-    hashlib.blake2s256.convert(input).bytes;
+  dynamic run() {
+    return hashlib.blake2s256.convert(input).bytes;
   }
 }
 
-void main() {
-  print('--------- BLAKE-2b ----------');
-  final conditions = [
-    [5 << 20, 10],
-    [1 << 10, 5000],
-    [10, 100000],
-  ];
-  for (var condition in conditions) {
-    int size = condition[0];
-    int iter = condition[1];
-    print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).measureDiff([]);
+void main() async {
+  print('--------- BLAKE-2s ----------');
+  for (int size in [5 << 20, 1 << 10, 10]) {
+    print('---- message: ${formatSize(size)} ----');
+    await HashlibBenchmark(size).measureRate();
     print('');
   }
 }

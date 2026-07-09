@@ -5,10 +5,10 @@ import 'dart:typed_data';
 
 import '_base.dart';
 
-class ListBenchmark extends Benchmark {
+class ListBenchmark extends SyncBenchmark {
   List<int> list = [];
 
-  ListBenchmark(int size, int iter) : super('List<int>', size, iter);
+  ListBenchmark(int size) : super('List<int>', size);
 
   @override
   void setup() {
@@ -16,14 +16,7 @@ class ListBenchmark extends Benchmark {
   }
 
   @override
-  void exercise() {
-    for (int i = 0; i < iter; ++i) {
-      run();
-    }
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     List<int> list = List.filled(size + 10, 0, growable: false);
     for (int i = 0; i < size; ++i) {
       list[i] = i & 0xFF;
@@ -44,30 +37,17 @@ class ListBenchmark extends Benchmark {
           (list[i + 2] << 8) |
           (list[i + 3]);
     }
+    return list;
   }
 }
 
-class ListGrowingBenchmark extends Benchmark {
-  List<int> list = [];
-
-  ListGrowingBenchmark(int size, int iter)
-      : super('Growing List<int>', size, iter);
+class ListGrowingBenchmark extends SyncBenchmark {
+  ListGrowingBenchmark(int size) : super('Growing List<int>', size);
 
   @override
-  void setup() {
-    list = [];
-  }
-
-  @override
-  void exercise() {
-    for (int i = 0; i < iter; ++i) {
-      run();
-    }
-  }
-
-  @override
-  void run() {
-    for (int i = 0; i < size; ++i) {
+  dynamic run() {
+    List<int> list = [];
+    for (int i = 0; i < size + 10; ++i) {
       list.add(i & 0xFF);
     }
     for (int i = 0; i < size; ++i) {
@@ -86,13 +66,14 @@ class ListGrowingBenchmark extends Benchmark {
           (list[i + 2] << 8) |
           (list[i + 3]);
     }
+    return list;
   }
 }
 
-class Uint8ListBenchmark extends Benchmark {
+class Uint8ListBenchmark extends SyncBenchmark {
   Uint8List uint8list = Uint8List(0);
 
-  Uint8ListBenchmark(int size, int iter) : super('Uint8List', size, iter);
+  Uint8ListBenchmark(int size) : super('Uint8List', size);
 
   @override
   void setup() {
@@ -100,14 +81,7 @@ class Uint8ListBenchmark extends Benchmark {
   }
 
   @override
-  void exercise() {
-    for (int i = 0; i < iter; ++i) {
-      run();
-    }
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     for (int i = 0; i < size; ++i) {
       uint8list[i] = i;
     }
@@ -127,13 +101,14 @@ class Uint8ListBenchmark extends Benchmark {
           (uint8list[i + 2] << 8) |
           (uint8list[i + 3]);
     }
+    return uint8list;
   }
 }
 
-class ByteDataBenchmark extends Benchmark {
+class ByteDataBenchmark extends SyncBenchmark {
   ByteData byteData = ByteData(0);
 
-  ByteDataBenchmark(int size, int iter) : super('ByteData', size, iter);
+  ByteDataBenchmark(int size) : super('ByteData', size);
 
   @override
   void setup() {
@@ -141,14 +116,7 @@ class ByteDataBenchmark extends Benchmark {
   }
 
   @override
-  void exercise() {
-    for (int i = 0; i < iter; ++i) {
-      run();
-    }
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     for (int i = 0; i < size; ++i) {
       byteData.setUint8(i, i);
     }
@@ -158,14 +126,15 @@ class ByteDataBenchmark extends Benchmark {
     for (int i = 0; i < size; i += 4) {
       byteData.getUint32(i);
     }
+    return byteData;
   }
 }
 
-class ByteDataViewBenchmark extends Benchmark {
+class ByteDataViewBenchmark extends SyncBenchmark {
   Uint8List uint8list = Uint8List(0);
   ByteData byteData = ByteData(0);
 
-  ByteDataViewBenchmark(int size, int iter) : super('ByteDataView', size, iter);
+  ByteDataViewBenchmark(int size) : super('ByteDataView', size);
 
   @override
   void setup() {
@@ -174,14 +143,7 @@ class ByteDataViewBenchmark extends Benchmark {
   }
 
   @override
-  void exercise() {
-    for (int i = 0; i < iter; ++i) {
-      run();
-    }
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     for (int i = 0; i < size; ++i) {
       uint8list[i] = i & 0xFF;
     }
@@ -191,30 +153,20 @@ class ByteDataViewBenchmark extends Benchmark {
     for (int i = 0; i < size; i += 4) {
       byteData.getUint32(i);
     }
+    return byteData;
   }
 }
 
-void main() {
+void main() async {
   print('-------- BUFFER ---------');
-  ListBenchmark(1 << 7, 1 << 15).measureDiff([
-    ListGrowingBenchmark(1 << 7, 1 << 15),
-    ByteDataBenchmark(1 << 7, 1 << 15),
-    ByteDataViewBenchmark(1 << 7, 1 << 15),
-    Uint8ListBenchmark(1 << 7, 1 << 15),
-  ]);
-  print('');
-  ListBenchmark(1 << 11, 1 << 11).measureDiff([
-    ListGrowingBenchmark(1 << 11, 1 << 11),
-    ByteDataBenchmark(1 << 11, 1 << 11),
-    ByteDataViewBenchmark(1 << 11, 1 << 11),
-    Uint8ListBenchmark(1 << 11, 1 << 11),
-  ]);
-  print('');
-  ListBenchmark(1 << 18, 1 << 3).measureDiff([
-    ListGrowingBenchmark(1 << 18, 1 << 3),
-    ByteDataBenchmark(1 << 18, 1 << 3),
-    ByteDataViewBenchmark(1 << 18, 1 << 3),
-    Uint8ListBenchmark(1 << 18, 1 << 3),
-  ]);
-  print('');
+  for (int size in [1 << 7, 1 << 11, 1 << 18]) {
+    print('---- size: ${formatSize(size)} ----');
+    await ListBenchmark(size).measureDiff([
+      ListGrowingBenchmark(size),
+      ByteDataBenchmark(size),
+      ByteDataViewBenchmark(size),
+      Uint8ListBenchmark(size),
+    ]);
+    print('');
+  }
 }

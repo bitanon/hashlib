@@ -9,122 +9,130 @@ import '_base.dart';
 
 const int _maxInt = 0xFFFFFFFF;
 
-class SystemRandomBenchmark extends Benchmark {
+class SystemRandomBenchmark extends SyncBenchmark {
   final random = HashlibRandom(RNG.system);
-  SystemRandomBenchmark(int size, int iter) : super('system', size, iter);
+  SystemRandomBenchmark(int size) : super('system', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt();
+      x = random.nextInt();
     }
+    return x;
   }
 }
 
-class SecureRandomBenchmark extends Benchmark {
+class SecureRandomBenchmark extends SyncBenchmark {
   final random = HashlibRandom(RNG.secure);
-  SecureRandomBenchmark(int size, int iter) : super('secure', size, iter);
+  SecureRandomBenchmark(int size) : super('secure', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt();
+      x = random.nextInt();
     }
+    return x;
   }
 }
 
-class KeccakRandomBenchmark extends Benchmark {
+class KeccakRandomBenchmark extends SyncBenchmark {
   final random = HashlibRandom(RNG.keccak);
-  KeccakRandomBenchmark(int size, int iter) : super('keccak', size, iter);
+  KeccakRandomBenchmark(int size) : super('keccak', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt();
+      x = random.nextInt();
     }
+    return x;
   }
 }
 
-class SHA256RandomBenchmark extends Benchmark {
+class SHA256RandomBenchmark extends SyncBenchmark {
   final random = HashlibRandom(RNG.sha256);
-  SHA256RandomBenchmark(int size, int iter) : super('sha256', size, iter);
+  SHA256RandomBenchmark(int size) : super('sha256', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt();
+      x = random.nextInt();
     }
+    return x;
   }
 }
 
-class SM3RandomBenchmark extends Benchmark {
+class SM3RandomBenchmark extends SyncBenchmark {
   final random = HashlibRandom(RNG.sm3);
-  SM3RandomBenchmark(int size, int iter) : super('sm3', size, iter);
+  SM3RandomBenchmark(int size) : super('sm3', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt();
+      x = random.nextInt();
     }
+    return x;
   }
 }
 
-class XXH64RandomBenchmark extends Benchmark {
+class XXH64RandomBenchmark extends SyncBenchmark {
   final random = HashlibRandom(RNG.xxh64);
-  XXH64RandomBenchmark(int size, int iter) : super('xxh64', size, iter);
+  XXH64RandomBenchmark(int size) : super('xxh64', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt();
+      x = random.nextInt();
     }
+    return x;
   }
 }
 
-class RandomBenchmark extends Benchmark {
+class RandomBenchmark extends SyncBenchmark {
   final random = Random(56468882);
-  RandomBenchmark(int size, int iter) : super('Random', size, iter);
+  RandomBenchmark(int size) : super('Random', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt(_maxInt);
+      x = random.nextInt(_maxInt);
     }
+    return x;
   }
 }
 
-class SystemSecureRandomBenchmark extends Benchmark {
+class SystemSecureRandomBenchmark extends SyncBenchmark {
   final random = Random.secure();
-  SystemSecureRandomBenchmark(int size, int iter)
-      : super('Random.secure', size, iter);
+  SystemSecureRandomBenchmark(int size) : super('Random.secure', size);
 
   @override
-  void run() {
+  dynamic run() {
+    int x = 0;
     for (int i = 0; i < size; ++i) {
-      random.nextInt(_maxInt);
+      x = random.nextInt(_maxInt);
     }
+    return x;
   }
 }
 
-void main() {
+void main() async {
   print('--------- Random ----------');
-  final conditions = [
-    [5 << 20, 10],
-    [1 << 10, 5000],
-    [10, 100000],
-  ];
-  for (var condition in conditions) {
-    int size = condition[0];
-    int iter = condition[1];
-    print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    RandomBenchmark(size, iter).measureDiff([
-      SystemSecureRandomBenchmark(size, iter),
-      SecureRandomBenchmark(size, iter),
-      SystemRandomBenchmark(size, iter),
-      KeccakRandomBenchmark(size, iter),
-      SM3RandomBenchmark(size, iter),
-      SHA256RandomBenchmark(size, iter),
-      XXH64RandomBenchmark(size, iter),
+  for (int size in [5 << 20, 1 << 10, 10]) {
+    print('---- size: ${formatSize(size)} ----');
+    await RandomBenchmark(size).measureDiff([
+      SystemSecureRandomBenchmark(size),
+      SecureRandomBenchmark(size),
+      SystemRandomBenchmark(size),
+      KeccakRandomBenchmark(size),
+      SM3RandomBenchmark(size),
+      SHA256RandomBenchmark(size),
+      XXH64RandomBenchmark(size),
     ]);
     print('');
   }

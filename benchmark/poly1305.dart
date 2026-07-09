@@ -15,57 +15,42 @@ Random random = Random();
 final key = List.generate(16, (i) => random.nextInt(256));
 final secret = List.generate(16, (i) => random.nextInt(256));
 
-class HashlibBenchmark extends Benchmark {
-  Uint8List _key = Uint8List(32);
-  Uint8List _input = Uint8List(0);
-  HashlibBenchmark(int size, int iter) : super('hashlib', size, iter);
+class HashlibBenchmark extends SyncBenchmark {
+  final Uint8List input;
+  final Uint8List keyData;
+  HashlibBenchmark(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        keyData = Uint8List.fromList([...key, ...secret]),
+        super('hashlib', size);
 
   @override
-  void setup() {
-    super.setup();
-    _input = Uint8List.fromList(input);
-    _key = Uint8List.fromList([...key, ...secret]);
-  }
-
-  @override
-  void run() {
-    hashlib.poly1305auth(_input, _key);
+  dynamic run() {
+    return hashlib.poly1305auth(input, keyData);
   }
 }
 
-class PointyCastleBenchmark extends Benchmark {
-  Uint8List _key = Uint8List(32);
-  Uint8List _input = Uint8List(0);
-  PointyCastleBenchmark(int size, int iter) : super('PointyCastle', size, iter);
+class PointyCastleBenchmark extends SyncBenchmark {
+  final Uint8List input;
+  final Uint8List keyData;
+  PointyCastleBenchmark(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        keyData = Uint8List.fromList([...key, ...secret]),
+        super('PointyCastle', size);
 
   @override
-  void setup() {
-    super.setup();
-    _input = Uint8List.fromList(input);
-    _key = Uint8List.fromList([...key, ...secret]);
-  }
-
-  @override
-  void run() {
+  dynamic run() {
     final d = pc.Poly1305();
-    d.init(KeyParameter(_key));
-    d.process(_input);
+    d.init(KeyParameter(keyData));
+    return d.process(input);
   }
 }
 
-void main() {
+void main() async {
   print('------- Poly1305 --------');
-  final conditions = [
-    [5 << 20, 10],
-    [1 << 10, 5000],
-    [10, 100000],
-  ];
-  for (var condition in conditions) {
-    int size = condition[0];
-    int iter = condition[1];
-    print('---- size: ${formatSize(size)} | iterations: $iter ----');
-    HashlibBenchmark(size, iter).measureDiff([
-      PointyCastleBenchmark(size, iter),
+  for (int size in [5 << 20, 1 << 10, 10]) {
+    print('---- message: ${formatSize(size)} ----');
+    await HashlibBenchmark(size).measureDiff([
+      PointyCastleBenchmark(size),
     ]);
     print('');
   }

@@ -23,7 +23,6 @@ dev_dependencies:
   crypto: any
   hash: any
   pointycastle: any
-  benchmark_harness: any
   argon2: any
   pana: any
   coverage: any
