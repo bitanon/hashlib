@@ -421,13 +421,36 @@ class Argon2Internal {
   }
 
   /// `v[x] += v[y] + 2 * ((v[x] & _mask32) * (v[y] & _mask32))`
+  ///
+  /// The 64-bit words are stored as (low, high) 32-bit pairs. To stay correct
+  /// on the web where integers are IEEE-754 doubles, the low-word product is
+  /// built from 16-bit limbs and every carry is propagated with `~/`/`%` by
+  /// `2^32`; all intermediate values remain below `2^53`, so no precision is
+  /// lost and no `BigInt` allocation is needed.
   static void _fBlaMka(Uint32List v, int x, int y) {
-    var t = (BigInt.from(v[x]) * BigInt.from(v[y])) << 1;
-    t += (BigInt.from(v[x + 1]) << 32) + BigInt.from(v[x]);
-    t += (BigInt.from(v[y + 1]) << 32) + BigInt.from(v[y]);
+    int xl = v[x], xh = v[x + 1];
+    int yl = v[y], yh = v[y + 1];
 
-    v[x] = t.toUnsigned(32).toInt();
-    v[x + 1] = (t >> 32).toUnsigned(32).toInt();
+    // Full 32x32 -> 64 product of the low words via 16-bit limbs.
+    int a0 = xl & _mask16, a1 = xl >>> 16;
+    int b0 = yl & _mask16, b1 = yl >>> 16;
+    int m0 = a0 * b0;
+    int m1 = a0 * b1 + a1 * b0;
+    int m2 = a1 * b1;
+    int lo = m0 + (m1 % 0x10000) * 0x10000;
+    int pLo = lo % 0x100000000;
+    int pHi = m2 + m1 ~/ 0x10000 + lo ~/ 0x100000000;
+
+    // Double the product: 2 * p (mod 2^64).
+    int dLo = pLo * 2;
+    int dHi = pHi * 2 + dLo ~/ 0x100000000;
+    dLo %= 0x100000000;
+
+    // v[x] = (xl,xh) + (yl,yh) + (dLo,dHi) (mod 2^64).
+    int sumLo = xl + yl + dLo;
+    int sumHi = xh + yh + dHi + sumLo ~/ 0x100000000;
+    v[x] = sumLo; // Uint32List store truncates to the low 32 bits
+    v[x + 1] = sumHi;
   }
 
   // v[k] = (v[i] << (64 - n)) | (v[i] >>> n)

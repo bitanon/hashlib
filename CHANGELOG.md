@@ -1,3 +1,7 @@
+# 2.4.3
+
+- Optimize Argon2 on the Web/JS platform by replacing `BigInt` arithmetic in the compression function with 32-bit integer math
+
 # 2.4.2
 
 - Bump `convertlib` to `^3.5.1`
