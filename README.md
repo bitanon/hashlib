@@ -62,24 +62,45 @@ import 'package:hashlib/random.dart'; // randomBytes, uuid, HashlibRandom
 Full API reference:
 [hashlib library](https://pub.dev/documentation/hashlib/latest/).
 
-## Quickstart
+## Which tool do I need?
 
-Compute a digest of a string in one call, and derive an HMAC from any hash by
-attaching a key:
+A hash turns any input — text, a file, bytes — into a short, fixed-size
+"fingerprint". Different jobs need different tools. Here is the plain-English
+map:
+
+| Your goal | Reach for | Examples |
+| --------- | --------- | -------- |
+| Fingerprint data, detect changes, build a cache key | a **cryptographic hash** | `sha256`, `blake2b256` |
+| Store a user password safely | a **password KDF** (slow on purpose) | `argon2id`, `bcrypt` |
+| Prove a message came from someone who knows a secret key | a **MAC** | `sha256.hmac`, `poly1305` |
+| Quickly catch accidental corruption (not attackers) | a **checksum** | `crc32`, `adler32` |
+| Generate 2FA / one-time login codes | an **OTP** generator | `TOTP`, `HOTP` |
+| Generate unguessable tokens, IDs, or salts | **secure random** | `randomBytes`, `uuid` |
+
+Three rules of thumb if you are new to this:
+
+- **Never store a password as a plain hash** — not even `sha256`. Use a KDF like
+  `argon2id`; it is deliberately slow, which makes guessing passwords expensive.
+- **Checksums are not security.** `crc32`, `adler32`, and the xxHash family are
+  fast but trivial to forge. Use them against accidents, never against an
+  attacker.
+- **Unsure which cryptographic hash?** `sha256` is the safe universal default;
+  `blake2b256` is faster. Avoid `md5` and `sha1` for anything security-related.
+
+## Quickstart
 
 ```dart
 import 'package:hashlib/hashlib.dart';
 
 void main() {
-  final text = 'Happy Hashing!';
-
-  // One-shot hex digest
-  print(sha256.string(text));
-
-  // Keyed HMAC-SHA256
-  print(sha256.hmac.byString('password').string(text));
+  // A hex fingerprint of some text — that's the whole idea.
+  print(sha256.string('Happy Hashing!').hex());
 }
 ```
+
+Every algorithm follows the same shape: call it on a `String`, a `List<int>`,
+or a stream, then read the result as hex, Base64, raw bytes, or a `BigInt`. The
+[Usage](#usage) section below shows one short recipe per task.
 
 ## Supported algorithms
 
@@ -235,162 +256,118 @@ dart test -p vm        # fast, VM-only iteration
 [crypto]: https://pub.dev/packages/crypto
 [pointycastle]: https://pub.dev/packages/pointycastle
 
-## Recipes
+## Usage
 
-Runnable programs for every snippet below live in the
+Short, focused snippets follow — one per task. Every algorithm listed in the
+tables above plugs into the same calls, and full runnable programs live in the
 [example](https://github.com/bitanon/hashlib/tree/master/example) folder.
 
-### Hashing, checksums, MAC, and OTP
+### Hash text or bytes
 
-<!-- file: example/hashlib_example.dart -->
+Turn any input into a fingerprint and read it in whatever format you need:
 
 ```dart
-import 'package:hashlib/codecs.dart';
-import 'package:hashlib/hashlib.dart';
+final digest = sha256.string('Happy Hashing!');
 
-void main() {
-  var text = "Happy Hashing!";
-  print("text => $text");
+print(digest);           // hex string (the default when printed)
+print(digest.hex());     // "d8d0..."  same value, explicit
+print(digest.base64());  // Base64 encoding
+digest.bytes;            // raw bytes as a Uint8List
 
-  final key = "password";
-  final salt = "some salt";
-  print("key => $key");
-  print("salt => $salt");
-  print('');
-
-  final pw = key.codeUnits;
-  final iv = salt.codeUnits;
-
-  // Example of hash-code generations
-  print('XXH32 => ${xxh32code(text)}');
-  print('CRC32 => ${crc32code(text)}');
-  print('Adler32 => ${adler32code(text)}');
-  print('CRC16 => ${crc16code(text)}');
-  print('');
-
-  // Examples of Hash generation
-  print('CRC64 => ${crc64sum(text)}');
-  print('XXH64 => ${xxh64sum(text)}');
-  print('XXH3 => ${xxh3sum(text)}');
-  print('XXH128 => ${xxh128sum(text)}');
-  print('MD2 => ${md2.string(text)}');
-  print('MD4 => ${md4.string(text)}');
-  print('MD5 => ${md5.string(text)}');
-  print('SHA-1 => ${sha1.string(text)}');
-  print('SHA-224 => ${sha224.string(text)}');
-  print('SHA-256 => ${sha256.string(text)}');
-  print('SHA-384 => ${sha384.string(text)}');
-  print('SHA-512 => ${sha512.string(text)}');
-  print('SHA-512/224 => ${sha512t224.string(text)}');
-  print('SHA-512/256 => ${sha512t256.string(text)}');
-  print('SHA3-224 => ${sha3_224.string(text)}');
-  print('SHA3-256 => ${sha3_256.string(text)}');
-  print('SHA3-384 => ${sha3_384.string(text)}');
-  print('SHA3-512 => ${sha3_512.string(text)}');
-  print('Keccak-224 => ${keccak224.string(text)}');
-  print('Keccak-256 => ${keccak256.string(text)}');
-  print('Keccak-384 => ${keccak384.string(text)}');
-  print('Keccak-512 => ${keccak512.string(text)}');
-  print('SHAKE-128 => ${shake128.of(20).string(text)}');
-  print('SHAKE-256 => ${shake256.of(20).string(text)}');
-  print('BLAKE2s-256 => ${blake2s256.string(text)}');
-  print('BLAKE2b-512 => ${blake2b512.string(text)}');
-  print('SM3 => ${sm3.string(text)}');
-  print('');
-
-  // Examples of MAC generations
-  print('HMAC/MD5 => ${md5.hmac.by(pw).string(text)}');
-  print('HMAC/SHA1 => ${sha1.hmac.byString(text)}');
-  print('HMAC/SHA256 => ${sha256.hmac.byString(key).string(text)}');
-  print('HMAC/SHA3-256 => ${HMAC(sha3_256).by(pw).string(text)}');
-  print("HMAC/BLAKE2b-256 => ${blake2b512.hmac.by(pw).string(text)}");
-  print("BLAKE-2b-MAC/256 => ${blake2b256.mac.by(pw).string(text)}");
-  print("BLAKE-2b-MAC/224 => ${Blake2b(28).mac.by(pw).string(text)}");
-  print('');
-
-  // Examples of OTP generation
-  int nw = DateTime.now().millisecondsSinceEpoch ~/ 30000;
-  var counter = fromHex(nw.toRadixString(16).padLeft(16, '0'));
-  print('TOTP[time=$nw] => ${TOTP(iv).value()}');
-  print('HOTP[counter=$nw] => ${HOTP(iv, counter: counter).value()}');
-  print('');
-}
+sha256.convert([1, 2, 3]);      // hash a List<int> of bytes instead
+sha256sum('Happy Hashing!');    // shortcut straight to a hex String
 ```
 
-<!-- file: example/hashlib_example.dart -->
+Swap `sha256` for any hash — `md5`, `sha3_256`, `blake2b512`, `sm3`, and the
+rest all share this exact API.
 
-### Password and key derivation
+### Hash a large file or stream
 
-<!-- file: example/keygen_example.dart -->
+Feed data in chunks instead of loading everything into memory. The result is
+identical to hashing it all at once:
+
+```dart
+final sink = sha256.createSink();
+sink.add(firstChunk);   // each chunk is a List<int>
+sink.add(nextChunk);
+final digest = sink.digest();
+```
+
+### Store and verify a password
+
+Hash the password with a slow KDF and a fresh random salt, then store only the
+encoded result. To check a login, verify against that string — nothing is ever
+decrypted:
 
 ```dart
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/random.dart'; // for randomBytes
 
-void main() {
-  final key = "password";
-  final salt = "some salt";
-  print("key => $key");
-  print("salt => $salt");
-  print('');
+// Sign-up: hash and store.
+final salt = randomBytes(16);
+final stored = argon2id(password.codeUnits, salt).encoded();
+// stored => "$argon2id$v=19$m=65536,t=3,p=4$..."  safe to save in your database
 
-  final pw = key.codeUnits;
-  final iv = salt.codeUnits;
-
-  // Examples of Argon2 key derivation
-  final argon2Test = Argon2Security.test;
-  print("[Argon2i] => ${argon2i(pw, iv, security: argon2Test)}");
-  print("[Argon2d] => ${argon2d(pw, iv, security: argon2Test)}");
-  print("[Argon2id] => ${argon2id(pw, iv, security: argon2Test)}");
-
-  // Examples of scrypt key derivation
-  final scryptLittle = ScryptSecurity.little;
-  print("[scrypt] => ${scrypt(pw, iv, security: scryptLittle, dklen: 24)}");
-  print('');
-
-  // Examples of bcrypt key derivation
-  final bcryptLittle = BcryptSecurity.little;
-  print("[bcrypt] => ${bcrypt(pw, bcryptSalt(security: bcryptLittle))}");
-  print('');
-
-  // Examples of PBKDF2 key derivation
-  print("SHA256/HMAC/PBKDF2 => ${pbkdf2(pw, iv).hex()}");
-  print("BLAKE2b-256/HMAC/PBKDF2 => ${blake2b256.pbkdf2(iv).hex(pw)}");
-  print("BLAKE2b-256/MAC/PBKDF2 => ${blake2b256.mac.pbkdf2(iv).hex(pw)}");
-  print("SHA1/HMAC/PBKDF2 => ${sha1.pbkdf2(iv, iterations: 100).hex(pw)}");
-  print('');
-}
+// Login: check the password against the stored hash.
+final ok = argon2Verify(stored, password.codeUnits); // true / false
 ```
 
-<!-- file: example/keygen_example.dart -->
-
-### Secure random and UUID
-
-<!-- file: example/random_example.dart -->
+`bcrypt` works the same way and generates its own salt:
 
 ```dart
-import 'package:hashlib/codecs.dart';
+final stored = bcrypt(password.codeUnits);
+final ok = bcryptVerify(stored, password.codeUnits);
+```
+
+Both accept a `security:` preset (`test`, `little`, `moderate`, `good`,
+`strong`) that trades speed for resistance to guessing — pick the strongest
+your latency budget allows, e.g.
+`argon2id(password.codeUnits, salt, security: Argon2Security.moderate)`.
+
+### Authenticate a message with a key (HMAC)
+
+A MAC proves a message was not tampered with by anyone who does not know the
+shared key. Attach `.hmac` to any hash:
+
+```dart
+final tag = sha256.hmac.byString('shared-secret-key').string('transfer 100 coins');
+
+// The receiver recomputes the tag and compares it in constant time:
+final valid = tag.isEqual(receivedTag);
+```
+
+> Compare tags with `isEqual()` (constant-time), never with `==` on the hex
+> string — a plain comparison can leak the answer through timing.
+
+### Fast checksum for accidental corruption
+
+Cheap integrity checks against bit-rot and transfer errors — not attackers:
+
+```dart
+crc32code('Happy Hashing!');   // => 3003384410 (an int)
+adler32code('Happy Hashing!'); // another fast, non-secure checksum
+```
+
+### One-time passwords (2FA)
+
+```dart
+final secret = 'my-shared-secret'.codeUnits;
+
+TOTP(secret).value();                  // 6-digit code, rotates every 30 seconds
+HOTP(secret, counter: counter).value(); // counter-based code (counter is bytes)
+```
+
+### Secure random values and UUIDs
+
+```dart
+import 'package:hashlib/codecs.dart'; // for toHex
 import 'package:hashlib/random.dart';
 
-void main() {
-  print('UUID Generation:');
-  print('UUIDv1: ${uuid.v1()}');
-  print('UUIDv3: ${uuid.v3()}');
-  print('UUIDv4: ${uuid.v4()}');
-  print('UUIDv5: ${uuid.v5()}');
-  print('UUIDv6: ${uuid.v6()}');
-  print('UUIDv7: ${uuid.v7()}');
-  print('UUIDv8: ${uuid.v8()}');
-  print('');
-
-  print('Random Generation:');
-  print(randomNumbers(4));
-  print(toHex(randomBytes(16)));
-  print(randomString(32, lower: true, whitelist: '_'.codeUnits));
-  print('');
-}
+randomBytes(16);          // 16 cryptographically-secure bytes (great for a salt)
+toHex(randomBytes(16));   // the same, as a hex string
+randomString(32);         // a random text token
+uuid.v4();                // a random UUID (v1/v3/v5/v6/v7/v8 also available)
 ```
-
-<!-- file: example/random_example.dart -->
 
 ## Benchmarks
 
