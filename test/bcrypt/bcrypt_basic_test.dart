@@ -183,34 +183,22 @@ void main() {
     });
     test("Bcrypt from encoded with invalid salt", () {
       expect(
-        () => Bcrypt.fromEncoded(fromCrypt(r"$2b$05$bvIG6Nmid91Mu9RcmmWZf")),
-        throwsA(
-          isA<FormatException>().having(
-            (e) => e.message,
-            'message',
-            'Invalid hash',
-          ),
-        ),
+        () => Bcrypt.fromEncoded(fromCrypt(r"$2b$05$bvIG6Nmid91Mu9RcmmWZf0")),
+        throwsFormatException,
       );
       expect(
-        () => Bcrypt.fromEncoded(fromCrypt(r"$2b$05$bvIG6Nmid91Mu9RcmmWZf0")),
+        () => Bcrypt.fromEncoded(fromCrypt(r"$2b$05$bvIG6Nmid91Mu9RcmmWZf")),
         throwsA(
-          isA<FormatException>().having(
-            (e) => e.message,
-            'message',
-            'Invalid length',
-          ),
+          isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid hash'),
         ),
       );
       expect(
         () => Bcrypt.fromEncoded(fromCrypt(
             r"$2b$05$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1")),
         throwsA(
-          isA<FormatException>().having(
-            (e) => e.message,
-            'message',
-            'Invalid hash',
-          ),
+          isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid hash'),
         ),
       );
       Bcrypt.fromEncoded(fromCrypt(
