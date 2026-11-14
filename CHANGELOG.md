@@ -1,3 +1,7 @@
+# 2.4.4
+
+- Migrate away from deprecated dart.library.js conditional imports
+
 # 2.4.3
 
 - Optimize Argon2 on the Web/JS platform by replacing `BigInt` arithmetic in
