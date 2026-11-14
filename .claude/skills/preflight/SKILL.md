@@ -1,7 +1,7 @@
 ---
 name: preflight
 description: Run hashlib's CI gate locally, scoped to the current change — format, analyze, VM tests, plus node/integration/pana when the diff warrants them. Use before committing, when asked to "check", "verify", "preflight", or "is this ready", and as the final step of any code change.
-argument-hint: "[quick|full]"
+argument-hint: '[quick|full]'
 ---
 
 # Preflight: reproduce CI locally before it bounces
@@ -22,7 +22,7 @@ git diff --name-only HEAD
 Classify the changed files:
 
 - **JS-sensitive** if any changed file: has a `_32bit`/`_64bit` sibling, is a
-  dispatcher (contains `if (dart.library.js)`), lives in `lib/src/random/`,
+  dispatcher (contains `if (dart.library.js_interop)`), lives in `lib/src/random/`,
   or touches `lib/src/core/` conditional exports (`hash_base*.dart`).
 - **Consumer-visible** if `lib/src/hashlib.dart`, any `lib/*.dart` barrel, or
   `pubspec.yaml` changed.

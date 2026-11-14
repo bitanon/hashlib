@@ -1,7 +1,7 @@
 ---
 name: new-algorithm
 description: Implement a new hash/MAC/KDF algorithm in hashlib end-to-end — sink, wrapper, exports, cited test vectors, compare tests, benchmark, README row, changelog. Use when asked to add, implement, or port a hash algorithm, checksum, MAC, or KDF.
-argument-hint: "<algorithm-name> [spec-url]"
+argument-hint: '<algorithm-name> [spec-url]'
 ---
 
 # New algorithm: the full wiring checklist
@@ -56,7 +56,7 @@ Create `lib/src/algorithms/<family>/<name>.dart` (or flat
 pairs, JS-safe), and the dispatcher `<name>.dart` containing only:
 
 ```dart
-export '<name>_64bit.dart' if (dart.library.js) '<name>_32bit.dart';
+export '<name>_64bit.dart' if (dart.library.js_interop) '<name>_32bit.dart';
 ```
 
 Both variants must produce byte-identical output; Phase 3 proves it.
@@ -137,7 +137,7 @@ Then register it everywhere:
   `// ignore: library_annotations` + `@Tags(['vm-only'])`, comparing over
   random inputs of lengths 0–99 (copy `compare_md5_test.dart`).
 - If 64-bit twins exist: the KAT map runs on all platforms (do NOT tag it
-  vm-only unless it needs dart:io) — that is exactly what proves the _32bit
+  vm-only unless it needs dart:io) — that is exactly what proves the \_32bit
   variant. Run `dart test -p node test/<name>_test.dart` and confirm the
   tests executed rather than skipped.
 
@@ -151,11 +151,10 @@ Then register it everywhere:
   Wire it into `benchmark/benchmark.dart` only if at least one comparison
   package exists. Do NOT regenerate BENCHMARK.md.
 - `README.md`: add a row to the matching Features table —
-  `| \`<name>\` | \`<name>sum\` | [<SPEC-NAME>](<spec-url>) |` — keeping the
+  `| \`<name>\` | \`<name>sum\` | [<SPEC-NAME>](spec-url) |` — keeping the
   table's existing column pattern.
 - `CHANGELOG.md`: bullet under the unreleased/top section in house style,
-  e.g. `- New hash algorithm: \`<name>\` #<issue>` — but do NOT create a new
-  `# X.Y.Z` heading or touch `pubspec.yaml` version; releases are the
+  e.g. `- New hash algorithm: \`<name>\` #<issue>`— but do NOT create a new`# X.Y.Z`heading or touch`pubspec.yaml` version; releases are the
   maintainer's call.
 
 ## Phase 5 — Gate

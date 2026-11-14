@@ -21,7 +21,7 @@ The siblings live at `github.com/bitanon/convertlib` and
 one, locate the checkout first, and if there is none, ask or clone.
 
 Inter-package dependencies are **hosted on pub.dev, never path deps**. Local
-edits to `convertlib` are invisible here until published *and* the caret
+edits to `convertlib` are invisible here until published _and_ the caret
 constraint in `pubspec.yaml` is bumped. See "Cross-repo changes" at the end.
 
 ## Six ground rules (never violate)
@@ -94,20 +94,20 @@ public — the RNG and SHAKE generators instantiate them directly.
 
 Run from the repo root.
 
-| Task                        | Command                                        |
-| --------------------------- | ---------------------------------------------- |
-| Install deps                | `dart pub get`                                 |
-| Format (CI-gating)          | `dart format .` (check: `--output=none --set-exit-if-changed .`) |
-| Analyze (CI-gating)         | `dart analyze --fatal-infos`                   |
-| Tests, default              | `dart test -p vm`                              |
-| One file                    | `dart test -p vm test/sha256_test.dart`        |
-| By name                     | `dart test -p vm -N "pattern"`                 |
-| Web/JS proof                | `dart test -p node` (chrome also configured)   |
-| Consumer smoke test         | `cd test_integration && dart pub get && dart run main.dart` |
-| Coverage                    | `sh scripts/coverage.sh` (needs `sh scripts/globals.sh` once) |
-| Full BENCHMARK.md regen     | `sh scripts/benchmark.sh` — reference hardware only, see mistakes |
-| One algorithm's benchmark   | `dart compile exe benchmark/<algo>.dart -o build/<algo> && ./build/<algo>` |
-| pub.dev score check         | `dart pub global run pana --exit-code-threshold 0` |
+| Task                      | Command                                                                    |
+| ------------------------- | -------------------------------------------------------------------------- |
+| Install deps              | `dart pub get`                                                             |
+| Format (CI-gating)        | `dart format .` (check: `--output=none --set-exit-if-changed .`)           |
+| Analyze (CI-gating)       | `dart analyze --fatal-infos`                                               |
+| Tests, default            | `dart test -p vm`                                                          |
+| One file                  | `dart test -p vm test/sha256_test.dart`                                    |
+| By name                   | `dart test -p vm -N "pattern"`                                             |
+| Web/JS proof              | `dart test -p node` (chrome also configured)                               |
+| Consumer smoke test       | `cd test_integration && dart pub get && dart run main.dart`                |
+| Coverage                  | `sh scripts/coverage.sh` (needs `sh scripts/globals.sh` once)              |
+| Full BENCHMARK.md regen   | `sh scripts/benchmark.sh` — reference hardware only, see mistakes          |
+| One algorithm's benchmark | `dart compile exe benchmark/<algo>.dart -o build/<algo> && ./build/<algo>` |
+| pub.dev score check       | `dart pub global run pana --exit-code-threshold 0`                         |
 
 Default to `-p vm`. Run `-p node` in addition whenever the change touches a
 file with a `_32bit`/`_64bit` twin, a conditional import, `lib/src/random/`,
@@ -155,7 +155,7 @@ that task.
   `StateError` for use-after-close, `UnsupportedError` for platform gaps.
   Never throw strings (`only_throw_errors` lint).
 - **Platform splits** use conditional import/export triads only:
-  `import 'x_64bit.dart' if (dart.library.js) 'x_32bit.dart';` for word size,
+  `import 'x_64bit.dart' if (dart.library.js_interop) 'x_32bit.dart';` for word size,
   `export 'stub.dart' if (dart.library.io) 'io.dart';` for dart:io. Never
   import `dart:io` directly in shared code.
 - **Lints**: `analysis_options.yaml` = `package:lints/recommended` + extras
@@ -187,7 +187,7 @@ that task.
 - **Commits**: imperative, capitalized, no trailing period, backticks around
   identifiers, issue refs appended as `#NN`. Examples from history:
   `Refactor \`HashDigest\` class to extend \`ByteCollector\``,
-  `CRC with different polynomials #33`.
+`CRC with different polynomials #33`.
 - **CHANGELOG.md**: newest at top, heading `# X.Y.Z` (H1, no "v", no date),
   `-` bullets, imperative and capitalized, identifiers/filenames in
   backticks, nested sub-bullets indented 2 spaces. Breaking changes get a
@@ -204,93 +204,93 @@ that task.
 
 1. **Writing Dart 3.** You'll reach for records, patterns, or a switch
    expression because your training says they're idiomatic.
-   *Rule: SDK floor is 2.19. `dart analyze --fatal-infos` must pass — it
+   _Rule: SDK floor is 2.19. `dart analyze --fatal-infos` must pass — it
    enforces language version 2.19 — and you must not raise the SDK constraint
-   to make an error go away.*
+   to make an error go away._
 
 2. **Fixing the 64-bit file and calling it done.** SHA-512, Blake2b, Keccak,
    XXH64, XXH3, Argon2, Poly1305 all have `_64bit`/`_32bit` twins; editing
    one silently breaks the other platform, and VM tests won't catch it.
-   *Rule: if the file you touched has a `_32bit` or `_64bit` sibling, make
+   _Rule: if the file you touched has a `_32bit` or `_64bit` sibling, make
    the equivalent change in both, then run `dart test -p vm` AND
    `dart test -p node` before claiming success. Note: their vector tests are
    tagged `vm-only`, so also sanity-check via a compare/round-trip test or a
    quick script on node. Exception: the `_32bit` files of xxh64/xxh3/xxh128
    are intentional stubs that throw `UnimplementedError` — the xxHash-64
    family is unsupported on web by design (`test/xxh_web_test.dart` locks
-   this in).*
+   this in)._
 
 3. **"Improving" a public name.** `stringStraem` is misspelled and
    `test/fixures/` too. You'll want to fix them.
-   *Rule: exported names, signatures, and `$`-methods change only through
+   _Rule: exported names, signatures, and `$`-methods change only through
    `@Deprecated('...')` + replacement + changelog breaking-change entry +
    explicit maintainer approval. Renames of directories/files inside `test/`
-   are cheap but pointless churn — leave them.*
+   are cheap but pointless churn — leave them._
 
 4. **Silencing the analyzer instead of fixing the code.**
-   *Rule: no new `// ignore:` comments. The three sanctioned patterns already
+   _Rule: no new `// ignore:` comments. The three sanctioned patterns already
    in the codebase are: `library_annotations` before `@Tags`,
    `constant_identifier_names` for consts like `hmac_sha256`, and
    `deprecated_member_use_from_same_package` inside `registry.dart`. Anything
-   else means fix the underlying issue.*
+   else means fix the underlying issue._
 
 5. **Breaking const-ness.** Adding a non-final field or computed getter to a
    wrapper class breaks `const sha256 = _SHA256();` and every downstream
    const expression.
-   *Rule: wrapper classes stay const-constructible; new configuration goes
-   into constructor parameters stored in final fields.*
+   _Rule: wrapper classes stay const-constructible; new configuration goes
+   into constructor parameters stored in final fields._
 
 6. **Testing with invented vectors.** A hash that matches its own test proves
    nothing.
-   *Rule: every known-answer test cites an official source (RFC, FIPS, NIST
+   _Rule: every known-answer test cites an official source (RFC, FIPS, NIST
    CAVP, the reference implementation's repo) in a comment. If you cannot
    find official vectors, generate them with an independent implementation
    (e.g. Python's hashlib/cryptography, openssl) and record the exact command
-   in the test file comment.*
+   in the test file comment._
 
 7. **Editing generated output.** `doc/api/` looks like documentation;
    `coverage/` and `BENCHMARK.md` look like reports to update.
-   *Rule: `doc/`, `coverage/`, `build/` are gitignored machine output —
+   _Rule: `doc/`, `coverage/`, `build/` are gitignored machine output —
    never edit, never commit. `BENCHMARK.md` is tracked but generated: it is
    only regenerated wholesale by `scripts/benchmark.sh` on the maintainer's
    reference machine (Apple M3 Pro). Never commit benchmark numbers from any
-   other machine unless explicitly asked.*
+   other machine unless explicitly asked._
 
 8. **Registry drift.** Adding an algorithm but forgetting one of its
    registration points — or conversely, spending effort on the deprecated
    registry.
-   *Rule: follow the new-algorithm checklist in the quality bar below, in
+   _Rule: follow the new-algorithm checklist in the quality bar below, in
    order. `lib/src/core/registry.dart` is `@Deprecated` and slated for
-   removal: add the entry for completeness, but never build features on it.*
+   removal: add the entry for completeness, but never build features on it._
 
 9. **Assuming the sibling repos are path-linked.** You'll edit
    `convertlib` locally and expect hashlib's tests to see it.
-   *Rule: they won't. Dependencies are hosted. For local experiments you may
+   _Rule: they won't. Dependencies are hosted. For local experiments you may
    add a temporary `dependency_overrides:` with a path — but it must never be
    committed, and the real fix ships via the publish chain (see Cross-repo
-   changes).*
+   changes)._
 
 10. **Skipping, deleting, or loosening a failing test to get green.**
-    *Rule: a failing test is a finding, not an obstacle. Report it with
+    _Rule: a failing test is a finding, not an obstacle. Report it with
     output. Modifying expected vector values is forbidden unless you can cite
-    the official source proving the old value wrong.*
+    the official source proving the old value wrong._
 
 11. **Forgetting the format gate.** CI fails on
     `dart format --set-exit-if-changed`; your hand-written alignment will
     bounce.
-    *Rule: run `dart format .` as the last edit step, every time.*
+    _Rule: run `dart format .` as the last edit step, every time._
 
 12. **Touching CI workflows as a side effect.** `release.yml` publishes to
     pub.dev on tag push; a small "improvement" can ship a broken release
     pipeline.
-    *Rule: `.github/workflows/` changes only when the task is explicitly
-    about CI, and never bundled with code changes.*
+    _Rule: `.github/workflows/` changes only when the task is explicitly
+    about CI, and never bundled with code changes._
 
 13. **Printing secrets or state.** Debug `print()` of keys, seeds, or
     internal state left in library code.
-    *Rule: `lib/` contains no `print` and no logging. Debug output belongs in
+    _Rule: `lib/` contains no `print` and no logging. Debug output belongs in
     tests or scratch scripts only. MAC/digest equality uses the provided
-    `verify()`/`isEqual` helpers, not early-exit byte loops.*
+    `verify()`/`isEqual` helpers, not early-exit byte loops._
 
 ## Quality bar per deliverable
 
@@ -342,7 +342,7 @@ that task.
 ### Performance change
 
 - [ ] Base gate, `-p vm` AND `-p node` (perf work is where web breaks hide)
-- [ ] Before/after numbers from the *same machine, same power state*, using
+- [ ] Before/after numbers from the _same machine, same power state_, using
       the single-algorithm benchmark (`benchmark/<algo>.dart`), quoted in
       your summary; a change without measured improvement is reverted
 - [ ] Output identical to pre-change for the full vector suite (perf work

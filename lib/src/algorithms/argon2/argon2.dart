@@ -4,7 +4,7 @@
 import 'package:convertlib/convertlib.dart';
 import 'package:hashlib/src/core/kdf_base.dart';
 
-import 'argon2_64bit.dart' if (dart.library.js) 'argon2_32bit.dart';
+import 'argon2_64bit.dart' if (dart.library.js_interop) 'argon2_32bit.dart';
 import 'common.dart';
 import 'security.dart';
 
