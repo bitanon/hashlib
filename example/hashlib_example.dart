@@ -1,5 +1,6 @@
 import 'package:hashlib/codecs.dart';
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib/random.dart';
 
 void main() {
   var text = "Happy Hashing!";
@@ -67,4 +68,7 @@ void main() {
   print('TOTP[time=$nw] => ${TOTP(iv).value()}');
   print('HOTP[counter=$nw] => ${HOTP(iv, counter: counter).value()}');
   print('');
+
+  var random = randomString(16, lower: true, upper: true, numeric: true);
+  print('Random => $random');
 }

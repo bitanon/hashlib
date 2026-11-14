@@ -13,10 +13,13 @@ import 'package:hashlib/src/core/hash_base.dart';
 
 import 'generator_vm.dart'
     if (dart.library.html) 'generator_vm.dart'
-    if (dart.library.js_interop) 'generator_js.dart';
+    if (dart.library.js) 'generator_js.dart'
+    if (dart.library.js_interop) 'generator_vm.dart';
+
 export 'generator_vm.dart'
     if (dart.library.html) 'generator_vm.dart'
-    if (dart.library.js_interop) 'generator_js.dart';
+    if (dart.library.js) 'generator_js.dart'
+    if (dart.library.js_interop) 'generator_vm.dart';
 
 const int _mask32 = 0xFFFFFFFF;
 

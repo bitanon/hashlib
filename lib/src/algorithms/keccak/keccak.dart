@@ -1,9 +1,13 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'keccak_64bit.dart' if (dart.library.js_interop) 'keccak_32bit.dart';
+import 'keccak_64bit.dart'
+    if (dart.library.js_interop) 'keccak_32bit.dart'
+    if (dart.library.js) 'keccak_32bit.dart';
 
-export 'keccak_64bit.dart' if (dart.library.js_interop) 'keccak_32bit.dart';
+export 'keccak_64bit.dart'
+    if (dart.library.js_interop) 'keccak_32bit.dart'
+    if (dart.library.js) 'keccak_32bit.dart';
 
 /// Implementation of Keccak-224 that generates a 224-bit hash.
 class Keccak224Hash extends KeccakHash {

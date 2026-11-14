@@ -2,7 +2,8 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'sha2_1024_64bit.dart'
-    if (dart.library.js_interop) 'sha2_1024_32bit.dart';
+    if (dart.library.js_interop) 'sha2_1024_32bit.dart'
+    if (dart.library.js) 'sha2_1024_32bit.dart';
 import 'sha2_512.dart';
 
 /// Implementation of 224-bit hash generator based on 512-bit SHA2.
