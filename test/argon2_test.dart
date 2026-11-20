@@ -139,6 +139,25 @@ void main() {
       expect(argon2.convert('password'.codeUnits).hex(), matcher);
     });
 
+    // Generated with argon2-cffi:
+    // hash_secret_raw(b"password", b"some salt", time_cost=2,
+    //   memory_cost=1024, parallelism=4, hash_len=32, type=Type.ID, version=19).
+    // https://github.com/hynek/argon2-cffi
+    test("argon2id m=1024, t=2, p=4 @ out = 32", () {
+      final argon2 = Argon2(
+        version: Argon2Version.v13,
+        type: Argon2Type.argon2id,
+        hashLength: 32,
+        iterations: 2,
+        parallelism: 4,
+        memorySizeKB: 1024,
+        salt: "some salt".codeUnits,
+      );
+      final matcher =
+          "498853f05db697e14bc7b8b1100e4a2ee918c72f4960b851b21e17f4ec7de227";
+      expect(argon2.convert('password'.codeUnits).hex(), matcher);
+    });
+
     test("encoded hash instance check", () {
       final encoded =
           r"$argon2id$v=19$m=128,t=1,p=4$c29tZSBzYWx0$24VHMpaU5EkkdH5rpdnb5zeOf3Y";

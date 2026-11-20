@@ -41,7 +41,7 @@ class Argon2Internal {
     int pass, slice, lane;
     var hash0 = Uint8List(64 + 8);
     var hash0as32 = Uint32List.view(hash0.buffer);
-    var buffer32 = Uint32List(ctx.blocks << 8);
+    var buffer32 = Uint32List(ctx.blocks * 256);
     var buffer = Uint8List.view(buffer32.buffer);
     var result = Uint8List(ctx.hashLength);
 
@@ -55,7 +55,7 @@ class Argon2Internal {
     for (i = 0; i < ctx.lanes; i++, k += ctx.columns) {
       // B[i][0] = H'^(1024)(H_0 || LE32(0) || LE32(i))
       hash0as32[17] = i;
-      _expandHash(1024, hash0, buffer, k << 10);
+      _expandHash(1024, hash0, buffer, k * 1024);
     }
 
     // Second Lane Blocks
@@ -64,7 +64,7 @@ class Argon2Internal {
     for (i = 0; i < ctx.lanes; i++, k += ctx.columns) {
       // B[i][1] = H'^(1024)(H_0 || LE32(1) || LE32(i))
       hash0as32[17] = i;
-      _expandHash(1024, hash0, buffer, k << 10);
+      _expandHash(1024, hash0, buffer, k * 1024);
     }
 
     // Further block generation
@@ -79,10 +79,10 @@ class Argon2Internal {
     // Finalization
     /* XOR the blocks */
     j = ctx.columns - 1;
-    var block = Uint8List.view(buffer.buffer, j << 10, 1024);
+    var block = Uint8List.view(buffer.buffer, j * 1024, 1024);
     for (k = 1; k < ctx.lanes; ++k) {
       j += ctx.columns;
-      p = j << 10;
+      p = j * 1024;
       for (i = 0; i < 1024; ++i, ++p) {
         block[i] ^= buffer[p];
       }
@@ -193,8 +193,8 @@ class Argon2Internal {
       _temp[_input + 3] = 0;
       _temp[_input + 4] = slice;
       _temp[_input + 5] = 0;
-      _temp[_input + 6] = ctx.blocks;
-      _temp[_input + 7] = ctx.blocks >>> 32;
+      _temp[_input + 6] = ctx.blocks & _mask32;
+      _temp[_input + 7] = ctx.blocks ~/ 0x100000000;
       _temp[_input + 8] = ctx.passes;
       _temp[_input + 9] = 0;
       _temp[_input + 10] = ctx.type.index;
@@ -239,11 +239,11 @@ class Argon2Internal {
           _fillBlock(_temp, prev: _zero, ref: _input, next: _address);
           _fillBlock(_temp, prev: _zero, ref: _address, next: _address);
         }
-        rand0 = _temp[_address + (j << 1)];
-        rand1 = _temp[_address + (j << 1) + 1];
+        rand0 = _temp[_address + (j * 2)];
+        rand1 = _temp[_address + (j * 2) + 1];
       } else {
-        rand0 = buffer[previous << 8];
-        rand1 = buffer[(previous << 8) + 1];
+        rand0 = buffer[previous * 256];
+        rand1 = buffer[(previous * 256) + 1];
       }
 
       /* 1.2.2 Computing the lane of the reference block */
@@ -267,9 +267,9 @@ class Argon2Internal {
       /* 2 Creating a new block */
       _fillBlock(
         buffer,
-        next: current << 8,
-        prev: previous << 8,
-        ref: (refLane * ctx.columns + refIndex) << 8,
+        next: current * 256,
+        prev: previous * 256,
+        ref: (refLane * ctx.columns + refIndex) * 256,
         /* 1.2.1 v10 and earlier: overwrite, not XOR */
         xor: ctx.version != Argon2Version.v10 && pass > 0,
       );
@@ -304,22 +304,22 @@ class Argon2Internal {
     for (i = j = 0; i < 8; i++, j += 16) {
       _blake2bMixer(
         _blockR,
-        (j) << 1,
-        (j + 1) << 1,
-        (j + 2) << 1,
-        (j + 3) << 1,
-        (j + 4) << 1,
-        (j + 5) << 1,
-        (j + 6) << 1,
-        (j + 7) << 1,
-        (j + 8) << 1,
-        (j + 9) << 1,
-        (j + 10) << 1,
-        (j + 11) << 1,
-        (j + 12) << 1,
-        (j + 13) << 1,
-        (j + 14) << 1,
-        (j + 15) << 1,
+        j * 2,
+        (j + 1) * 2,
+        (j + 2) * 2,
+        (j + 3) * 2,
+        (j + 4) * 2,
+        (j + 5) * 2,
+        (j + 6) * 2,
+        (j + 7) * 2,
+        (j + 8) * 2,
+        (j + 9) * 2,
+        (j + 10) * 2,
+        (j + 11) * 2,
+        (j + 12) * 2,
+        (j + 13) * 2,
+        (j + 14) * 2,
+        (j + 15) * 2,
       );
     }
 
@@ -328,22 +328,22 @@ class Argon2Internal {
     for (i = j = 0; i < 8; i++, j += 2) {
       _blake2bMixer(
         _blockR,
-        (j) << 1,
-        (j + 1) << 1,
-        (j + 16) << 1,
-        (j + 17) << 1,
-        (j + 32) << 1,
-        (j + 33) << 1,
-        (j + 48) << 1,
-        (j + 49) << 1,
-        (j + 64) << 1,
-        (j + 65) << 1,
-        (j + 80) << 1,
-        (j + 81) << 1,
-        (j + 96) << 1,
-        (j + 97) << 1,
-        (j + 112) << 1,
-        (j + 113) << 1,
+        j * 2,
+        (j + 1) * 2,
+        (j + 16) * 2,
+        (j + 17) * 2,
+        (j + 32) * 2,
+        (j + 33) * 2,
+        (j + 48) * 2,
+        (j + 49) * 2,
+        (j + 64) * 2,
+        (j + 65) * 2,
+        (j + 80) * 2,
+        (j + 81) * 2,
+        (j + 96) * 2,
+        (j + 97) * 2,
+        (j + 112) * 2,
+        (j + 113) * 2,
       );
     }
 
@@ -402,22 +402,23 @@ class Argon2Internal {
   static void _increment(Uint32List v, int i) {
     if (v[i] == _mask32) {
       v[i] = 0;
-      v[i + 1]++;
+      v[i + 1] = (v[i + 1] + 1) & _mask32;
     } else {
-      v[i]++;
+      v[i] = (v[i] + 1) & _mask32;
     }
   }
 
   /// `((x * y) mod 2^64) >> 32`
   static int _multiplyAndGetMSB(int x, int y) {
-    int lx, hx, ly, hy;
+    x &= _mask32;
+    y &= _mask32;
+    int lx = x & _mask16, hx = x >>> 16;
+    int ly = y & _mask16, hy = y >>> 16;
+    int low = lx * ly;
+    int cross = lx * hy + hx * ly;
+    int lower = low + (cross % 0x10000) * 0x10000;
 
-    hx = (x >>> 16) & _mask16;
-    lx = x & _mask16;
-    hy = (y >>> 16) & _mask16;
-    ly = y & _mask16;
-
-    return ((hy * hx) + ((lx * hy + hx * ly) >>> 16)) & _mask32;
+    return (hx * hy + cross ~/ 0x10000 + lower ~/ 0x100000000) & _mask32;
   }
 
   /// `v[x] += v[y] + 2 * ((v[x] & _mask32) * (v[y] & _mask32))`
@@ -445,12 +446,13 @@ class Argon2Internal {
     int dLo = pLo * 2;
     int dHi = pHi * 2 + dLo ~/ 0x100000000;
     dLo %= 0x100000000;
+    dHi %= 0x100000000;
 
     // v[x] = (xl,xh) + (yl,yh) + (dLo,dHi) (mod 2^64).
     int sumLo = xl + yl + dLo;
     int sumHi = xh + yh + dHi + sumLo ~/ 0x100000000;
-    v[x] = sumLo; // Uint32List store truncates to the low 32 bits
-    v[x + 1] = sumHi;
+    v[x] = sumLo & _mask32;
+    v[x + 1] = sumHi & _mask32;
   }
 
   // v[k] = (v[i] << (64 - n)) | (v[i] >>> n)
@@ -461,11 +463,11 @@ class Argon2Internal {
       v[k + 1] = b;
       v[k] = a;
     } else if (n < 32) {
-      v[k + 1] = (b << (32 - n)) | (a >>> n);
-      v[k] = (a << (32 - n)) | (b >>> n);
+      v[k + 1] = ((b << (32 - n)) | (a >>> n)) & _mask32;
+      v[k] = ((a << (32 - n)) | (b >>> n)) & _mask32;
     } else {
-      v[k + 1] = (a << (64 - n)) | (b >>> (n - 32));
-      v[k] = (b << (64 - n)) | (a >>> (n - 32));
+      v[k + 1] = ((a << (64 - n)) | (b >>> (n - 32))) & _mask32;
+      v[k] = ((b << (64 - n)) | (a >>> (n - 32))) & _mask32;
     }
   }
 

@@ -1,3 +1,7 @@
+# 2.4.4
+
+- Fixes Argon2 32bit implementation for dart2js #38
+
 # 2.4.3
 
 - Migrate away from deprecated dart.library.js conditional imports

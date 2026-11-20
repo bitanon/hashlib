@@ -41,7 +41,7 @@ that is its only runtime dependency.
 
 ```yaml
 dependencies:
-  hashlib: ^2.4.2
+  hashlib: ^2.4.4
 ```
 
 or run `dart pub add hashlib`. A single import exposes every algorithm:
@@ -68,14 +68,14 @@ A hash turns any input — text, a file, bytes — into a short, fixed-size
 "fingerprint". Different jobs need different tools. Here is the plain-English
 map:
 
-| Your goal | Reach for | Examples |
-| --------- | --------- | -------- |
-| Fingerprint data, detect changes, build a cache key | a **cryptographic hash** | `sha256`, `blake2b256` |
-| Store a user password safely | a **password KDF** (slow on purpose) | `argon2id`, `bcrypt` |
-| Prove a message came from someone who knows a secret key | a **MAC** | `sha256.hmac`, `poly1305` |
-| Quickly catch accidental corruption (not attackers) | a **checksum** | `crc32`, `adler32` |
-| Generate 2FA / one-time login codes | an **OTP** generator | `TOTP`, `HOTP` |
-| Generate unguessable tokens, IDs, or salts | **secure random** | `randomBytes`, `uuid` |
+| Your goal                                                | Reach for                            | Examples                  |
+| -------------------------------------------------------- | ------------------------------------ | ------------------------- |
+| Fingerprint data, detect changes, build a cache key      | a **cryptographic hash**             | `sha256`, `blake2b256`    |
+| Store a user password safely                             | a **password KDF** (slow on purpose) | `argon2id`, `bcrypt`      |
+| Prove a message came from someone who knows a secret key | a **MAC**                            | `sha256.hmac`, `poly1305` |
+| Quickly catch accidental corruption (not attackers)      | a **checksum**                       | `crc32`, `adler32`        |
+| Generate 2FA / one-time login codes                      | an **OTP** generator                 | `TOTP`, `HOTP`            |
+| Generate unguessable tokens, IDs, or salts               | **secure random**                    | `randomBytes`, `uuid`     |
 
 Three rules of thumb if you are new to this:
 
